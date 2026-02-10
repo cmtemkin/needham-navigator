@@ -1,0 +1,49 @@
+{
+  "name": "needham-navigator",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "ingest": "tsx scripts/ingest.ts",
+    "crawl": "tsx scripts/crawl.ts",
+    "monitor": "tsx scripts/monitor.ts"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^3.0.26",
+    "@mendable/firecrawl-js": "^4.12.1",
+    "@supabase/supabase-js": "^2.95.3",
+    "ai": "^6.0.78",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "crypto-js": "^4.2.0",
+    "lucide-react": "^0.563.0",
+    "next": "14.2.35",
+    "openai": "^6.20.0",
+    "pdf-parse": "^2.4.5",
+    "react": "^18",
+    "react-dom": "^18",
+    "tailwind-merge": "^3.4.0",
+    "tailwindcss-animate": "^1.0.7"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20",
+    "@types/pdf-parse": "^1.1.5",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.35",
+    "jest": "^30.2.0",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "ts-jest": "^29.4.6",
+    "tsx": "^4.21.0",
+    "typescript": "^5"
+  }
+}

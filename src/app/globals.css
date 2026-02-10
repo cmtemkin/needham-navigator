@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Needham Navigator brand tokens (Section 9.2) */
+    --primary: #003F87;
+    --primary-light: #0052B0;
+    --primary-dark: #002D62;
+    --accent: #D4AF37;
+    --accent-light: #F0E2A0;
+    --bg: #FFFFFF;
+    --surface: #F7F8FA;
+    --surface-hover: #EEF0F4;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5A6070;
+    --text-muted: #9CA3AF;
+    --border: #E2E5EB;
+    --border-light: #EFF1F5;
+    --success: #059669;
+    --warning: #D97706;
+
+    /* shadcn/ui CSS variables */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 10%;
+    --card: 220 20% 98%;
+    --card-foreground: 0 0% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 0 0% 10%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --input: 220 13% 91%;
+    --ring: 213 100% 26%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border-light;
+    box-sizing: border-box;
+  }
+  body {
+    @apply bg-surface text-text-primary antialiased;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+}
+
+/* Hide scrollbar for horizontal scroll containers */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
