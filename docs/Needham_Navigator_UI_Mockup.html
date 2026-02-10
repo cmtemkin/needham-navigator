@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Needham Navigator — Interactive UI Mockup</title>
+<style>
+  :root {
+    --primary: #003F87;
+    --primary-light: #0052B0;
+    --primary-dark: #002D62;
+    --accent: #D4AF37;
+    --accent-light: #F0E2A0;
+    --bg: #FFFFFF;
+    --surface: #F7F8FA;
+    --surface-hover: #EEF0F4;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5A6070;
+    --text-muted: #9CA3AF;
+    --border: #E2E5EB;
+    --border-light: #EFF1F5;
+    --success: #059669;
+    --warning: #D97706;
+    --radius: 12px;
+    --radius-lg: 16px;
+    --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.10);
+    --shadow-xl: 0 16px 48px rgba(0,0,0,0.12);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: var(--text-primary);
+    background: var(--surface);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* ========== MOCKUP BANNER ========== */
+  .mockup-banner {
+    background: var(--accent);
+    color: var(--primary-dark);
+    text-align: center;
+    padding: 7px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  /* ========== HEADER ========== */
+  .header {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border-light);
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    box-shadow: var(--shadow-xs);
+  }
+  .header-inner {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 24px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo-group {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    cursor: pointer;
+  }
+  .logo-icon {
+    width: 34px;
+    height: 34px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 800;
+    font-size: 15px;
+  }
+  .logo-text {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: -0.3px;
+  }
+  .logo-tag {
+    font-size: 10.5px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .header-btn {
+    padding: 7px 14px;
+    border: none;
+    background: none;
+    color: var(--text-secondary);
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .header-btn:hover { background: var(--surface); color: var(--text-primary); }
+  .header-btn-primary {
+    background: var(--primary);
+    color: white;
+    font-weight: 600;
+  }
+  .header-btn-primary:hover { background: var(--primary-light); color: white; }
+
+  /* ========== VIEWS ========== */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ========== LANDING PAGE ========== */
+  .hero {
+    background: linear-gradient(170deg, var(--primary) 0%, var(--primary-dark) 60%, #001A3D 100%);
+    padding: 56px 24px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 50%, rgba(212,175,55,0.08) 0%, transparent 50%),
+                radial-gradient(circle at 70% 30%, rgba(255,255,255,0.04) 0%, transparent 40%);
+    pointer-events: none;
+  }
+  .hero-content { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.85);
+    font-weight: 500;
+    margin-bottom: 20px;
+    backdrop-filter: blur(8px);
+  }
+  .hero-badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse-dot 2s infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .hero h1 {
+    font-size: 34px;
+    font-weight: 800;
+    color: white;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    margin-bottom: 12px;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero-subtitle {
+    font-size: 16px;
+    color: rgba(255,255,255,0.72);
+    line-height: 1.6;
+    max-width: 480px;
+    margin: 0 auto 28px;
+  }
+
+  /* Hero Search Bar */
+  .hero-search {
+    max-width: 560px;
+    margin: 0 auto;
+  }
+  .hero-search-bar {
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 14px;
+    padding: 5px 5px 5px 18px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.1);
+    transition: box-shadow 0.2s;
+  }
+  .hero-search-bar:focus-within {
+    box-shadow: 0 4px 24px rgba(0,0,0,0.2), 0 0 0 2px var(--accent);
+  }
+  .hero-search-icon {
+    color: var(--text-muted);
+    flex-shrink: 0;
+    margin-right: 10px;
+  }
+  .hero-search-input {
+    flex: 1;
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 15px;
+    color: var(--text-primary);
+    padding: 12px 0;
+  }
+  .hero-search-input::placeholder { color: #B0B5C0; }
+  .hero-search-submit {
+    padding: 11px 20px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .hero-search-submit:hover { background: var(--primary-light); }
+  .hero-hint {
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  /* ========== QUICK PROMPTS SECTION ========== */
+  .prompts-section {
+    max-width: 1120px;
+    margin: -28px auto 0;
+    padding: 0 24px;
+    position: relative;
+    z-index: 10;
+  }
+  .prompts-row {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+  }
+  .prompts-row::-webkit-scrollbar { display: none; }
+  .prompt-pill {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 16px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    font-size: 13px;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.15s;
+    box-shadow: var(--shadow-sm);
+    white-space: nowrap;
+    font-weight: 500;
+  }
+  .prompt-pill:hover {
+    border-color: var(--primary);
+    background: #F0F4FA;
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+  .prompt-pill-icon { font-size: 15px; }
+
+  /* ========== LIFE SITUATION TILES ========== */
+  .tiles-section {
+    max-width: 1120px;
+    margin: 32px auto 0;
+    padding: 0 24px;
+  }
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+  }
+  .section-subtitle {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+  .tiles-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+  .tile {
+    background: white;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 22px 20px 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .tile:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+  .tile-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: 14px;
+  }
+  .tile-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 5px;
+    letter-spacing: -0.1px;
+  }
+  .tile-desc {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+  .tile-prompts {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .tile-prompt {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--primary);
+    cursor: pointer;
+    padding: 5px 8px;
+    border-radius: 6px;
+    transition: background 0.1s;
+    font-weight: 500;
+  }
+  .tile-prompt:hover { background: #EBF0F8; }
+  .tile-prompt-arrow {
+    font-size: 10px;
+    opacity: 0;
+    transition: opacity 0.15s, transform 0.15s;
+    transform: translateX(-4px);
+  }
+  .tile-prompt:hover .tile-prompt-arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* ========== POPULAR QUESTIONS ========== */
+  .popular-section {
+    max-width: 1120px;
+    margin: 36px auto 0;
+    padding: 0 24px;
+  }
+  .popular-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .popular-card {
+    background: white;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .popular-card:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
+  }
+  .popular-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary);
+    flex-shrink: 0;
+  }
+  .popular-text {
+    font-size: 13.5px;
+    color: var(--text-primary);
+    line-height: 1.45;
+    font-weight: 500;
+  }
+  .popular-category {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  /* ========== DEPARTMENT QUICK ACCESS ========== */
+  .depts-section {
+    max-width: 1120px;
+    margin: 36px auto 0;
+    padding: 0 24px;
+  }
+  .depts-row {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+  .depts-row::-webkit-scrollbar { display: none; }
+  .dept-chip {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: white;
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    box-shadow: var(--shadow-xs);
+  }
+  .dept-chip:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-sm);
+  }
+  .dept-chip-icon { font-size: 16px; }
+  .dept-chip-name { font-size: 13px; font-weight: 600; color: var(--text-primary); white-space: nowrap; }
+  .dept-chip-phone { font-size: 11.5px; color: var(--text-muted); white-space: nowrap; }
+
+  /* ========== FOOTER ========== */
+  .page-footer {
+    max-width: 1120px;
+    margin: 40px auto 0;
+    padding: 24px 24px 32px;
+    text-align: center;
+    border-top: 1px solid var(--border-light);
+  }
+  .page-footer p {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .page-footer a { color: var(--primary); text-decoration: none; }
+  .page-footer a:hover { text-decoration: underline; }
+
+  /* ========== CHAT VIEW ========== */
+  .chat-view {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 60px);
+  }
+  .chat-back-bar {
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+  }
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .back-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .chat-messages {
+    flex: 1;
+    padding: 0 24px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+  }
+
+  /* Chat context header */
+  .chat-context {
+    text-align: center;
+    padding: 16px 24px 8px;
+  }
+  .chat-context-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: #EBF0F8;
+    border-radius: 20px;
+    font-size: 12.5px;
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  /* Messages */
+  .msg { display: flex; gap: 10px; max-width: 100%; animation: msgIn 0.3s ease; }
+  .msg.user { justify-content: flex-end; }
+  .msg.ai { justify-content: flex-start; }
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .msg-bubble {
+    max-width: 80%;
+    padding: 14px 18px;
+    border-radius: 16px;
+    font-size: 14.5px;
+    line-height: 1.65;
+  }
+  .msg.user .msg-bubble {
+    background: var(--primary);
+    color: white;
+    border-bottom-right-radius: 6px;
+  }
+  .msg.ai .msg-bubble {
+    background: white;
+    border: 1px solid var(--border-light);
+    border-bottom-left-radius: 6px;
+    color: var(--text-primary);
+    box-shadow: var(--shadow-xs);
+  }
+  .ai-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    font-weight: 800;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* Source citations in chat */
+  .source-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+  }
+  .source-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 11.5px;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+  .source-chip:hover { border-color: var(--primary); background: #EBF0F8; }
+  .source-chip .src-icon { font-size: 10px; }
+
+  /* Confidence badge */
+  .confidence {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 10px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .confidence.high { background: #ECFDF5; color: var(--success); }
+  .confidence.medium { background: #FFFBEB; color: var(--warning); }
+  .confidence-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  /* Follow-up suggestions */
+  .followups {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 14px;
+  }
+  .followup-btn {
+    padding: 7px 14px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+  .followup-btn:hover { border-color: var(--primary); color: var(--primary); background: #F5F8FC; }
+
+  /* Chat input */
+  .chat-input-area {
+    padding: 12px 24px 20px;
+    background: var(--surface);
+    position: sticky;
+    bottom: 0;
+  }
+  .chat-input-wrap {
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 4px 4px 4px 16px;
+    transition: all 0.2s;
+    box-shadow: var(--shadow-sm);
+  }
+  .chat-input-wrap:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0,63,135,0.08), var(--shadow-sm);
+  }
+  .chat-input {
+    flex: 1;
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 14.5px;
+    color: var(--text-primary);
+    padding: 11px 0;
+    font-family: inherit;
+  }
+  .chat-input::placeholder { color: #B8BCC8; }
+  .send-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: none;
+    background: var(--primary);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+  .send-btn:hover { background: var(--primary-light); }
+  .disclaimer-text {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 8px;
+    line-height: 1.4;
+  }
+
+  /* Typing indicator */
+  .typing-dots { display: inline-flex; gap: 4px; align-items: center; padding: 4px 0; }
+  .typing-dots span {
+    width: 6px; height: 6px;
+    background: var(--text-muted);
+    border-radius: 50%;
+    animation: blink 1.4s infinite both;
+  }
+  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink { 0%, 80%, 100% { opacity: 0.3; } 40% { opacity: 1; } }
+
+  /* Suggested prompts inside chat */
+  .chat-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 4px 0 8px;
+    justify-content: center;
+  }
+  .chat-suggestion-btn {
+    padding: 9px 16px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    font-size: 13px;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+  .chat-suggestion-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: #F5F8FC;
+    transform: translateY(-1px);
+  }
+
+  /* ========== MOBILE ========== */
+  @media (max-width: 900px) {
+    .tiles-grid { grid-template-columns: repeat(2, 1fr); }
+    .popular-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .hero { padding: 40px 16px 36px; }
+    .hero h1 { font-size: 26px; }
+    .hero-subtitle { font-size: 14px; }
+    .tiles-grid { grid-template-columns: 1fr; }
+    .tiles-section, .popular-section, .prompts-section, .depts-section { padding: 0 16px; }
+    .header-actions { display: none; }
+    .chat-messages { padding: 0 16px 16px; }
+    .chat-input-area { padding: 12px 16px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="mockup-banner">UI MOCKUP — Needham Navigator v2 — Interactive Prototype</div>
+
+<!-- ========== HEADER ========== -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo-group" onclick="showLanding()">
+      <div class="logo-icon">N</div>
+      <div>
+        <div class="logo-text">Needham Navigator</div>
+        <div class="logo-tag">Your AI Town Guide</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="header-btn" onclick="showLanding()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
+      </button>
+      <button class="header-btn header-btn-primary" onclick="openChat()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Ask a Question
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ========== LANDING VIEW ========== -->
+<div class="view active" id="landingView">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        AI-Powered &middot; Always Up to Date
+      </div>
+      <h1>Your guide to everything <span>Needham</span></h1>
+      <p class="hero-subtitle">Ask questions about town services, permits, schools, zoning, and more. Get instant answers with official sources.</p>
+      <div class="hero-search">
+        <div class="hero-search-bar">
+          <svg class="hero-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="hero-search-input" type="text" placeholder="Try: &quot;What permits do I need for a deck?&quot;" id="heroInput">
+          <button class="hero-search-submit" onclick="submitHeroSearch()">Ask Navigator</button>
+        </div>
+        <p class="hero-hint">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          Powered by AI &middot; Sourced from official Needham documents
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Prompts Row -->
+  <section class="prompts-section">
+    <div class="prompts-row">
+      <div class="prompt-pill" onclick="askQuestion('When is the transfer station open?')">
+        <span class="prompt-pill-icon">&#x267B;&#xFE0F;</span> Transfer station hours
+      </div>
+      <div class="prompt-pill" onclick="askQuestion('How do I pay my property tax bill?')">
+        <span class="prompt-pill-icon">&#x1F4B0;</span> Pay my tax bill
+      </div>
+      <div class="prompt-pill" onclick="askQuestion('How do I register to vote in Needham?')">
+        <span class="prompt-pill-icon">&#x1F5F3;&#xFE0F;</span> Register to vote
+      </div>
+      <div class="prompt-pill" onclick="askQuestion('What are the school enrollment deadlines?')">
+        <span class="prompt-pill-icon">&#x1F3EB;</span> School enrollment
+      </div>
+      <div class="prompt-pill" onclick="askQuestion('When is the next Town Meeting?')">
+        <span class="prompt-pill-icon">&#x1F3DB;&#xFE0F;</span> Town Meeting dates
+      </div>
+      <div class="prompt-pill" onclick="askQuestion('What is the snow parking ban policy?')">
+        <span class="prompt-pill-icon">&#x2744;&#xFE0F;</span> Snow parking ban
+      </div>
+      <div class="prompt-pill" onclick="askQuestion('How do I get a dog license?')">
+        <span class="prompt-pill-icon">&#x1F436;</span> Dog license
+      </div>
+      <div class="prompt-pill" onclick="askQuestion('What are the library hours?')">
+        <span class="prompt-pill-icon">&#x1F4DA;</span> Library hours
+      </div>
+    </div>
+  </section>
+
+  <!-- Life Situation Tiles -->
+  <section class="tiles-section">
+    <div class="section-header">
+      <h2 class="section-title">What can we help you with?</h2>
+      <span class="section-subtitle">Click a topic or question to start chatting</span>
+    </div>
+    <div class="tiles-grid">
+
+      <div class="tile" onclick="askQuestion('What permits do I need to build a deck?')">
+        <div class="tile-icon" style="background: #EBF5FF;">&#x1F3E0;</div>
+        <div class="tile-title">Home &amp; Property</div>
+        <div class="tile-desc">Building permits, zoning rules, property taxes, and home renovations</div>
+        <div class="tile-prompts">
+          <div class="tile-prompt" onclick="event.stopPropagation(); askQuestion('What setback requirements apply to the SRB zoning district?')">
+            <span>Zoning setback rules</span>
+            <span class="tile-prompt-arrow">&rarr;</span>
+          </div>
+          <div class="tile-prompt" onclick="event.stopPropagation(); askQuestion('How do I apply for a building permit in Needham?')">
+            <span>Apply for a building permit</span>
+            <span class="tile-prompt-arrow">&rarr;</span>
+          </div>
+          <div class="tile-prompt" onclick="event.stopPropagation(); askQuestion('How is my property tax calculated?')">
+            <span>Property tax info</span>
+            <span class="tile-prompt-arrow">&rarr;</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tile" onclick="askQuestion('How do I enroll my child in Needham public schools?')">
+        <div class="tile-icon" style="background: #F0FDF4;">&#x1F393;</div>
+        <div class="tile-title">Schools &amp; Education</div>
+        <div class="tile-desc">Enrollment, school calendar, bus routes, and special education services</div>
+        <div class="tile-prompts">
+          <div class="tile-prompt" onclick="event.stopPropagation(); askQuestion('What are the Needham public school start times?')">
+            <span>School start times</span>
+            <span class="tile-prompt-arrow">&rarr;</span>
+          </div>
+          <div class="tile-prompt" onclick="event.stopPropagation(); askQuestion('How do school bus routes work in Needham?')">
+            <span>Bus route info</span>
+            <span class="tile-prompt-arrow">&rarr;</span>
+          </div>
+          <div class="tile-prompt" onclick="event.stopPropagation(); askQuestion('What special education services are available?')">
+            <span>Special education</span>
+            <span class="tile-prompt-arrow">&rarr;</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tile" onclick="askQuestion('What days and hours is the transfer station open?')">
+        <div class="tile-icon" style="background: #FEF9C3;">&#x267B;&#xFE0F;</div>
+        <div class="tile-title">Trash &amp; Recycling</div>
+        <div class="tile-desc">Transfer station, recycling rules, yard waste, and hazardous materials</div>
+        <div class="tile-prompts">
+          <div class="tile-prompt" onclick="event.stopPropagation(); askQuestion('What items can I recycle in Needham?')">
+            <span>What can I recycle?</span>
+            <span class="tile-prompt-arrow">&rarr;</span>
+          </div>
+          <div class="tile-prompt" onclick="event.stopPropagation(); askQuestion('How do I get a transfer station sticker?')">
+            <span>Get a sticker</span>
+            <span class="tile-prompt-arrow">&rarr;</span>
+          </div>
+          <div class="tile-prompt" onclick="event.stopPropagation(); askQuestion('When is the next hazardous waste collection day?')">
+            <span>Hazardous waste day</span>
+            <span class="tile-prompt-arrow">&rarr;</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tile" onclick="askQuestion('What recreation programs are available in Needham?')">
+        <div class="tile-icon" style="background: #FEE2E2;">&#x26BD;</div>
+        <div class="tile-title">Parks &amp; Recreation</div>
+        <div class="tile-desc">Youth sports, programs, park rentals, pools, and community events</div>
+        <div class="tile-prompts">
+          <div class="tile-prompt" onclick="event.stopPropagation(); askQuestion('How do I sign up for youth sports in Needham?')">
+            <span>Youth sports signups</span>
+            <span class="tile-prompt-arrow">&rarr;</span>
+          </div>
+          <div class="tile-prompt" onclick="event.stopPropagation(); askQuestion('How do I reserve a park or field in Needham?')">
+            <span>Reserve a field</span>
+            <span class="tile-prompt-arrow">&rarr;</span>
+          </div>
+          <div class="tile-prompt" onclick="event.stopPropagation(); askQuestion('When does the Rosemary Pool open for the season?')">
+            <span>Pool schedule</span>
+            <span class="tile-prompt-arrow">&rarr;</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tile" onclick="askQuestion('How do I get to Boston from Needham by public transit?')">
+        <div class="tile-icon" style="background: #EDE9FE;">&#x1F68A;</div>
+        <div class="tile-title">Getting Around</div>
+        <div class="tile-desc">Commuter rail, bus routes, parking, and transportation services</div>
+        <div class="tile-prompts">
+          <div class="tile-prompt" onclick="event.stopPropagation(); askQuestion('What are the MBTA commuter rail times for Needham?')">
+            <span>Commuter rail times</span>
+            <span class="tile-prompt-arrow">&rarr;</span>
+          </div>
+          <div class="tile-prompt" onclick="event.stopPropagation(); askQuestion('Where can I find public parking in Needham Center?')">
+            <span>Parking in town center</span>
+            <span class="tile-prompt-arrow">&rarr;</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tile" onclick="askQuestion('How do I register to vote in Needham?')">
+        <div class="tile-icon" style="background: #FFF1F2;">&#x1F3DB;&#xFE0F;</div>
+        <div class="tile-title">Town Government</div>
+        <div class="tile-desc">Elections, Town Meeting, committees, budgets, and civic participation</div>
+        <div class="tile-prompts">
+          <div class="tile-prompt" onclick="event.stopPropagation(); askQuestion('When is the next Town Meeting and how do I attend?')">
+            <span>Town Meeting info</span>
+            <span class="tile-prompt-arrow">&rarr;</span>
+          </div>
+          <div class="tile-prompt" onclick="event.stopPropagation(); askQuestion('What is the current Needham town budget?')">
+            <span>Town budget</span>
+            <span class="tile-prompt-arrow">&rarr;</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tile" onclick="askQuestion('What emergency numbers should I know in Needham?')">
+        <div class="tile-icon" style="background: #FEF3C7;">&#x1F6A8;</div>
+        <div class="tile-title">Safety &amp; Emergencies</div>
+        <div class="tile-desc">Police, fire, emergency alerts, and public safety resources</div>
+        <div class="tile-prompts">
+          <div class="tile-prompt" onclick="event.stopPropagation(); askQuestion('How do I sign up for Needham emergency alerts?')">
+            <span>Emergency alerts</span>
+            <span class="tile-prompt-arrow">&rarr;</span>
+          </div>
+          <div class="tile-prompt" onclick="event.stopPropagation(); askQuestion('How do I file a police report in Needham?')">
+            <span>File a police report</span>
+            <span class="tile-prompt-arrow">&rarr;</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tile" onclick="askQuestion('I just moved to Needham. What do I need to know?')">
+        <div class="tile-icon" style="background: #DBEAFE;">&#x1F4E6;</div>
+        <div class="tile-title">New to Needham</div>
+        <div class="tile-desc">Moving checklist, utilities, registrations, and getting settled</div>
+        <div class="tile-prompts">
+          <div class="tile-prompt" onclick="event.stopPropagation(); askQuestion('How do I set up water and sewer service in Needham?')">
+            <span>Set up utilities</span>
+            <span class="tile-prompt-arrow">&rarr;</span>
+          </div>
+          <div class="tile-prompt" onclick="event.stopPropagation(); askQuestion('How do I get a library card in Needham?')">
+            <span>Get a library card</span>
+            <span class="tile-prompt-arrow">&rarr;</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Popular Questions -->
+  <section class="popular-section">
+    <div class="section-header">
+      <h2 class="section-title">Most asked questions</h2>
+    </div>
+    <div class="popular-grid">
+      <div class="popular-card" onclick="askQuestion('When is the transfer station open and where is it located?')">
+        <div class="popular-num">1</div>
+        <div>
+          <div class="popular-text">When is the transfer station open?</div>
+          <div class="popular-category">Trash &amp; Recycling</div>
+        </div>
+      </div>
+      <div class="popular-card" onclick="askQuestion('What permits do I need to renovate my kitchen?')">
+        <div class="popular-num">2</div>
+        <div>
+          <div class="popular-text">What permits do I need for a renovation?</div>
+          <div class="popular-category">Home &amp; Property</div>
+        </div>
+      </div>
+      <div class="popular-card" onclick="askQuestion('How do I pay my property tax bill online?')">
+        <div class="popular-num">3</div>
+        <div>
+          <div class="popular-text">How do I pay my property tax?</div>
+          <div class="popular-category">Town Government</div>
+        </div>
+      </div>
+      <div class="popular-card" onclick="askQuestion('When does school start in the fall?')">
+        <div class="popular-num">4</div>
+        <div>
+          <div class="popular-text">When does school start?</div>
+          <div class="popular-category">Schools</div>
+        </div>
+      </div>
+      <div class="popular-card" onclick="askQuestion('Is there a snow parking ban in effect?')">
+        <div class="popular-num">5</div>
+        <div>
+          <div class="popular-text">Is there a snow parking ban?</div>
+          <div class="popular-category">Getting Around</div>
+        </div>
+      </div>
+      <div class="popular-card" onclick="askQuestion('How do I register my dog in Needham?')">
+        <div class="popular-num">6</div>
+        <div>
+          <div class="popular-text">How do I register my dog?</div>
+          <div class="popular-category">Town Services</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Department Quick Access -->
+  <section class="depts-section">
+    <div class="section-header">
+      <h2 class="section-title">Departments</h2>
+      <span class="section-subtitle">Click to ask about a department</span>
+    </div>
+    <div class="depts-row">
+      <div class="dept-chip" onclick="askQuestion('What services does Needham Town Hall provide and what are the hours?')">
+        <span class="dept-chip-icon">&#x1F3E2;</span>
+        <div>
+          <div class="dept-chip-name">Town Hall</div>
+          <div class="dept-chip-phone">(781) 455-7500</div>
+        </div>
+      </div>
+      <div class="dept-chip" onclick="askQuestion('How do I contact the Needham Building Department and what do they handle?')">
+        <span class="dept-chip-icon">&#x1F3D7;&#xFE0F;</span>
+        <div>
+          <div class="dept-chip-name">Building Dept.</div>
+          <div class="dept-chip-phone">(781) 455-7550</div>
+        </div>
+      </div>
+      <div class="dept-chip" onclick="askQuestion('What does the Needham Planning Department handle?')">
+        <span class="dept-chip-icon">&#x1F4D0;</span>
+        <div>
+          <div class="dept-chip-name">Planning &amp; Dev.</div>
+          <div class="dept-chip-phone">(781) 455-7550</div>
+        </div>
+      </div>
+      <div class="dept-chip" onclick="askQuestion('What services does Needham Public Works provide?')">
+        <span class="dept-chip-icon">&#x1F6E0;&#xFE0F;</span>
+        <div>
+          <div class="dept-chip-name">Public Works</div>
+          <div class="dept-chip-phone">(781) 455-7550</div>
+        </div>
+      </div>
+      <div class="dept-chip" onclick="askQuestion('How do I contact Needham police for a non-emergency?')">
+        <span class="dept-chip-icon">&#x1F46E;</span>
+        <div>
+          <div class="dept-chip-name">Police</div>
+          <div class="dept-chip-phone">(781) 455-7570</div>
+        </div>
+      </div>
+      <div class="dept-chip" onclick="askQuestion('How do I contact the Needham Fire Department?')">
+        <span class="dept-chip-icon">&#x1F692;</span>
+        <div>
+          <div class="dept-chip-name">Fire Dept.</div>
+          <div class="dept-chip-phone">(781) 455-7580</div>
+        </div>
+      </div>
+      <div class="dept-chip" onclick="askQuestion('What programs does Needham Parks and Recreation offer?')">
+        <span class="dept-chip-icon">&#x1F3BE;</span>
+        <div>
+          <div class="dept-chip-name">Parks &amp; Rec</div>
+          <div class="dept-chip-phone">(781) 455-7550</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="page-footer">
+    <p>Needham Navigator is an independent community tool. Not affiliated with, endorsed by, or operated by the Town of Needham. AI responses may contain errors. Always verify with official sources at <a href="#">needhamma.gov</a> or call (781) 455-7500. <a href="#">Terms</a> &middot; <a href="#">Privacy</a></p>
+  </footer>
+</div>
+
+<!-- ========== CHAT VIEW ========== -->
+<div class="view" id="chatView">
+  <div class="chat-view">
+    <div class="chat-back-bar">
+      <button class="back-btn" onclick="showLanding()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Home
+      </button>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+      <!-- Messages will be injected here -->
+    </div>
+
+    <div class="chat-input-area">
+      <div class="chat-input-wrap">
+        <input class="chat-input" id="chatInput" type="text" placeholder="Ask anything about Needham..." onkeydown="if(event.key==='Enter')sendMessage()">
+        <button class="send-btn" onclick="sendMessage()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
+      </div>
+      <p class="disclaimer-text">AI-generated responses may be inaccurate. Always verify with official sources. Not affiliated with the Town of Needham.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ========== STATE ==========
+  let chatHistory = [];
+  let currentContext = '';
+
+  // ========== SAMPLE RESPONSES (for interactive demo) ==========
+  const sampleResponses = {
+    'default': {
+      text: `<p>I'd be happy to help you with that! Let me look through the official Needham town records to find the most accurate information.</p><br><p>While this is a prototype demo, in the real Needham Navigator I would search through official town documents, zoning by-laws, and department records to give you a detailed, sourced answer.</p>`,
+      sources: ['Town of Needham Official Records'],
+      confidence: 'high',
+      followups: ['Tell me more about this topic', 'What department handles this?', 'What forms do I need?']
+    },
+    'transfer station': {
+      text: `<p>The <strong>Needham Transfer Station &amp; Recycling Center</strong> is located at <strong>1421 Central Avenue</strong>.</p><br><p><strong>Hours of operation:</strong></p><p>&#x2022; Wednesday: 7:30 AM – 3:30 PM<br>&#x2022; Saturday: 7:30 AM – 3:30 PM<br>&#x2022; Sunday: 12:00 PM – 3:30 PM</p><br><p><strong>Important note:</strong> Needham does not have curbside trash pickup. All residents must bring their trash and recycling to the Transfer Station. You'll need a valid <strong>Transfer Station sticker</strong> on your vehicle, which can be purchased at Town Hall or online.</p><br><p><strong>Cost:</strong> The annual sticker fee is based on vehicle type (typically $200-$365/year for residential).</p>`,
+      sources: ['Needham DPW Transfer Station Page', 'Town Fee Schedule 2024'],
+      confidence: 'high',
+      followups: ['How do I get a transfer station sticker?', 'What items can I recycle?', 'Where do I dispose of electronics?']
+    },
+    'permit': {
+      text: `<p>For most home improvement projects in Needham, you'll need a <strong>Building Permit</strong> from the Building Department.</p><br><p><strong>How to apply:</strong></p><p>&#x2022; Submit electronically via <strong>ViewPoint Cloud</strong> at needhamma.viewpointcloud.com</p><br><p><strong>Required documents typically include:</strong></p><p>&#x2022; Plot plan (stamped by registered land surveyor)<br>&#x2022; Building plans (stamped and signed)<br>&#x2022; Workers' Compensation affidavit<br>&#x2022; Debris Removal Form</p><br><p><strong>Fees:</strong> $10 per $1,000 of estimated construction cost (minimum $150 for residential).</p><br><p>The <strong>Building Department</strong> is at 500 Dedham Avenue. Hours: M/W/Th 7:30-5, Tue 7:30-6, Fri 7:30-12:30.</p>`,
+      sources: ['Building & Construction Permits Guide', 'Permit Fee Schedule', 'ViewPoint Cloud Portal'],
+      confidence: 'high',
+      followups: ['How long does the permit process take?', 'Do I need a permit for a fence?', 'What inspections are required?']
+    },
+    'tax': {
+      text: `<p>You can pay your Needham property tax bill in several ways:</p><br><p><strong>Online:</strong> Visit the Town of Needham payment portal at needhamma.gov and navigate to "Pay Bills Online." You can pay by credit card or ACH bank transfer.</p><br><p><strong>By mail:</strong> Send a check to the Town of Needham Tax Collector, 1471 Highland Avenue, Needham, MA 02492.</p><br><p><strong>In person:</strong> Visit Town Hall at 1471 Highland Avenue during business hours (M-F, 8:30 AM - 5:00 PM).</p><br><p><strong>Tax bills</strong> are issued quarterly. The FY2024 residential tax rate is approximately $11.33 per $1,000 of assessed value.</p>`,
+      sources: ['Tax Collector Page - needhamma.gov', 'FY2024 Tax Rate Classification'],
+      confidence: 'high',
+      followups: ['When are tax bills due?', 'How do I apply for a tax exemption?', 'What is my property assessed at?']
+    },
+    'school': {
+      text: `<p>To enroll your child in <strong>Needham Public Schools</strong>:</p><br><p><strong>1. Visit the NPS website</strong> at needham.k12.ma.us and go to "Registration & Enrollment"</p><br><p><strong>2. Required documents:</strong></p><p>&#x2022; Proof of residency (deed, lease, or utility bill)<br>&#x2022; Child's birth certificate<br>&#x2022; Immunization records<br>&#x2022; Previous school records (if transferring)</p><br><p><strong>3. School assignment</strong> is based on your home address. The district has five elementary schools, one middle school (Pollard), and one high school (Needham High).</p><br><p><strong>Kindergarten:</strong> Children must be 5 years old by September 1 of the enrollment year.</p><br><p>Contact the NPS Central Registration office at <strong>(781) 455-0400 ext. 211</strong>.</p>`,
+      sources: ['NPS Registration Page', 'Needham School Committee Policy', 'District Enrollment Guide'],
+      confidence: 'high',
+      followups: ['What are school start times?', 'How do bus routes work?', 'What are the school vacation dates?']
+    },
+    'vote': {
+      text: `<p>To <strong>register to vote</strong> in Needham:</p><br><p><strong>Online:</strong> Visit RegisterToVoteMA.com — the official Massachusetts online voter registration portal. You'll need your MA driver's license or ID number.</p><br><p><strong>By mail:</strong> Download a mail-in registration form from sec.state.ma.us and send it to the Town Clerk.</p><br><p><strong>In person:</strong> Visit the Town Clerk's office at Town Hall, 1471 Highland Avenue. Hours: M-F 8:30 AM – 5:00 PM.</p><br><p><strong>Deadlines:</strong> You must register at least 10 days before an election. Check needhamma.gov/elections for upcoming election dates.</p>`,
+      sources: ['Town Clerk Voter Registration Page', 'MA Secretary of State - Elections Division'],
+      confidence: 'high',
+      followups: ['When is the next election?', 'Where is my polling location?', 'How do I request an absentee ballot?']
+    },
+    'new to needham': {
+      text: `<p>Welcome to Needham! Here's your <strong>new resident checklist</strong>:</p><br><p><strong>Essentials:</strong></p><p>&#x2022; <strong>Transfer Station sticker</strong> — No curbside pickup! Get one at Town Hall or online<br>&#x2022; <strong>Water/Sewer</strong> — Contact DPW at (781) 455-7550 to set up service<br>&#x2022; <strong>Register to vote</strong> — Town Clerk at Town Hall or online at RegisterToVoteMA.com<br>&#x2022; <strong>Dog license</strong> — Required annually, available from the Town Clerk<br>&#x2022; <strong>Library card</strong> — Free at Needham Free Public Library, 1139 Highland Ave</p><br><p><strong>Good to know:</strong></p><p>&#x2022; Needham has an <strong>open Town Meeting</strong> form of government<br>&#x2022; The town has 3 MBTA commuter rail stations (Needham Heights, Needham Center, Needham Junction)<br>&#x2022; Snow parking bans are announced via the town alert system</p>`,
+      sources: ['New Resident Guide - needhamma.gov', 'Town Services Directory'],
+      confidence: 'high',
+      followups: ['How do I sign up for town alerts?', 'What are the best parks in Needham?', 'Where is the nearest grocery store?']
+    },
+    'zoning': {
+      text: `<p>Needham has several <strong>zoning districts</strong>, each with specific dimensional regulations:</p><br><p><strong>Common residential districts:</strong></p><p>&#x2022; <strong>SRA (Single Residence A)</strong> — Min lot: 15,000 sq ft<br>&#x2022; <strong>SRB (Single Residence B)</strong> — Min lot: 20,000 sq ft; setbacks: Front 25', Side 15', Rear 25'<br>&#x2022; <strong>GRA (General Residence A)</strong> — Min lot: 10,000 sq ft</p><br><p>To find your zoning district, you can:</p><p>&#x2022; Check the <strong>Needham Zoning Map</strong> on the town's GIS viewer<br>&#x2022; Call Planning & Community Development at <strong>(781) 455-7550</strong><br>&#x2022; Visit Town Hall with your address</p>`,
+      sources: ['Zoning By-Law Ch.4, §4.1', 'Dimensional Regulations Table', 'Needham GIS Zoning Map'],
+      confidence: 'high',
+      followups: ['What can I build in my zoning district?', 'How do I apply for a variance?', 'What is the lot coverage limit?']
+    }
+  };
+
+  // ========== NAVIGATION ==========
+  function showLanding() {
+    document.getElementById('landingView').classList.add('active');
+    document.getElementById('chatView').classList.remove('active');
+  }
+
+  function showChat() {
+    document.getElementById('landingView').classList.remove('active');
+    document.getElementById('chatView').classList.add('active');
+    setTimeout(() => document.getElementById('chatInput').focus(), 100);
+  }
+
+  function openChat(context) {
+    currentContext = context || '';
+    showChat();
+    if (chatHistory.length === 0) {
+      renderWelcomeChat();
+    }
+  }
+
+  // ========== CHAT FUNCTIONS ==========
+  function renderWelcomeChat() {
+    const container = document.getElementById('chatMessages');
+    container.innerHTML = `
+      <div style="text-align:center; padding: 32px 16px 16px;">
+        <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--primary-light));display:inline-flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:20px;margin-bottom:12px;">N</div>
+        <h3 style="font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:6px;">Hi! I'm Needham Navigator</h3>
+        <p style="font-size:14px;color:var(--text-secondary);max-width:360px;margin:0 auto 20px;line-height:1.5;">Ask me anything about Needham town services, permits, schools, zoning, and more.</p>
+      </div>
+      <div class="chat-suggestions">
+        <button class="chat-suggestion-btn" onclick="askFromChat('What permits do I need for a deck?')">&#x1F3E0; Permits for a deck</button>
+        <button class="chat-suggestion-btn" onclick="askFromChat('When is the transfer station open?')">&#x267B;&#xFE0F; Transfer station hours</button>
+        <button class="chat-suggestion-btn" onclick="askFromChat('How do I enroll my child in school?')">&#x1F393; School enrollment</button>
+        <button class="chat-suggestion-btn" onclick="askFromChat('How do I pay my tax bill?')">&#x1F4B0; Pay my taxes</button>
+        <button class="chat-suggestion-btn" onclick="askFromChat('I just moved to Needham')">&#x1F4E6; New resident guide</button>
+        <button class="chat-suggestion-btn" onclick="askFromChat('What is my zoning district?')">&#x1F4D0; Check my zoning</button>
+      </div>
+    `;
+  }
+
+  function askQuestion(question) {
+    currentContext = '';
+    showChat();
+    chatHistory = [];
+    renderChatHistory();
+    addUserMessage(question);
+    simulateResponse(question);
+  }
+
+  function askFromChat(question) {
+    addUserMessage(question);
+    simulateResponse(question);
+  }
+
+  function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    addUserMessage(text);
+    simulateResponse(text);
+  }
+
+  function submitHeroSearch() {
+    const input = document.getElementById('heroInput');
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    askQuestion(text);
+  }
+
+  // Hero input enter key
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('heroInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') submitHeroSearch();
+    });
+  });
+
+  function addUserMessage(text) {
+    chatHistory.push({ role: 'user', text });
+    renderChatHistory();
+    scrollChatToBottom();
+  }
+
+  function addAIMessage(response) {
+    chatHistory.push({ role: 'ai', ...response });
+    renderChatHistory();
+    scrollChatToBottom();
+  }
+
+  function renderChatHistory() {
+    const container = document.getElementById('chatMessages');
+    let html = '';
+    chatHistory.forEach((msg, i) => {
+      if (msg.role === 'user') {
+        html += `<div class="msg user"><div class="msg-bubble">${escapeHtml(msg.text)}</div></div>`;
+      } else if (msg.role === 'ai') {
+        html += `
+          <div class="msg ai">
+            <div class="ai-avatar">N</div>
+            <div>
+              <div class="msg-bubble">
+                ${msg.text}
+                ${msg.sources ? `<div class="source-chips">${msg.sources.map(s => `<span class="source-chip"><span class="src-icon">&#x1F4C4;</span> ${escapeHtml(s)}</span>`).join('')}</div>` : ''}
+                ${msg.confidence ? `<div class="confidence ${msg.confidence}"><span class="confidence-dot"></span> ${msg.confidence.charAt(0).toUpperCase() + msg.confidence.slice(1)} confidence</div>` : ''}
+                ${msg.followups ? `<div class="followups">${msg.followups.map(f => `<button class="followup-btn" onclick="askFromChat('${escapeAttr(f)}')">${escapeHtml(f)}</button>`).join('')}</div>` : ''}
+              </div>
+            </div>
+          </div>`;
+      } else if (msg.role === 'typing') {
+        html += `
+          <div class="msg ai">
+            <div class="ai-avatar">N</div>
+            <div><div class="msg-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div></div>
+          </div>`;
+      }
+    });
+    container.innerHTML = html;
+  }
+
+  function simulateResponse(question) {
+    // Show typing
+    chatHistory.push({ role: 'typing' });
+    renderChatHistory();
+    scrollChatToBottom();
+
+    // Find best matching response
+    const q = question.toLowerCase();
+    let response = sampleResponses['default'];
+
+    if (q.includes('transfer') || q.includes('trash') || q.includes('recycl') || q.includes('sticker')) {
+      response = sampleResponses['transfer station'];
+    } else if (q.includes('permit') || q.includes('build') || q.includes('deck') || q.includes('renovation') || q.includes('renovate')) {
+      response = sampleResponses['permit'];
+    } else if (q.includes('tax') || q.includes('pay') || q.includes('bill')) {
+      response = sampleResponses['tax'];
+    } else if (q.includes('school') || q.includes('enroll') || q.includes('kindergarten') || q.includes('education')) {
+      response = sampleResponses['school'];
+    } else if (q.includes('vote') || q.includes('election') || q.includes('register to')) {
+      response = sampleResponses['vote'];
+    } else if (q.includes('new to') || q.includes('moved') || q.includes('moving') || q.includes('new resident')) {
+      response = sampleResponses['new to needham'];
+    } else if (q.includes('zone') || q.includes('zoning') || q.includes('setback') || q.includes('srb') || q.includes('sra') || q.includes('lot')) {
+      response = sampleResponses['zoning'];
+    }
+
+    // Remove typing and add response after delay
+    setTimeout(() => {
+      chatHistory = chatHistory.filter(m => m.role !== 'typing');
+      addAIMessage(response);
+    }, 1200 + Math.random() * 800);
+  }
+
+  function scrollChatToBottom() {
+    const container = document.getElementById('chatMessages');
+    setTimeout(() => { container.scrollTop = container.scrollHeight; }, 50);
+  }
+
+  function escapeHtml(str) {
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  function escapeAttr(str) {
+    return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+  }
+</script>
+
+</body>
+</html>

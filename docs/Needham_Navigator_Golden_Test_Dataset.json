@@ -1,0 +1,1143 @@
+[
+  {
+    "id": "ZON-001",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Zoning & Dimensional Regulations",
+    "question": "Can I build a deck in my backyard? What's the setback distance?",
+    "expected_answer_contains": [
+      "deck permitted with setback requirements",
+      "setback distance (typically 10-15 feet depending on zone)",
+      "reference to zoning bylaw or dimensional requirements"
+    ],
+    "expected_source": "Zoning Bylaw or Dimensional Regulations",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Straightforward zoning question about common residential addition"
+  },
+  {
+    "id": "ZON-002",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Zoning & Dimensional Regulations",
+    "question": "What's my lot size minimum and maximum height for structures?",
+    "expected_answer_contains": [
+      "minimum lot size for district",
+      "maximum height (typically 35-45 feet)",
+      "current zoning district identification"
+    ],
+    "expected_source": "Zoning Bylaw, Zoning Map",
+    "expected_confidence": "Medium",
+    "difficulty": "Medium",
+    "notes": "Requires both lot size and height info; may need to identify which zone first"
+  },
+  {
+    "id": "ZON-003",
+    "persona": "David (Real Estate Agent)",
+    "category": "Zoning & Dimensional Regulations",
+    "question": "What zoning district is 42 Great Plain Road in?",
+    "expected_answer_contains": [
+      "specific zoning district (e.g., Residential A, B, or Business)",
+      "address or parcel reference"
+    ],
+    "expected_source": "Zoning Map, Property Records",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Agent needs specific property zoning lookup"
+  },
+  {
+    "id": "ZON-004",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Zoning & Dimensional Regulations",
+    "question": "I want to build an addition. How close to the property line can I get?",
+    "expected_answer_contains": [
+      "side yard setback (typically 15-25 feet)",
+      "rear yard setback (typically 20-30 feet)",
+      "front yard setback (typically 25-40 feet)",
+      "setback varies by zoning district"
+    ],
+    "expected_source": "Zoning Bylaw, Dimensional Regulations",
+    "expected_confidence": "High",
+    "difficulty": "Medium",
+    "notes": "Common question; answer depends on which zone"
+  },
+  {
+    "id": "ZON-005",
+    "persona": "Lisa (Small Business Owner)",
+    "category": "Zoning & Dimensional Regulations",
+    "question": "Can I operate a home-based consulting business from my house?",
+    "expected_answer_contains": [
+      "home occupation permitted with restrictions",
+      "no more than X employees allowed",
+      "no signage or customer traffic impacts",
+      "may require home occupation permit"
+    ],
+    "expected_source": "Zoning Bylaw, Home Occupation Section",
+    "expected_confidence": "Medium",
+    "difficulty": "Medium",
+    "notes": "Conditional use question with restrictions"
+  },
+  {
+    "id": "ZON-006",
+    "persona": "David (Real Estate Agent)",
+    "category": "Zoning & Dimensional Regulations",
+    "question": "What uses are allowed in the Business district?",
+    "expected_answer_contains": [
+      "retail, office permitted",
+      "list of permitted uses",
+      "conditional uses requiring special permit",
+      "prohibited uses"
+    ],
+    "expected_source": "Zoning Bylaw Use Tables",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Standard permitted use lookup"
+  },
+  {
+    "id": "ZON-007",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Zoning & Dimensional Regulations",
+    "question": "I want to put up a fence. Are there height restrictions?",
+    "expected_answer_contains": [
+      "fence height limit (typically 4-6 feet)",
+      "may vary by setback location",
+      "materials requirements if specified"
+    ],
+    "expected_source": "Zoning Bylaw, Fence Regulations",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Very common residential question"
+  },
+  {
+    "id": "ZON-008",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Zoning & Dimensional Regulations",
+    "question": "Can I have a swimming pool? What about a hot tub?",
+    "expected_answer_contains": [
+      "pools allowed with setback requirements",
+      "may require fencing for safety",
+      "permit or building approval needed",
+      "safety and dimensional requirements"
+    ],
+    "expected_source": "Zoning Bylaw, Building Code, Pool/Spa Regulations",
+    "expected_confidence": "Medium",
+    "difficulty": "Medium",
+    "notes": "Involves safety code in addition to zoning"
+  },
+  {
+    "id": "ZON-009",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Zoning & Dimensional Regulations",
+    "question": "What about building a small guest house or ADU on my property?",
+    "expected_answer_contains": [
+      "accessory dwelling units allowed or not",
+      "size restrictions if allowed",
+      "setback and parking requirements",
+      "owner-occupancy requirements if any"
+    ],
+    "expected_source": "Zoning Bylaw, ADU Regulations",
+    "expected_confidence": "Medium",
+    "difficulty": "Hard",
+    "notes": "May require synthesis of multiple zoning provisions"
+  },
+  {
+    "id": "ZON-010",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Zoning & Dimensional Regulations",
+    "question": "Can they build a commercial building near residential areas?",
+    "expected_answer_contains": [
+      "zoning districts separate uses",
+      "buffers or transition zones may exist",
+      "need special permit for certain uses",
+      "dimensional or use restrictions apply"
+    ],
+    "expected_source": "Zoning Bylaw, Zoning Map",
+    "expected_confidence": "Medium",
+    "difficulty": "Hard",
+    "notes": "Broad question about zoning philosophy; may need context"
+  },
+  {
+    "id": "ZON-011",
+    "persona": "David (Real Estate Agent)",
+    "category": "Zoning & Dimensional Regulations",
+    "question": "What's the floor area ratio (FAR) for downtown properties?",
+    "expected_answer_contains": [
+      "specific FAR number or range",
+      "lot coverage percentages",
+      "building height to width ratios if applicable"
+    ],
+    "expected_source": "Zoning Bylaw, Commercial/Downtown Regulations",
+    "expected_confidence": "Medium",
+    "difficulty": "Easy",
+    "notes": "Technical zoning metric; agent audience"
+  },
+  {
+    "id": "PERMIT-001",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Building Permits & Process",
+    "question": "Do I need a permit to build a deck?",
+    "expected_answer_contains": [
+      "building permit required",
+      "electrical/structural permitting process",
+      "where to apply",
+      "typical timeline"
+    ],
+    "expected_source": "Building Department Info, Permit Requirements",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Most basic permit question"
+  },
+  {
+    "id": "PERMIT-002",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Building Permits & Process",
+    "question": "How much does a building permit cost?",
+    "expected_answer_contains": [
+      "permit fee schedule",
+      "calculation method (e.g., per square foot)",
+      "reference to fee schedule or bylaw"
+    ],
+    "expected_source": "Building Department Fee Schedule",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Straightforward fee lookup"
+  },
+  {
+    "id": "PERMIT-003",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Building Permits & Process",
+    "question": "What's the process for getting a building permit? How long does it take?",
+    "expected_answer_contains": [
+      "application submission steps",
+      "required documents (plans, etc.)",
+      "review and approval timeline (typically 3-6 weeks)",
+      "inspection requirements"
+    ],
+    "expected_source": "Building Department Process Guide",
+    "expected_confidence": "High",
+    "difficulty": "Medium",
+    "notes": "Multi-step process explanation needed"
+  },
+  {
+    "id": "PERMIT-004",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Building Permits & Process",
+    "question": "Do I need to hire an architect or engineer for my deck permit?",
+    "expected_answer_contains": [
+      "permit requirements may specify professional certification",
+      "size/complexity thresholds for professional design",
+      "stamp/certification requirements"
+    ],
+    "expected_source": "Building Department Requirements, Building Code",
+    "expected_confidence": "Medium",
+    "difficulty": "Medium",
+    "notes": "Depends on project specifics"
+  },
+  {
+    "id": "PERMIT-005",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Building Permits & Process",
+    "question": "What if my project isn't done yet? Can I get an extension on my permit?",
+    "expected_answer_contains": [
+      "permit validity period (typically 12-24 months)",
+      "extension process and fees",
+      "requirements for permit renewal"
+    ],
+    "expected_source": "Building Department Policy, Building Code",
+    "expected_confidence": "Medium",
+    "difficulty": "Medium",
+    "notes": "Administrative question about permit lifecycle"
+  },
+  {
+    "id": "PERMIT-006",
+    "persona": "Lisa (Small Business Owner)",
+    "category": "Building Permits & Process",
+    "question": "What permits do I need to open a retail store on Main Street?",
+    "expected_answer_contains": [
+      "building/occupancy permit",
+      "health/sanitary permits",
+      "sign permit",
+      "business license",
+      "specific permits by type of business"
+    ],
+    "expected_source": "Building Dept, Health Dept, Business Licensing",
+    "expected_confidence": "Medium",
+    "difficulty": "Hard",
+    "notes": "Multi-department question; needs synthesis"
+  },
+  {
+    "id": "PERMIT-007",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Building Permits & Process",
+    "question": "Do I need a separate electrical permit for my deck addition?",
+    "expected_answer_contains": [
+      "electrical permit required for new circuits or outlets",
+      "licensed electrician may be required",
+      "inspection of electrical work"
+    ],
+    "expected_source": "Building Department, Electrical Code",
+    "expected_confidence": "High",
+    "difficulty": "Medium",
+    "notes": "Depends on scope of electrical work"
+  },
+  {
+    "id": "PERMIT-008",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Building Permits & Process",
+    "question": "What happens if I start work without getting a permit?",
+    "expected_answer_contains": [
+      "penalties and fines",
+      "stop work order may be issued",
+      "may need to bring work into compliance",
+      "legal consequences"
+    ],
+    "expected_source": "Building Code Enforcement, Town Bylaws",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Compliance warning question"
+  },
+  {
+    "id": "TRASH-001",
+    "persona": "James (New Resident)",
+    "category": "Transfer Station / Trash",
+    "question": "When is the transfer station open?",
+    "expected_answer_contains": [
+      "hours of operation (daily or specific days)",
+      "Saturday/Sunday hours if different",
+      "holiday closures"
+    ],
+    "expected_source": "Transfer Station Hours, DPW Information",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Critical information for new residents"
+  },
+  {
+    "id": "TRASH-002",
+    "persona": "James (New Resident)",
+    "category": "Transfer Station / Trash",
+    "question": "Where is the transfer station located?",
+    "expected_answer_contains": [
+      "street address or major intersection",
+      "parking information",
+      "accessibility details"
+    ],
+    "expected_source": "DPW Information, Transfer Station Location",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Critical information for new residents"
+  },
+  {
+    "id": "TRASH-003",
+    "persona": "James (New Resident)",
+    "category": "Transfer Station / Trash",
+    "question": "How much does it cost to use the transfer station?",
+    "expected_answer_contains": [
+      "resident sticker/permit cost if any",
+      "per-visit or per-weight fees if applicable",
+      "free for residents vs. non-residents"
+    ],
+    "expected_source": "Transfer Station Fees, DPW Pricing",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Cost information for budgeting"
+  },
+  {
+    "id": "TRASH-004",
+    "persona": "James (New Resident)",
+    "category": "Transfer Station / Trash",
+    "question": "What items can't I throw away at the transfer station?",
+    "expected_answer_contains": [
+      "hazardous waste restrictions",
+      "e-waste procedures",
+      "bulky items that need separate drop-off",
+      "banned items (tires, batteries, etc.)"
+    ],
+    "expected_source": "Transfer Station Rules, Accepted Materials List",
+    "expected_confidence": "High",
+    "difficulty": "Medium",
+    "notes": "Important for proper disposal"
+  },
+  {
+    "id": "TRASH-005",
+    "persona": "James (New Resident)",
+    "category": "Transfer Station / Trash",
+    "question": "Do I need to separate recyclables or can I put them in the trash?",
+    "expected_answer_contains": [
+      "recycling program details",
+      "accepted recyclables list",
+      "separation requirements",
+      "separate recycling stream or single-stream"
+    ],
+    "expected_source": "Recycling Program, Transfer Station Rules",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Environmental compliance question"
+  },
+  {
+    "id": "TAX-001",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Property Taxes & Assessments",
+    "question": "How much are property taxes in Needham?",
+    "expected_answer_contains": [
+      "current tax rate (per $1,000 assessed value)",
+      "average tax amount for typical home",
+      "how rate is set or reference year"
+    ],
+    "expected_source": "Tax Assessor Info, Tax Rate, Town Budget",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Common question for budgeting"
+  },
+  {
+    "id": "TAX-002",
+    "persona": "David (Real Estate Agent)",
+    "category": "Property Taxes & Assessments",
+    "question": "What's the assessed value of 42 Great Plain Road?",
+    "expected_answer_contains": [
+      "specific assessed value",
+      "parcel ID or address",
+      "assessment date"
+    ],
+    "expected_source": "Property Records, Tax Assessor Database",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Lookup of specific property assessment"
+  },
+  {
+    "id": "TAX-003",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Property Taxes & Assessments",
+    "question": "When are property taxes due?",
+    "expected_answer_contains": [
+      "quarterly or annual due dates",
+      "grace periods if any",
+      "penalty information if late"
+    ],
+    "expected_source": "Tax Collector Info, Due Dates",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Important for payment planning"
+  },
+  {
+    "id": "TAX-004",
+    "persona": "James (New Resident)",
+    "category": "Property Taxes & Assessments",
+    "question": "How do I appeal my property assessment if I think it's too high?",
+    "expected_answer_contains": [
+      "appeal process and deadline",
+      "Board of Assessors contact",
+      "required documentation",
+      "timeline for decision"
+    ],
+    "expected_source": "Tax Assessor, Appeal Process",
+    "expected_confidence": "Medium",
+    "difficulty": "Medium",
+    "notes": "Administrative process explanation"
+  },
+  {
+    "id": "TAX-005",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Property Taxes & Assessments",
+    "question": "What exemptions are available for seniors or disabled residents?",
+    "expected_answer_contains": [
+      "property tax exemption programs",
+      "eligibility criteria",
+      "application process",
+      "percentage or dollar amount of exemption"
+    ],
+    "expected_source": "Tax Assessor, Senior/Disabled Exemptions",
+    "expected_confidence": "Medium",
+    "difficulty": "Medium",
+    "notes": "Important for eligible residents"
+  },
+  {
+    "id": "SCHOOL-001",
+    "persona": "James (New Resident)",
+    "category": "Schools",
+    "question": "What schools are in Needham? Are they good?",
+    "expected_answer_contains": [
+      "list of elementary, middle, high schools",
+      "grades served",
+      "contact information",
+      "optional: school ratings or test scores if available"
+    ],
+    "expected_source": "School Directory, School Information",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Critical for new family with children"
+  },
+  {
+    "id": "SCHOOL-002",
+    "persona": "David (Real Estate Agent)",
+    "category": "Schools",
+    "question": "Which school district does this property fall into?",
+    "expected_answer_contains": [
+      "specific elementary school",
+      "middle school",
+      "high school",
+      "school assignment based on address"
+    ],
+    "expected_source": "School Attendance Boundaries, School Map",
+    "expected_confidence": "High",
+    "difficulty": "Medium",
+    "notes": "Requires mapping address to school zone"
+  },
+  {
+    "id": "SCHOOL-003",
+    "persona": "James (New Resident)",
+    "category": "Schools",
+    "question": "What's the school calendar? When do schools open and close?",
+    "expected_answer_contains": [
+      "first day of school",
+      "last day of school",
+      "vacation/break dates",
+      "school hours if specified"
+    ],
+    "expected_source": "School Calendar",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Important for planning and registration"
+  },
+  {
+    "id": "SCHOOL-004",
+    "persona": "James (New Resident)",
+    "category": "Schools",
+    "question": "How do I register my child for school?",
+    "expected_answer_contains": [
+      "registration process and timeline",
+      "required documents",
+      "registration deadline",
+      "contact person/office"
+    ],
+    "expected_source": "School Registration Info, District Information",
+    "expected_confidence": "Medium",
+    "difficulty": "Medium",
+    "notes": "Administrative process for new families"
+  },
+  {
+    "id": "SCHOOL-005",
+    "persona": "James (New Resident)",
+    "category": "Schools",
+    "question": "What are school lunch costs and do you offer free/reduced lunch?",
+    "expected_answer_contains": [
+      "lunch pricing",
+      "free/reduced lunch programs",
+      "eligibility criteria",
+      "how to apply for assistance"
+    ],
+    "expected_source": "School Lunch Program, District Info",
+    "expected_confidence": "Medium",
+    "difficulty": "Easy",
+    "notes": "Important for family budgeting"
+  },
+  {
+    "id": "TRANS-001",
+    "persona": "James (New Resident)",
+    "category": "Transportation / MBTA",
+    "question": "What MBTA stations are near Needham?",
+    "expected_answer_contains": [
+      "station names (e.g., Needham Junction, Needham Heights)",
+      "what line(s) serve them",
+      "approximate distance from town center"
+    ],
+    "expected_source": "MBTA Information, Needham Transit",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Critical for commuters"
+  },
+  {
+    "id": "TRANS-002",
+    "persona": "James (New Resident)",
+    "category": "Transportation / MBTA",
+    "question": "How do I get to Boston on the MBTA?",
+    "expected_answer_contains": [
+      "MBTA line to use (e.g., D line bus or commuter rail)",
+      "travel time",
+      "frequency of service",
+      "fare information"
+    ],
+    "expected_source": "MBTA Schedule, Route Information",
+    "expected_confidence": "High",
+    "difficulty": "Medium",
+    "notes": "Requires routing information"
+  },
+  {
+    "id": "TRANS-003",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Transportation / MBTA",
+    "question": "Are there local bus routes in Needham?",
+    "expected_answer_contains": [
+      "local shuttle or bus routes if available",
+      "where they go",
+      "frequency and schedule"
+    ],
+    "expected_source": "Local Transit, Town Shuttle Info",
+    "expected_confidence": "Medium",
+    "difficulty": "Easy",
+    "notes": "May not exist in all towns"
+  },
+  {
+    "id": "TRANS-004",
+    "persona": "James (New Resident)",
+    "category": "Transportation / MBTA",
+    "question": "Where can I park for the MBTA station?",
+    "expected_answer_contains": [
+      "parking lot location and capacity",
+      "daily parking rates if charged",
+      "permit vs. hourly parking",
+      "accessibility information"
+    ],
+    "expected_source": "MBTA Station Info, Parking Details",
+    "expected_confidence": "Medium",
+    "difficulty": "Easy",
+    "notes": "Practical question for commuters"
+  },
+  {
+    "id": "SAFETY-001",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Public Safety",
+    "question": "What's the crime rate in Needham?",
+    "expected_answer_contains": [
+      "crime statistics or crime rates",
+      "comparison to state/regional averages if available",
+      "where to report crimes"
+    ],
+    "expected_source": "Police Department, Crime Statistics",
+    "expected_confidence": "Medium",
+    "difficulty": "Easy",
+    "notes": "May have limited data in system"
+  },
+  {
+    "id": "SAFETY-002",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Public Safety",
+    "question": "How do I report a crime or emergency?",
+    "expected_answer_contains": [
+      "call 911 for emergency",
+      "non-emergency police number",
+      "where to file reports"
+    ],
+    "expected_source": "Police Department Contact Info",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Critical safety information"
+  },
+  {
+    "id": "SAFETY-003",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Public Safety",
+    "question": "Does Needham have a fire department? How fast are response times?",
+    "expected_answer_contains": [
+      "fire department presence",
+      "station locations",
+      "response time information if available",
+      "emergency services contact"
+    ],
+    "expected_source": "Fire Department, Emergency Services",
+    "expected_confidence": "Medium",
+    "difficulty": "Easy",
+    "notes": "Community safety question"
+  },
+  {
+    "id": "HEALTH-001",
+    "persona": "Lisa (Small Business Owner)",
+    "category": "Health Department / Food Permits",
+    "question": "What do I need to do to start a food truck or catering business?",
+    "expected_answer_contains": [
+      "health department permits required",
+      "kitchen certification/licensing",
+      "food handler certification",
+      "inspection process"
+    ],
+    "expected_source": "Health Department, Food Service Permits",
+    "expected_confidence": "Medium",
+    "difficulty": "Hard",
+    "notes": "Requires synthesis of multiple regulations"
+  },
+  {
+    "id": "HEALTH-002",
+    "persona": "Lisa (Small Business Owner)",
+    "category": "Health Department / Food Permits",
+    "question": "How often are food establishments inspected?",
+    "expected_answer_contains": [
+      "inspection frequency (e.g., annually, bi-annually)",
+      "what items are checked",
+      "violations and penalties if any"
+    ],
+    "expected_source": "Health Department, Inspection Standards",
+    "expected_confidence": "Medium",
+    "difficulty": "Easy",
+    "notes": "Operational question for food business"
+  },
+  {
+    "id": "HEALTH-003",
+    "persona": "Lisa (Small Business Owner)",
+    "category": "Health Department / Food Permits",
+    "question": "Where do I get a food service establishment license?",
+    "expected_answer_contains": [
+      "health department location/contact",
+      "application process",
+      "required documentation",
+      "fee information"
+    ],
+    "expected_source": "Health Department Contact, Licensing Process",
+    "expected_confidence": "Medium",
+    "difficulty": "Easy",
+    "notes": "Administrative process question"
+  },
+  {
+    "id": "HEALTH-004",
+    "persona": "James (New Resident)",
+    "category": "Health Department / Food Permits",
+    "question": "How do I register with the health department?",
+    "expected_answer_contains": [
+      "health department contact information",
+      "what registrations are needed",
+      "where to find services"
+    ],
+    "expected_source": "Health Department, Local Services",
+    "expected_confidence": "Medium",
+    "difficulty": "Easy",
+    "notes": "General resident question"
+  },
+  {
+    "id": "PARK-001",
+    "persona": "James (New Resident)",
+    "category": "Parks & Recreation",
+    "question": "What parks and recreation areas does Needham have?",
+    "expected_answer_contains": [
+      "list of parks by name",
+      "what activities available at each",
+      "locations/addresses"
+    ],
+    "expected_source": "Parks & Recreation Department, Park List",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Critical for new families"
+  },
+  {
+    "id": "PARK-002",
+    "persona": "James (New Resident)",
+    "category": "Parks & Recreation",
+    "question": "Do you have a swimming pool or beach?",
+    "expected_answer_contains": [
+      "public pool or beach availability",
+      "hours of operation",
+      "membership/admission costs",
+      "seasonal dates if applicable"
+    ],
+    "expected_source": "Parks & Recreation, Pool/Beach Info",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Popular question in summer"
+  },
+  {
+    "id": "PARK-003",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Parks & Recreation",
+    "question": "What recreational programs and classes are offered?",
+    "expected_answer_contains": [
+      "types of programs (youth sports, adult fitness, etc.)",
+      "seasons offered",
+      "registration process",
+      "cost information"
+    ],
+    "expected_source": "Parks & Recreation Programs, Registration",
+    "expected_confidence": "Medium",
+    "difficulty": "Medium",
+    "notes": "Requires program information"
+  },
+  {
+    "id": "GOV-001",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Town Meetings & Government",
+    "question": "When is the next town meeting?",
+    "expected_answer_contains": [
+      "date and time of next meeting",
+      "location",
+      "how to get agenda",
+      "how to participate"
+    ],
+    "expected_source": "Town Meeting Schedule, Board of Selectmen",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Critical civic engagement question"
+  },
+  {
+    "id": "GOV-002",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Town Meetings & Government",
+    "question": "How do I contact my town selectmen or town council?",
+    "expected_answer_contains": [
+      "contact information for selectmen",
+      "office location",
+      "office hours",
+      "methods to reach out (phone, email)"
+    ],
+    "expected_source": "Board of Selectmen Contact Info",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Essential civic information"
+  },
+  {
+    "id": "GOV-003",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Town Meetings & Government",
+    "question": "How is the town budget developed and approved?",
+    "expected_answer_contains": [
+      "budget process timeline",
+      "who develops the budget",
+      "town meeting vote requirement",
+      "when budgets are available for review"
+    ],
+    "expected_source": "Budget Process, Finance Department",
+    "expected_confidence": "Medium",
+    "difficulty": "Hard",
+    "notes": "Requires understanding of governance process"
+  },
+  {
+    "id": "GOV-004",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Town Meetings & Government",
+    "question": "What committees or boards can I join as a volunteer?",
+    "expected_answer_contains": [
+      "list of available boards/committees",
+      "what they do",
+      "how to apply or express interest",
+      "meeting schedules"
+    ],
+    "expected_source": "Town Boards & Committees List, Volunteer Info",
+    "expected_confidence": "Medium",
+    "difficulty": "Medium",
+    "notes": "Important for civic engagement"
+  },
+  {
+    "id": "GOV-005",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Town Meetings & Government",
+    "question": "How do I find out about local zoning or planning hearings?",
+    "expected_answer_contains": [
+      "where public hearings are posted",
+      "planning board/zoning board meetings",
+      "how to get notice of hearings",
+      "how to participate"
+    ],
+    "expected_source": "Planning Board, Zoning Board Info",
+    "expected_confidence": "Medium",
+    "difficulty": "Medium",
+    "notes": "Important for residents concerned about development"
+  },
+  {
+    "id": "GENERAL-001",
+    "persona": "James (New Resident)",
+    "category": "General 'Where Do I...' Questions",
+    "question": "Where do I get a library card?",
+    "expected_answer_contains": [
+      "library location(s)",
+      "registration/library card process",
+      "hours of operation",
+      "services available"
+    ],
+    "expected_source": "Library Information, Town Services",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Common new resident question"
+  },
+  {
+    "id": "GENERAL-002",
+    "persona": "James (New Resident)",
+    "category": "General 'Where Do I...' Questions",
+    "question": "Where can I get a resident parking permit?",
+    "expected_answer_contains": [
+      "which departments issue permits",
+      "where to go or how to apply",
+      "required documents",
+      "cost and renewal information"
+    ],
+    "expected_source": "Parking Services, Town Clerk",
+    "expected_confidence": "Medium",
+    "difficulty": "Easy",
+    "notes": "Practical question for residents"
+  },
+  {
+    "id": "GENERAL-003",
+    "persona": "James (New Resident)",
+    "category": "General 'Where Do I...' Questions",
+    "question": "Where is the town hall and what departments are there?",
+    "expected_answer_contains": [
+      "town hall address",
+      "departments and their locations",
+      "hours of operation",
+      "phone numbers for main desk"
+    ],
+    "expected_source": "Town Hall Directory, Contact Information",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Critical navigation for new residents"
+  },
+  {
+    "id": "GENERAL-004",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "General 'Where Do I...' Questions",
+    "question": "How do I file a complaint about a code violation?",
+    "expected_answer_contains": [
+      "code enforcement office location",
+      "complaint process",
+      "what violations they handle",
+      "timeline for response"
+    ],
+    "expected_source": "Code Enforcement, Complaint Procedures",
+    "expected_confidence": "Medium",
+    "difficulty": "Medium",
+    "notes": "Important for civic engagement/code compliance"
+  },
+  {
+    "id": "GENERAL-005",
+    "persona": "James (New Resident)",
+    "category": "General 'Where Do I...' Questions",
+    "question": "Where do I register to vote?",
+    "expected_answer_contains": [
+      "voter registration office location",
+      "registration deadline before elections",
+      "required documentation",
+      "online vs. in-person registration options"
+    ],
+    "expected_source": "Town Clerk, Voter Registration",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Critical civic information"
+  },
+  {
+    "id": "VAGUE-001",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Vague Questions",
+    "question": "I want to do something to my house but I'm not sure what yet. What do I need to know?",
+    "expected_answer_contains": [
+      "mention of permits process",
+      "zoning considerations",
+      "suggestion to speak with building department",
+      "reference to scope affecting requirements"
+    ],
+    "expected_source": "Building Department General Info",
+    "expected_confidence": "Low",
+    "difficulty": "Hard",
+    "notes": "Deliberately vague; system should ask clarifying questions or provide general guidance"
+  },
+  {
+    "id": "VAGUE-002",
+    "persona": "Lisa (Small Business Owner)",
+    "category": "Vague Questions",
+    "question": "What permits do I need to start a business in Needham?",
+    "expected_answer_contains": [
+      "business license",
+      "type-specific permits depend on business",
+      "building permits if applicable",
+      "suggestion to contact specific departments by business type"
+    ],
+    "expected_source": "Business Licensing, Multiple Departments",
+    "expected_confidence": "Medium",
+    "difficulty": "Hard",
+    "notes": "Requires understanding business type; open-ended answer expected"
+  },
+  {
+    "id": "MULTIPART-001",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Multi-Part Questions",
+    "question": "What's my zoning district and what permits will I need to add a second story to my house?",
+    "expected_answer_contains": [
+      "specific zoning district",
+      "setback/height requirements for addition",
+      "building permit required",
+      "may include electrical/plumbing permits",
+      "reference to dimensional and zoning requirements"
+    ],
+    "expected_source": "Zoning Bylaw, Building Department, Zoning Map",
+    "expected_confidence": "Medium",
+    "difficulty": "Hard",
+    "notes": "Two-part question requiring coordination of sources"
+  },
+  {
+    "id": "MULTIPART-002",
+    "persona": "David (Real Estate Agent)",
+    "category": "Multi-Part Questions",
+    "question": "What's the zoning, what schools does this property feed into, and what's the assessed value?",
+    "expected_answer_contains": [
+      "specific zoning district",
+      "elementary, middle, and high school assignments",
+      "assessed value"
+    ],
+    "expected_source": "Zoning Map, School Attendance Boundaries, Tax Assessor",
+    "expected_confidence": "High",
+    "difficulty": "Hard",
+    "notes": "Three separate lookups required; agent needs comprehensive profile"
+  },
+  {
+    "id": "WRONGASSUMP-001",
+    "persona": "James (New Resident)",
+    "category": "Wrong Assumptions",
+    "question": "Where do I put my trash cans on the curb for pickup?",
+    "expected_answer_contains": [
+      "Needham uses transfer station model, not curbside pickup",
+      "direction to transfer station information",
+      "no curbside trash service"
+    ],
+    "expected_source": "Transfer Station Info, DPW Services",
+    "expected_confidence": "High",
+    "difficulty": "Medium",
+    "notes": "Tests ability to correct false assumption gracefully"
+  },
+  {
+    "id": "WRONGASSUMP-002",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Wrong Assumptions",
+    "question": "I don't need a permit for a small deck, right?",
+    "expected_answer_contains": [
+      "all decks require building permits",
+      "even small decks need approval",
+      "reference to building code requirements",
+      "encourage permit application"
+    ],
+    "expected_source": "Building Department Requirements",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Tests ability to correct misconception"
+  },
+  {
+    "id": "MISSING-001",
+    "persona": "David (Real Estate Agent)",
+    "category": "Information System May Not Have",
+    "question": "What are the median home prices in Needham?",
+    "expected_answer_contains": [
+      "graceful explanation that system doesn't track real estate data",
+      "direction to sources (Zillow, MLS, local agents)",
+      "offer to help with other zoning/property info instead"
+    ],
+    "expected_source": "N/A - Out of scope",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "System should acknowledge out-of-scope; don't make up data"
+  },
+  {
+    "id": "MISSING-002",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Information System May Not Have",
+    "question": "What's the detailed budget breakdown for 2024?",
+    "expected_answer_contains": [
+      "direction to town budget or finance office",
+      "may provide general outline if available",
+      "acknowledge if detailed breakdowns not in system"
+    ],
+    "expected_source": "Finance Department, Budget Documents",
+    "expected_confidence": "Medium",
+    "difficulty": "Easy",
+    "notes": "May have high-level info but not detailed budget"
+  },
+  {
+    "id": "CONTEXT-001",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Context-Dependent Follow-up",
+    "question": "I'm building a deck. [System provides info]. Now, do I need electrical permits?",
+    "expected_answer_contains": [
+      "depends on deck design",
+      "no electrical permit if no outlets/lighting",
+      "electrical permit required if adding circuits",
+      "reference to building code"
+    ],
+    "expected_source": "Building Code, Electrical Requirements",
+    "expected_confidence": "Medium",
+    "difficulty": "Medium",
+    "notes": "Assumes prior context about deck project"
+  },
+  {
+    "id": "CONTEXT-002",
+    "persona": "David (Real Estate Agent)",
+    "category": "Context-Dependent Follow-up",
+    "question": "You said it's in zone Residential-A. What other uses are allowed there besides single-family homes?",
+    "expected_answer_contains": [
+      "permitted uses in Residential-A zone",
+      "may include accessory dwellings if allowed",
+      "typical prohibited uses for that zone",
+      "reference to zoning table"
+    ],
+    "expected_source": "Zoning Bylaw Use Tables",
+    "expected_confidence": "High",
+    "difficulty": "Medium",
+    "notes": "Follow-up that references previous answer"
+  },
+  {
+    "id": "OUTOFSCOPE-001",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Out-of-Scope / Graceful Fallback",
+    "question": "How do I get a divorce in Massachusetts?",
+    "expected_answer_contains": [
+      "polite explanation that this is outside municipal scope",
+      "suggestion to consult legal professional or state resources",
+      "offer to help with Needham-specific questions"
+    ],
+    "expected_source": "N/A - Out of Scope",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Test graceful out-of-scope handling"
+  },
+  {
+    "id": "OUTOFSCOPE-002",
+    "persona": "James (New Resident)",
+    "category": "Out-of-Scope / Graceful Fallback",
+    "question": "What's the best restaurant in Needham?",
+    "expected_answer_contains": [
+      "explanation that reviews are subjective and outside scope",
+      "perhaps directory of local restaurants if available",
+      "suggestion to search Google/Yelp",
+      "offer to help with town services instead"
+    ],
+    "expected_source": "N/A - Out of Scope",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Test graceful out-of-scope handling"
+  },
+  {
+    "id": "OUTOFSCOPE-003",
+    "persona": "Lisa (Small Business Owner)",
+    "category": "Out-of-Scope / Graceful Fallback",
+    "question": "Do you have any investment recommendations for my business?",
+    "expected_answer_contains": [
+      "polite explanation that financial advice is outside scope",
+      "suggestion to consult financial advisor or SBA",
+      "offer to help with permits, zoning, town regulations instead"
+    ],
+    "expected_source": "N/A - Out of Scope",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Test graceful out-of-scope handling with clear offer to help with what it CAN do"
+  },
+  {
+    "id": "EDGE-001",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Edge Cases",
+    "question": "What if I already built my deck without a permit? What happens now?",
+    "expected_answer_contains": [
+      "explanation of code enforcement process",
+      "encouragement to come into compliance",
+      "description of inspection and remediation process",
+      "penalties for unpermitted work"
+    ],
+    "expected_source": "Code Enforcement, Building Code",
+    "expected_confidence": "Medium",
+    "difficulty": "Hard",
+    "notes": "Sensitive question about enforcement; test helpful, non-punitive tone"
+  },
+  {
+    "id": "EDGE-002",
+    "persona": "David (Real Estate Agent)",
+    "category": "Edge Cases",
+    "question": "Can this property support a commercial use or is it locked into residential?",
+    "expected_answer_contains": [
+      "reference to current zoning",
+      "special permit possibility if allowed",
+      "variance/change of use requirements",
+      "recommendation to consult planning department"
+    ],
+    "expected_source": "Zoning Bylaw, Variance Process",
+    "expected_confidence": "Medium",
+    "difficulty": "Hard",
+    "notes": "Tests understanding of zone flexibility and legal processes"
+  }
+]
