@@ -43,7 +43,7 @@ export async function GET(request: Request): Promise<Response> {
   const { searchParams } = new URL(request.url);
   const townId = searchParams.get("town")?.trim() || DEFAULT_TOWN_ID;
   try {
-    const supabase = getSupabaseClient();
+    const supabase = getSupabaseClient({ townId });
     const pageSize = 1000;
     let start = 0;
     const countsByType = new Map<string, number>();

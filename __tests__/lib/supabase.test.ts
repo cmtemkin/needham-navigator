@@ -59,7 +59,21 @@ describe("supabase client", () => {
       getSupabaseClient();
       expect(createClient).toHaveBeenCalledWith(
         "https://test.supabase.co",
-        "test-anon-key"
+        "test-anon-key",
+        { global: undefined }
+      );
+    });
+  });
+
+  it("sends x-town-id header for tenant-scoped anon clients", () => {
+    jest.isolateModules(() => {
+      const { createClient } = require("@supabase/supabase-js");
+      const { getSupabaseClient } = require("@/lib/supabase");
+      getSupabaseClient({ townId: "needham" });
+      expect(createClient).toHaveBeenCalledWith(
+        "https://test.supabase.co",
+        "test-anon-key",
+        { global: { headers: { "x-town-id": "needham" } } }
       );
     });
   });
@@ -82,6 +96,15 @@ describe("supabase client", () => {
       const client1 = getSupabaseClient();
       const client2 = getSupabaseClient();
       expect(client1).toBe(client2);
+    });
+  });
+
+  it("returns distinct clients for different towns", () => {
+    jest.isolateModules(() => {
+      const { getSupabaseClient } = require("@/lib/supabase");
+      const needhamClient = getSupabaseClient({ townId: "needham" });
+      const mockTownClient = getSupabaseClient({ townId: "mock-town" });
+      expect(needhamClient).not.toBe(mockTownClient);
     });
   });
 });

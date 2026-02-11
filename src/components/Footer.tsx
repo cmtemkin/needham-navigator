@@ -1,20 +1,41 @@
+"use client";
+
+import { useI18n } from "@/lib/i18n";
+import { useTown } from "@/lib/town-context";
+
 export function Footer() {
+  const town = useTown();
+  const { t } = useI18n();
+  const shortTownName = town.name.replace(/,\s*[A-Z]{2}$/i, "");
+  const appName = `${shortTownName} Navigator`;
+  const townHallPhone = town.departments[0]?.phone ?? "(781) 455-7500";
+  const websiteText = town.website_url.replace(/^https?:\/\//, "");
+
+  const disclaimerText = t("footer.disclaimer", {
+    app_name: appName,
+    town: shortTownName,
+    website: websiteText,
+    phone: townHallPhone,
+  });
+
+  const splitParts = disclaimerText.split(websiteText);
+  const beforeWebsite = splitParts[0] ?? disclaimerText;
+  const afterWebsite = splitParts.slice(1).join(websiteText);
+
   return (
-    <footer className="max-w-content mx-auto mt-10 px-6 py-6 pb-8 text-center border-t border-border-light">
-      <p className="text-[11.5px] text-text-muted leading-relaxed max-w-[600px] mx-auto">
-        Needham Navigator is an independent community tool. Not affiliated with,
-        endorsed by, or operated by the Town of Needham. AI responses may
-        contain errors. Always verify with official sources at{" "}
+    <footer className="mx-auto mt-10 max-w-content border-t border-border-light px-4 py-6 pb-8 text-center sm:px-6">
+      <p className="mx-auto max-w-[720px] text-[11.5px] leading-relaxed text-text-muted">
+        {beforeWebsite}
         <a
-          href="https://needhamma.gov"
+          href={town.website_url}
           target="_blank"
           rel="noopener noreferrer"
           className="text-primary hover:underline"
         >
-          needhamma.gov
-        </a>{" "}
-        or call (781) 455-7500.{" "}
-        <span className="text-text-muted">Terms &middot; Privacy</span>
+          {websiteText}
+        </a>
+        {afterWebsite}
+        <span className="text-text-muted"> {t("footer.terms_privacy")}</span>
       </p>
     </footer>
   );
