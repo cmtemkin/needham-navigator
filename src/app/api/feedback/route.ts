@@ -21,7 +21,7 @@ async function findOrCreateConversationId(options: {
   townId: string;
   sessionId: string;
 }): Promise<string> {
-  const supabase = getSupabaseClient();
+  const supabase = getSupabaseClient({ townId: options.townId });
 
   const { data: existingRows, error: lookupError } = await supabase
     .from("conversations")
@@ -104,7 +104,7 @@ export async function POST(request: Request): Promise<Response> {
       comment: comment || null,
     };
 
-    const supabase = getSupabaseClient();
+    const supabase = getSupabaseClient({ townId });
     const { error } = await supabase.from("feedback").insert(payload);
 
     if (error) {

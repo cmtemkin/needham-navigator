@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Needham Navigator",
   description:
-    "AI-powered municipal information hub for Needham, MA. Get instant answers about town services, zoning, permits, and more.",
+    "AI-powered municipal information hub. Get instant answers about town services, zoning, permits, and more.",
 };
 
 export default function RootLayout({

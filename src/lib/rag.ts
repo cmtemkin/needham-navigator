@@ -1,7 +1,8 @@
 import { generateEmbedding } from "@/lib/embeddings";
 import { getSupabaseClient } from "@/lib/supabase";
+import { DEFAULT_TOWN_ID as DEFAULT_TOWN_ID_FROM_CONFIG } from "@/lib/towns";
 
-export const DEFAULT_TOWN_ID = "needham";
+export const DEFAULT_TOWN_ID = DEFAULT_TOWN_ID_FROM_CONFIG;
 
 const DEFAULT_MATCH_THRESHOLD = 0.7;
 const DEFAULT_MATCH_COUNT = 8;
@@ -217,7 +218,7 @@ export async function retrieveRelevantChunks(
   }
 
   const embedding = await generateEmbedding(trimmedQuery);
-  const supabase = getSupabaseClient();
+  const supabase = getSupabaseClient({ townId });
 
   const { data, error } = await supabase.rpc("match_documents", {
     query_embedding: embedding,
@@ -249,7 +250,7 @@ export async function textSearchChunks(
     return [];
   }
 
-  const supabase = getSupabaseClient();
+  const supabase = getSupabaseClient({ townId });
   const { data, error } = await supabase
     .from("document_chunks")
     .select("id, chunk_text, metadata")

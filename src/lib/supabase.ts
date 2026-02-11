@@ -8,20 +8,31 @@ function getEnvVar(name: string): string {
   return value;
 }
 
+type SupabaseClientOptions = {
+  townId?: string;
+};
+
 /**
  * Supabase client using the anon key (respects RLS policies).
- * Use this for public-facing reads.
+ * The optional x-town-id header lets Postgres policies enforce tenant isolation.
  */
-let anonClient: SupabaseClient | null = null;
+const anonClients = new Map<string, SupabaseClient>();
 
-export function getSupabaseClient(): SupabaseClient {
-  if (!anonClient) {
-    anonClient = createClient(
-      getEnvVar("SUPABASE_URL"),
-      getEnvVar("SUPABASE_ANON_KEY")
-    );
+export function getSupabaseClient(options?: SupabaseClientOptions): SupabaseClient {
+  const normalizedTownId = options?.townId?.trim() ?? "";
+  const cacheKey = normalizedTownId || "__default__";
+
+  const existing = anonClients.get(cacheKey);
+  if (existing) {
+    return existing;
   }
-  return anonClient;
+
+  const headers = normalizedTownId ? { "x-town-id": normalizedTownId } : undefined;
+  const client = createClient(getEnvVar("SUPABASE_URL"), getEnvVar("SUPABASE_ANON_KEY"), {
+    global: headers ? { headers } : undefined,
+  });
+  anonClients.set(cacheKey, client);
+  return client;
 }
 
 /**

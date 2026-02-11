@@ -21,7 +21,11 @@ interface ChatBubbleProps {
 export function ChatBubble({ message, onFollowupClick }: ChatBubbleProps) {
   if (message.role === "typing") {
     return (
-      <div className="flex gap-2.5 justify-start animate-msg-in">
+      <div
+        className="flex gap-2.5 justify-start animate-msg-in"
+        role="status"
+        aria-live="polite"
+      >
         <div className="w-[30px] h-[30px] rounded-full bg-gradient-to-br from-primary to-primary-light flex items-center justify-center text-white text-xs font-extrabold shrink-0 mt-0.5">
           N
         </div>
@@ -35,7 +39,7 @@ export function ChatBubble({ message, onFollowupClick }: ChatBubbleProps) {
   if (message.role === "user") {
     return (
       <div className="flex justify-end animate-msg-in">
-        <div className="max-w-[80%] bg-primary text-white px-[18px] py-3.5 rounded-2xl rounded-br-md text-[14.5px] leading-relaxed">
+        <div className="max-w-[90%] sm:max-w-[80%] bg-primary text-white px-[18px] py-3.5 rounded-2xl rounded-br-md text-[14.5px] leading-relaxed">
           {message.text}
         </div>
       </div>
@@ -49,7 +53,7 @@ export function ChatBubble({ message, onFollowupClick }: ChatBubbleProps) {
         N
       </div>
       <div>
-        <div className="max-w-[80%] bg-white border border-border-light rounded-2xl rounded-bl-md px-[18px] py-3.5 shadow-xs text-[14.5px] text-text-primary leading-relaxed">
+        <div className="max-w-[92%] sm:max-w-[80%] bg-white border border-border-light rounded-2xl rounded-bl-md px-[18px] py-3.5 shadow-xs text-[14.5px] text-text-primary leading-relaxed">
           {/* Render markdown-like text */}
           <div
             className="prose-sm [&_strong]:font-bold [&_p]:mb-2 [&_p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:mb-2 [&_li]:mb-1"
@@ -76,11 +80,11 @@ export function ChatBubble({ message, onFollowupClick }: ChatBubbleProps) {
               {message.followups.map((followup) => (
                 <button
                   key={followup}
-                  onClick={() => onFollowupClick?.(followup)}
-                  className="px-3.5 py-[7px] bg-white border border-border-default rounded-[20px] text-[12.5px] text-text-secondary font-medium hover:border-primary hover:text-primary hover:bg-[#F5F8FC] transition-all cursor-pointer"
-                >
-                  {followup}
-                </button>
+                    onClick={() => onFollowupClick?.(followup)}
+                    className="px-3.5 py-[7px] bg-white border border-border-default rounded-[20px] text-[12.5px] text-text-secondary font-medium hover:border-primary hover:text-primary hover:bg-[#F5F8FC] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  >
+                    {followup}
+                  </button>
               ))}
             </div>
           )}
