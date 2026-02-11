@@ -2,11 +2,11 @@
  * scripts/ingest.ts — Main ingestion orchestrator
  *
  * Coordinates the full pipeline:
- * 1. Crawl needhamma.gov with Firecrawl → markdown pages
- * 2. Download & extract discovered PDFs → text
+ * 1. Crawl needhamma.gov with Firecrawl -> markdown pages
+ * 2. Download & extract discovered PDFs -> text
  * 3. Chunk all content by document type (Section 4)
  * 4. Generate embeddings & upsert into Supabase pgvector
- * 5. Log the ingestion run
+ * 5. Log the ingestion run with structured success/failure counts
  *
  * Usage:
  *   npx tsx scripts/ingest.ts                    # Full ingestion
@@ -20,6 +20,7 @@ import { crawlWebsite, CrawlResult } from "./crawl";
 import { extractPdfs, PdfExtractionResult } from "./extract-pdf";
 import { chunkDocument, Chunk, detectDocumentType } from "./chunk";
 import { embedAndStoreChunks } from "./embed";
+import { IngestionLogger, StageTimer } from "./logger";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -38,6 +39,7 @@ interface IngestOptions {
   limit?: number;
   pdfOnly?: boolean;
   singleUrl?: string;
+  triggeredBy?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -46,7 +48,8 @@ interface IngestOptions {
 
 async function ingestCrawledPages(
   pages: CrawlResult[],
-  townId: string
+  townId: string,
+  stage: StageTimer
 ): Promise<{ chunks: number; errors: number }> {
   const supabase = getSupabaseServiceClient();
   let totalChunks = 0;
@@ -54,7 +57,6 @@ async function ingestCrawledPages(
 
   for (const page of pages) {
     try {
-      // Get or create the document record
       const { data: doc, error: upsertError } = await supabase
         .from("documents")
         .upsert(
@@ -75,23 +77,27 @@ async function ingestCrawledPages(
       if (upsertError || !doc) {
         console.error(`[ingest] Error upserting doc for ${page.url}: ${upsertError?.message}`);
         errors++;
+        stage.recordFailure(1, `Upsert failed for ${page.url}: ${upsertError?.message}`);
         continue;
       }
 
-      // Chunk the page content
       const chunks = chunkDocument(page.markdown, {
         documentId: doc.id,
         documentUrl: page.url,
         documentTitle: page.title,
       });
 
-      // Embed and store chunks
       const result = await embedAndStoreChunks(chunks, doc.id, { townId });
       totalChunks += result.chunksEmbedded;
       errors += result.errors;
+      stage.recordSuccess();
+      if (result.errors > 0) {
+        stage.recordFailure(result.errors, `Embedding errors for ${page.url}`);
+      }
     } catch (err) {
       console.error(`[ingest] Error processing page ${page.url}:`, err);
       errors++;
+      stage.recordFailure(1, `Exception processing ${page.url}`);
     }
   }
 
@@ -100,7 +106,8 @@ async function ingestCrawledPages(
 
 async function ingestPdfs(
   pdfResults: PdfExtractionResult[],
-  townId: string
+  townId: string,
+  stage: StageTimer
 ): Promise<{ chunks: number; errors: number }> {
   const supabase = getSupabaseServiceClient();
   let totalChunks = 0;
@@ -108,7 +115,6 @@ async function ingestPdfs(
 
   for (const pdf of pdfResults) {
     try {
-      // Get the document record (should already exist from extractPdfs)
       const { data: doc } = await supabase
         .from("documents")
         .select("id")
@@ -117,7 +123,6 @@ async function ingestPdfs(
         .single();
 
       if (!doc) {
-        // Create if not exists
         const { data: newDoc, error: insertError } = await supabase
           .from("documents")
           .insert({
@@ -128,10 +133,7 @@ async function ingestPdfs(
             content_hash: pdf.contentHash,
             file_size_bytes: pdf.fileSizeBytes,
             downloaded_at: new Date().toISOString(),
-            metadata: {
-              page_count: pdf.pageCount,
-              extraction_method: pdf.extractionMethod,
-            },
+            metadata: { page_count: pdf.pageCount, extraction_method: pdf.extractionMethod },
           })
           .select("id")
           .single();
@@ -139,32 +141,26 @@ async function ingestPdfs(
         if (insertError || !newDoc) {
           console.error(`[ingest] Error creating doc for ${pdf.url}: ${insertError?.message}`);
           errors++;
+          stage.recordFailure(1, `Insert failed for ${pdf.url}: ${insertError?.message}`);
           continue;
         }
 
-        const chunks = chunkDocument(pdf.text, {
-          documentId: newDoc.id,
-          documentUrl: pdf.url,
-          documentTitle: pdf.title,
-        });
-
+        const chunks = chunkDocument(pdf.text, { documentId: newDoc.id, documentUrl: pdf.url, documentTitle: pdf.title });
         const result = await embedAndStoreChunks(chunks, newDoc.id, { townId });
         totalChunks += result.chunksEmbedded;
         errors += result.errors;
       } else {
-        const chunks = chunkDocument(pdf.text, {
-          documentId: doc.id,
-          documentUrl: pdf.url,
-          documentTitle: pdf.title,
-        });
-
+        const chunks = chunkDocument(pdf.text, { documentId: doc.id, documentUrl: pdf.url, documentTitle: pdf.title });
         const result = await embedAndStoreChunks(chunks, doc.id, { townId });
         totalChunks += result.chunksEmbedded;
         errors += result.errors;
       }
+
+      stage.recordSuccess();
     } catch (err) {
       console.error(`[ingest] Error processing PDF ${pdf.url}:`, err);
       errors++;
+      stage.recordFailure(1, `Exception processing ${pdf.url}`);
     }
   }
 
@@ -175,134 +171,110 @@ async function ingestPdfs(
 // Main
 // ---------------------------------------------------------------------------
 
-export async function runIngestion(
-  options: IngestOptions = {}
-): Promise<IngestResult> {
-  const {
-    townId = "needham",
-    limit = 200,
-    pdfOnly = false,
-    singleUrl,
-  } = options;
+export async function runIngestion(options: IngestOptions = {}): Promise<IngestResult> {
+  const { townId = "needham", limit = 200, pdfOnly = false, singleUrl, triggeredBy = "cli" } = options;
 
-  const startTime = Date.now();
-  const supabase = getSupabaseServiceClient();
+  const logger = new IngestionLogger({ townId, action: "crawl", triggeredBy });
+
   let pagesProcessed = 0;
   let pdfsProcessed = 0;
   let totalChunks = 0;
   let totalErrors = 0;
 
-  console.log("=".repeat(60));
-  console.log(`[ingest] Starting ingestion for town: ${townId}`);
-  console.log("=".repeat(60));
-
-  // Step 1: Crawl website (unless PDF-only or single URL mode)
   let crawlResults: CrawlResult[] = [];
   let allPdfUrls: string[] = [];
 
   if (!pdfOnly && !singleUrl) {
-    console.log("\n--- Step 1: Crawling needhamma.gov ---");
-    crawlResults = await crawlWebsite({ townId, limit });
-    pagesProcessed = crawlResults.length;
-
-    // Collect all discovered PDF URLs
-    allPdfUrls = Array.from(
-      new Set(crawlResults.flatMap((r) => r.pdfUrls))
-    );
-    console.log(`Discovered ${allPdfUrls.length} unique PDF URLs`);
+    const crawlStage = logger.startStage("Crawl");
+    try {
+      crawlResults = await crawlWebsite({ townId, limit });
+      pagesProcessed = crawlResults.length;
+      crawlStage.recordSuccess(crawlResults.length);
+      allPdfUrls = Array.from(new Set(crawlResults.flatMap((r) => r.pdfUrls)));
+      crawlStage.addDetail("pdf_urls_discovered", allPdfUrls.length);
+    } catch (err) {
+      crawlStage.recordFailure(1, `Crawl failed: ${err}`);
+    }
+    logger.addStageResult(crawlStage.finish());
   }
 
-  // Step 2: Handle single URL re-ingestion
   if (singleUrl) {
-    console.log(`\n--- Re-ingesting single URL: ${singleUrl} ---`);
-    if (singleUrl.endsWith(".pdf")) {
-      allPdfUrls = [singleUrl];
-    } else {
-      // Re-crawl just this URL using v2 API
-      const Firecrawl = (await import("@mendable/firecrawl-js")).default;
-      const firecrawl = new Firecrawl({
-        apiKey: process.env.FIRECRAWL_API_KEY!,
-      });
-      const scrapeResult = await firecrawl.scrape(singleUrl, {
-        formats: ["markdown"],
-      });
-      if (scrapeResult.markdown) {
-        const { createHash } = await import("crypto");
-        crawlResults = [
-          {
+    const singleStage = logger.startStage("Single URL Re-ingest");
+    try {
+      if (singleUrl.endsWith(".pdf")) {
+        allPdfUrls = [singleUrl];
+        singleStage.recordSuccess();
+      } else {
+        const Firecrawl = (await import("@mendable/firecrawl-js")).default;
+        const firecrawl = new Firecrawl({ apiKey: process.env.FIRECRAWL_API_KEY! });
+        const scrapeResult = await firecrawl.scrape(singleUrl, { formats: ["markdown"] });
+        if (scrapeResult.markdown) {
+          const { createHash } = await import("crypto");
+          crawlResults = [{
             url: singleUrl,
             title: (scrapeResult.metadata?.title as string) || "Untitled",
             markdown: scrapeResult.markdown,
             sourceType: "html",
-            contentHash: createHash("sha256")
-              .update(scrapeResult.markdown)
-              .digest("hex"),
+            contentHash: createHash("sha256").update(scrapeResult.markdown).digest("hex"),
             fileSizeBytes: Buffer.byteLength(scrapeResult.markdown, "utf-8"),
             pdfUrls: [],
-          },
-        ];
-        pagesProcessed = 1;
+          }];
+          pagesProcessed = 1;
+          singleStage.recordSuccess();
+        } else {
+          singleStage.recordFailure(1, "No markdown returned from scrape");
+        }
       }
+    } catch (err) {
+      singleStage.recordFailure(1, `Single URL re-ingest failed: ${err}`);
     }
+    logger.addStageResult(singleStage.finish());
   }
 
-  // Step 3: Process crawled HTML pages
   if (crawlResults.length > 0) {
-    console.log(`\n--- Step 2: Chunking & embedding ${crawlResults.length} pages ---`);
-    const pageResult = await ingestCrawledPages(crawlResults, townId);
+    const embedPageStage = logger.startStage("Chunk & Embed Pages");
+    const pageResult = await ingestCrawledPages(crawlResults, townId, embedPageStage);
     totalChunks += pageResult.chunks;
     totalErrors += pageResult.errors;
+    embedPageStage.addDetail("total_chunks", pageResult.chunks);
+    logger.addStageResult(embedPageStage.finish());
   }
 
-  // Step 4: Extract and process PDFs
   if (allPdfUrls.length > 0) {
-    console.log(`\n--- Step 3: Extracting ${allPdfUrls.length} PDFs ---`);
-    const pdfResults = await extractPdfs(allPdfUrls, { townId });
-    pdfsProcessed = pdfResults.length;
+    const pdfExtractStage = logger.startStage("PDF Extraction");
+    let pdfResults: PdfExtractionResult[] = [];
+    try {
+      pdfResults = await extractPdfs(allPdfUrls, { townId });
+      pdfsProcessed = pdfResults.length;
+      pdfExtractStage.recordSuccess(pdfResults.length);
+      pdfExtractStage.addDetail("pdf_urls_attempted", allPdfUrls.length);
+      const skipped = allPdfUrls.length - pdfResults.length;
+      if (skipped > 0) pdfExtractStage.recordSkip(skipped, "PDFs failed extraction or were empty");
+    } catch (err) {
+      pdfExtractStage.recordFailure(allPdfUrls.length, `PDF extraction failed: ${err}`);
+    }
+    logger.addStageResult(pdfExtractStage.finish());
 
     if (pdfResults.length > 0) {
-      console.log(`\n--- Step 4: Chunking & embedding ${pdfResults.length} PDFs ---`);
-      const pdfChunkResult = await ingestPdfs(pdfResults, townId);
+      const embedPdfStage = logger.startStage("Chunk & Embed PDFs");
+      const pdfChunkResult = await ingestPdfs(pdfResults, townId, embedPdfStage);
       totalChunks += pdfChunkResult.chunks;
       totalErrors += pdfChunkResult.errors;
+      embedPdfStage.addDetail("total_chunks", pdfChunkResult.chunks);
+      logger.addStageResult(embedPdfStage.finish());
     }
   }
 
-  // Step 5: Log the run
-  const durationMs = Date.now() - startTime;
-
-  await supabase.from("ingestion_log").insert({
-    town_id: townId,
-    action: "crawl",
-    documents_processed: pagesProcessed + pdfsProcessed,
-    errors: totalErrors,
-    duration_ms: durationMs,
-    details: {
-      pages_processed: pagesProcessed,
-      pdfs_processed: pdfsProcessed,
-      total_chunks: totalChunks,
-      crawl_limit: limit,
-      pdf_only: pdfOnly,
-      single_url: singleUrl || null,
-    },
+  const summary = await logger.finish({
+    pages_processed: pagesProcessed,
+    pdfs_processed: pdfsProcessed,
+    total_chunks: totalChunks,
+    crawl_limit: limit,
+    pdf_only: pdfOnly,
+    single_url: singleUrl || null,
   });
 
-  console.log("\n" + "=".repeat(60));
-  console.log("[ingest] INGESTION COMPLETE");
-  console.log(`  Pages processed: ${pagesProcessed}`);
-  console.log(`  PDFs processed:  ${pdfsProcessed}`);
-  console.log(`  Total chunks:    ${totalChunks}`);
-  console.log(`  Errors:          ${totalErrors}`);
-  console.log(`  Duration:        ${(durationMs / 1000).toFixed(1)}s`);
-  console.log("=".repeat(60));
-
-  return {
-    pagesProcessed,
-    pdfsProcessed,
-    totalChunks,
-    totalErrors,
-    durationMs,
-  };
+  return { pagesProcessed, pdfsProcessed, totalChunks, totalErrors: summary.totalErrors, durationMs: summary.totalDurationMs };
 }
 
 // ---------------------------------------------------------------------------
@@ -311,16 +283,9 @@ export async function runIngestion(
 
 if (require.main === module) {
   const args = process.argv.slice(2);
-
-  const limit = parseInt(
-    args.find((a) => a.startsWith("--limit="))?.split("=")[1] || "200"
-  );
+  const limit = parseInt(args.find((a) => a.startsWith("--limit="))?.split("=")[1] || "200");
   const pdfOnly = args.includes("--pdf-only");
-  const singleUrl = args
-    .find((a) => a.startsWith("--url="))
-    ?.split("=")
-    .slice(1)
-    .join("=");
+  const singleUrl = args.find((a) => a.startsWith("--url="))?.split("=").slice(1).join("=");
 
   (async () => {
     try {

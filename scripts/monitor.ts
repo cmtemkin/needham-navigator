@@ -6,11 +6,13 @@
  * 2. Compares HTTP HEAD responses (Last-Modified, Content-Length, ETag)
  *    for tracked URLs against stored hashes
  * 3. Queues changed URLs for re-ingestion
+ * 4. Logs all results with structured success/failure counts
  *
  * Designed to be run via Replit Scheduled Deployments.
  */
 
 import { getSupabaseServiceClient } from "../src/lib/supabase";
+import { IngestionLogger } from "./logger";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -43,54 +45,24 @@ async function checkUrlForChanges(
 ): Promise<{ changed: boolean; newMetadata: Record<string, unknown> }> {
   try {
     const response = await fetch(url, { method: "HEAD" });
-
     if (!response.ok) {
-      console.warn(
-        `[monitor] HEAD request failed for ${url}: ${response.status}`
-      );
+      console.warn(`[monitor] HEAD request failed for ${url}: ${response.status}`);
       return { changed: false, newMetadata: storedMetadata };
     }
 
     const lastModified = response.headers.get("last-modified");
     const contentLength = response.headers.get("content-length");
     const etag = response.headers.get("etag");
+    const newMetadata = { ...storedMetadata, last_modified: lastModified, content_length: contentLength, etag, last_checked: new Date().toISOString() };
 
-    const newMetadata = {
-      ...storedMetadata,
-      last_modified: lastModified,
-      content_length: contentLength,
-      etag,
-      last_checked: new Date().toISOString(),
-    };
-
-    // Detect changes
     const storedEtag = storedMetadata.etag as string | undefined;
     const storedLastModified = storedMetadata.last_modified as string | undefined;
     const storedContentLength = storedMetadata.content_length as string | undefined;
 
-    // ETag is the most reliable change indicator
-    if (etag && storedEtag && etag !== storedEtag) {
-      return { changed: true, newMetadata };
-    }
-
-    // Last-Modified comparison
-    if (lastModified && storedLastModified && lastModified !== storedLastModified) {
-      return { changed: true, newMetadata };
-    }
-
-    // Content-Length as fallback
-    if (
-      contentLength &&
-      storedContentLength &&
-      contentLength !== storedContentLength
-    ) {
-      return { changed: true, newMetadata };
-    }
-
-    // If we have no prior metadata, flag as changed on first run
-    if (!storedEtag && !storedLastModified && !storedContentLength) {
-      return { changed: true, newMetadata };
-    }
+    if (etag && storedEtag && etag !== storedEtag) return { changed: true, newMetadata };
+    if (lastModified && storedLastModified && lastModified !== storedLastModified) return { changed: true, newMetadata };
+    if (contentLength && storedContentLength && contentLength !== storedContentLength) return { changed: true, newMetadata };
+    if (!storedEtag && !storedLastModified && !storedContentLength) return { changed: true, newMetadata };
 
     return { changed: false, newMetadata };
   } catch (err) {
@@ -103,29 +75,18 @@ async function checkUrlForChanges(
 // RSS feed check
 // ---------------------------------------------------------------------------
 
-async function checkRssFeed(
-  rssFeedUrl: string
-): Promise<string[]> {
+async function checkRssFeed(rssFeedUrl: string): Promise<string[]> {
   try {
     const response = await fetch(rssFeedUrl);
-    if (!response.ok) {
-      console.warn(`[monitor] RSS fetch failed: ${response.status}`);
-      return [];
-    }
-
+    if (!response.ok) { console.warn(`[monitor] RSS fetch failed: ${response.status}`); return []; }
     const xml = await response.text();
-
-    // Simple RSS link extraction (no XML parser needed for basic use)
     const linkRegex = /<link>([^<]+)<\/link>/g;
     const urls: string[] = [];
     let match;
     while ((match = linkRegex.exec(xml)) !== null) {
       const url = match[1].trim();
-      if (url.startsWith("http")) {
-        urls.push(url);
-      }
+      if (url.startsWith("http")) urls.push(url);
     }
-
     console.log(`[monitor] RSS feed returned ${urls.length} URLs`);
     return urls;
   } catch (err) {
@@ -139,106 +100,62 @@ async function checkRssFeed(
 // ---------------------------------------------------------------------------
 
 export async function runChangeDetection(
-  townId: string = "needham"
+  townId: string = "needham",
+  triggeredBy: string = "cli"
 ): Promise<ChangeDetectionResult> {
-  const startTime = Date.now();
+  const logger = new IngestionLogger({ townId, action: "monitor", triggeredBy });
   const supabase = getSupabaseServiceClient();
-  let errors = 0;
 
-  console.log(`[monitor] Starting change detection for town: ${townId}`);
-
-  // Get all tracked documents
+  // Stage 1: Fetch tracked documents
+  const fetchStage = logger.startStage("Fetch Tracked Documents");
+  let tracked: TrackedDocument[] = [];
   const { data: documents, error: fetchError } = await supabase
-    .from("documents")
-    .select("id, url, content_hash, metadata")
-    .eq("town_id", townId);
+    .from("documents").select("id, url, content_hash, metadata").eq("town_id", townId);
 
   if (fetchError) {
+    fetchStage.recordFailure(1, `Failed to fetch documents: ${fetchError.message}`);
+    logger.addStageResult(fetchStage.finish());
+    await logger.finish();
     throw new Error(`Failed to fetch documents: ${fetchError.message}`);
   }
+  tracked = (documents || []) as TrackedDocument[];
+  fetchStage.recordSuccess(tracked.length);
+  logger.addStageResult(fetchStage.finish());
 
-  const tracked = (documents || []) as TrackedDocument[];
-  console.log(`[monitor] Checking ${tracked.length} tracked documents`);
-
+  // Stage 2: HTTP HEAD checks
+  const headCheckStage = logger.startStage("HTTP HEAD Checks");
   const changedUrls: string[] = [];
-
-  // Check each tracked URL for changes
   for (const doc of tracked) {
-    const { changed, newMetadata } = await checkUrlForChanges(
-      doc.url,
-      doc.content_hash,
-      doc.metadata || {}
-    );
-
-    if (changed) {
-      changedUrls.push(doc.url);
-      console.log(`[monitor] Change detected: ${doc.url}`);
-    }
-
-    // Update metadata with latest HEAD response data
-    const { error: updateError } = await supabase
-      .from("documents")
-      .update({ metadata: newMetadata })
-      .eq("id", doc.id);
-
-    if (updateError) {
-      errors++;
-      console.error(`[monitor] Error updating ${doc.url}: ${updateError.message}`);
-    }
+    const { changed, newMetadata } = await checkUrlForChanges(doc.url, doc.content_hash, doc.metadata || {});
+    if (changed) { changedUrls.push(doc.url); headCheckStage.recordSuccess(); } else { headCheckStage.recordSkip(1); }
+    const { error: updateError } = await supabase.from("documents").update({ metadata: newMetadata }).eq("id", doc.id);
+    if (updateError) headCheckStage.recordFailure(1, `Error updating ${doc.url}: ${updateError.message}`);
   }
+  headCheckStage.addDetail("changed_count", changedUrls.length);
+  logger.addStageResult(headCheckStage.finish());
 
-  // Check RSS feed for new URLs
-  const rssUrls = await checkRssFeed(
-    "https://www.needhamma.gov/rss.aspx"
-  );
-
+  // Stage 3: RSS feed
+  const rssStage = logger.startStage("RSS Feed Check");
+  const rssUrls = await checkRssFeed("https://www.needhamma.gov/rss.aspx");
   const existingUrls = new Set(tracked.map((d) => d.url));
   const newUrls = rssUrls.filter((u) => !existingUrls.has(u));
+  rssStage.recordSuccess(rssUrls.length);
+  rssStage.addDetail("new_urls_found", newUrls.length);
+  logger.addStageResult(rssStage.finish());
 
-  // Flag stale documents (not verified in 90 days)
+  // Stage 4: Staleness flagging
+  const staleStage = logger.startStage("Staleness Flagging");
   const ninetyDaysAgo = new Date();
   ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
-
   const { error: staleError } = await supabase
-    .from("documents")
-    .update({ is_stale: true })
-    .eq("town_id", townId)
-    .lt("last_verified_at", ninetyDaysAgo.toISOString());
+    .from("documents").update({ is_stale: true }).eq("town_id", townId).lt("last_verified_at", ninetyDaysAgo.toISOString());
+  if (staleError) staleStage.recordFailure(1, `Error flagging stale docs: ${staleError.message}`);
+  else staleStage.recordSuccess();
+  logger.addStageResult(staleStage.finish());
 
-  if (staleError) {
-    console.error(`[monitor] Error flagging stale docs: ${staleError.message}`);
-    errors++;
-  }
+  const summary = await logger.finish({ changed_urls: changedUrls, new_urls: newUrls, checked_at: new Date().toISOString() });
 
-  // Log the monitoring run
-  const durationMs = Date.now() - startTime;
-  await supabase.from("ingestion_log").insert({
-    town_id: townId,
-    action: "monitor",
-    documents_processed: tracked.length,
-    errors,
-    duration_ms: durationMs,
-    details: {
-      changed_urls: changedUrls,
-      new_urls: newUrls,
-      checked_at: new Date().toISOString(),
-    },
-  });
-
-  const result: ChangeDetectionResult = {
-    checkedUrls: tracked.length,
-    changedUrls,
-    newUrls,
-    removedUrls: [],
-    errors,
-    durationMs,
-  };
-
-  console.log(
-    `[monitor] Complete: ${changedUrls.length} changed, ${newUrls.length} new, ${errors} errors (${durationMs}ms)`
-  );
-
-  return result;
+  return { checkedUrls: tracked.length, changedUrls, newUrls, removedUrls: [], errors: summary.totalErrors, durationMs: summary.totalDurationMs };
 }
 
 // ---------------------------------------------------------------------------
@@ -252,7 +169,7 @@ if (require.main === module) {
       console.log("\n--- Change Detection Summary ---");
       console.log(`Checked: ${result.checkedUrls} URLs`);
       console.log(`Changed: ${result.changedUrls.length}`);
-      result.changedUrls.forEach((u) => console.log(`  → ${u}`));
+      result.changedUrls.forEach((u) => console.log(`  -> ${u}`));
       console.log(`New: ${result.newUrls.length}`);
       result.newUrls.forEach((u) => console.log(`  + ${u}`));
       console.log(`Errors: ${result.errors}`);
