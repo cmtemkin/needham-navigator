@@ -12,6 +12,10 @@ import { findMockResponse } from "@/lib/mock-data";
 import { useTownHref } from "@/lib/town-context";
 import { useI18n } from "@/lib/i18n";
 
+function generateSessionId(): string {
+  return `sess-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
 function ChatLoadingFallback() {
   return (
     <div
@@ -35,6 +39,7 @@ function ChatContent() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const hasProcessedInitial = useRef(false);
+  const sessionIdRef = useRef(generateSessionId());
   const homeHref = useTownHref();
   const { t } = useI18n();
 
@@ -125,7 +130,7 @@ function ChatContent() {
         ) : (
           <>
             {messages.map((msg) => (
-              <ChatBubble key={msg.id} message={msg} onFollowupClick={handleSend} />
+              <ChatBubble key={msg.id} message={msg} onFollowupClick={handleSend} sessionId={sessionIdRef.current} />
             ))}
             {isTyping && (
               <ChatBubble message={{ id: "typing", role: "typing", text: "" }} />

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Home, MessageSquare } from "lucide-react";
+import { Home, MessageSquare, FileCheck } from "lucide-react";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useI18n } from "@/lib/i18n";
 import { useTown, useTownHref } from "@/lib/town-context";
@@ -11,6 +11,7 @@ export function Header() {
   const { t } = useI18n();
   const homeHref = useTownHref();
   const chatHref = useTownHref("/chat");
+  const permitsHref = useTownHref("/permits");
   const shortTownName = town.name.replace(/,\s*[A-Z]{2}$/i, "");
 
   return (
@@ -38,6 +39,13 @@ export function Header() {
           >
             <Home size={15} />
             {t("header.home")}
+          </Link>
+          <Link
+            href={permitsHref}
+            className="flex items-center gap-[5px] rounded-lg px-3.5 py-[7px] text-[13.5px] font-medium text-text-secondary transition-all hover:bg-surface hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            <FileCheck size={15} />
+            {t("header.permits")}
           </Link>
           <Link
             href={chatHref}

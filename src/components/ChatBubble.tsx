@@ -2,6 +2,7 @@
 
 import { SourceChip } from "./SourceChip";
 import { ConfidenceBadge } from "./ConfidenceBadge";
+import { FeedbackButtons } from "./FeedbackButtons";
 import type { MockSource } from "@/lib/mock-data";
 
 export interface ChatMessage {
@@ -16,9 +17,10 @@ export interface ChatMessage {
 interface ChatBubbleProps {
   message: ChatMessage;
   onFollowupClick?: (question: string) => void;
+  sessionId?: string;
 }
 
-export function ChatBubble({ message, onFollowupClick }: ChatBubbleProps) {
+export function ChatBubble({ message, onFollowupClick, sessionId }: ChatBubbleProps) {
   if (message.role === "typing") {
     return (
       <div
@@ -88,6 +90,9 @@ export function ChatBubble({ message, onFollowupClick }: ChatBubbleProps) {
               ))}
             </div>
           )}
+
+          {/* Feedback */}
+          <FeedbackButtons responseId={message.id} sessionId={sessionId} />
         </div>
       </div>
     </div>
