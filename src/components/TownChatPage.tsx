@@ -9,8 +9,10 @@ import { ChatBubble, type ChatMessage } from "@/components/ChatBubble";
 import { ChatInput } from "@/components/ChatInput";
 import { ChatWelcome } from "@/components/ChatWelcome";
 import { findMockResponse } from "@/lib/mock-data";
-import { useTownHref } from "@/lib/town-context";
+import { useTownHref, useTown } from "@/lib/town-context";
 import { useI18n } from "@/lib/i18n";
+
+const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true";
 
 function generateSessionId(): string {
   return `sess-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -41,6 +43,7 @@ function ChatContent() {
   const hasProcessedInitial = useRef(false);
   const sessionIdRef = useRef(generateSessionId());
   const homeHref = useTownHref();
+  const town = useTown();
   const { t } = useI18n();
 
   const scrollToBottom = useCallback(() => {
@@ -49,7 +52,83 @@ function ChatContent() {
     }, 50);
   }, []);
 
-  const simulateResponse = useCallback(
+  const callRealAPI = useCallback(
+    async (question: string) => {
+      setErrorMessage(null);
+      setIsTyping(true);
+      scrollToBottom();
+
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: [{ role: "user", content: question }],
+            town_id: town.town_id,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("API request failed");
+        }
+
+        // Simple implementation: read the full response
+        // TODO: Implement streaming for better UX
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder();
+        let fullText = "";
+        let confidence: "high" | "medium" | "low" | undefined;
+        let sources: ChatMessage["sources"] = [];
+
+        if (reader) {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const chunk = decoder.decode(value, { stream: true });
+            // Basic parsing of the stream chunks
+            const lines = chunk.split("\n");
+            for (const line of lines) {
+              if (line.startsWith("0:")) {
+                const jsonStr = line.slice(2);
+                try {
+                  const data = JSON.parse(jsonStr);
+                  if (data.type === "text-delta") {
+                    fullText += data.delta;
+                  } else if (data.type === "data-confidence") {
+                    confidence = data.data;
+                  } else if (data.type === "data-sources") {
+                    sources = data.data;
+                  }
+                } catch {
+                  // Skip invalid JSON chunks
+                }
+              }
+            }
+          }
+        }
+
+        const aiMessage: ChatMessage = {
+          id: `ai-${Date.now()}`,
+          role: "ai",
+          text: fullText || "No response received.",
+          sources,
+          confidence,
+          followups: [], // Real API doesn't return followups yet
+        };
+        setMessages((prev) => [...prev, aiMessage]);
+      } catch (error) {
+        console.error("Chat API error:", error);
+        setErrorMessage(t("chat.error_response"));
+      } finally {
+        setIsTyping(false);
+        scrollToBottom();
+      }
+    },
+    [scrollToBottom, t, town.town_id]
+  );
+
+  const simulateMockResponse = useCallback(
     (question: string) => {
       setErrorMessage(null);
       setIsTyping(true);
@@ -79,6 +158,8 @@ function ChatContent() {
     [scrollToBottom, t]
   );
 
+  const handleResponse = USE_MOCK_DATA ? simulateMockResponse : callRealAPI;
+
   const handleSend = useCallback(
     (text: string) => {
       const userMessage: ChatMessage = {
@@ -88,9 +169,9 @@ function ChatContent() {
       };
       setMessages((prev) => [...prev, userMessage]);
       scrollToBottom();
-      simulateResponse(text);
+      handleResponse(text);
     },
-    [simulateResponse, scrollToBottom]
+    [handleResponse, scrollToBottom]
   );
 
   useEffect(() => {

@@ -1,5 +1,5 @@
-// Mock data for standalone frontend development
-// This file will be removed after merging with the chat-api branch
+// Mock data for testing and demos
+// Toggle with NEXT_PUBLIC_USE_MOCK_DATA=true in .env to use mock responses instead of real RAG API
 
 export interface MockSource {
   title: string;

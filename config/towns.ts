@@ -107,6 +107,7 @@ export const TOWNS: TownConfig[] = [
       enableMultiLanguage: true,
     },
   },
+  // Remove before production deployment — used for multi-tenant testing only
   {
     town_id: "mock-town",
     name: "Mock Town, MA",
