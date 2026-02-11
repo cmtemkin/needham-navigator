@@ -202,6 +202,7 @@ export function dedupeSources(chunks: RetrievedChunk[]): SourceReference[] {
 }
 
 // Query expansion: add related terms for better recall
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const QUERY_EXPANSIONS: Record<string, string[]> = {
   trash: ["transfer station", "solid waste", "recycling", "garbage", "refuse"],
   permit: ["building permit", "application", "approval", "zoning", "variance"],
