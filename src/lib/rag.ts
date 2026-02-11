@@ -1,6 +1,7 @@
 import { generateEmbedding } from "@/lib/embeddings";
 import { getSupabaseClient } from "@/lib/supabase";
 import { DEFAULT_TOWN_ID as DEFAULT_TOWN_ID_FROM_CONFIG } from "@/lib/towns";
+import { expandQuery } from "@/lib/synonyms";
 
 export const DEFAULT_TOWN_ID = DEFAULT_TOWN_ID_FROM_CONFIG;
 
@@ -242,17 +243,63 @@ export function dedupeSources(chunks: RetrievedChunk[]): SourceReference[] {
   return Array.from(seen.values()).slice(0, MAX_SOURCE_PILLS);
 }
 
-// Query expansion: add related terms for better recall
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const QUERY_EXPANSIONS: Record<string, string[]> = {
-  trash: ["transfer station", "solid waste", "recycling", "garbage", "refuse"],
-  permit: ["building permit", "application", "approval", "zoning", "variance"],
-  school: ["education", "enrollment", "student", "kindergarten", "NPS"],
-  tax: ["property tax", "assessment", "exemption", "abatement", "bill"],
-  parking: ["parking ban", "street parking", "permit parking", "snow emergency"],
-  zoning: ["bylaw", "district", "setback", "dimensional", "FAR", "lot coverage"],
-  vote: ["election", "voter registration", "ballot", "polling", "town meeting"],
+// ---------------------------------------------------------------------------
+// Fuzzy intent matching — detect common question patterns and add keywords
+// ---------------------------------------------------------------------------
+
+type IntentPattern = {
+  /** Regex patterns that indicate this intent */
+  patterns: RegExp[];
+  /** Keywords to inject into the search query */
+  keywords: string[];
 };
+
+const INTENT_PATTERNS: IntentPattern[] = [
+  {
+    patterns: [/when is .+ open/i, /hours for/i, /what time does/i, /what are .+ hours/i, /is .+ open/i],
+    keywords: ["hours", "schedule", "open", "closed"],
+  },
+  {
+    patterns: [/where is/i, /where do i/i, /how do i get to/i, /address for/i, /location of/i],
+    keywords: ["address", "location", "directions"],
+  },
+  {
+    patterns: [/who do i call/i, /who handles/i, /contact for/i, /phone number/i, /email for/i],
+    keywords: ["department", "contact", "phone", "email"],
+  },
+  {
+    patterns: [/how much does .+ cost/i, /what'?s the fee/i, /price of/i, /fee for/i],
+    keywords: ["fee", "cost", "rate", "schedule"],
+  },
+  {
+    patterns: [/do i need a permit/i, /can i build/i, /permit for/i, /permit to/i],
+    keywords: ["permit", "application", "requirements", "zoning"],
+  },
+  {
+    patterns: [/how do i/i, /what'?s the process/i, /steps to/i, /how to/i],
+    keywords: ["application", "process", "steps", "requirements"],
+  },
+];
+
+/**
+ * Detect intent from a query and return additional keywords to inject.
+ */
+function detectIntent(query: string): string[] {
+  const keywords = new Set<string>();
+  const lowerQuery = query.toLowerCase();
+
+  for (const intent of INTENT_PATTERNS) {
+    if (intent.patterns.some((p) => p.test(lowerQuery))) {
+      for (const kw of intent.keywords) {
+        if (!lowerQuery.includes(kw)) {
+          keywords.add(kw);
+        }
+      }
+    }
+  }
+
+  return Array.from(keywords);
+}
 
 // Department keywords for routing
 const DEPARTMENT_KEYWORDS: Record<string, string[]> = {
@@ -362,6 +409,32 @@ function selectDiverseChunks(chunks: RetrievedChunk[], maxCount: number): Retrie
   return selected;
 }
 
+/**
+ * Run a single vector search against Supabase match_documents RPC.
+ */
+async function vectorSearch(
+  queryText: string,
+  townId: string,
+  matchThreshold: number,
+  matchCount: number,
+): Promise<MatchDocumentRow[]> {
+  const embedding = await generateEmbedding(queryText);
+  const supabase = getSupabaseClient({ townId });
+
+  const { data, error } = await supabase.rpc("match_documents", {
+    query_embedding: embedding,
+    match_town_id: townId,
+    match_threshold: matchThreshold,
+    match_count: matchCount,
+  });
+
+  if (error) {
+    throw new Error(`Failed to retrieve semantic matches: ${error.message}`);
+  }
+
+  return (data ?? []) as MatchDocumentRow[];
+}
+
 export async function retrieveRelevantChunks(
   query: string,
   options?: {
@@ -381,33 +454,57 @@ export async function retrieveRelevantChunks(
     return [];
   }
 
-  // Detect department for routing
-  const detectedDepartment = detectDepartment(trimmedQuery);
+  // Step 1: Synonym expansion
+  const { expanded, expandedQuery } = expandQuery(trimmedQuery, townId);
 
-  const embedding = await generateEmbedding(trimmedQuery);
-  const supabase = getSupabaseClient({ townId });
+  // Step 2: Intent detection — add intent keywords to the expanded query
+  const intentKeywords = detectIntent(trimmedQuery);
+  const fullExpandedQuery =
+    intentKeywords.length > 0
+      ? `${expandedQuery} ${intentKeywords.join(" ")}`
+      : expandedQuery;
 
-  const { data, error } = await supabase.rpc("match_documents", {
-    query_embedding: embedding,
-    match_town_id: townId,
-    match_threshold: matchThreshold,
-    match_count: matchCount,
-  });
+  // Step 3: Detect department for reranking (use expanded terms for better detection)
+  const detectedDepartment = detectDepartment(fullExpandedQuery);
 
-  if (error) {
-    throw new Error(`Failed to retrieve semantic matches: ${error.message}`);
+  // Step 4: Run vector searches in parallel — original query + expanded query
+  const hasExpansions = expanded.length > 0 || intentKeywords.length > 0;
+
+  const searchPromises: Promise<MatchDocumentRow[]>[] = [
+    vectorSearch(trimmedQuery, townId, matchThreshold, matchCount),
+  ];
+
+  if (hasExpansions) {
+    searchPromises.push(
+      vectorSearch(fullExpandedQuery, townId, matchThreshold, matchCount),
+    );
   }
 
-  const rows = (data ?? []) as MatchDocumentRow[];
-  const chunks = rows.map((row, index) => toRetrievedChunk(row, index));
+  const searchResults = await Promise.all(searchPromises);
+
+  // Step 5: Merge and deduplicate, keeping the highest similarity per chunk
+  const bestByChunkId = new Map<string, MatchDocumentRow>();
+
+  for (const rows of searchResults) {
+    for (const row of rows) {
+      const existing = bestByChunkId.get(row.id);
+      const sim = coerceSimilarity(row.similarity);
+      if (!existing || coerceSimilarity(existing.similarity) < sim) {
+        bestByChunkId.set(row.id, row);
+      }
+    }
+  }
+
+  const mergedRows = Array.from(bestByChunkId.values());
+  const allChunks = mergedRows.map((row, index) => toRetrievedChunk(row, index));
 
   // Filter out noise — chunks below the similarity floor are irrelevant
-  const relevant = chunks.filter((c) => c.similarity >= MIN_SIMILARITY_FLOOR);
+  const chunks = allChunks.filter((c) => c.similarity >= MIN_SIMILARITY_FLOOR);
 
-  // Apply reranking with multiple factors
-  const reranked = rerankChunks(relevant, trimmedQuery, detectedDepartment);
+  // Step 6: Rerank using the full expanded query for better keyword overlap scoring
+  const reranked = rerankChunks(chunks, fullExpandedQuery, detectedDepartment);
 
-  // Select diverse chunks (max one per document initially)
+  // Step 7: Select diverse chunks
   const diverse = selectDiverseChunks(reranked, finalCount);
 
   return diverse;
