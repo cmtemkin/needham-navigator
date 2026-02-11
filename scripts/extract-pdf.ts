@@ -34,17 +34,6 @@ export interface ExtractionOptions {
   forceMethod?: "simple" | "llamaparse";
 }
 
-// Patterns indicating a PDF likely needs LlamaParse
-const COMPLEX_PDF_INDICATORS = [
-  "fee schedule",
-  "budget",
-  "financial",
-  "table of",
-  "zoning map",
-  "dimensional",
-  "schedule of",
-];
-
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -53,9 +42,56 @@ function hashContent(content: string): string {
   return createHash("sha256").update(content).digest("hex");
 }
 
-function isProbablyComplex(url: string, title: string): boolean {
+/**
+ * Heuristic-based complexity detection
+ * Analyzes simple extraction output to determine if LlamaParse is needed
+ */
+async function isProbablyComplex(
+  pdfBuffer: Buffer,
+  url: string,
+  title: string
+): Promise<boolean> {
+  // Keyword-based hints from URL/title
+  const keywords = [
+    "fee schedule",
+    "budget",
+    "financial",
+    "table of",
+    "zoning map",
+    "dimensional",
+    "schedule of",
+  ];
   const lower = `${url} ${title}`.toLowerCase();
-  return COMPLEX_PDF_INDICATORS.some((indicator) => lower.includes(indicator));
+  const hasKeywordHint = keywords.some((k) => lower.includes(k));
+
+  // Try simple extraction first
+  try {
+    const simpleResult = await extractSimple(pdfBuffer);
+    const avgCharsPerPage = simpleResult.pageCount > 0
+      ? simpleResult.text.length / simpleResult.pageCount
+      : simpleResult.text.length;
+
+    // Count markdown table markers (|...|)
+    const tableCount = (simpleResult.text.match(/\|.*\|/g) || []).length;
+
+    // Heuristics:
+    // 1. Low character count per page (<200) = likely scanned/images
+    // 2. High table density (>10 tables) = table-heavy document
+    // 3. Nearly empty extraction (<100 chars) = likely failed simple extraction
+    // 4. Keyword hint from URL/title
+
+    const isComplex =
+      avgCharsPerPage < 200 ||
+      tableCount > 10 ||
+      simpleResult.text.trim().length < 100 ||
+      (hasKeywordHint && tableCount > 3);
+
+    return isComplex;
+  } catch (err) {
+    // If simple extraction fails, assume complex
+    console.log(`[extract-pdf] Simple extraction failed, assuming complex: ${err}`);
+    return true;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -175,6 +211,44 @@ async function extractWithLlamaParse(
   throw new Error("LlamaParse job timed out after 5 minutes");
 }
 
+/**
+ * Validate extraction quality
+ */
+interface ExtractionValidation {
+  isValid: boolean;
+  warnings: string[];
+  errors: string[];
+}
+
+function validateExtraction(result: PdfExtractionResult): ExtractionValidation {
+  const warnings: string[] = [];
+  const errors: string[] = [];
+
+  // Multi-page PDF with very little text = likely extraction failure
+  if (result.pageCount > 1 && result.text.length < 100) {
+    errors.push(
+      `Multi-page PDF (${result.pageCount} pages) extracted <100 chars - likely extraction failure`
+    );
+  }
+
+  // Check for common extraction artifacts (non-printable characters)
+  const nonPrintableCount = (result.text.match(/[^\x20-\x7E\n\r]/g) || []).length;
+  if (nonPrintableCount > result.text.length * 0.1) {
+    warnings.push("High density of non-printable characters detected");
+  }
+
+  // Fee schedules should have table markers
+  if (result.url.toLowerCase().includes("fee") && !result.text.includes("|")) {
+    warnings.push("Fee schedule PDF has no detected tables");
+  }
+
+  return {
+    isValid: errors.length === 0,
+    warnings,
+    errors,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Main extraction function
 // ---------------------------------------------------------------------------
@@ -191,7 +265,7 @@ export async function extractPdf(
 
   const isComplex = forceMethod
     ? forceMethod === "llamaparse"
-    : isProbablyComplex(url, title);
+    : await isProbablyComplex(pdfBuffer, url, title);
 
   let text: string;
   let pageCount: number;
@@ -216,8 +290,9 @@ export async function extractPdf(
       text = result.text;
       pageCount = result.pageCount;
       method = "simple";
-    } catch {
+    } catch (err) {
       // Fallback to LlamaParse
+      console.warn(`[extract-pdf] Simple extraction failed, trying LlamaParse: ${err}`);
       const result = await extractWithLlamaParse(pdfBuffer, fileName);
       text = result.text;
       pageCount = result.pageCount;
@@ -225,11 +300,7 @@ export async function extractPdf(
     }
   }
 
-  console.log(
-    `[extract-pdf] Extracted ${pageCount} pages from ${fileName} (${method})`
-  );
-
-  return {
+  const extractionResult: PdfExtractionResult = {
     url,
     title,
     text,
@@ -239,60 +310,90 @@ export async function extractPdf(
     extractionMethod: method,
     isComplex,
   };
+
+  // Validate extraction
+  const validation = validateExtraction(extractionResult);
+  if (!validation.isValid) {
+    console.error(`[extract-pdf] ❌ ${fileName} validation failed:`, validation.errors);
+  }
+  if (validation.warnings.length > 0) {
+    console.warn(`[extract-pdf] ⚠️  ${fileName} warnings:`, validation.warnings);
+  }
+
+  console.log(
+    `[extract-pdf] Extracted ${pageCount} pages from ${fileName} (${method})`
+  );
+
+  return extractionResult;
 }
 
 // ---------------------------------------------------------------------------
-// Batch extraction
+// Batch extraction with parallel processing
 // ---------------------------------------------------------------------------
 
 export async function extractPdfs(
   urls: string[],
-  options: ExtractionOptions = {}
+  options: ExtractionOptions & { concurrency?: number } = {}
 ): Promise<PdfExtractionResult[]> {
-  const { townId = "needham" } = options;
+  const { townId = "needham", concurrency = 3 } = options;
   const results: PdfExtractionResult[] = [];
   const supabase = getSupabaseServiceClient();
 
-  for (const url of urls) {
-    try {
-      // Check if content has changed via hash
-      const { data: existing } = await supabase
-        .from("documents")
-        .select("content_hash")
-        .eq("town_id", townId)
-        .eq("url", url)
-        .single();
+  console.log(`[extract-pdf] Processing ${urls.length} PDFs with concurrency ${concurrency}`);
 
-      const result = await extractPdf(url, options);
+  // Process in batches for parallelization
+  for (let i = 0; i < urls.length; i += concurrency) {
+    const batch = urls.slice(i, i + concurrency);
 
-      if (existing?.content_hash === result.contentHash) {
-        console.log(`[extract-pdf] Skipping ${url} (unchanged)`);
-        continue;
-      }
+    const batchPromises = batch.map(async (url) => {
+      try {
+        // Check if content has changed via hash
+        const { data: existing } = await supabase
+          .from("documents")
+          .select("content_hash")
+          .eq("town_id", townId)
+          .eq("url", url)
+          .single();
 
-      // Store document record
-      await supabase.from("documents").upsert(
-        {
-          town_id: townId,
-          url,
-          title: result.title,
-          source_type: "pdf",
-          content_hash: result.contentHash,
-          file_size_bytes: result.fileSizeBytes,
-          downloaded_at: new Date().toISOString(),
-          metadata: {
-            page_count: result.pageCount,
-            extraction_method: result.extractionMethod,
-            is_complex: result.isComplex,
+        const result = await extractPdf(url, options);
+
+        if (existing?.content_hash === result.contentHash) {
+          console.log(`[extract-pdf] Skipping ${url} (unchanged)`);
+          return null;
+        }
+
+        // Store document record
+        await supabase.from("documents").upsert(
+          {
+            town_id: townId,
+            url,
+            title: result.title,
+            source_type: "pdf",
+            content_hash: result.contentHash,
+            file_size_bytes: result.fileSizeBytes,
+            downloaded_at: new Date().toISOString(),
+            metadata: {
+              page_count: result.pageCount,
+              extraction_method: result.extractionMethod,
+              is_complex: result.isComplex,
+            },
           },
-        },
-        { onConflict: "town_id,url" }
-      );
+          { onConflict: "town_id,url" }
+        );
 
-      results.push(result);
-    } catch (err) {
-      console.error(`[extract-pdf] Failed to extract ${url}:`, err);
-    }
+        return result;
+      } catch (err) {
+        console.error(`[extract-pdf] Failed to extract ${url}:`, err);
+        return null;
+      }
+    });
+
+    const batchResults = await Promise.all(batchPromises);
+    results.push(...batchResults.filter((r): r is PdfExtractionResult => r !== null));
+
+    console.log(
+      `[extract-pdf] Batch ${Math.floor(i / concurrency) + 1}/${Math.ceil(urls.length / concurrency)} complete`
+    );
   }
 
   console.log(

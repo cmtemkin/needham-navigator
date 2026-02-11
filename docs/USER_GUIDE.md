@@ -78,6 +78,77 @@ Visit `/admin` to access:
 
 ---
 
+## Developer / Data Quality Tools
+
+### Data Validation
+
+Run `npm run validate` to check ingestion data quality:
+
+```bash
+npm run validate [town_id]
+```
+
+**What it validates:**
+- ✓ All chunks have required metadata (document_title, document_type, document_url, chunk_type, etc.)
+- ✓ No duplicate chunks (same content_hash)
+- ✓ Embedding dimensions are correct (1536 for text-embedding-3-small)
+- ✓ No orphaned chunks (document_id references non-existent documents)
+- ✓ Coverage report showing chunk count per department
+
+**Sample output:**
+```
+=== INGESTION VALIDATION REPORT ===
+Town: needham
+Total Documents: 215
+Total Chunks: 1,847
+Avg Chunks/Document: 8.6
+
+Document Types:
+  zoning_bylaws        324
+  general_bylaws       198
+  building_permits     145
+  ...
+
+Department Coverage:
+  Planning & Community Development    487 chunks
+  Department of Public Works          234 chunks
+  ...
+
+✅ Validation PASSED
+```
+
+### Enhanced Ingestion Pipeline
+
+**Comprehensive Crawling** (`npm run crawl`)
+
+New CLI options for production-grade crawling:
+- `npm run crawl --sources` — Crawl all 40+ data sources from registry
+- `npm run crawl --high-priority` — Crawl only high-priority sources (priority 4-5)
+- `npm run crawl --map` — Discover all URLs on site
+
+**Features:**
+- Incremental crawling (skips unchanged documents via content-hash)
+- Retry logic with exponential backoff (3 attempts)
+- 40+ source URL registry in `config/crawl-sources.ts`
+- Priority-based processing (1=low, 5=high)
+
+**Monitoring** (`npm run monitor`)
+
+Daily change detection with content-hash comparison:
+- Tracks `last_crawled` (every check) and `last_changed` (only when content changes)
+- 0% false positives (vs. ~50% with HTTP HEAD)
+- Flags stale documents (>90 days since last verification)
+- Queues changed documents for re-ingestion
+
+**Data Quality Features:**
+- Exact token counting with js-tiktoken (100% accuracy)
+- Heuristic-based PDF complexity detection
+- Parallel PDF extraction (3 concurrent by default)
+- Extraction validation (flags multi-page PDFs with <100 chars)
+- Enhanced metadata: chunk_index, total_chunks, content_hash
+
+---
+
 ## Navigation
 
 | Page | URL | Description |

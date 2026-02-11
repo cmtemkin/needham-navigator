@@ -41,6 +41,29 @@ function hashContent(content: string): string {
   return createHash("sha256").update(content).digest("hex");
 }
 
+/**
+ * Retry a function with exponential backoff
+ */
+async function retry<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelay: number = 1000
+): Promise<T> {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      if (attempt === maxRetries - 1) {
+        throw error;
+      }
+      const delay = baseDelay * Math.pow(2, attempt);
+      console.log(`[crawl] Retry attempt ${attempt + 1}/${maxRetries} after ${delay}ms...`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+  throw new Error("Retry exhausted"); // Should never reach here
+}
+
 function extractPdfUrls(markdown: string, baseUrl: string): string[] {
   // Match markdown links ending in .pdf
   const linkRegex = /\[([^\]]*)\]\(([^)]*\.pdf[^)]*)\)/gi;
@@ -98,9 +121,16 @@ export async function crawlWebsite(
       "/Calendar.aspx*",
       "/AgendaCenter*",
       "/rss*",
+      "/Search.aspx*",
+      "/Login.aspx*",
+      "/print/*",
+      "/email/*",
       "*.jpg",
       "*.png",
       "*.gif",
+      "*.xlsx",
+      "*.docx",
+      "*.zip",
     ],
     townId = "needham",
   } = options;
@@ -114,23 +144,51 @@ export async function crawlWebsite(
 
   console.log(`[crawl] Starting crawl of ${baseUrl} (limit: ${limit})`);
 
+  // Fetch existing documents to enable incremental crawling
+  const supabase = getSupabaseServiceClient();
+  const { data: existingDocs } = await supabase
+    .from("documents")
+    .select("url, content_hash")
+    .eq("town_id", townId);
+
+  const existingHashes = new Map(
+    (existingDocs || []).map((d) => [d.url, d.content_hash])
+  );
+  console.log(`[crawl] Found ${existingHashes.size} existing documents for incremental check`);
+
   // v2 API: crawl() polls until complete and returns CrawlJob
-  const crawlJob = await firecrawl.crawl(baseUrl, {
-    limit,
-    includePaths,
-    excludePaths,
-    scrapeOptions: {
-      formats: ["markdown"],
-    },
-  });
+  // Wrap in retry for transient failures
+  const crawlJob = await retry(
+    async () =>
+      firecrawl.crawl(baseUrl, {
+        limit,
+        includePaths,
+        excludePaths,
+        scrapeOptions: {
+          formats: ["markdown"],
+        },
+      }),
+    3,
+    1000
+  );
 
   const results: CrawlResult[] = [];
   const allPdfUrls: string[] = [];
+  let skippedUnchanged = 0;
 
   for (const page of crawlJob.data || []) {
     const markdown = page.markdown || "";
     const url = (page.metadata?.sourceURL as string) || (page.metadata?.url as string) || "";
     if (!url || !markdown) continue;
+
+    const newHash = hashContent(markdown);
+    const existingHash = existingHashes.get(url);
+
+    // Incremental crawling: skip if content unchanged
+    if (existingHash === newHash) {
+      skippedUnchanged++;
+      continue;
+    }
 
     const pdfUrls = extractPdfUrls(markdown, baseUrl);
     allPdfUrls.push(...pdfUrls);
@@ -140,7 +198,7 @@ export async function crawlWebsite(
       title: (page.metadata?.title as string) || extractTitle(markdown, url),
       markdown,
       sourceType: "html",
-      contentHash: hashContent(markdown),
+      contentHash: newHash,
       fileSizeBytes: Buffer.byteLength(markdown, "utf-8"),
       pdfUrls,
     };
@@ -149,7 +207,7 @@ export async function crawlWebsite(
   }
 
   console.log(
-    `[crawl] Crawled ${results.length} pages, discovered ${allPdfUrls.length} PDF links`
+    `[crawl] Crawled ${results.length} pages (${skippedUnchanged} unchanged), discovered ${allPdfUrls.length} PDF links`
   );
 
   // Store results in Supabase
@@ -194,6 +252,56 @@ async function storeCrawlResults(
 }
 
 // ---------------------------------------------------------------------------
+// Crawl from source registry
+// ---------------------------------------------------------------------------
+
+import { CRAWL_SOURCES, getHighPrioritySources, type CrawlSource } from "../config/crawl-sources";
+
+export async function crawlFromSources(
+  sources: CrawlSource[] = CRAWL_SOURCES,
+  townId: string = "needham"
+): Promise<{ total: number; succeeded: number; failed: number; results: CrawlResult[] }> {
+  console.log(`[crawl] Starting crawl from ${sources.length} sources`);
+
+  // Sort by priority (high to low)
+  const sortedSources = [...sources].sort((a, b) => b.priority - a.priority);
+
+  let succeeded = 0;
+  let failed = 0;
+  const allResults: CrawlResult[] = [];
+
+  for (const source of sortedSources) {
+    try {
+      console.log(`\n[crawl] Processing source: ${source.id} (priority ${source.priority})`);
+      console.log(`[crawl] URL: ${source.url}`);
+
+      const results = await crawlWebsite({
+        baseUrl: source.url,
+        limit: source.maxDepth ? source.maxDepth * 20 : 50, // Rough estimate
+        townId,
+      });
+
+      allResults.push(...results);
+      succeeded++;
+      console.log(`[crawl] ✓ ${source.id}: ${results.length} pages`);
+    } catch (error) {
+      failed++;
+      console.error(`[crawl] ✗ ${source.id} failed:`, error);
+    }
+  }
+
+  console.log(`\n[crawl] Source crawl complete: ${succeeded}/${sources.length} succeeded, ${failed} failed`);
+  console.log(`[crawl] Total pages crawled: ${allResults.length}`);
+
+  return {
+    total: sources.length,
+    succeeded,
+    failed,
+    results: allResults,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Map endpoint — discover all URLs on the site
 // ---------------------------------------------------------------------------
 
@@ -225,6 +333,8 @@ if (require.main === module) {
   const args = process.argv.slice(2);
   const limit = parseInt(args.find((a) => a.startsWith("--limit="))?.split("=")[1] || "200");
   const mapOnly = args.includes("--map");
+  const sourcesOnly = args.includes("--sources");
+  const highPriorityOnly = args.includes("--high-priority");
 
   (async () => {
     try {
@@ -232,6 +342,14 @@ if (require.main === module) {
         const urls = await discoverUrls();
         console.log(`\nDiscovered ${urls.length} URLs:`);
         urls.forEach((u) => console.log(`  ${u}`));
+      } else if (sourcesOnly || highPriorityOnly) {
+        const sources = highPriorityOnly ? getHighPrioritySources() : CRAWL_SOURCES;
+        const result = await crawlFromSources(sources);
+        console.log(`\n=== CRAWL FROM SOURCES COMPLETE ===`);
+        console.log(`Total sources: ${result.total}`);
+        console.log(`Succeeded: ${result.succeeded}`);
+        console.log(`Failed: ${result.failed}`);
+        console.log(`Total pages: ${result.results.length}`);
       } else {
         const results = await crawlWebsite({ limit });
         console.log(`\nCrawl complete. ${results.length} pages processed.`);

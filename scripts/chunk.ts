@@ -6,6 +6,8 @@
  * document-type-specific parameters.
  */
 
+import { createHash } from "crypto";
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -48,6 +50,9 @@ export interface ChunkMetadata {
   cross_references: string[];
   keywords: string[];
   applies_to: string[];
+  chunk_index?: number;
+  total_chunks?: number;
+  content_hash?: string;
 }
 
 export interface Chunk {
@@ -172,17 +177,24 @@ export function detectDocumentType(title: string, content: string): DocumentType
 }
 
 // ---------------------------------------------------------------------------
-// Tokenizer approximation
+// Tokenizer (js-tiktoken for exact token counting)
 //
-// ~4 characters per token is a standard approximation for English text.
-// Good enough for chunking; exact count isn't critical.
+// Uses the same tokenizer as OpenAI's text-embedding-3-small model
+// for accurate token counting. This prevents chunks from exceeding
+// embedding model limits and ensures consistent overlap.
 // ---------------------------------------------------------------------------
 
+import { encodingForModel } from "js-tiktoken";
+
+// Initialize encoder (reuse for performance)
+const encoder = encodingForModel("gpt-4"); // Compatible with text-embedding-3-small
+
 function estimateTokens(text: string): number {
-  return Math.ceil(text.length / 4);
+  return encoder.encode(text).length;
 }
 
 function charLimitFromTokens(tokens: number): number {
+  // Still use char approximation for initial splits, then validate with actual tokenization
   return tokens * 4;
 }
 
@@ -342,17 +354,28 @@ function splitAtBoundaries(
 }
 
 /**
+ * Get the last N tokens from text (for overlap)
+ */
+function getLastNTokens(text: string, n: number): string {
+  const tokens = encoder.encode(text);
+  if (tokens.length <= n) return text;
+  const overlapTokens = tokens.slice(-n);
+  return encoder.decode(overlapTokens);
+}
+
+/**
  * Split a section into chunks that respect the max token limit,
  * with overlap for context continuity.
+ *
+ * Uses actual token counting for accurate chunk sizing.
  */
 function splitSectionIntoChunks(
   section: SplitSection,
   config: ChunkingConfig
 ): string[] {
-  const maxChars = charLimitFromTokens(config.maxTokens);
-  const overlapChars = charLimitFromTokens(config.overlapTokens);
-
-  if (section.content.length <= maxChars) {
+  // Check if section is already small enough
+  const sectionTokens = estimateTokens(section.content);
+  if (sectionTokens <= config.maxTokens) {
     return [section.content];
   }
 
@@ -361,13 +384,18 @@ function splitSectionIntoChunks(
   let currentChunk = "";
 
   for (const para of paragraphs) {
-    if (currentChunk.length + para.length + 2 > maxChars && currentChunk) {
+    const testChunk = currentChunk + (currentChunk ? "\n\n" : "") + para;
+    const actualTokens = estimateTokens(testChunk);
+
+    if (actualTokens > config.maxTokens && currentChunk) {
+      // Current chunk + para exceeds limit, save current chunk and start new one
       chunks.push(currentChunk.trim());
-      // Keep overlap from the end of previous chunk
-      const overlapText = currentChunk.slice(-overlapChars);
+
+      // Add overlap from end of previous chunk
+      const overlapText = getLastNTokens(currentChunk, config.overlapTokens);
       currentChunk = overlapText + "\n\n" + para;
     } else {
-      currentChunk += (currentChunk ? "\n\n" : "") + para;
+      currentChunk = testChunk;
     }
   }
 
@@ -435,6 +463,16 @@ export function chunkDocument(
 
       chunkIndex++;
     }
+  }
+
+  // Add chunk_index, total_chunks, and content_hash to all chunks
+  const totalChunks = chunks.length;
+  for (let i = 0; i < chunks.length; i++) {
+    chunks[i].metadata.chunk_index = i;
+    chunks[i].metadata.total_chunks = totalChunks;
+    chunks[i].metadata.content_hash = createHash("sha256")
+      .update(chunks[i].text)
+      .digest("hex");
   }
 
   console.log(

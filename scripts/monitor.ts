@@ -31,43 +31,63 @@ interface TrackedDocument {
   id: string;
   url: string;
   content_hash: string | null;
+  source_type: "html" | "pdf" | null;
+  last_changed: string | null;
   metadata: Record<string, unknown>;
 }
 
 // ---------------------------------------------------------------------------
-// HTTP HEAD check
+// Content-hash-based change detection
 // ---------------------------------------------------------------------------
 
+import { createHash } from "crypto";
+
+function hashContent(content: string | Buffer): string {
+  return createHash("sha256")
+    .update(typeof content === "string" ? content : content)
+    .digest("hex");
+}
+
 async function checkUrlForChanges(
-  url: string,
-  storedHash: string | null,
-  storedMetadata: Record<string, unknown>
-): Promise<{ changed: boolean; newMetadata: Record<string, unknown> }> {
+  doc: TrackedDocument
+): Promise<{ changed: boolean; newHash: string | null; error?: string }> {
   try {
-    const response = await fetch(url, { method: "HEAD" });
-    if (!response.ok) {
-      console.warn(`[monitor] HEAD request failed for ${url}: ${response.status}`);
-      return { changed: false, newMetadata: storedMetadata };
+    // For HTML pages: re-fetch and compare hash
+    if (doc.source_type === "html") {
+      const response = await fetch(doc.url);
+      if (!response.ok) {
+        return {
+          changed: false,
+          newHash: null,
+          error: `HTTP ${response.status}`,
+        };
+      }
+      const html = await response.text();
+      const newHash = hashContent(html);
+      return { changed: newHash !== doc.content_hash, newHash };
     }
 
-    const lastModified = response.headers.get("last-modified");
-    const contentLength = response.headers.get("content-length");
-    const etag = response.headers.get("etag");
-    const newMetadata = { ...storedMetadata, last_modified: lastModified, content_length: contentLength, etag, last_checked: new Date().toISOString() };
+    // For PDFs: download and compare hash
+    if (doc.source_type === "pdf") {
+      const response = await fetch(doc.url);
+      if (!response.ok) {
+        return {
+          changed: false,
+          newHash: null,
+          error: `HTTP ${response.status}`,
+        };
+      }
+      const arrayBuffer = await response.arrayBuffer();
+      const pdfBuffer = Buffer.from(arrayBuffer);
+      const newHash = hashContent(pdfBuffer.toString("base64"));
+      return { changed: newHash !== doc.content_hash, newHash };
+    }
 
-    const storedEtag = storedMetadata.etag as string | undefined;
-    const storedLastModified = storedMetadata.last_modified as string | undefined;
-    const storedContentLength = storedMetadata.content_length as string | undefined;
-
-    if (etag && storedEtag && etag !== storedEtag) return { changed: true, newMetadata };
-    if (lastModified && storedLastModified && lastModified !== storedLastModified) return { changed: true, newMetadata };
-    if (contentLength && storedContentLength && contentLength !== storedContentLength) return { changed: true, newMetadata };
-    if (!storedEtag && !storedLastModified && !storedContentLength) return { changed: true, newMetadata };
-
-    return { changed: false, newMetadata };
+    return { changed: false, newHash: null };
   } catch (err) {
-    console.error(`[monitor] Error checking ${url}:`, err);
-    return { changed: false, newMetadata: storedMetadata };
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    console.error(`[monitor] Error checking ${doc.url}:`, errorMessage);
+    return { changed: false, newHash: null, error: errorMessage };
   }
 }
 
@@ -110,7 +130,9 @@ export async function runChangeDetection(
   const fetchStage = logger.startStage("Fetch Tracked Documents");
   let tracked: TrackedDocument[] = [];
   const { data: documents, error: fetchError } = await supabase
-    .from("documents").select("id, url, content_hash, metadata").eq("town_id", townId);
+    .from("documents")
+    .select("id, url, content_hash, source_type, last_changed, metadata")
+    .eq("town_id", townId);
 
   if (fetchError) {
     fetchStage.recordFailure(1, `Failed to fetch documents: ${fetchError.message}`);
@@ -122,17 +144,58 @@ export async function runChangeDetection(
   fetchStage.recordSuccess(tracked.length);
   logger.addStageResult(fetchStage.finish());
 
-  // Stage 2: HTTP HEAD checks
-  const headCheckStage = logger.startStage("HTTP HEAD Checks");
+  // Stage 2: Content-hash change detection
+  const changeCheckStage = logger.startStage("Content-Hash Change Detection");
   const changedUrls: string[] = [];
+  let errorCount = 0;
+
   for (const doc of tracked) {
-    const { changed, newMetadata } = await checkUrlForChanges(doc.url, doc.content_hash, doc.metadata || {});
-    if (changed) { changedUrls.push(doc.url); headCheckStage.recordSuccess(); } else { headCheckStage.recordSkip(1); }
-    const { error: updateError } = await supabase.from("documents").update({ metadata: newMetadata }).eq("id", doc.id);
-    if (updateError) headCheckStage.recordFailure(1, `Error updating ${doc.url}: ${updateError.message}`);
+    const { changed, newHash, error } = await checkUrlForChanges(doc);
+
+    if (error) {
+      errorCount++;
+      changeCheckStage.recordFailure(1, `Error checking ${doc.url}: ${error}`);
+      continue;
+    }
+
+    if (changed) {
+      changedUrls.push(doc.url);
+      changeCheckStage.recordSuccess();
+
+      // Update document with new hash and timestamps
+      const { error: updateError } = await supabase
+        .from("documents")
+        .update({
+          content_hash: newHash,
+          last_crawled: new Date().toISOString(),
+          last_changed: new Date().toISOString(),
+          is_stale: false,
+        })
+        .eq("id", doc.id);
+
+      if (updateError) {
+        changeCheckStage.recordFailure(1, `Error updating ${doc.url}: ${updateError.message}`);
+      }
+    } else {
+      changeCheckStage.recordSkip(1);
+
+      // Update last_crawled timestamp only
+      const { error: updateError } = await supabase
+        .from("documents")
+        .update({
+          last_crawled: new Date().toISOString(),
+        })
+        .eq("id", doc.id);
+
+      if (updateError) {
+        changeCheckStage.recordFailure(1, `Error updating ${doc.url}: ${updateError.message}`);
+      }
+    }
   }
-  headCheckStage.addDetail("changed_count", changedUrls.length);
-  logger.addStageResult(headCheckStage.finish());
+
+  changeCheckStage.addDetail("changed_count", changedUrls.length);
+  changeCheckStage.addDetail("error_count", errorCount);
+  logger.addStageResult(changeCheckStage.finish());
 
   // Stage 3: RSS feed
   const rssStage = logger.startStage("RSS Feed Check");
