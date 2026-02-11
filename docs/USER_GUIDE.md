@@ -123,18 +123,26 @@ Department Coverage:
 
 ### Enhanced Ingestion Pipeline
 
-**Comprehensive Crawling** (`npm run crawl`)
+**Custom Web Scraper** (`scripts/scraper.ts`)
 
-New CLI options for production-grade crawling:
+The scraper is purpose-built for CivicPlus municipal sites (zero external API cost):
+- Built on cheerio + @mozilla/readability + turndown
+- Parallel page fetching with rate limiting
+- Content-hash change detection for incremental scraping
+- Configurable via `scripts/scraper-config.ts`
+
+**Crawling** (`npm run crawl`)
 - `npm run crawl --sources` — Crawl all 40+ data sources from registry
 - `npm run crawl --high-priority` — Crawl only high-priority sources (priority 4-5)
 - `npm run crawl --map` — Discover all URLs on site
 
-**Features:**
-- Incremental crawling (skips unchanged documents via content-hash)
-- Retry logic with exponential backoff (3 attempts)
-- 40+ source URL registry in `config/crawl-sources.ts`
-- Priority-based processing (1=low, 5=high)
+**Smoke Test** (`scripts/smoke-test.ts`)
+- Quick validation: `npx ts-node scripts/smoke-test.ts`
+- Verifies the scraper can reach the site, fetch pages, and extract content
+
+**Re-ingestion** (`scripts/reingest-clean.ts`)
+- One-command full data refresh: scrape → chunk → embed → upsert
+- Run after scraper changes or when a full re-crawl is needed
 
 **Monitoring** (`npm run monitor`)
 

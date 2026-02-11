@@ -2,6 +2,46 @@
 
 ---
 
+## v0.7.0 — 2026-02-11
+
+**Custom Scraper — Firecrawl Replacement**
+
+### New Features
+
+**Custom Web Scraper** (`scripts/scraper.ts`)
+- Replaces Firecrawl API with a zero-cost custom scraper built on cheerio + @mozilla/readability + turndown
+- Purpose-built for CivicPlus municipal sites (needhamma.gov page structure)
+- Saves $16/month in Firecrawl API costs
+- Parallel page fetching with configurable concurrency and rate limiting
+- Content-hash based change detection for incremental scraping
+- Extracts clean markdown from HTML with boilerplate removal
+
+**Scraper Configuration** (`scripts/scraper-config.ts`)
+- Centralized URL patterns, selectors, and exclusion rules for CivicPlus sites
+- Configurable content selectors, navigation exclusions, and PDF link discovery
+- Easy to extend for additional municipal site platforms
+
+**Clean Re-ingestion Script** (`scripts/reingest-clean.ts`)
+- One-command pipeline to scrape → chunk → embed → upsert fresh data
+- Designed for full data refresh after switching scraper backends
+
+**Smoke Test** (`scripts/smoke-test.ts`)
+- Quick validation that the scraper can reach the site, fetch pages, and extract content
+- Useful for CI and pre-deploy checks
+
+### Changes
+- `scripts/crawl.ts` — now a thin backward-compatible wrapper that delegates to `scripts/scraper.ts`
+- `scripts/ingest.ts` — updated to work with the new scraper output format
+- `__tests__/scripts/crawl.test.ts` — rewritten for the new scraper API
+- `.env.example` — removed `FIRECRAWL_API_KEY`, added scraper config vars
+- `.gitignore` — added scraper output/cache directories
+
+### Infrastructure
+- Removed `@mendable/firecrawl-js` dependency
+- Added `cheerio`, `@mozilla/readability`, `turndown`, `jsdom` dependencies
+
+---
+
 ## v0.6.0 — 2026-02-11
 
 **AI Polish & Municipal Intelligence**
