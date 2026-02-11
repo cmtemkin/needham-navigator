@@ -92,8 +92,9 @@ describe("chunk", () => {
   });
 
   describe("estimateTokens", () => {
-    it("estimates tokens at ~4 chars per token", () => {
-      expect(estimateTokens("hello world")).toBe(3); // 11 chars / 4 = 2.75 → 3
+    it("uses exact js-tiktoken tokenization", () => {
+      // "hello world" is exactly 2 tokens in GPT tokenizer
+      expect(estimateTokens("hello world")).toBe(2);
     });
 
     it("handles empty string", () => {

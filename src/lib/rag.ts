@@ -5,7 +5,8 @@ import { DEFAULT_TOWN_ID as DEFAULT_TOWN_ID_FROM_CONFIG } from "@/lib/towns";
 export const DEFAULT_TOWN_ID = DEFAULT_TOWN_ID_FROM_CONFIG;
 
 const DEFAULT_MATCH_THRESHOLD = 0.7;
-const DEFAULT_MATCH_COUNT = 8;
+const DEFAULT_MATCH_COUNT = 20; // Retrieve more for reranking
+const DEFAULT_FINAL_COUNT = 8; // Final chunks to return after reranking
 
 type ChunkMetadata = Record<string, unknown>;
 
@@ -200,22 +201,146 @@ export function dedupeSources(chunks: RetrievedChunk[]): SourceReference[] {
   return Array.from(seen.values());
 }
 
+// Query expansion: add related terms for better recall
+const QUERY_EXPANSIONS: Record<string, string[]> = {
+  trash: ["transfer station", "solid waste", "recycling", "garbage", "refuse"],
+  permit: ["building permit", "application", "approval", "zoning", "variance"],
+  school: ["education", "enrollment", "student", "kindergarten", "NPS"],
+  tax: ["property tax", "assessment", "exemption", "abatement", "bill"],
+  parking: ["parking ban", "street parking", "permit parking", "snow emergency"],
+  zoning: ["bylaw", "district", "setback", "dimensional", "FAR", "lot coverage"],
+  vote: ["election", "voter registration", "ballot", "polling", "town meeting"],
+};
+
+// Department keywords for routing
+const DEPARTMENT_KEYWORDS: Record<string, string[]> = {
+  "Building Department": ["permit", "building", "construction", "inspection", "renovation"],
+  "Planning & Community Development": ["zoning", "variance", "planning", "development", "subdivision"],
+  "DPW": ["transfer station", "trash", "recycling", "water", "sewer", "road"],
+  "Schools": ["school", "enrollment", "education", "student", "bus", "kindergarten"],
+  "Town Clerk": ["vote", "election", "dog license", "vital records", "marriage"],
+  "Assessor": ["tax", "assessment", "property value", "exemption", "abatement"],
+  "Police": ["police", "safety", "emergency", "report", "parking ban"],
+  "Fire": ["fire", "emergency", "ambulance", "inspection"],
+};
+
+function detectDepartment(query: string): string | null {
+  const lowerQuery = query.toLowerCase();
+
+  for (const [dept, keywords] of Object.entries(DEPARTMENT_KEYWORDS)) {
+    if (keywords.some(keyword => lowerQuery.includes(keyword))) {
+      return dept;
+    }
+  }
+
+  return null;
+}
+
+// Reranking: score chunks by multiple factors
+function rerankChunks(
+  chunks: RetrievedChunk[],
+  query: string,
+  detectedDepartment: string | null
+): RetrievedChunk[] {
+  const queryTerms = query.toLowerCase().split(/\s+/).filter(t => t.length >= 3);
+
+  const scored = chunks.map(chunk => {
+    const chunkLower = chunk.chunkText.toLowerCase();
+    const metadata = chunk.metadata;
+
+    // Semantic similarity (0.6 weight)
+    const semanticScore = chunk.similarity * 0.6;
+
+    // Keyword overlap (0.2 weight)
+    const matchedTerms = queryTerms.filter(term => chunkLower.includes(term)).length;
+    const keywordScore = (matchedTerms / Math.max(queryTerms.length, 1)) * 0.2;
+
+    // Document recency (0.1 weight)
+    let recencyScore = 0;
+    const docDate = readString(metadata, ["document_date", "effective_date", "last_amended"]);
+    if (docDate) {
+      const year = parseInt(docDate.match(/\d{4}/)?.[0] ?? "0");
+      if (year >= 2024) recencyScore = 0.1;
+      else if (year >= 2020) recencyScore = 0.07;
+      else if (year >= 2015) recencyScore = 0.04;
+    }
+
+    // Document authority (0.1 weight)
+    let authorityScore = 0;
+    const docType = readString(metadata, ["document_type", "chunk_type"]);
+    if (docType === "regulation" || docType === "bylaw") authorityScore = 0.1;
+    else if (docType === "procedure" || docType === "meeting") authorityScore = 0.07;
+    else authorityScore = 0.05;
+
+    // Department boost
+    let deptBoost = 0;
+    if (detectedDepartment) {
+      const chunkDept = readString(metadata, ["department"]);
+      if (chunkDept && chunkDept.toLowerCase().includes(detectedDepartment.toLowerCase())) {
+        deptBoost = 0.15;
+      }
+    }
+
+    const relevanceScore = semanticScore + keywordScore + recencyScore + authorityScore + deptBoost;
+
+    return {
+      ...chunk,
+      relevanceScore,
+    };
+  });
+
+  // Sort by relevance score descending
+  scored.sort((a, b) => (b.relevanceScore ?? 0) - (a.relevanceScore ?? 0));
+
+  return scored;
+}
+
+// Ensure diversity of sources in final selection
+function selectDiverseChunks(chunks: RetrievedChunk[], maxCount: number): RetrievedChunk[] {
+  const selected: RetrievedChunk[] = [];
+  const seenDocs = new Set<string>();
+
+  // First pass: one chunk per unique document
+  for (const chunk of chunks) {
+    const docTitle = readString(chunk.metadata, ["document_title", "title"]) ?? "";
+    if (!seenDocs.has(docTitle) && selected.length < maxCount) {
+      selected.push(chunk);
+      seenDocs.add(docTitle);
+    }
+  }
+
+  // Second pass: fill remaining slots with highest scored chunks
+  for (const chunk of chunks) {
+    if (selected.length >= maxCount) break;
+    if (!selected.includes(chunk)) {
+      selected.push(chunk);
+    }
+  }
+
+  return selected;
+}
+
 export async function retrieveRelevantChunks(
   query: string,
   options?: {
     townId?: string;
     matchThreshold?: number;
     matchCount?: number;
+    finalCount?: number;
   }
 ): Promise<RetrievedChunk[]> {
   const townId = options?.townId ?? DEFAULT_TOWN_ID;
   const matchThreshold = options?.matchThreshold ?? DEFAULT_MATCH_THRESHOLD;
   const matchCount = options?.matchCount ?? DEFAULT_MATCH_COUNT;
+  const finalCount = options?.finalCount ?? DEFAULT_FINAL_COUNT;
 
   const trimmedQuery = query.trim();
   if (!trimmedQuery) {
     return [];
   }
+
+  // Detect department for routing
+  const detectedDepartment = detectDepartment(trimmedQuery);
 
   const embedding = await generateEmbedding(trimmedQuery);
   const supabase = getSupabaseClient({ townId });
@@ -232,7 +357,15 @@ export async function retrieveRelevantChunks(
   }
 
   const rows = (data ?? []) as MatchDocumentRow[];
-  return rows.map((row, index) => toRetrievedChunk(row, index));
+  const chunks = rows.map((row, index) => toRetrievedChunk(row, index));
+
+  // Apply reranking with multiple factors
+  const reranked = rerankChunks(chunks, trimmedQuery, detectedDepartment);
+
+  // Select diverse chunks (max one per document initially)
+  const diverse = selectDiverseChunks(reranked, finalCount);
+
+  return diverse;
 }
 
 export async function textSearchChunks(

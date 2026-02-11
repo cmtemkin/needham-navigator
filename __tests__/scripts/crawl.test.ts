@@ -49,10 +49,15 @@ jest.mock("@mendable/firecrawl-js", () => {
 
 // Mock Supabase
 const mockUpsert = jest.fn().mockResolvedValue({ error: null });
+const mockSelect = jest.fn().mockReturnThis();
+const mockEq = jest.fn().mockResolvedValue({ data: [], error: null });
+
 jest.mock("@/lib/supabase", () => ({
   getSupabaseServiceClient: () => ({
     from: () => ({
       upsert: mockUpsert,
+      select: mockSelect,
+      eq: mockEq,
     }),
   }),
 }));

@@ -31,21 +31,30 @@ describe("monitor", () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // Default: return 2 tracked documents
+    // Content hash of "original content" is a specific value
+    const originalHash = require("crypto").createHash("sha256").update("original content").digest("hex");
+    // Content hash of "new content" is different
+    const newHash = require("crypto").createHash("sha256").update("new content").digest("hex");
+
+    // Default: return 2 tracked documents with source_type and last_changed
     mockSelect.mockReturnValue({
       eq: jest.fn().mockResolvedValue({
         data: [
           {
             id: "doc-1",
             url: "https://www.needhamma.gov/page1",
-            content_hash: "abc123",
-            metadata: { etag: '"old-etag"' },
+            content_hash: originalHash,
+            source_type: "html",
+            last_changed: "2024-01-01T00:00:00Z",
+            metadata: {},
           },
           {
             id: "doc-2",
             url: "https://www.needhamma.gov/page2",
-            content_hash: "def456",
-            metadata: { etag: '"same-etag"' },
+            content_hash: originalHash,
+            source_type: "html",
+            last_changed: "2024-01-01T00:00:00Z",
+            metadata: {},
           },
         ],
         error: null,
@@ -61,26 +70,21 @@ describe("monitor", () => {
       }),
     });
 
-    // Mock fetch for HEAD requests
-    mockFetch.mockImplementation((url: string, options?: RequestInit) => {
-      if (options?.method === "HEAD") {
-        if (url.includes("page1")) {
-          return Promise.resolve({
-            ok: true,
-            headers: new Map([
-              ["etag", '"new-etag"'],
-              ["last-modified", "Wed, 10 Jan 2024 00:00:00 GMT"],
-              ["content-length", "5000"],
-            ]),
-          });
-        }
+    // Mock fetch for content-hash comparison
+    mockFetch.mockImplementation((url: string) => {
+      // page1 has NEW content (hash will differ)
+      if (url.includes("page1")) {
         return Promise.resolve({
           ok: true,
-          headers: new Map([
-            ["etag", '"same-etag"'],
-            ["last-modified", "Mon, 01 Jan 2024 00:00:00 GMT"],
-            ["content-length", "3000"],
-          ]),
+          text: () => Promise.resolve("new content"),
+        });
+      }
+
+      // page2 has SAME content (hash will match)
+      if (url.includes("page2")) {
+        return Promise.resolve({
+          ok: true,
+          text: () => Promise.resolve("original content"),
         });
       }
 
@@ -115,10 +119,10 @@ describe("monitor", () => {
     });
   });
 
-  it("detects changed URLs via ETag mismatch", async () => {
+  it("detects changed URLs via content-hash comparison", async () => {
     const result = await runChangeDetection("needham");
 
-    // page1 has a new etag, page2 has the same etag
+    // page1 has new content (different hash), page2 has same content (same hash)
     expect(result.changedUrls).toContain("https://www.needhamma.gov/page1");
     expect(result.changedUrls).not.toContain("https://www.needhamma.gov/page2");
   });
