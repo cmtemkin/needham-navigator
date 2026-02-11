@@ -30,10 +30,10 @@ The following technology choices have been confirmed and should not be reconside
 | **Database** | Supabase PostgreSQL + pgvector | Free tier for MVP; $25/mo Pro |
 | **Embeddings** | OpenAI text-embedding-3-small | $0.02/1M tokens (~$0.50/yr) |
 | **LLM** | GPT-4o Mini | ~$0.07/mo for 500 questions |
-| **Web Crawling** | Firecrawl API | $16/mo; clean markdown output |
+| **Web Crawling** | Custom scraper (cheerio + readability + turndown) | Free; built for municipal sites |
 | **PDF Extraction** | pypdf + LlamaParse | pypdf for simple; LlamaParse for complex |
-| **Hosting** | Replit | Dev + deploy; NOT Vercel for now |
-| **Scheduling** | Replit Scheduled Deployments | Daily cron for change detection |
+| **Hosting** | Vercel (free tier for MVP, scales with usage) | Automated deploys from GitHub |
+| **Scheduling** | Vercel Cron Jobs or GitHub Actions | Daily cron for change detection |
 | **AI SDK** | Vercel AI SDK | Streaming chat responses |
 
 **Important:** Do NOT substitute or reconsider any of these technology choices. They have been selected deliberately based on cost, capability, and the builder's familiarity.
@@ -764,6 +764,21 @@ After all three branches are merged, use Claude Code on main to:
 ## 13.3 Portfolio Positioning
 
 Frame at the intersection of three narratives: (1) **Product thinking** — identified user pain point, validated through research, built with clear metrics. (2) **AI/tech fluency** — built a production RAG app with embeddings, vector search, LLMs, prompt engineering. (3) **Entrepreneurial execution** — shipped working product in 2 weeks, designed as reusable SaaS framework, launched to real users.
+
+---
+
+### V2 Vision — AI-Powered Local Information Hub
+
+Needham Navigator evolves from a Q&A tool into a full AI-driven local information hub — an autonomous, self-updating newspaper for the town.
+
+**Phase 1 (Current):** Municipal Q&A — chat interface powered by town government documents
+**Phase 2:** Local Events — scrape community calendars (Parks & Rec, Library, Schools, Churches, local businesses) and surface "what's happening this week in Needham"
+**Phase 3:** Community Intelligence — aggregate publicly available data (Google Places, health inspections, real estate trends, school ratings) to answer broader questions about living in Needham
+**Phase 4:** Autonomous Newspaper — AI-generated weekly digest, trending topics, new documents detected, community highlights. Fully automated CI/CD pipeline keeps content fresh daily.
+
+**Domain:** needhamnavigator.com (Squarespace)
+**Hosting:** Vercel with automated deployments from GitHub
+**CI/CD:** GitHub Actions → Vercel deploy on push to main
 
 ---
 

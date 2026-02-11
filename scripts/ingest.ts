@@ -2,7 +2,7 @@
  * scripts/ingest.ts — Main ingestion orchestrator
  *
  * Coordinates the full pipeline:
- * 1. Crawl needhamma.gov with Firecrawl -> markdown pages
+ * 1. Scrape needhamma.gov with custom scraper -> clean markdown pages
  * 2. Download & extract discovered PDFs -> text
  * 3. Chunk all content by document type (Section 4)
  * 4. Generate embeddings & upsert into Supabase pgvector
@@ -10,13 +10,15 @@
  *
  * Usage:
  *   npx tsx scripts/ingest.ts                    # Full ingestion
- *   npx tsx scripts/ingest.ts --limit=10         # Crawl 10 pages only
+ *   npx tsx scripts/ingest.ts --limit=10         # Scrape 10 pages only
  *   npx tsx scripts/ingest.ts --pdf-only         # Only process PDFs
  *   npx tsx scripts/ingest.ts --url=<url>        # Re-ingest single URL
+ *   npx tsx scripts/ingest.ts --scrape-only      # Run just the scraper, no embedding
  */
 
+import { createHash } from "crypto";
 import { getSupabaseServiceClient } from "../src/lib/supabase";
-import { crawlWebsite, CrawlResult } from "./crawl";
+import { scrape, toCrawlResults, CrawlResult } from "./scraper";
 import { extractPdfs, PdfExtractionResult } from "./extract-pdf";
 import { chunkDocument, Chunk, detectDocumentType } from "./chunk";
 import { embedAndStoreChunks } from "./embed";
@@ -39,6 +41,7 @@ interface IngestOptions {
   limit?: number;
   pdfOnly?: boolean;
   singleUrl?: string;
+  scrapeOnly?: boolean;
   triggeredBy?: string;
 }
 
@@ -168,13 +171,76 @@ async function ingestPdfs(
 }
 
 // ---------------------------------------------------------------------------
+// Single URL scraping (replaces Firecrawl single-page scrape)
+// ---------------------------------------------------------------------------
+
+async function scrapeSingleUrl(url: string, userAgent: string): Promise<CrawlResult | null> {
+  try {
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": userAgent,
+        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      },
+      redirect: "follow",
+      signal: AbortSignal.timeout(30000),
+    });
+
+    if (!response.ok) {
+      console.error(`[ingest] HTTP ${response.status} for ${url}`);
+      return null;
+    }
+
+    const html = await response.text();
+
+    // Use JSDOM + Readability for content extraction (same as scraper)
+    const { JSDOM } = await import("jsdom");
+    const { Readability } = await import("@mozilla/readability");
+    const TurndownService = (await import("turndown")).default;
+
+    const dom = new JSDOM(html, { url });
+    const reader = new Readability(dom.window.document, { charThreshold: 50 });
+    const article = reader.parse();
+
+    if (!article?.content) return null;
+
+    const turndown = new TurndownService({ headingStyle: "atx" });
+    turndown.remove(["script", "style", "noscript", "iframe"]);
+    const markdown = turndown.turndown(article.content);
+
+    const title = article.title
+      ?.replace(/\s*[|\-–—]\s*(?:Town of )?Needham,?\s*(?:MA)?/gi, "")
+      .trim() || "Untitled";
+
+    return {
+      url,
+      title,
+      markdown,
+      sourceType: "html",
+      contentHash: createHash("sha256").update(markdown).digest("hex"),
+      fileSizeBytes: Buffer.byteLength(markdown, "utf-8"),
+      pdfUrls: [],
+    };
+  } catch (err) {
+    console.error(`[ingest] Single URL scrape failed for ${url}:`, err);
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
 
 export async function runIngestion(options: IngestOptions = {}): Promise<IngestResult> {
-  const { townId = "needham", limit = 200, pdfOnly = false, singleUrl, triggeredBy = "cli" } = options;
+  const {
+    townId = "needham",
+    limit = 200,
+    pdfOnly = false,
+    singleUrl,
+    scrapeOnly = false,
+    triggeredBy = "cli",
+  } = options;
 
-  const logger = new IngestionLogger({ townId, action: "crawl", triggeredBy });
+  const logger = new IngestionLogger({ townId, action: "scrape", triggeredBy });
 
   let pagesProcessed = 0;
   let pdfsProcessed = 0;
@@ -185,15 +251,16 @@ export async function runIngestion(options: IngestOptions = {}): Promise<IngestR
   let allPdfUrls: string[] = [];
 
   if (!pdfOnly && !singleUrl) {
-    const crawlStage = logger.startStage("Crawl");
+    const crawlStage = logger.startStage("Scrape");
     try {
-      crawlResults = await crawlWebsite({ townId, limit });
+      const scrapeResult = await scrape({ townId, maxPages: limit });
+      crawlResults = toCrawlResults(scrapeResult.documents, scrapeResult.pdfUrls);
       pagesProcessed = crawlResults.length;
       crawlStage.recordSuccess(crawlResults.length);
-      allPdfUrls = Array.from(new Set(crawlResults.flatMap((r) => r.pdfUrls)));
+      allPdfUrls = scrapeResult.pdfUrls;
       crawlStage.addDetail("pdf_urls_discovered", allPdfUrls.length);
     } catch (err) {
-      crawlStage.recordFailure(1, `Crawl failed: ${err}`);
+      crawlStage.recordFailure(1, `Scrape failed: ${err}`);
     }
     logger.addStageResult(crawlStage.finish());
   }
@@ -205,30 +272,39 @@ export async function runIngestion(options: IngestOptions = {}): Promise<IngestR
         allPdfUrls = [singleUrl];
         singleStage.recordSuccess();
       } else {
-        const Firecrawl = (await import("@mendable/firecrawl-js")).default;
-        const firecrawl = new Firecrawl({ apiKey: process.env.FIRECRAWL_API_KEY! });
-        const scrapeResult = await firecrawl.scrape(singleUrl, { formats: ["markdown"] });
-        if (scrapeResult.markdown) {
-          const { createHash } = await import("crypto");
-          crawlResults = [{
-            url: singleUrl,
-            title: (scrapeResult.metadata?.title as string) || "Untitled",
-            markdown: scrapeResult.markdown,
-            sourceType: "html",
-            contentHash: createHash("sha256").update(scrapeResult.markdown).digest("hex"),
-            fileSizeBytes: Buffer.byteLength(scrapeResult.markdown, "utf-8"),
-            pdfUrls: [],
-          }];
+        const result = await scrapeSingleUrl(
+          singleUrl,
+          "NeedhamNavigator/1.0 (community civic tool) Node.js"
+        );
+        if (result) {
+          crawlResults = [result];
           pagesProcessed = 1;
           singleStage.recordSuccess();
         } else {
-          singleStage.recordFailure(1, "No markdown returned from scrape");
+          singleStage.recordFailure(1, "No content extracted from URL");
         }
       }
     } catch (err) {
       singleStage.recordFailure(1, `Single URL re-ingest failed: ${err}`);
     }
     logger.addStageResult(singleStage.finish());
+  }
+
+  // If scrape-only mode, stop after scraping
+  if (scrapeOnly) {
+    console.log("\n[ingest] --scrape-only mode: stopping after scrape (no embedding)");
+    const summary = await logger.finish({
+      pages_processed: pagesProcessed,
+      pdfs_discovered: allPdfUrls.length,
+      scrape_only: true,
+    });
+    return {
+      pagesProcessed,
+      pdfsProcessed: 0,
+      totalChunks: 0,
+      totalErrors: summary.totalErrors,
+      durationMs: summary.totalDurationMs,
+    };
   }
 
   if (crawlResults.length > 0) {
@@ -285,11 +361,12 @@ if (require.main === module) {
   const args = process.argv.slice(2);
   const limit = parseInt(args.find((a) => a.startsWith("--limit="))?.split("=")[1] || "200");
   const pdfOnly = args.includes("--pdf-only");
+  const scrapeOnly = args.includes("--scrape-only");
   const singleUrl = args.find((a) => a.startsWith("--url="))?.split("=").slice(1).join("=");
 
   (async () => {
     try {
-      await runIngestion({ limit, pdfOnly, singleUrl });
+      await runIngestion({ limit, pdfOnly, singleUrl, scrapeOnly });
     } catch (err) {
       console.error("Ingestion failed:", err);
       process.exit(1);

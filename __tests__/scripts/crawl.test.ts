@@ -1,125 +1,110 @@
 /**
- * Tests for the crawl module.
+ * Tests for the scraper module.
  *
- * Since crawl.ts relies heavily on external APIs (Firecrawl, Supabase),
- * we test the exported helper functions and mock the API calls.
+ * Tests the scraper configuration helpers and content extraction.
+ * The actual crawling is tested via integration tests against real URLs.
  */
 
-// We need to test the helper functions that are used internally.
-// Since they're not exported, we test through the public interface
-// with mocked dependencies.
+import {
+  shouldSkipUrl,
+  isAllowedDomain,
+  isPdfUrl,
+  getDepartmentFromUrl,
+  NEEDHAM_CONFIG,
+} from "../../scripts/scraper-config";
 
-// Mock Firecrawl — v2 API: crawl(), map(), scrape()
-jest.mock("@mendable/firecrawl-js", () => {
-  return {
-    __esModule: true,
-    default: jest.fn().mockImplementation(() => ({
-      crawl: jest.fn().mockResolvedValue({
-        id: "test-job",
-        status: "completed",
-        total: 2,
-        completed: 2,
-        data: [
-          {
-            markdown: "# Town Hall\n\nVisit us at 1471 Highland Ave.\n\n[Budget PDF](/documents/budget.pdf)",
-            metadata: {
-              sourceURL: "https://www.needhamma.gov/town-hall",
-              title: "Town Hall",
-            },
-          },
-          {
-            markdown: "# Transfer Station\n\nOpen Wed and Sat.\n\n[Fee Schedule](/docs/fees.pdf)",
-            metadata: {
-              sourceURL: "https://www.needhamma.gov/transfer-station",
-              title: "Transfer Station",
-            },
-          },
-        ],
-      }),
-      map: jest.fn().mockResolvedValue({
-        links: [
-          { url: "https://www.needhamma.gov/", title: "Home" },
-          { url: "https://www.needhamma.gov/town-hall", title: "Town Hall" },
-          { url: "https://www.needhamma.gov/transfer-station", title: "Transfer Station" },
-        ],
-      }),
-    })),
-  };
-});
+describe("scraper-config", () => {
+  describe("shouldSkipUrl", () => {
+    it("skips calendar URLs", () => {
+      expect(shouldSkipUrl("https://www.needhamma.gov/Calendar.aspx")).toBe(true);
+    });
 
-// Mock Supabase
-const mockUpsert = jest.fn().mockResolvedValue({ error: null });
-const mockSelect = jest.fn().mockReturnThis();
-const mockEq = jest.fn().mockResolvedValue({ data: [], error: null });
+    it("skips image URLs", () => {
+      expect(shouldSkipUrl("https://www.needhamma.gov/photo.jpg")).toBe(true);
+      expect(shouldSkipUrl("https://www.needhamma.gov/logo.png")).toBe(true);
+    });
 
-jest.mock("@/lib/supabase", () => ({
-  getSupabaseServiceClient: () => ({
-    from: () => ({
-      upsert: mockUpsert,
-      select: mockSelect,
-      eq: mockEq,
-    }),
-  }),
-}));
+    it("skips login URLs", () => {
+      expect(shouldSkipUrl("https://www.needhamma.gov/Login.aspx")).toBe(true);
+    });
 
-describe("crawl", () => {
-  const originalEnv = process.env;
+    it("skips mailto links", () => {
+      expect(shouldSkipUrl("mailto:admin@needhamma.gov")).toBe(true);
+    });
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-    process.env = {
-      ...originalEnv,
-      FIRECRAWL_API_KEY: "test-fc-key",
-      SUPABASE_URL: "https://test.supabase.co",
-      SUPABASE_SERVICE_KEY: "test-service-key",
-    };
+    it("allows regular content URLs", () => {
+      expect(shouldSkipUrl("https://www.needhamma.gov/87/Public-Works")).toBe(false);
+      expect(shouldSkipUrl("https://www.needhamma.gov/1614/Zoning-By-Laws")).toBe(false);
+    });
   });
 
-  afterEach(() => {
-    process.env = originalEnv;
+  describe("isAllowedDomain", () => {
+    it("allows needhamma.gov", () => {
+      expect(isAllowedDomain("https://www.needhamma.gov/page")).toBe(true);
+      expect(isAllowedDomain("https://needhamma.gov/page")).toBe(true);
+    });
+
+    it("rejects other domains", () => {
+      expect(isAllowedDomain("https://www.google.com")).toBe(false);
+      expect(isAllowedDomain("https://www.mbta.com/schedules")).toBe(false);
+    });
+
+    it("handles invalid URLs gracefully", () => {
+      expect(isAllowedDomain("not-a-url")).toBe(false);
+    });
   });
 
-  it("crawls website and returns results", async () => {
-    const { crawlWebsite } = await import("../../scripts/crawl");
-    const results = await crawlWebsite({ limit: 10, townId: "needham" });
+  describe("isPdfUrl", () => {
+    it("detects PDF URLs", () => {
+      expect(isPdfUrl("https://www.needhamma.gov/docs/budget.pdf")).toBe(true);
+      expect(isPdfUrl("https://www.needhamma.gov/docs/budget.PDF")).toBe(true);
+    });
 
-    expect(results).toHaveLength(2);
-    expect(results[0].url).toBe("https://www.needhamma.gov/town-hall");
-    expect(results[0].title).toBe("Town Hall");
-    expect(results[0].sourceType).toBe("html");
-    expect(results[0].contentHash).toBeDefined();
+    it("detects PDFs with query params", () => {
+      expect(isPdfUrl("https://www.needhamma.gov/docs/budget.pdf?v=2")).toBe(true);
+    });
+
+    it("rejects non-PDF URLs", () => {
+      expect(isPdfUrl("https://www.needhamma.gov/page")).toBe(false);
+      expect(isPdfUrl("https://www.needhamma.gov/page.html")).toBe(false);
+    });
   });
 
-  it("discovers PDF URLs from page content", async () => {
-    const { crawlWebsite } = await import("../../scripts/crawl");
-    const results = await crawlWebsite({ limit: 10, townId: "needham" });
+  describe("getDepartmentFromUrl", () => {
+    it("detects Planning department", () => {
+      expect(getDepartmentFromUrl("https://www.needhamma.gov/planning/board")).toBe(
+        "Planning & Community Development"
+      );
+    });
 
-    // Both pages have PDF links
-    const allPdfs = results.flatMap((r) => r.pdfUrls);
-    expect(allPdfs.length).toBeGreaterThan(0);
-    expect(allPdfs.some((u) => u.includes(".pdf"))).toBe(true);
+    it("detects Public Works", () => {
+      expect(getDepartmentFromUrl("https://www.needhamma.gov/87/Public-Works")).toBe(
+        "Public Works"
+      );
+    });
+
+    it("detects Board of Health", () => {
+      expect(getDepartmentFromUrl("https://www.needhamma.gov/health/regulations")).toBe(
+        "Board of Health"
+      );
+    });
+
+    it("returns undefined for unknown paths", () => {
+      expect(getDepartmentFromUrl("https://www.needhamma.gov/")).toBeUndefined();
+    });
   });
 
-  it("stores crawl results in Supabase", async () => {
-    const { crawlWebsite } = await import("../../scripts/crawl");
-    await crawlWebsite({ limit: 10, townId: "needham" });
+  describe("NEEDHAM_CONFIG", () => {
+    it("has required fields", () => {
+      expect(NEEDHAM_CONFIG.townId).toBe("needham");
+      expect(NEEDHAM_CONFIG.seedUrls).toContain("https://www.needhamma.gov");
+      expect(NEEDHAM_CONFIG.maxDepth).toBeGreaterThan(0);
+      expect(NEEDHAM_CONFIG.crawlDelayMs).toBeGreaterThanOrEqual(1000);
+    });
 
-    expect(mockUpsert).toHaveBeenCalled();
-  });
-
-  it("throws if FIRECRAWL_API_KEY is missing", async () => {
-    delete process.env.FIRECRAWL_API_KEY;
-    jest.resetModules();
-
-    const { crawlWebsite } = await import("../../scripts/crawl");
-    await expect(crawlWebsite()).rejects.toThrow("Missing environment variable: FIRECRAWL_API_KEY");
-  });
-
-  it("discovers URLs via map endpoint", async () => {
-    const { discoverUrls } = await import("../../scripts/crawl");
-    const urls = await discoverUrls();
-
-    expect(urls).toHaveLength(3);
-    expect(urls).toContain("https://www.needhamma.gov/");
+    it("has polite crawl delay", () => {
+      // Ensure we don't accidentally set an aggressive crawl rate
+      expect(NEEDHAM_CONFIG.crawlDelayMs).toBeGreaterThanOrEqual(500);
+    });
   });
 });

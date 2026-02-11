@@ -27,6 +27,13 @@ Needham Navigator is an AI-powered municipal information hub built with Next.js 
 - Admin routes in `src/app/admin/`
 - Do NOT modify ingestion scripts (`scripts/`) unless explicitly asked
 
+## Key Decisions
+- **Domain:** needhamnavigator.com (purchased on Squarespace)
+- **Hosting:** Vercel (changed from Replit — cheaper for Next.js apps, better CI/CD)
+- **Vision:** Beyond Q&A → full AI-driven local information hub / autonomous newspaper. Events, reviews, community news. Fully automated CI/CD.
+- **Web Crawling:** Custom scraper (cheerio + @mozilla/readability + turndown) — replaces Firecrawl ($16/mo savings). Built specifically for municipal CivicPlus sites.
+- **CI/CD:** GitHub Actions → Vercel deploy on push to main
+
 ## Merge-to-Main Checklist
 Every time code is merged to `main`, complete these steps before pushing:
 

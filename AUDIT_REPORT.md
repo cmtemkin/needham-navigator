@@ -17,7 +17,7 @@
      - RLS policies for extensive security.
 3. **Data Ingestion Scripts**
    - `scripts/ingest.ts`, `crawl.ts`, `extract-pdf.ts` are well-structured.
-   - Env vars (`FIRECRAWL_API_KEY`, `LLAMAPARSE_API_KEY`) are correctly used.
+   - Env vars (`LLAMAPARSE_API_KEY`) are correctly used. Custom scraper replaced Firecrawl.
 4. **Legal & Compliance**
    - Disclaimer text is present in `Footer.tsx` and `prompts.ts`.
 
