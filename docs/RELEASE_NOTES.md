@@ -2,6 +2,52 @@
 
 ---
 
+## v0.6.0 — 2026-02-11
+
+**AI Polish & Municipal Intelligence**
+
+### New Features
+
+**Conversational AI Personality**
+- Rewritten system prompt: warm, conversational tone like a friendly town clerk
+- Leads with direct answers, ends with natural follow-up questions
+- Understands informal language ("the dump", "cops", "can I build a deck")
+- Phone numbers are clickable (tel: links) in chat responses
+- No bracket citations or metadata in AI text — clean, natural prose
+
+**Smart Query Expansion** (`src/lib/synonyms.ts`)
+- Two-tier synonym dictionary: 30+ universal entries + 9 Needham-specific entries
+- Automatic query expansion: "dump" → also searches "Transfer Station, solid waste, recycling"
+- Intent detection: "when is X open?" adds schedule/hours keywords to search
+- Department routing: matches queries to relevant town departments for reranking
+- Word-boundary matching prevents false positives (e.g., "street" won't match "tree")
+
+**Improved Source Citations**
+- Clean citation pills: CivicPlus CMS metadata stripped from document titles
+- Clickable source links open official town pages in a new tab
+- Generic/untitled sources filtered out automatically
+- Deduplication by URL, max 4 source pills per response
+- Responsive overflow handling on mobile
+
+**Better Confidence Scoring**
+- Now based on top similarity score (not average), more accurate for mixed-quality results
+- Configurable thresholds via environment variables (`CONFIDENCE_HIGH_THRESHOLD`, `CONFIDENCE_MEDIUM_THRESHOLD`)
+- New labels: "Verified from official sources" (high), "Based on town documents — verify for important decisions" (medium), "Limited information — contact the department directly" (low)
+- Updated labels in all 3 languages (en/es/zh)
+
+**Smarter Retrieval Pipeline**
+- Multi-query vector search: parallel searches with original + expanded queries
+- Similarity floor (0.35) filters out noise chunks
+- Multi-factor reranking: semantic similarity (60%), keyword overlap (20%), recency (10%), document authority (10%), plus department boost
+- Source diversity: selects chunks from different documents to avoid redundancy
+- Lowered match threshold to 0.30 for better recall
+
+### Bug Fixes
+- Fixed source format mismatch between API (`document_title`) and UI (`title`)
+- Edge case handling in system prompt (off-topic, ambiguous, multi-part questions)
+
+---
+
 ## v0.5.1 — 2026-02-11
 
 **Chat Bug Fix & Data Quality Improvements**

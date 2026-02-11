@@ -24,7 +24,11 @@ The home page shows popular questions, life-situation tiles, and department cont
 Navigate to **Ask a Question** from the header or visit `/<town>/chat`.
 
 - Type any question about town services, permits, zoning, schools, or departments
-- The AI responds with sourced answers, confidence levels, and follow-up suggestions
+- **Use everyday language** — say "the dump" instead of "Transfer Station", "who do I call about a rat" instead of "Board of Health contact" — the AI understands informal phrasing and expands your query automatically
+- The AI responds conversationally with sourced answers, confidence levels, and follow-up suggestions
+- **Clickable sources** — each response shows source pills linking directly to official town pages
+- **Clickable phone numbers** — phone numbers in answers are tap-to-call on mobile
+- **Confidence levels** — "Verified from official sources" (green), "Based on town documents" (yellow), or "Limited information" (orange) helps you know when to verify
 - Click a follow-up suggestion to continue the conversation
 - **Feedback**: Every AI response has thumbs up/down buttons — your feedback helps improve answers. You can optionally add a comment.
 
@@ -164,8 +168,9 @@ Legacy URLs like `/chat` automatically redirect to the default town.
 
 ## Tips
 
-- **Use everyday language** — You can say "the dump" instead of "Transfer Station" or "who do I call about a rat" instead of "Board of Health contact" — the AI understands informal phrasing
+- **Use everyday language** — Say "the dump", "cops", "can I build a deck" — the AI understands slang and informal phrasing, and automatically expands your search to find the right town info
 - **Be specific** — "What permits do I need for a 6-foot fence on my property line?" gets better answers than "fence permit"
 - **Use the Permit Wizard first** — it gives you a structured checklist, then you can ask follow-ups in chat
-- **Check confidence levels** — high confidence means strong source matches; low confidence means you should verify with the town directly
+- **Check confidence levels** — green ("Verified") means strong source matches; orange ("Limited info") means you should call the department directly
+- **Click source pills** — each answer includes clickable links to the official town pages the answer was based on
 - **Always verify** — This is an AI tool. For official decisions, contact the relevant department directly using the phone numbers provided.

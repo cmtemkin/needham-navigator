@@ -326,12 +326,12 @@ describe("Test 8 — Confidence Scoring", () => {
             { metadata: { document_type: "regulation" } },
             { metadata: { document_type: "regulation" } },
         ];
-        const result = scoreConfidence([0.92, 0.88, 0.90], officialChunks);
+        const result = scoreConfidence([0.92, 0.88, 0.90]);
         expect(result.level).toBe("high");
     });
 
     it("returns 'medium' for mid-range similarities", () => {
-        const result = scoreConfidence([0.75, 0.72]);
+        const result = scoreConfidence([0.50, 0.45]);
         expect(result.level).toBe("medium");
     });
 
