@@ -6,7 +6,8 @@ export const DEFAULT_TOWN_ID = DEFAULT_TOWN_ID_FROM_CONFIG;
 
 const DEFAULT_MATCH_THRESHOLD = 0.7;
 const DEFAULT_MATCH_COUNT = 20; // Retrieve more for reranking
-const DEFAULT_FINAL_COUNT = 8; // Final chunks to return after reranking
+const DEFAULT_FINAL_COUNT = 5; // Final chunks to pass to LLM
+const MIN_SIMILARITY_FLOOR = 0.35; // Drop chunks below this — they're noise
 
 type ChunkMetadata = Record<string, unknown>;
 
@@ -85,6 +86,29 @@ function readNumber(meta: ChunkMetadata, keys: string[]): number | undefined {
   return undefined;
 }
 
+/**
+ * Strip CivicPlus CMS metadata from document titles.
+ * "Frequently Asked Questions - CivicPlus.CMS.FAQ" → "Frequently Asked Questions"
+ */
+const GENERIC_TITLES = new Set(["untitled", "default", "n/a", "none", "document"]);
+
+export function cleanDocumentTitle(title: string): string {
+  let cleaned = title;
+  // Remove CivicPlus module suffixes like "- CivicPlus.CMS.FAQ", "- CivicPlus.CMS.Document"
+  cleaned = cleaned.replace(/\s*[-–]\s*CivicPlus\.[A-Za-z.]+$/i, "");
+  // Remove trailing " - Needham, MA" or " | Town of Needham"
+  cleaned = cleaned.replace(/\s*[-–|]\s*(?:Town of\s+)?Needham(?:,?\s*MA)?$/i, "");
+  // Remove leading/trailing whitespace
+  cleaned = cleaned.trim();
+  // If the title is now empty or too generic, fall back
+  if (!cleaned || cleaned.length < 3) return title.trim();
+  return cleaned;
+}
+
+function isGenericTitle(title: string): boolean {
+  return GENERIC_TITLES.has(title.toLowerCase().trim());
+}
+
 function cleanLine(text: string, maxLength = 400): string {
   const normalized = text.replace(/\s+/g, " ").trim();
   if (normalized.length <= maxLength) {
@@ -130,12 +154,21 @@ function getDocumentDate(metadata: ChunkMetadata): string | undefined {
 }
 
 export function formatSourceCitation(metadata: ChunkMetadata): string {
-  const documentTitle =
+  const rawTitle =
     readString(metadata, ["document_title", "title"]) ?? "Unknown Document";
-  const section = getSection(metadata) ?? "Section n/a";
-  const date = getDocumentDate(metadata) ?? "Unknown date";
+  const documentTitle = cleanDocumentTitle(rawTitle);
+  const section = getSection(metadata);
+  const date = getDocumentDate(metadata);
 
-  return `[${documentTitle}, ${section} (${date})]`;
+  // Only include section/date if they're meaningful (not "Default", "Introduction", "Unknown date")
+  const boilerplateSections = new Set(["default", "introduction", "section n/a", "n/a"]);
+  const cleanSection = section && !boilerplateSections.has(section.toLowerCase()) ? section : undefined;
+  const cleanDate = date && date !== "Unknown date" ? date : undefined;
+
+  if (cleanSection && cleanDate) return `[${documentTitle}, ${cleanSection} (${cleanDate})]`;
+  if (cleanSection) return `[${documentTitle}, ${cleanSection}]`;
+  if (cleanDate) return `[${documentTitle} (${cleanDate})]`;
+  return `[${documentTitle}]`;
 }
 
 export function toSourceReference(
@@ -143,8 +176,9 @@ export function toSourceReference(
   sourceId = "S1"
 ): SourceReference {
   const metadata = asMetadata(metadataValue);
-  const documentTitle =
+  const rawTitle =
     readString(metadata, ["document_title", "title"]) ?? "Unknown Document";
+  const documentTitle = cleanDocumentTitle(rawTitle);
   const section = getSection(metadata);
   const date = getDocumentDate(metadata);
   const documentUrl = readString(metadata, ["document_url", "url"]);
@@ -188,17 +222,24 @@ export function buildContextDocuments(chunks: RetrievedChunk[]): Array<{
   }));
 }
 
+const MAX_SOURCE_PILLS = 4;
+
 export function dedupeSources(chunks: RetrievedChunk[]): SourceReference[] {
   const seen = new Map<string, SourceReference>();
 
   for (const chunk of chunks) {
-    const key = `${chunk.source.citation}|${chunk.source.documentUrl ?? ""}`;
+    // Skip sources with generic/meaningless titles
+    if (isGenericTitle(chunk.source.documentTitle)) continue;
+    // Dedup by URL first, then by cleaned title
+    const key = chunk.source.documentUrl
+      ? chunk.source.documentUrl
+      : chunk.source.documentTitle;
     if (!seen.has(key)) {
       seen.set(key, chunk.source);
     }
   }
 
-  return Array.from(seen.values());
+  return Array.from(seen.values()).slice(0, MAX_SOURCE_PILLS);
 }
 
 // Query expansion: add related terms for better recall
@@ -360,8 +401,11 @@ export async function retrieveRelevantChunks(
   const rows = (data ?? []) as MatchDocumentRow[];
   const chunks = rows.map((row, index) => toRetrievedChunk(row, index));
 
+  // Filter out noise — chunks below the similarity floor are irrelevant
+  const relevant = chunks.filter((c) => c.similarity >= MIN_SIMILARITY_FLOOR);
+
   // Apply reranking with multiple factors
-  const reranked = rerankChunks(chunks, trimmedQuery, detectedDepartment);
+  const reranked = rerankChunks(relevant, trimmedQuery, detectedDepartment);
 
   // Select diverse chunks (max one per document initially)
   const diverse = selectDiverseChunks(reranked, finalCount);

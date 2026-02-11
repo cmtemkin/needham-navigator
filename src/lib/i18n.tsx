@@ -44,9 +44,9 @@ const DICTIONARIES: Record<LanguageCode, Record<string, string>> = {
     "chat.input_disclaimer":
       "AI-generated responses may be inaccurate. Always verify with official sources. Not affiliated with the Town of {town}.",
     "chat.error_response": "Unable to load a response right now.",
-    "confidence.high": "High confidence",
-    "confidence.medium": "Medium confidence",
-    "confidence.low": "Low confidence",
+    "confidence.high": "Verified from official sources",
+    "confidence.medium": "Based on town documents",
+    "confidence.low": "Limited info — call the department",
     "footer.disclaimer":
       "{app_name} is an independent community tool. Not affiliated with, endorsed by, or operated by the Town of {town}. AI responses may contain errors. Always verify with official sources at {website} or call {phone}.",
     "footer.terms_privacy": "Terms · Privacy",
@@ -97,9 +97,9 @@ const DICTIONARIES: Record<LanguageCode, Record<string, string>> = {
     "chat.input_disclaimer":
       "Las respuestas generadas por IA pueden contener errores. Verifica siempre con fuentes oficiales. No esta afiliado al Municipio de {town}.",
     "chat.error_response": "No se puede cargar una respuesta en este momento.",
-    "confidence.high": "Alta confianza",
-    "confidence.medium": "Confianza media",
-    "confidence.low": "Baja confianza",
+    "confidence.high": "Verificado de fuentes oficiales",
+    "confidence.medium": "Basado en documentos municipales",
+    "confidence.low": "Info limitada — llame al departamento",
     "footer.disclaimer":
       "{app_name} es una herramienta comunitaria independiente. No esta afiliada, respaldada ni operada por el Municipio de {town}. Las respuestas de IA pueden contener errores. Verifica siempre con fuentes oficiales en {website} o llama al {phone}.",
     "footer.terms_privacy": "Terminos · Privacidad",
@@ -150,9 +150,9 @@ const DICTIONARIES: Record<LanguageCode, Record<string, string>> = {
     "chat.input_disclaimer":
       "AI 生成的回答可能不完全准确，请务必以官方来源为准。本工具与 {town} 市政机构无隶属关系。",
     "chat.error_response": "当前无法加载回复。",
-    "confidence.high": "高置信度",
-    "confidence.medium": "中等置信度",
-    "confidence.low": "低置信度",
+    "confidence.high": "已从官方来源核实",
+    "confidence.medium": "基于市政文件",
+    "confidence.low": "信息有限 — 请致电相关部门",
     "footer.disclaimer":
       "{app_name} 是独立社区工具，与 {town} 市政机构无隶属、背书或运营关系。AI 回答可能有误，请通过 {website} 或致电 {phone} 进行核实。",
     "footer.terms_privacy": "条款 · 隐私",

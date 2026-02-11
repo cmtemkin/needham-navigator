@@ -98,7 +98,13 @@ function ChatContent() {
                   } else if (data.type === "data-confidence") {
                     confidence = data.data?.level ?? data.data;
                   } else if (data.type === "data-sources") {
-                    sources = data.data;
+                    // Map API source format to MockSource format used by ChatBubble
+                    sources = (data.data ?? []).map((s: Record<string, unknown>) => ({
+                      title: (s.document_title as string) ?? (s.title as string) ?? "Source",
+                      section: s.section as string | undefined,
+                      date: s.date as string | undefined,
+                      url: (s.document_url as string) ?? (s.url as string) ?? undefined,
+                    }));
                   }
                 } catch {
                   // Skip invalid JSON chunks

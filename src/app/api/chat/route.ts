@@ -131,8 +131,8 @@ export async function POST(request: Request): Promise<Response> {
   try {
     const chunks = await retrieveRelevantChunks(latestUserMessage.content, {
       townId,
-      matchThreshold: 0.40,
-      matchCount: 8,
+      matchThreshold: 0.30,
+      matchCount: 20,
     });
 
     const confidence = scoreConfidenceFromChunks(chunks);
@@ -149,9 +149,8 @@ export async function POST(request: Request): Promise<Response> {
     if (chunks.length === 0) {
       return staticStreamResponse({
         text: [
-          "I don't have specific information about that in the indexed Needham documents yet.",
-          "Please contact the relevant town department directly or call Town Hall at (781) 455-7500.",
-          "For Needham-specific help, you can ask about permits, zoning, transfer station hours, schools, taxes, or town services.",
+          "I'm not sure about that one. Your best bet is to call Town Hall at (781) 455-7500 — they'll know right away or can point you to the right department.",
+          "You can also try asking me about permits, zoning, the Transfer Station, schools, taxes, or other town services.",
         ].join("\n\n"),
         confidence,
         sources,

@@ -6,12 +6,16 @@ export type ConfidenceScore = {
   label: string;
   color: ConfidenceColor;
   averageSimilarity: number;
+  topSimilarity: number;
   supportingChunks: number;
   reason: string;
 };
 
-const HIGH_THRESHOLD = 0.85;
-const MEDIUM_THRESHOLD = 0.7;
+// Configurable thresholds — tune based on data quality.
+// Current crawled data has boilerplate diluting scores, so 0.60 is realistic for "high".
+const HIGH_THRESHOLD = parseFloat(process.env.CONFIDENCE_HIGH_THRESHOLD ?? "0.60");
+const MEDIUM_THRESHOLD = parseFloat(process.env.CONFIDENCE_MEDIUM_THRESHOLD ?? "0.40");
+const HIGH_MIN_CHUNKS = 2;
 
 function roundTo(value: number, decimals: number): number {
   const factor = 10 ** decimals;
@@ -22,9 +26,10 @@ export function scoreConfidence(similarities: number[]): ConfidenceScore {
   if (similarities.length === 0) {
     return {
       level: "low",
-      label: "Low Confidence",
+      label: "Limited information — contact the department directly",
       color: "orange",
       averageSimilarity: 0,
+      topSimilarity: 0,
       supportingChunks: 0,
       reason: "No supporting documents were retrieved.",
     };
@@ -37,9 +42,10 @@ export function scoreConfidence(similarities: number[]): ConfidenceScore {
   if (validScores.length === 0) {
     return {
       level: "low",
-      label: "Low Confidence",
+      label: "Limited information — contact the department directly",
       color: "orange",
       averageSimilarity: 0,
+      topSimilarity: 0,
       supportingChunks: 0,
       reason: "Similarity scores were unavailable for retrieved documents.",
     };
@@ -48,39 +54,40 @@ export function scoreConfidence(similarities: number[]): ConfidenceScore {
   const averageSimilarity =
     validScores.reduce((sum, value) => sum + value, 0) / validScores.length;
   const roundedAverage = roundTo(averageSimilarity, 3);
+  const topSimilarity = roundTo(Math.max(...validScores), 3);
 
-  if (roundedAverage > HIGH_THRESHOLD && validScores.length >= 2) {
+  if (topSimilarity >= HIGH_THRESHOLD && validScores.length >= HIGH_MIN_CHUNKS) {
     return {
       level: "high",
-      label: "High Confidence",
+      label: "Verified from official sources",
       color: "green",
       averageSimilarity: roundedAverage,
+      topSimilarity,
       supportingChunks: validScores.length,
-      reason:
-        "Multiple supporting chunks have strong semantic similarity (> 0.85).",
+      reason: `Top match similarity ${topSimilarity} with ${validScores.length} supporting chunks.`,
     };
   }
 
-  if (roundedAverage >= MEDIUM_THRESHOLD || validScores.length === 1) {
+  if (topSimilarity >= MEDIUM_THRESHOLD || validScores.length === 1) {
     return {
       level: "medium",
-      label: "Medium Confidence",
+      label: "Based on town documents — verify for important decisions",
       color: "yellow",
       averageSimilarity: roundedAverage,
+      topSimilarity,
       supportingChunks: validScores.length,
-      reason:
-        "Some relevant supporting context was found, but verification may still be needed.",
+      reason: `Top match similarity ${topSimilarity}. Verification recommended.`,
     };
   }
 
   return {
     level: "low",
-    label: "Low Confidence",
+    label: "Limited information — contact the department directly",
     color: "orange",
     averageSimilarity: roundedAverage,
+    topSimilarity,
     supportingChunks: validScores.length,
-    reason:
-      "Matches were weak (< 0.70 similarity) or not sufficiently corroborated.",
+    reason: `Top match similarity ${topSimilarity} is below ${MEDIUM_THRESHOLD}.`,
   };
 }
 

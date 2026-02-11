@@ -64,7 +64,7 @@ export function ChatBubble({ message, onFollowupClick, sessionId }: ChatBubblePr
 
           {/* Source chips */}
           {message.sources && message.sources.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-3">
+            <div className="flex flex-wrap gap-1.5 mt-3 sm:flex-wrap overflow-x-auto scrollbar-hide">
               {message.sources.map((source, i) => (
                 <SourceChip key={i} source={source} />
               ))}
@@ -112,6 +112,10 @@ function TypingDots() {
 function formatMarkdown(text: string): string {
   return text
     .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    // Make phone numbers clickable: (781) 455-7500 → <a href="tel:+17814557500">
+    .replace(/\((\d{3})\)\s*(\d{3})-(\d{4})/g, '<a href="tel:+1$1$2$3" class="text-primary underline">($1) $2-$3</a>')
+    // Numbered lists: "1. " → <li>
+    .replace(/\n(\d+)\.\s/g, "\n<li>")
     .replace(/\n- /g, "\n<li>")
     .replace(/\n\n/g, "</p><p>")
     .replace(/\n/g, "<br>")
