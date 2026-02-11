@@ -9,6 +9,81 @@
 import { createHash } from "crypto";
 
 // ---------------------------------------------------------------------------
+// Boilerplate stripping — removes CivicEngage/needhamma.gov chrome
+// ---------------------------------------------------------------------------
+
+const BOILERPLATE_PATTERNS: Array<{ pattern: RegExp; label: string }> = [
+  // Loading placeholders & spinner images
+  { pattern: /!\[Loading\]\([^)]*\)/g, label: "loading-img" },
+  { pattern: /^Loading$/gm, label: "loading-text" },
+
+  // Skip-to-content links
+  { pattern: /\[Skip to Main Content\]\([^)]*\)/g, label: "skip-nav" },
+
+  // CivicEngage image repository images (decorative banners, logos)
+  { pattern: /!\[\]\(https?:\/\/(?:www\.)?needhamma\.gov\/ImageRepository\/[^)]*\)/g, label: "banner-img" },
+
+  // Breadcrumb trails: numbered list where each item is a link to needhamma.gov
+  { pattern: /^(?:\d+\.\s*\[[^\]]*\]\(https?:\/\/(?:www\.)?needhamma\.gov\/[^)]*\)\n?)+/gm, label: "breadcrumbs" },
+
+  // "Do Not Show Again Close" modal/popup leftovers
+  { pattern: /Do Not Show AgainClose/g, label: "modal-close" },
+
+  // BESbswy font measurement strings (CivicEngage anti-FOUT)
+  { pattern: /(?:BESbswy){2,}/g, label: "font-probe" },
+
+  // Google Translate language picker (massive list of language names)
+  { pattern: /Select Language\s*(?:Abkhaz|Acehnese)[\s\S]*?(?:Zulu|Zapotec)\b/g, label: "translate-picker" },
+  // Continuation fragments of the language list (orphan chunk)
+  { pattern: /^[a-zA-Z]+(?:ese|ian|ish|ala|ulu|tic|ari|aze|ala)\b(?:[A-Z][a-z]+){5,}/gm, label: "translate-fragment" },
+
+  // "Powered by Google Translate" badge
+  { pattern: /Powered by \[!\[Google Translate\][^\]]*\]\([^)]*\)\s*/g, label: "translate-badge" },
+
+  // Slideshow / carousel controls
+  { pattern: /Arrow LeftArrow Right/g, label: "carousel-arrows" },
+  { pattern: /Slideshow Left Arrow[\s\S]*?Slideshow Right Arrow/g, label: "slideshow-ctrl" },
+
+  // Newsletter sign-up CTA
+  { pattern: /Sign Up for the Town's Weekly e-Newsletter/g, label: "newsletter-cta" },
+
+  // Close button text
+  { pattern: /^Close \*\*×\*\*$/gm, label: "close-btn" },
+
+  // Empty image tags (no alt text, decorative)
+  { pattern: /!\[\]\([^)]*\)/g, label: "empty-img" },
+
+  // CivicEngage footer boilerplate
+  { pattern: /Government Websites by CivicPlus®?/g, label: "civic-footer" },
+  { pattern: /\[Powered by.*?CivicPlus.*?\]\([^)]*\)/g, label: "civic-powered" },
+
+  // Repeated "Loading\nLoading" blocks
+  { pattern: /(?:Loading\s*\n\s*){2,}/g, label: "multi-loading" },
+];
+
+/**
+ * Strip HTML/CMS boilerplate from crawled markdown, keeping only
+ * the substantive page content.
+ */
+export function stripBoilerplate(markdown: string): string {
+  let cleaned = markdown;
+
+  for (const { pattern } of BOILERPLATE_PATTERNS) {
+    // Reset lastIndex for stateful regexes
+    pattern.lastIndex = 0;
+    cleaned = cleaned.replace(pattern, "");
+  }
+
+  // Collapse runs of 3+ blank lines into 2
+  cleaned = cleaned.replace(/\n{3,}/g, "\n\n");
+
+  // Trim leading/trailing whitespace
+  cleaned = cleaned.trim();
+
+  return cleaned;
+}
+
+// ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
@@ -420,14 +495,89 @@ export interface ChunkDocumentOptions {
   documentDate?: string;
 }
 
+/**
+ * Recursively split an oversized chunk until every piece fits within the
+ * embedding model's token limit.  Strategy (in order):
+ *   1. Split on paragraph breaks (\n\n)
+ *   2. Split on single newlines (\n)
+ *   3. Split on sentence boundaries (. ! ?)
+ *   4. Hard split by encoded tokens (last resort)
+ */
+function splitOversizedChunk(
+  chunk: Chunk,
+  limit: number,
+  overlapTokens: number,
+  out: Chunk[],
+): void {
+  if (estimateTokens(chunk.text) <= limit) {
+    out.push(chunk);
+    return;
+  }
+
+  // Try progressively finer split delimiters
+  const delimiters = [/\n\n+/, /\n/, /(?<=\.)\s+/];
+
+  for (const delim of delimiters) {
+    const parts = chunk.text.split(delim);
+    if (parts.length <= 1) continue; // delimiter not found, try next
+
+    let currentText = "";
+    let didSplit = false;
+
+    for (const part of parts) {
+      const separator = delim.source.includes("\\n\\n") ? "\n\n" : delim.source.includes("\\n") ? "\n" : " ";
+      const testText = currentText + (currentText ? separator : "") + part;
+
+      if (estimateTokens(testText) > limit && currentText) {
+        // Recurse in case currentText is still oversized
+        splitOversizedChunk(
+          { text: currentText.trim(), metadata: { ...chunk.metadata } },
+          limit,
+          overlapTokens,
+          out,
+        );
+        const overlapText = getLastNTokens(currentText, overlapTokens);
+        currentText = overlapText + separator + part;
+        didSplit = true;
+      } else {
+        currentText = testText;
+      }
+    }
+
+    if (currentText.trim()) {
+      splitOversizedChunk(
+        { text: currentText.trim(), metadata: { ...chunk.metadata } },
+        limit,
+        overlapTokens,
+        out,
+      );
+    }
+
+    if (didSplit) return;
+  }
+
+  // Last resort: hard-split by tokens
+  const tokens = encoder.encode(chunk.text);
+  for (let start = 0; start < tokens.length; start += limit - overlapTokens) {
+    const slice = tokens.slice(start, start + limit);
+    const text = encoder.decode(slice).trim();
+    if (text) {
+      out.push({ text, metadata: { ...chunk.metadata } });
+    }
+  }
+}
+
 export function chunkDocument(
   text: string,
   options: ChunkDocumentOptions
 ): Chunk[] {
-  const docType = options.documentType || detectDocumentType(options.documentTitle, text);
+  // Strip CMS/HTML boilerplate before chunking
+  const cleanedText = stripBoilerplate(text);
+
+  const docType = options.documentType || detectDocumentType(options.documentTitle, cleanedText);
   const config = CHUNKING_CONFIGS[docType];
 
-  const sections = splitAtBoundaries(text, config.breakStrategy);
+  const sections = splitAtBoundaries(cleanedText, config.breakStrategy);
   const chunks: Chunk[] = [];
 
   let chunkIndex = 0;
@@ -465,20 +615,30 @@ export function chunkDocument(
     }
   }
 
+  // Safety check: split any chunk exceeding the embedding model limit (8192 tokens).
+  // We use 7500 as the ceiling to leave headroom.
+  const EMBEDDING_TOKEN_LIMIT = 7500;
+  const SAFETY_OVERLAP_TOKENS = 50;
+  const safeChunks: Chunk[] = [];
+
+  for (const chunk of chunks) {
+    splitOversizedChunk(chunk, EMBEDDING_TOKEN_LIMIT, SAFETY_OVERLAP_TOKENS, safeChunks);
+  }
+
   // Add chunk_index, total_chunks, and content_hash to all chunks
-  const totalChunks = chunks.length;
-  for (let i = 0; i < chunks.length; i++) {
-    chunks[i].metadata.chunk_index = i;
-    chunks[i].metadata.total_chunks = totalChunks;
-    chunks[i].metadata.content_hash = createHash("sha256")
-      .update(chunks[i].text)
+  const totalChunks = safeChunks.length;
+  for (let i = 0; i < safeChunks.length; i++) {
+    safeChunks[i].metadata.chunk_index = i;
+    safeChunks[i].metadata.total_chunks = totalChunks;
+    safeChunks[i].metadata.content_hash = createHash("sha256")
+      .update(safeChunks[i].text)
       .digest("hex");
   }
 
   console.log(
-    `[chunk] Chunked "${options.documentTitle}" (${docType}) into ${chunks.length} chunks`
+    `[chunk] Chunked "${options.documentTitle}" (${docType}) into ${safeChunks.length} chunks`
   );
-  return chunks;
+  return safeChunks;
 }
 
 function detectChunkType(text: string, docType: DocumentType): ChunkType {

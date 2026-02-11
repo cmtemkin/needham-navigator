@@ -86,17 +86,17 @@ function ChatContent() {
             if (done) break;
 
             const chunk = decoder.decode(value, { stream: true });
-            // Basic parsing of the stream chunks
+            // Parse SSE data: lines from Vercel AI SDK createUIMessageStream
             const lines = chunk.split("\n");
             for (const line of lines) {
-              if (line.startsWith("0:")) {
-                const jsonStr = line.slice(2);
+              if (line.startsWith("data: ")) {
+                const jsonStr = line.slice(6);
                 try {
                   const data = JSON.parse(jsonStr);
                   if (data.type === "text-delta") {
                     fullText += data.delta;
                   } else if (data.type === "data-confidence") {
-                    confidence = data.data;
+                    confidence = data.data?.level ?? data.data;
                   } else if (data.type === "data-sources") {
                     sources = data.data;
                   }

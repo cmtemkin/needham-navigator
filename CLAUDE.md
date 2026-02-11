@@ -31,9 +31,10 @@ Needham Navigator is an AI-powered municipal information hub built with Next.js 
 Every time code is merged to `main`, complete these steps before pushing:
 
 1. **Build passes** — run `npx next build` and confirm zero errors
-2. **Update User Guide** — edit `docs/USER_GUIDE.md` to reflect any new or changed features
-3. **Update Release Notes** — add a new version entry to `docs/RELEASE_NOTES.md` with:
+2. **UI smoke test** — start the dev server and verify critical user flows work in the browser (at minimum: load the chat page, send a question, confirm a response appears)
+3. **Update User Guide** — edit `docs/USER_GUIDE.md` to reflect any new or changed features
+4. **Update Release Notes** — add a new version entry to `docs/RELEASE_NOTES.md` with:
    - Version number (bump minor for features, patch for fixes)
    - Date
    - Summary of what changed, grouped by New Features / Bug Fixes / Breaking Changes
-4. **Commit docs with the merge** — include doc updates in the same commit or as a follow-up before pushing
+5. **Commit docs with the merge** — include doc updates in the same commit or as a follow-up before pushing

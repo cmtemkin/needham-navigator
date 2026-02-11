@@ -2,6 +2,22 @@
 
 ---
 
+## v0.5.1 — 2026-02-11
+
+**Chat Bug Fix & Data Quality Improvements**
+
+### Bug Fixes
+- **Fixed "No response received" in chat UI**: The SSE stream parser in `TownChatPage.tsx` expected `0:` prefix but Vercel AI SDK v6 sends `data:` prefix — chat now correctly displays AI answers
+- **Fixed confidence extraction**: Confidence level now correctly extracted from nested object returned by API
+
+### Improvements
+- **Boilerplate stripping**: Added `stripBoilerplate()` to `scripts/chunk.ts` — removes 15 patterns of CivicEngage CMS chrome (loading spinners, breadcrumbs, Google Translate picker, font probes, footer badges) before chunking
+- **Oversized chunk safety**: Added `splitOversizedChunk()` with 4-level recursive splitting (paragraphs → newlines → sentences → hard token split) to prevent embedding API errors
+- **Lowered match threshold**: Changed vector search threshold from 0.65 to 0.40 in chat API to return results for more queries
+- **UI smoke test in checklist**: Added browser-based UI verification as step 2 in the merge-to-main checklist in `CLAUDE.md`
+
+---
+
 ## v0.5.0 — 2026-02-10
 
 **Production-Grade Ingestion Pipeline**

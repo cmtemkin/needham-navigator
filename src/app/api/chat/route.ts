@@ -131,7 +131,7 @@ export async function POST(request: Request): Promise<Response> {
   try {
     const chunks = await retrieveRelevantChunks(latestUserMessage.content, {
       townId,
-      matchThreshold: 0.65,
+      matchThreshold: 0.40,
       matchCount: 8,
     });
 

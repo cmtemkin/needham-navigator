@@ -164,6 +164,7 @@ Legacy URLs like `/chat` automatically redirect to the default town.
 
 ## Tips
 
+- **Use everyday language** — You can say "the dump" instead of "Transfer Station" or "who do I call about a rat" instead of "Board of Health contact" — the AI understands informal phrasing
 - **Be specific** — "What permits do I need for a 6-foot fence on my property line?" gets better answers than "fence permit"
 - **Use the Permit Wizard first** — it gives you a structured checklist, then you can ask follow-ups in chat
 - **Check confidence levels** — high confidence means strong source matches; low confidence means you should verify with the town directly
