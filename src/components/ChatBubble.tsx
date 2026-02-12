@@ -58,7 +58,16 @@ export function ChatBubble({ message, onFollowupClick, sessionId }: ChatBubblePr
         <div className="max-w-[92%] sm:max-w-[80%] bg-white border border-border-light rounded-2xl rounded-bl-md px-[18px] py-3.5 shadow-xs text-[14.5px] text-text-primary leading-relaxed">
           {/* Render markdown-like text */}
           <div
-            className="prose-sm [&_strong]:font-bold [&_p]:mb-2 [&_p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:mb-2 [&_li]:mb-1"
+            className={[
+              "leading-[1.6]",
+              "[&_strong]:font-semibold",
+              "[&_p]:mb-3 [&_p:last-child]:mb-0",
+              "[&_ul]:my-3 [&_ul]:border-l-2 [&_ul]:border-primary/20 [&_ul]:pl-4 [&_ul]:list-none",
+              "[&_ol]:my-3 [&_ol]:border-l-2 [&_ol]:border-primary/20 [&_ol]:pl-4 [&_ol]:list-decimal",
+              "[&_li]:mb-2 [&_li:last-child]:mb-0",
+              "[&_a]:text-primary [&_a]:underline [&_a]:decoration-primary/30 [&_a]:underline-offset-2 [&_a:hover]:decoration-primary/60",
+              "[&_ul_ul]:mt-2 [&_ul_ul]:mb-0 [&_ol_ol]:mt-2 [&_ol_ol]:mb-0",
+            ].join(" ")}
             dangerouslySetInnerHTML={{ __html: formatMarkdown(message.text) }}
           />
 
@@ -110,15 +119,64 @@ function TypingDots() {
 }
 
 function formatMarkdown(text: string): string {
-  return text
+  // Inline formatting first (before line-level processing)
+  const processed = text
     .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-    // Make phone numbers clickable: (781) 455-7500 → <a href="tel:+17814557500">
-    .replace(/\((\d{3})\)\s*(\d{3})-(\d{4})/g, '<a href="tel:+1$1$2$3" class="text-primary underline">($1) $2-$3</a>')
-    // Numbered lists: "1. " → <li>
-    .replace(/\n(\d+)\.\s/g, "\n<li>")
-    .replace(/\n- /g, "\n<li>")
-    .replace(/\n\n/g, "</p><p>")
-    .replace(/\n/g, "<br>")
-    .replace(/^/, "<p>")
-    .replace(/$/, "</p>");
+    .replace(
+      /\((\d{3})\)\s*(\d{3})-(\d{4})/g,
+      '<a href="tel:+1$1$2$3">($1) $2-$3</a>'
+    )
+    .replace(
+      /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,
+      '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
+    );
+
+  // Process block-level elements line by line
+  const lines = processed.split("\n");
+  const output: string[] = [];
+  let inList: "ul" | "ol" | null = null;
+
+  for (const line of lines) {
+    const bulletMatch = line.match(/^[-*]\s+(.+)/);
+    const numberedMatch = line.match(/^\d+\.\s+(.+)/);
+
+    if (bulletMatch) {
+      if (inList !== "ul") {
+        if (inList) output.push(`</${inList}>`);
+        output.push("<ul>");
+        inList = "ul";
+      }
+      output.push(`<li>${bulletMatch[1]}</li>`);
+    } else if (numberedMatch) {
+      if (inList !== "ol") {
+        if (inList) output.push(`</${inList}>`);
+        output.push("<ol>");
+        inList = "ol";
+      }
+      output.push(`<li>${numberedMatch[1]}</li>`);
+    } else {
+      if (inList) {
+        output.push(`</${inList}>`);
+        inList = null;
+      }
+      if (line.trim() === "") {
+        output.push("</p><p>");
+      } else {
+        output.push(line + "<br>");
+      }
+    }
+  }
+
+  if (inList) output.push(`</${inList}>`);
+
+  let html = "<p>" + output.join("") + "</p>";
+
+  // Clean up artifacts
+  html = html
+    .replace(/<br><\/p>/g, "</p>")
+    .replace(/<p><\/p>/g, "")
+    .replace(/<br>(<ul>|<ol>)/g, "$1")
+    .replace(/(<\/ul>|<\/ol>)<br>/g, "$1");
+
+  return html;
 }
