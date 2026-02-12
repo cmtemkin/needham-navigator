@@ -28,6 +28,18 @@ export type TownFeatureFlags = {
   enableZoningMap: boolean;
   enablePermitWizard: boolean;
   enableMultiLanguage: boolean;
+  enableDashboard: boolean;
+  enableNews: boolean;
+  enableEvents: boolean;
+  enableDining: boolean;
+  enableSafety: boolean;
+  enableTransit: boolean;
+  enableWeather: boolean;
+};
+
+export type TownLocation = {
+  lat: number;
+  lng: number;
 };
 
 export type TownConfig = {
@@ -38,6 +50,10 @@ export type TownConfig = {
   vector_namespace: string;
   departments: TownDepartment[];
   feature_flags: TownFeatureFlags;
+  /** Geographic center for weather/geo queries */
+  location: TownLocation;
+  /** MBTA route ID (e.g. "CR-Needham") */
+  transit_route?: string;
 };
 
 export const TOWNS: TownConfig[] = [
@@ -105,7 +121,16 @@ export const TOWNS: TownConfig[] = [
       enableZoningMap: true,
       enablePermitWizard: true,
       enableMultiLanguage: true,
+      enableDashboard: true,
+      enableNews: true,
+      enableEvents: true,
+      enableDining: true,
+      enableSafety: true,
+      enableTransit: true,
+      enableWeather: true,
     },
+    location: { lat: 42.2828, lng: -71.2337 },
+    transit_route: "CR-Needham",
   },
   // Remove before production deployment — used for multi-tenant testing only
   {
@@ -150,7 +175,15 @@ export const TOWNS: TownConfig[] = [
       enableZoningMap: false,
       enablePermitWizard: false,
       enableMultiLanguage: true,
+      enableDashboard: false,
+      enableNews: false,
+      enableEvents: false,
+      enableDining: false,
+      enableSafety: false,
+      enableTransit: false,
+      enableWeather: false,
     },
+    location: { lat: 42.0, lng: -71.0 },
   },
 ];
 

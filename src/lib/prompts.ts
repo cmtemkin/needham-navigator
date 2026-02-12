@@ -89,6 +89,17 @@ export function buildChatSystemPrompt(options: {
 }): string {
   const sections: string[] = [APPENDIX_A_SYSTEM_PROMPT];
 
+  // Inject current date so the LLM knows what's past vs. upcoming
+  const today = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  sections.push(
+    `TODAY'S DATE: ${today}\nDo not present past events or meetings as upcoming. If a date in the context documents is in the past, say it already happened and suggest checking the town website for the next scheduled date.`
+  );
+
   if (options.includeDisclaimer) {
     sections.push(`FIRST-MESSAGE DISCLAIMER:\n${FIRST_MESSAGE_DISCLAIMER}`);
   }

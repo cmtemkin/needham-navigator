@@ -66,6 +66,25 @@ Click the language toggle (globe icon) in the header to switch between:
 
 All navigation, labels, and system text are translated. AI chat responses are currently in English.
 
+### Local News Feed
+
+Navigate to **News** from the header or visit `/<town>/news`.
+
+A real-time aggregated feed of local news from multiple sources:
+
+| Source | Description |
+|--------|-------------|
+| **Needham Patch** | Hyperlocal news and community stories |
+| **Needham Observer** | In-depth local reporting |
+| **Needham Local** | Community-focused coverage and video |
+| **Town of Needham** | Official town government RSS updates |
+
+**Features:**
+- Filter by source using filter chips at the top
+- Each article shows source badge, publish time (relative), summary, and link to full article
+- "Load more" pagination for browsing older articles
+- Content is automatically refreshed via the ingestion pipeline
+
 ### Department Directory
 
 The home page lists key town departments with phone numbers. Click any department to ask the AI about their services.
@@ -167,6 +186,7 @@ Daily change detection with content-hash comparison:
 |------|-----|-------------|
 | Home | `/<town>` | Landing page with quick links |
 | Chat | `/<town>/chat` | AI-powered Q&A |
+| News | `/<town>/news` | Aggregated local news feed |
 | Permits | `/<town>/permits` | Permit wizard |
 | Admin | `/admin` | Dashboard (not town-scoped) |
 

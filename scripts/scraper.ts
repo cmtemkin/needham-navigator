@@ -128,8 +128,11 @@ function normalizeUrl(href: string, baseUrl: string): string | null {
     const url = new URL(href, baseUrl);
     // Strip fragment
     url.hash = "";
-    // Normalize trailing slash
-    const normalized = url.toString();
+    // Strip trailing slash consistently (including root path)
+    let normalized = url.toString();
+    if (normalized.endsWith("/")) {
+      normalized = normalized.slice(0, -1);
+    }
     return normalized;
   } catch {
     return null;
@@ -518,7 +521,7 @@ export async function scrape(options: ScrapeOptions = {}): Promise<ScrapeResult>
         continue;
       }
 
-      const department = getDepartmentFromUrl(url, config);
+      const department = getDepartmentFromUrl(url, config, extracted.title);
       const contentHash = hashContent(extracted.markdown);
 
       results.push({

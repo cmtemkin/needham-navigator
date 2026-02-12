@@ -172,15 +172,53 @@ export const NEEDHAM_CONFIG: ScraperConfig = {
 // ---------------------------------------------------------------------------
 
 /**
- * Get the department for a given URL based on path patterns.
+ * Title-based department classification patterns.
+ * Used as a fallback when URL patterns don't match.
+ */
+const TITLE_DEPARTMENT_PATTERNS: Array<{ pattern: RegExp; department: string }> = [
+  { pattern: /select.?board|town manager|town hall/i, department: "Select Board" },
+  { pattern: /clerk|election|voter|census|vital.record|marriage|dog.licen|registrar|town.meeting/i, department: "Town Clerk" },
+  { pattern: /police|arrest|firearm|sex.offend|mission.statement.*chief/i, department: "Police Department" },
+  { pattern: /fire(?!work)|burn|smoke|ems|dispatch|fire.safety|fire.prevention/i, department: "Fire Department" },
+  { pattern: /health|covid|immuniz|food.safe|tick|mosquit|opioid|narcan|septic|biosafe/i, department: "Board of Health" },
+  { pattern: /dpw|public.work|highway|snow|plow|recycl|transfer.station|trash|solid.waste|sewer|water(?!.color)|storm|fleet|engineering.division/i, department: "Public Works" },
+  { pattern: /park.{0,3}rec|camp|pool|field.status|trail|youth.sport|playground|rosemary|claxton/i, department: "Parks & Recreation" },
+  { pattern: /school|education/i, department: "Schools" },
+  { pattern: /tax|assess|excise|treasur|collector|lien|betterment|billing.*payment/i, department: "Treasurer/Collector" },
+  { pattern: /plan(?:ning)?(?:.board)?|zon(?:ing|e)|board.of.appeal|mbta.communit|housing(?!.authority)|afford|downtown.study/i, department: "Planning & Community Development" },
+  { pattern: /conserv|wetland/i, department: "Conservation" },
+  { pattern: /library/i, department: "Library" },
+  { pattern: /veteran|memorial.day|purple.heart/i, department: "Veterans Services" },
+  { pattern: /human.resource|employ(?:ment|ee)|job.desc|classif.*compens|personnel|open.enroll|benefit/i, department: "Human Resources" },
+  { pattern: /finance|budget|arpa|contract.info|financial.report/i, department: "Finance" },
+  { pattern: /council.on.aging|senior|elder(?:ly)?|center.at.the.heights/i, department: "Council on Aging" },
+  { pattern: /sustain|energy|climate|green.communit|solar|heat.pump/i, department: "Sustainability" },
+  { pattern: /emergen(?:cy)?.manage/i, department: "Emergency Management" },
+  { pattern: /economic.develop|small.business|parking.study/i, department: "Economic Development" },
+  { pattern: /purchas|doing.business.with/i, department: "Purchasing" },
+];
+
+/**
+ * Get the department for a given URL based on path patterns,
+ * with optional title-based fallback.
  */
 export function getDepartmentFromUrl(
   url: string,
-  config: ScraperConfig = NEEDHAM_CONFIG
+  config: ScraperConfig = NEEDHAM_CONFIG,
+  title?: string
 ): string | undefined {
+  // First: try URL-based patterns
   for (const { pattern, department } of config.departmentPatterns) {
     if (pattern.test(url)) {
       return department;
+    }
+  }
+  // Fallback: try title-based patterns
+  if (title) {
+    for (const { pattern, department } of TITLE_DEPARTMENT_PATTERNS) {
+      if (pattern.test(title)) {
+        return department;
+      }
     }
   }
   return undefined;

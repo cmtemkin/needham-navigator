@@ -2,6 +2,81 @@
 
 ---
 
+## v0.8.1 — 2026-02-11
+
+**Data Quality Cleanup**
+
+### Fixes
+- **Department classification 4x improvement**: Title-based fallback patterns classify 47% of pages (236/500) into 24 departments — up from 12% (58/500) using URL patterns alone
+- **Duplicate URL elimination**: Trailing-slash normalization in scraper prevents duplicate pages (e.g., `/page` vs `/page/`)
+- **Stale date prevention**: System prompt now includes today's date so the AI won't present past events as upcoming
+- **Build fix**: Resolved pre-existing type errors in connector framework (`runner.ts`, `scraper.ts`)
+
+### Re-ingestion
+- Full re-scrape and re-ingest with improved department metadata
+- 500 documents, 2,068 chunks, 0 errors
+
+---
+
+## v0.8.0 — 2026-02-11
+
+**Community Platform: Connector Framework + Local News Aggregation**
+
+### New Features
+
+**Pluggable Connector Framework**
+- Config-driven data source architecture — add new content sources without code changes
+- Generic connectors for RSS feeds, iCal calendars, and web scraping
+- Connector registry with factory pattern for extensibility
+- Automated ingestion runner with schedule tracking, error handling, and deduplication
+- Content normalization into unified `content_items` table with pgvector embeddings
+- `source_configs` table stores per-town connector configuration (URL, selectors, schedule)
+- Cron API endpoint (`/api/cron/ingest`) for automated daily/hourly ingestion
+
+**Local News Feed** (`/<town>/news`)
+- Aggregates articles from 3 local news sources:
+  - **Needham Patch** — 15 articles ingested
+  - **Needham Observer** — 15 articles ingested
+  - **Needham Local** — 10 articles ingested
+- Filter by source with one-click filter chips
+- Article cards with source badge, relative time, summary, and external link
+- Load more pagination for browsing older articles
+- News link in header navigation (feature-flag gated)
+
+**Content API** (`/api/content`)
+- Generic content query endpoint: filter by town, category, source
+- Pagination with offset/limit and total count
+- Excludes expired content automatically
+
+**AI Content Generator** (`src/lib/ai/content-generator.ts`)
+- Article summarization via GPT-4o-mini (2-sentence summaries)
+- Daily digest generation from recent content items
+- Weekend event preview generation (for future events integration)
+
+**News Widget** (`src/components/dashboard/NewsFeedWidget.tsx`)
+- Compact 5-headline widget for future dashboard integration
+- "View all" link to full news page
+
+### Database
+
+- **Migration:** `004_content_platform.sql` — creates `content_items`, `source_configs`, and `generated_content` tables with pgvector HNSW indexing, RLS policies, and semantic search function
+- **40 news articles** ingested from initial scrape of 3 Needham news sources
+
+### Infrastructure
+
+- Expanded `TownConfig` with new feature flags: `enableNews`, `enableEvents`, `enableDining`, `enableSafety`, `enableTransit`, `enableWeather`, `enableDashboard`
+- Added `location` (lat/lng) and `transit_route` fields to town config
+- New scripts: `scripts/seed-sources.ts` (source config seeder)
+- Connector source files: `src/lib/connectors/` (types, registry, runner, rss, ical, scraper)
+
+### Pages (28 total, +5 new)
+- `/<town>/news` — local news feed
+- `/api/content` — content query API
+- `/api/cron/ingest` — automated ingestion endpoint
+- 2 additional static generation pages
+
+---
+
 ## v0.7.1 — 2026-02-11
 
 **Full Re-Scrape & Data Quality Validation**
