@@ -2,6 +2,17 @@
 
 ---
 
+## v0.8.2 — 2026-02-12
+
+**API Error Handling Hardening**
+
+### Bug Fixes
+- **Chat no longer returns 500 when OpenAI embedding API fails**: Wrapped RAG retrieval in its own try/catch so embedding or Supabase failures gracefully degrade to the "call Town Hall" fallback response instead of crashing
+- **Content API handles missing `content_items` table**: If the migration hasn't been applied, `/api/content` returns an empty result set (200) instead of a 500 error
+- **Added `console.error` logging to both `/api/chat` and `/api/content`**: Future errors will now appear in Vercel runtime logs for faster diagnosis
+
+---
+
 ## v0.8.1 — 2026-02-11
 
 **Data Quality Cleanup**

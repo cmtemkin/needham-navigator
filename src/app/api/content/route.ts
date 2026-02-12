@@ -58,6 +58,22 @@ export async function GET(request: NextRequest): Promise<Response> {
   } catch (error) {
     const details =
       error instanceof Error ? error.message : "Unexpected content API error.";
+    console.error("[api/content] Error:", details);
+
+    // If the content_items table doesn't exist yet (migration not applied),
+    // return an empty result instead of crashing
+    if (
+      typeof details === "string" &&
+      details.includes("does not exist")
+    ) {
+      return Response.json({
+        items: [],
+        total: 0,
+        hasMore: false,
+        offset,
+        limit,
+      });
+    }
 
     return Response.json(
       { error: "Unable to load content.", details },

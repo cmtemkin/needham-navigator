@@ -8,6 +8,7 @@ import {
   dedupeSources,
   DEFAULT_TOWN_ID,
   retrieveRelevantChunks,
+  type RetrievedChunk,
 } from "@/lib/rag";
 
 type IncomingMessage = {
@@ -129,11 +130,18 @@ export async function POST(request: Request): Promise<Response> {
   const responseId = randomUUID();
 
   try {
-    const chunks = await retrieveRelevantChunks(latestUserMessage.content, {
-      townId,
-      matchThreshold: 0.30,
-      matchCount: 20,
-    });
+    // Wrap retrieval in its own try/catch so embedding/Supabase failures
+    // degrade gracefully to the "call Town Hall" fallback instead of a 500
+    let chunks: RetrievedChunk[] = [];
+    try {
+      chunks = await retrieveRelevantChunks(latestUserMessage.content, {
+        townId,
+        matchThreshold: 0.30,
+        matchCount: 20,
+      });
+    } catch (retrievalError) {
+      console.error("[api/chat] Retrieval failed, returning fallback:", retrievalError);
+    }
 
     const confidence = scoreConfidenceFromChunks(chunks);
     const sources = dedupeSources(chunks).map((source) => ({
@@ -204,6 +212,7 @@ export async function POST(request: Request): Promise<Response> {
       headers: { "Cache-Control": "no-store" },
     });
   } catch (error) {
+    console.error("[api/chat] Error:", error);
     const message =
       error instanceof Error ? error.message : "Unexpected chat API error.";
     return Response.json(
