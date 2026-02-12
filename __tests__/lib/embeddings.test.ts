@@ -23,7 +23,7 @@ describe("embeddings", () => {
   });
 
   it("exports correct model name", () => {
-    expect(EMBEDDING_MODEL).toBe("text-embedding-3-small");
+    expect(EMBEDDING_MODEL).toBe("text-embedding-3-large");
   });
 
   it("exports correct dimensions", () => {
@@ -41,7 +41,7 @@ describe("embeddings", () => {
       expect(result).toEqual(fakeEmbedding);
       expect(result).toHaveLength(1536);
       expect(mockCreate).toHaveBeenCalledWith({
-        model: "text-embedding-3-small",
+        model: "text-embedding-3-large",
         input: "test text",
         dimensions: 1536,
       });
