@@ -2,6 +2,41 @@
 
 ---
 
+## v0.7.1 — 2026-02-11
+
+**Full Re-Scrape & Data Quality Validation**
+
+### Data Improvements
+- **500 pages scraped** (up from 198 with Firecrawl — 152% increase)
+- **2,068 chunks ingested** (up from 1,023 — 102% increase)
+- **47 PDFs discovered** for future processing
+- **Zero boilerplate** across all 500 pages — no [Loading], CivicPlus footers, language pickers, or navigation menus
+- All old Firecrawl data cleared and replaced with clean custom scraper output
+
+### Quality Scores (New vs Old)
+| Question | Old Similarity | New Similarity | Change |
+|---|---|---|---|
+| Transfer station sticker | 0.504 | **0.678** | +0.174 |
+| Zoning setbacks | 0.432 | **0.525** | +0.093 |
+| Deck permit | 0.552 | **0.507** | -0.045 |
+| Property tax rate | — | **0.746** | New |
+| Town meeting | — | **0.694** | New |
+| Where to vote | — | **0.635** | New |
+| Snow parking ban | — | **0.633** | New |
+| Dump hours | — | **0.663** | New |
+
+- **9 of 10 test questions returned meaningful answers**
+- **6 High confidence, 3 Medium confidence** (vs mostly Low/Low-Medium before)
+- All citation titles are clean (no "Default" or "CivicPlus.CMS.FAQ" metadata)
+- All responses are conversational and human-sounding
+
+### Validation
+- Ingestion validation passed with zero errors
+- Zero orphaned chunks, zero documents without chunks
+- Department coverage across 13+ municipal departments
+
+---
+
 ## v0.7.0 — 2026-02-11
 
 **Custom Scraper — Firecrawl Replacement**
