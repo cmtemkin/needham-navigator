@@ -1,0 +1,124 @@
+name: Nightly Production Health Check
+
+on:
+  schedule:
+    # Run every night at 2 AM ET (7 AM UTC)
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+    # Allow manual trigger
+
+permissions:
+  issues: write
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check production site
+        id: health
+        run: |
+          echo "Checking needhamnavigator.com..."
+
+          # --- CHECK 1: Homepage loads ---
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 "https://www.needhamnavigator.com/needham" || echo "000")
+          echo "Homepage HTTP code: $HTTP_CODE"
+
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "homepage_status=down" >> $GITHUB_OUTPUT
+            echo "homepage_code=$HTTP_CODE" >> $GITHUB_OUTPUT
+          else
+            echo "homepage_status=up" >> $GITHUB_OUTPUT
+            echo "homepage_code=$HTTP_CODE" >> $GITHUB_OUTPUT
+          fi
+
+          # --- CHECK 2: Chat API functional test ---
+          # Send a real question and verify we get a meaningful response (not just a 200)
+          API_RESPONSE=$(curl -s --max-time 60 -X POST "https://www.needhamnavigator.com/api/chat" \
+            -H "Content-Type: application/json" \
+            -d '{"message":"What are the hours for Needham Town Hall?","townId":"needham"}' || echo "CURL_FAILED")
+
+          API_CODE=$(echo "$API_RESPONSE" | head -c 1)
+
+          # Re-fetch just for HTTP code
+          API_HTTP=$(curl -s -o /dev/null -w "%{http_code}" --max-time 60 -X POST "https://www.needhamnavigator.com/api/chat" \
+            -H "Content-Type: application/json" \
+            -d '{"message":"What are the hours for Needham Town Hall?","townId":"needham"}' || echo "000")
+          echo "Chat API HTTP code: $API_HTTP"
+
+          # Check if the response contains actual content (not an error message)
+          if [ "$API_HTTP" = "000" ] || [ "$API_HTTP" = "500" ] || [ "$API_HTTP" = "502" ] || [ "$API_HTTP" = "503" ]; then
+            echo "api_status=down" >> $GITHUB_OUTPUT
+            echo "api_code=$API_HTTP" >> $GITHUB_OUTPUT
+            echo "api_detail=HTTP error" >> $GITHUB_OUTPUT
+          elif echo "$API_RESPONSE" | grep -qi "error\|unable to load\|internal server"; then
+            echo "api_status=down" >> $GITHUB_OUTPUT
+            echo "api_code=$API_HTTP" >> $GITHUB_OUTPUT
+            echo "api_detail=Response contains error message" >> $GITHUB_OUTPUT
+          else
+            echo "api_status=up" >> $GITHUB_OUTPUT
+            echo "api_code=$API_HTTP" >> $GITHUB_OUTPUT
+            echo "api_detail=Functional response received" >> $GITHUB_OUTPUT
+          fi
+
+          # --- CHECK 3: Permits page loads ---
+          PERMITS_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 "https://www.needhamnavigator.com/needham/permits" || echo "000")
+          echo "Permits page HTTP code: $PERMITS_CODE"
+
+          if [ "$PERMITS_CODE" != "200" ]; then
+            echo "permits_status=down" >> $GITHUB_OUTPUT
+            echo "permits_code=$PERMITS_CODE" >> $GITHUB_OUTPUT
+          else
+            echo "permits_status=up" >> $GITHUB_OUTPUT
+            echo "permits_code=$PERMITS_CODE" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create issue if site is down
+        if: steps.health.outputs.homepage_status == 'down' || steps.health.outputs.api_status == 'down' || steps.health.outputs.permits_status == 'down'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const homepageStatus = '${{ steps.health.outputs.homepage_status }}';
+            const homepageCode = '${{ steps.health.outputs.homepage_code }}';
+            const apiStatus = '${{ steps.health.outputs.api_status }}';
+            const apiCode = '${{ steps.health.outputs.api_code }}';
+            const apiDetail = '${{ steps.health.outputs.api_detail }}';
+            const permitsStatus = '${{ steps.health.outputs.permits_status }}';
+            const permitsCode = '${{ steps.health.outputs.permits_code }}';
+            const today = new Date().toISOString().split('T')[0];
+
+            let body = `## Production Health Check Failed — ${today}\n\n`;
+            body += `| Endpoint | Status | HTTP Code | Detail |\n|---|---|---|---|\n`;
+            body += `| Homepage | ${homepageStatus === 'up' ? '✅ Up' : '❌ Down'} | ${homepageCode} | — |\n`;
+            body += `| Chat API | ${apiStatus === 'up' ? '✅ Up' : '❌ Down'} | ${apiCode} | ${apiDetail} |\n`;
+            body += `| Permits | ${permitsStatus === 'up' ? '✅ Up' : '❌ Down'} | ${permitsCode} | — |\n\n`;
+            body += `**What to do:**\n`;
+            body += `1. Check Vercel deployment logs: https://vercel.com/charlie-temkins-projects/needham-navigator\n`;
+            body += `2. Open a Claude Code session and run the agent preflight checklist\n`;
+            body += `3. If the last deploy broke things, use Vercel's "Instant Rollback" button\n`;
+            body += `4. The chat API test sends a real question ("What are the hours for Needham Town Hall?") — if it fails, the AI pipeline is broken, not just the server\n`;
+
+            // Check if there's already an open health-check issue to avoid duplicates
+            const existingIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'prod-down',
+              state: 'open'
+            });
+
+            if (existingIssues.data.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `🔴 Production is down — ${today}`,
+                body: body,
+                labels: ['prod-down']
+              });
+            } else {
+              // Add a comment to the existing issue instead
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssues.data[0].number,
+                body: `**Still down as of ${today}:**\n\nHomepage: ${homepageCode} | Chat API: ${apiCode} (${apiDetail}) | Permits: ${permitsCode}`
+              });
+            }

@@ -45,3 +45,30 @@ Every time code is merged to `main`, complete these steps before pushing:
    - Date
    - Summary of what changed, grouped by New Features / Bug Fixes / Breaking Changes
 5. **Commit docs with the merge** — include doc updates in the same commit or as a follow-up before pushing
+
+## CI/CD Rules for All Agents
+
+**CRITICAL — All agents MUST follow these rules:**
+
+1. **NEVER push directly to main** — main is protected, direct pushes will be rejected
+2. **ALWAYS create a feature branch** — `git checkout -b feature/your-feature-name`
+3. **Push your branch and create a PR** — `git push origin feature/your-feature-name && gh pr create --fill`
+4. **NEVER merge your own PR** — GitHub Actions will auto-merge if CI passes
+5. **If CI fails**, fix the errors on your branch and push again — CI will re-run automatically
+6. **Keep PRs focused** — one feature or fix per PR, not everything at once
+7. **Write clear commit messages** — describe what changed and why
+8. **Before starting any new work**, check for open issues labeled `ci-failure` or `prod-down`:
+   `gh issue list --label ci-failure --label prod-down --state open`
+   If any exist, **fix those first** before starting new features
+
+## Agent Preflight Checklist (MANDATORY)
+
+Every agent session MUST start with these steps before writing any new code:
+
+1. Check for open issues: `gh issue list --label ci-failure --label prod-down --state open`
+2. Verify build health: `git checkout main && git pull origin main && npm ci && npm run build`
+3. Check in-flight work: `gh pr list --state open`
+4. If anything is broken, fix it FIRST — create a `fix/` branch, push, and create a PR
+5. Only after everything is green should you start new feature work
+
+Branch naming: `feature/<name>`, `fix/<name>`, `setup/<name>`, `data/<name>`
