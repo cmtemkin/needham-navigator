@@ -79,19 +79,28 @@ npx tsc --noEmit
 3. Go back to Step 1 and re-run ALL three checks
 4. Repeat this loop until all three pass with zero errors
 
-**Step 3: Only after all three checks pass, push your code**
+**Step 3: Local Preview Checkpoint (MANDATORY)**
+
+After all checks pass, you MUST let the user preview before pushing:
+1. Start the dev server: `npx next dev -p 3000`
+2. Tell the user: "All checks pass. Preview your changes at http://localhost:3000/needham - let me know if it looks good or if you want changes."
+3. **STOP and WAIT** for the user to respond.
+4. If the user requests changes, make them and go back to Step 1.
+5. Only proceed to Step 4 after the user explicitly approves.
+
+**Step 4: Only after user approval, push your code**
 ```
 git add <changed-files>
 git commit -m "type: description of change"
 git push -u origin <branch-name>
 ```
 
-**Step 4: Create the PR**
+**Step 5: Create the PR**
 ```
 gh pr create --title "type: description" --body "Summary of changes"
 ```
 
-**YOU are the primary gate. The CI pipeline is a safety net, not the first line of defense. If you push code that fails CI, you have failed. Fix it locally first.**
+**YOU are the primary gate. The CI pipeline is a safety net, not the first line of defense. If you push code that fails CI, you have failed. Fix it locally first. If you push code the user hasn't approved, you have also failed.**
 
 ## Agent Preflight Checklist (MANDATORY)
 
