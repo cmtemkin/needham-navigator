@@ -22,13 +22,16 @@ import {
   Search,
   RotateCcw,
   Eye,
+  Settings,
+  Save,
+  Cpu,
 } from "lucide-react";
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-type Tab = "documents" | "analytics" | "logs";
+type Tab = "documents" | "analytics" | "logs" | "settings";
 
 interface AdminDocument {
   id: string;
@@ -543,6 +546,146 @@ function LogsTab({ password }: { password: string }) {
 }
 
 // ---------------------------------------------------------------------------
+// Settings Tab
+// ---------------------------------------------------------------------------
+
+interface AvailableModel {
+  id: string;
+  label: string;
+  inputPrice: number;
+  outputPrice: number;
+}
+
+function SettingsTab({ password }: { password: string }) {
+  const [chatModel, setChatModel] = useState("");
+  const [availableModels, setAvailableModels] = useState<AvailableModel[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const res = await adminFetch("/api/admin/settings", password);
+      if (res.ok) {
+        const data = await res.json();
+        setChatModel(data.chat_model || "");
+        setAvailableModels(data.available_models || []);
+      }
+      setLoading(false);
+    })();
+  }, [password]);
+
+  const handleSave = async () => {
+    setSaving(true);
+    setSaved(false);
+    setError(null);
+
+    const res = await adminFetch("/api/admin/settings", password, {
+      method: "PUT",
+      body: JSON.stringify({ chat_model: chatModel }),
+    });
+
+    if (res.ok) {
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setError(data.error || "Failed to save settings");
+    }
+    setSaving(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <RefreshCw size={24} className="animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  const selectedModel = availableModels.find((m) => m.id === chatModel);
+
+  return (
+    <div>
+      <div className="bg-white border border-border-default rounded-lg p-6">
+        <h3 className="text-sm font-semibold text-text-primary mb-1 flex items-center gap-2">
+          <Cpu size={15} className="text-primary" />
+          Chat Model
+        </h3>
+        <p className="text-xs text-text-muted mb-4">
+          Select the OpenAI model used for chat responses. Changes take effect immediately.
+        </p>
+
+        <div className="space-y-2 mb-4">
+          {availableModels.map((model) => (
+            <label
+              key={model.id}
+              className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                chatModel === model.id
+                  ? "border-primary bg-primary/5"
+                  : "border-border-default hover:border-primary/30"
+              }`}
+            >
+              <input
+                type="radio"
+                name="chatModel"
+                value={model.id}
+                checked={chatModel === model.id}
+                onChange={() => setChatModel(model.id)}
+                className="accent-primary"
+              />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-text-primary">{model.label}</span>
+                  <code className="text-[11px] text-text-muted bg-surface px-1.5 py-0.5 rounded">{model.id}</code>
+                </div>
+                <span className="text-xs text-text-secondary">
+                  ${model.inputPrice.toFixed(2)}/M input &middot; ${model.outputPrice.toFixed(2)}/M output
+                </span>
+              </div>
+            </label>
+          ))}
+        </div>
+
+        {selectedModel && (
+          <div className="text-xs text-text-muted mb-4 p-3 bg-surface rounded-lg">
+            Estimated cost per chat: ~$0.000{Math.round(selectedModel.inputPrice * 2 + selectedModel.outputPrice * 0.5).toString().padStart(2, "0")} (based on ~2K input + ~500 output tokens)
+          </div>
+        )}
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
+          >
+            {saving ? (
+              <RefreshCw size={14} className="animate-spin" />
+            ) : (
+              <Save size={14} />
+            )}
+            Save
+          </button>
+          {saved && (
+            <span className="inline-flex items-center gap-1 text-sm text-green-600">
+              <CheckCircle2 size={14} />
+              Saved
+            </span>
+          )}
+          {error && (
+            <span className="inline-flex items-center gap-1 text-sm text-red-600">
+              <XCircle size={14} />
+              {error}
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Main Admin Dashboard
 // ---------------------------------------------------------------------------
 
@@ -560,6 +703,7 @@ export default function AdminPage() {
     { id: "documents", label: "Documents", icon: FileText },
     { id: "analytics", label: "Analytics", icon: BarChart3 },
     { id: "logs", label: "Ingestion Logs", icon: Activity },
+    { id: "settings", label: "Settings", icon: Settings },
   ];
 
   return (
@@ -609,6 +753,7 @@ export default function AdminPage() {
         {activeTab === "documents" && <DocumentsTab password={password} />}
         {activeTab === "analytics" && <AnalyticsTab password={password} />}
         {activeTab === "logs" && <LogsTab password={password} />}
+        {activeTab === "settings" && <SettingsTab password={password} />}
       </main>
     </div>
   );

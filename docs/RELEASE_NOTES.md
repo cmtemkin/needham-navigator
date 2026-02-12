@@ -2,6 +2,17 @@
 
 ---
 
+## v0.8.3 — 2026-02-12
+
+**Configurable Chat Model + Upgrade to GPT-5 Nano**
+
+### New Features
+- **Admin model selector**: New Settings tab in `/admin` dashboard lets you swap the chat model without redeploying. Choose from GPT-5 Nano, GPT-5 Mini, GPT-4o Mini, or GPT-4.1 Mini with pricing info displayed inline.
+- **Default model → GPT-5 Nano**: 3x cheaper than GPT-4o Mini ($0.05 vs $0.15/M input), newer model, 400K context window. Perfect for municipal Q&A.
+- **Model stored in Supabase**: Chat model preference persisted in `towns.config` JSONB column — changes take effect immediately, no migration needed.
+
+---
+
 ## v0.8.2 — 2026-02-12
 
 **API Error Handling Hardening**

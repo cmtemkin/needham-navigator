@@ -10,6 +10,12 @@ import {
   retrieveRelevantChunks,
   type RetrievedChunk,
 } from "@/lib/rag";
+import { getSupabaseClient } from "@/lib/supabase";
+
+const DEFAULT_CHAT_MODEL = "gpt-5-nano";
+const ALLOWED_MODELS = new Set([
+  "gpt-5-nano", "gpt-5-mini", "gpt-4o-mini", "gpt-4.1-mini",
+]);
 
 type IncomingMessage = {
   role: "user" | "assistant" | "system";
@@ -166,13 +172,30 @@ export async function POST(request: Request): Promise<Response> {
       });
     }
 
+    // Read configured chat model from town config
+    let chatModel = DEFAULT_CHAT_MODEL;
+    try {
+      const supabase = getSupabaseClient({ townId });
+      const { data } = await supabase
+        .from("towns")
+        .select("config")
+        .eq("id", townId)
+        .single();
+      const config = (data?.config as Record<string, unknown>) ?? {};
+      if (typeof config.chat_model === "string" && ALLOWED_MODELS.has(config.chat_model)) {
+        chatModel = config.chat_model;
+      }
+    } catch {
+      // Fall through to default model
+    }
+
     const systemPrompt = buildChatSystemPrompt({
       contextDocuments: buildContextDocuments(chunks),
       includeDisclaimer,
     });
 
     const result = streamText({
-      model: openai("gpt-4o-mini"),
+      model: openai(chatModel),
       system: systemPrompt,
       messages: messages.map((message) => ({
         role: message.role,
