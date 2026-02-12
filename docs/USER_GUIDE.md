@@ -98,6 +98,7 @@ Visit `/admin` to access:
 - **Analytics** — feedback trends, query volume, response quality metrics
 - **System Logs** — ingestion status, error tracking, sync history
 - **Document Management** — view indexed content and sources
+- **Settings** — configure the AI chat model (GPT-5 Nano, GPT-5 Mini, GPT-4o Mini, GPT-4.1 Mini) with pricing info; changes take effect immediately
 
 ---
 
@@ -114,7 +115,7 @@ npm run validate [town_id]
 **What it validates:**
 - ✓ All chunks have required metadata (document_title, document_type, document_url, chunk_type, etc.)
 - ✓ No duplicate chunks (same content_hash)
-- ✓ Embedding dimensions are correct (1536 for text-embedding-3-small)
+- ✓ Embedding dimensions are correct (1536 for text-embedding-3-large)
 - ✓ No orphaned chunks (document_id references non-existent documents)
 - ✓ Coverage report showing chunk count per department
 

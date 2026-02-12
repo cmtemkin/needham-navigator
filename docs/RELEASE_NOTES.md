@@ -2,6 +2,17 @@
 
 ---
 
+## v0.8.4 — 2026-02-12
+
+**Embedding Model Migration: text-embedding-3-small → text-embedding-3-large**
+
+### Bug Fixes
+- **Fixed broken RAG retrieval**: OpenAI changed `text-embedding-3-small` to return 384 dimensions instead of 1536 after a service incident, causing "different vector dimensions" errors in pgvector search
+- **Switched to `text-embedding-3-large`** (with `dimensions: 1536`) which correctly respects the dimensions parameter — same vector size, more capable model
+- **Re-embedded all 2,068 chunks** in Supabase with the new model — full RAG pipeline restored with high-confidence answers and source citations
+
+---
+
 ## v0.8.3 — 2026-02-12
 
 **Configurable Chat Model + Upgrade to GPT-5 Nano**

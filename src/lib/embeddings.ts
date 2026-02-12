@@ -13,7 +13,7 @@ function getOpenAI(): OpenAI {
   return openaiClient;
 }
 
-const EMBEDDING_MODEL = "text-embedding-3-small";
+const EMBEDDING_MODEL = "text-embedding-3-large";
 const EMBEDDING_DIMENSIONS = 1536;
 const MAX_BATCH_SIZE = 100; // OpenAI allows up to 2048, but 100 is safer for rate limits
 
