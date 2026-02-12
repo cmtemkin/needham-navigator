@@ -59,14 +59,14 @@ export function ChatBubble({ message, onFollowupClick, sessionId }: ChatBubblePr
           {/* Render markdown-like text */}
           <div
             className={[
-              "leading-[1.6]",
+              "leading-7",
               "[&_strong]:font-semibold",
-              "[&_p]:mb-3 [&_p:last-child]:mb-0",
-              "[&_ul]:my-3 [&_ul]:border-l-2 [&_ul]:border-primary/20 [&_ul]:pl-4 [&_ul]:list-none",
-              "[&_ol]:my-3 [&_ol]:border-l-2 [&_ol]:border-primary/20 [&_ol]:pl-4 [&_ol]:list-decimal",
-              "[&_li]:mb-2 [&_li:last-child]:mb-0",
+              "[&_p]:my-4 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0",
+              "[&_ul]:my-4 [&_ul]:list-disc [&_ul]:pl-[1.625em]",
+              "[&_ol]:my-4 [&_ol]:list-decimal [&_ol]:pl-[1.625em]",
+              "[&_li]:my-2 [&_li]:pl-1.5",
               "[&_a]:text-primary [&_a]:underline [&_a]:decoration-primary/30 [&_a]:underline-offset-2 [&_a:hover]:decoration-primary/60",
-              "[&_ul_ul]:mt-2 [&_ul_ul]:mb-0 [&_ol_ol]:mt-2 [&_ol_ol]:mb-0",
+              "[&_ul_ul]:my-2 [&_ol_ol]:my-2 [&_ul_ol]:my-2 [&_ol_ul]:my-2",
             ].join(" ")}
             dangerouslySetInnerHTML={{ __html: formatMarkdown(message.text) }}
           />
@@ -137,8 +137,8 @@ function formatMarkdown(text: string): string {
   let inList: "ul" | "ol" | null = null;
 
   for (const line of lines) {
-    const bulletMatch = line.match(/^[-*]\s+(.+)/);
-    const numberedMatch = line.match(/^\d+\.\s+(.+)/);
+    const bulletMatch = line.match(/^\s*[-*]\s+(.+)/);
+    const numberedMatch = line.match(/^\s*\d+\.\s+(.+)/);
 
     if (bulletMatch) {
       if (inList !== "ul") {
