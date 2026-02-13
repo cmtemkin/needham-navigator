@@ -115,6 +115,17 @@ Every agent session MUST start with these steps before writing any new code:
 
 Branch naming: `feature/<name>`, `fix/<name>`, `setup/<name>`, `data/<name>`
 
+## Vercel Cron Jobs
+- **Daily Monitor** (`/api/cron/monitor`): Runs at 6:00 AM UTC (1:00 AM Eastern) via `vercel.json`
+  - Checks tracked needhamma.gov pages for content-hash changes
+  - Monitors RSS feed for new pages
+  - Flags documents not verified in 90+ days as stale
+  - Logs results to `ingestion_log` table with `triggered_by: "vercel-cron"`
+  - Secured by `CRON_SECRET` Bearer token (set in Vercel Dashboard)
+  - Core logic in `src/lib/monitor.ts`, route in `src/app/api/cron/monitor/route.ts`
+- **Connector Ingest** (`/api/cron/ingest`): Runs connectors on schedule
+- **Sync** (`/api/cron/sync`): Legacy sync endpoint (predecessor to monitor)
+
 ## CI/CD Pipeline Status
 - **Last validated:** 2026-02-12
 - **Pipeline:** GitHub Actions (ci.yml) > auto-merge > Vercel deploy
