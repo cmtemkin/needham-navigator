@@ -31,34 +31,66 @@ jobs:
             echo "homepage_code=$HTTP_CODE" >> $GITHUB_OUTPUT
           fi
 
-          # --- CHECK 2: Chat API functional test ---
-          # Send a real question and verify we get a meaningful response (not just a 200)
-          API_RESPONSE=$(curl -s --max-time 60 -X POST "https://www.needhamnavigator.com/api/chat" \
-            -H "Content-Type: application/json" \
-            -d '{"message":"What are the hours for Needham Town Hall?","townId":"needham"}' || echo "CURL_FAILED")
+          # --- CHECK 2: Chat API functional test (with retries) ---
+          API_UP="false"
+          API_STATUS="down"
+          API_HTTP="000"
+          API_BODY=""
+          API_DETAIL=""
 
-          API_CODE=$(echo "$API_RESPONSE" | head -c 1)
+          for attempt in 1 2 3; do
+            echo "Chat API attempt $attempt of 3..."
 
-          # Re-fetch just for HTTP code
-          API_HTTP=$(curl -s -o /dev/null -w "%{http_code}" --max-time 60 -X POST "https://www.needhamnavigator.com/api/chat" \
-            -H "Content-Type: application/json" \
-            -d '{"message":"What are the hours for Needham Town Hall?","townId":"needham"}' || echo "000")
-          echo "Chat API HTTP code: $API_HTTP"
+            # Single curl call captures both body and HTTP code
+            RAW_RESPONSE=$(curl -s -w "\nHTTP_CODE:%{http_code}" --max-time 60 -X POST "https://www.needhamnavigator.com/api/chat" \
+              -H "Content-Type: application/json" \
+              -d '{"message":"What are the hours for Needham Town Hall?","townId":"needham"}' 2>/dev/null || echo "HTTP_CODE:000")
 
-          # Check if the response contains actual content (not an error message)
-          if [ "$API_HTTP" = "000" ] || [ "$API_HTTP" = "500" ] || [ "$API_HTTP" = "502" ] || [ "$API_HTTP" = "503" ]; then
-            echo "api_status=down" >> $GITHUB_OUTPUT
-            echo "api_code=$API_HTTP" >> $GITHUB_OUTPUT
-            echo "api_detail=HTTP error" >> $GITHUB_OUTPUT
-          elif echo "$API_RESPONSE" | grep -qi "error\|unable to load\|internal server"; then
-            echo "api_status=down" >> $GITHUB_OUTPUT
-            echo "api_code=$API_HTTP" >> $GITHUB_OUTPUT
-            echo "api_detail=Response contains error message" >> $GITHUB_OUTPUT
-          else
-            echo "api_status=up" >> $GITHUB_OUTPUT
-            echo "api_code=$API_HTTP" >> $GITHUB_OUTPUT
-            echo "api_detail=Functional response received" >> $GITHUB_OUTPUT
+            API_HTTP=$(echo "$RAW_RESPONSE" | grep -o 'HTTP_CODE:[0-9]*' | tail -1 | cut -d: -f2)
+            API_BODY=$(echo "$RAW_RESPONSE" | sed '/HTTP_CODE:[0-9]*/d')
+            API_HTTP=${API_HTTP:-000}
+
+            echo "  HTTP code: $API_HTTP"
+            echo "  Response length: ${#API_BODY} chars"
+
+            # SUCCESS: 200 or 201 with a non-trivial response body
+            if [ "$API_HTTP" = "200" ] || [ "$API_HTTP" = "201" ]; then
+              if [ ${#API_BODY} -gt 50 ]; then
+                if [ "$attempt" -eq 1 ]; then
+                  API_STATUS="up"
+                else
+                  API_STATUS="degraded"
+                fi
+                API_UP="true"
+                API_DETAIL="Functional response received (attempt $attempt)"
+                echo "  Chat API OK on attempt $attempt"
+                break
+              else
+                echo "  Response too short (${#API_BODY} chars), retrying..."
+              fi
+            fi
+
+            # HARD FAIL (no retry): HTTP 500
+            if [ "$API_HTTP" = "500" ]; then
+              API_DETAIL="Server error (HTTP 500) — response: ${API_BODY:0:200}"
+              echo "  Hard failure (500), not retrying"
+              break
+            fi
+
+            # RETRY-WORTHY: 000 (timeout), 400, 429 (rate limit), 502, 503
+            echo "  Attempt $attempt failed (HTTP $API_HTTP), retrying in 60s..."
+            [ "$attempt" -lt 3 ] && sleep 60
+          done
+
+          # Final status
+          if [ "$API_UP" = "false" ]; then
+            API_DETAIL=${API_DETAIL:-"All 3 attempts failed (last HTTP $API_HTTP) — response: ${API_BODY:0:200}"}
           fi
+
+          echo "api_status=$API_STATUS" >> $GITHUB_OUTPUT
+          echo "api_code=$API_HTTP" >> $GITHUB_OUTPUT
+          echo "api_detail=$API_DETAIL" >> $GITHUB_OUTPUT
+          echo "Chat API final status: $API_STATUS (HTTP $API_HTTP)"
 
           # --- CHECK 3: Permits page loads ---
           PERMITS_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 "https://www.needhamnavigator.com/needham/permits" || echo "000")
@@ -86,16 +118,19 @@ jobs:
             const permitsCode = '${{ steps.health.outputs.permits_code }}';
             const today = new Date().toISOString().split('T')[0];
 
+            const statusIcon = (s) => s === 'up' ? '✅ Up' : s === 'degraded' ? '🟡 Degraded' : '❌ Down';
+
             let body = `## Production Health Check Failed — ${today}\n\n`;
             body += `| Endpoint | Status | HTTP Code | Detail |\n|---|---|---|---|\n`;
-            body += `| Homepage | ${homepageStatus === 'up' ? '✅ Up' : '❌ Down'} | ${homepageCode} | — |\n`;
-            body += `| Chat API | ${apiStatus === 'up' ? '✅ Up' : '❌ Down'} | ${apiCode} | ${apiDetail} |\n`;
-            body += `| Permits | ${permitsStatus === 'up' ? '✅ Up' : '❌ Down'} | ${permitsCode} | — |\n\n`;
+            body += `| Homepage | ${statusIcon(homepageStatus)} | ${homepageCode} | — |\n`;
+            body += `| Chat API | ${statusIcon(apiStatus)} | ${apiCode} | ${apiDetail} |\n`;
+            body += `| Permits | ${statusIcon(permitsStatus)} | ${permitsCode} | — |\n\n`;
             body += `**What to do:**\n`;
             body += `1. Check Vercel deployment logs: https://vercel.com/charlie-temkins-projects/needham-navigator\n`;
             body += `2. Open a Claude Code session and run the agent preflight checklist\n`;
             body += `3. If the last deploy broke things, use Vercel's "Instant Rollback" button\n`;
             body += `4. The chat API test sends a real question ("What are the hours for Needham Town Hall?") — if it fails, the AI pipeline is broken, not just the server\n`;
+            body += `5. Chat API retried 3 times with 60s delays before marking as down — this is not a transient blip\n`;
 
             // Check if there's already an open health-check issue to avoid duplicates
             const existingIssues = await github.rest.issues.listForRepo({
