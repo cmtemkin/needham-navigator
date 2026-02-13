@@ -5,6 +5,7 @@ import {
   useContext,
   type PropsWithChildren,
 } from "react";
+import { usePathname } from "next/navigation";
 import type { TownConfig } from "@/lib/towns";
 
 const TownContext = createContext<TownConfig | null>(null);
@@ -32,5 +33,19 @@ export function townHref(townId: string, path = ""): string {
 
 export function useTownHref(path = ""): string {
   const town = useTown();
-  return townHref(town.town_id, path);
+  const pathname = usePathname();
+  const normalizedPath = path
+    ? path.startsWith("/")
+      ? path
+      : `/${path}`
+    : "";
+
+  // When the user arrived via a root-rewritten URL (e.g. "/" or "/chat"),
+  // keep links root-relative so the URL bar stays clean.
+  const onRootPath = !pathname.startsWith(`/${town.town_id}`);
+  if (onRootPath) {
+    return normalizedPath || "/";
+  }
+
+  return `/${town.town_id}${normalizedPath}`;
 }
