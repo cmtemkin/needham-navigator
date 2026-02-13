@@ -135,6 +135,7 @@ function formatMarkdown(text: string): string {
   const lines = processed.split("\n");
   const output: string[] = [];
   let inList: "ul" | "ol" | null = null;
+  let olItemCount = 0; // Track numbered items so we can resume after bullet interruptions
 
   for (const line of lines) {
     const bulletMatch = line.match(/^\s*[-*]\s+(.+)/);
@@ -150,9 +151,12 @@ function formatMarkdown(text: string): string {
     } else if (numberedMatch) {
       if (inList !== "ol") {
         if (inList) output.push(`</${inList}>`);
-        output.push("<ol>");
+        // Resume numbering if this is a continuation after a bullet interruption
+        const startAttr = olItemCount > 0 ? ` start="${olItemCount + 1}"` : "";
+        output.push(`<ol${startAttr}>`);
         inList = "ol";
       }
+      olItemCount++;
       output.push(`<li>${numberedMatch[1]}</li>`);
     } else {
       if (inList) {
@@ -175,7 +179,7 @@ function formatMarkdown(text: string): string {
   html = html
     .replace(/<br><\/p>/g, "</p>")
     .replace(/<p><\/p>/g, "")
-    .replace(/<br>(<ul>|<ol>)/g, "$1")
+    .replace(/<br>(<ul>|<ol[\s>])/g, "$1")
     .replace(/(<\/ul>|<\/ol>)<br>/g, "$1");
 
   return html;

@@ -6,8 +6,8 @@ import { expandQuery } from "@/lib/synonyms";
 export const DEFAULT_TOWN_ID = DEFAULT_TOWN_ID_FROM_CONFIG;
 
 const DEFAULT_MATCH_THRESHOLD = 0.7;
-const DEFAULT_MATCH_COUNT = 20; // Retrieve more for reranking
-const DEFAULT_FINAL_COUNT = 5; // Final chunks to pass to LLM
+const DEFAULT_MATCH_COUNT = 30; // Retrieve more for reranking
+const DEFAULT_FINAL_COUNT = 10; // Final chunks to pass to LLM
 const MIN_SIMILARITY_FLOOR = 0.35; // Drop chunks below this — they're noise
 
 type ChunkMetadata = Record<string, unknown>;
@@ -370,7 +370,7 @@ function rerankChunks(
     if (detectedDepartment) {
       const chunkDept = readString(metadata, ["department"]);
       if (chunkDept && chunkDept.toLowerCase().includes(detectedDepartment.toLowerCase())) {
-        deptBoost = 0.15;
+        deptBoost = 0.05;
       }
     }
 
@@ -388,25 +388,24 @@ function rerankChunks(
   return scored;
 }
 
-// Ensure diversity of sources in final selection
-function selectDiverseChunks(chunks: RetrievedChunk[], maxCount: number): RetrievedChunk[] {
+// Select top chunks by reranked score, capping per-document chunks to
+// prevent near-duplicate content from flooding the results. Without this
+// cap, pages crawled from multiple URLs with the same title (e.g.
+// "Recycling & Solid Waste Division") can consume most slots and crowd
+// out relevant sibling chunks from other documents.
+const MAX_CHUNKS_PER_DOC = 3;
+
+function selectTopChunks(chunks: RetrievedChunk[], maxCount: number): RetrievedChunk[] {
   const selected: RetrievedChunk[] = [];
-  const seenDocs = new Set<string>();
+  const docCounts = new Map<string, number>();
 
-  // First pass: one chunk per unique document
-  for (const chunk of chunks) {
-    const docTitle = readString(chunk.metadata, ["document_title", "title"]) ?? "";
-    if (!seenDocs.has(docTitle) && selected.length < maxCount) {
-      selected.push(chunk);
-      seenDocs.add(docTitle);
-    }
-  }
-
-  // Second pass: fill remaining slots with highest scored chunks
   for (const chunk of chunks) {
     if (selected.length >= maxCount) break;
-    if (!selected.includes(chunk)) {
+    const docTitle = readString(chunk.metadata, ["document_title", "title"]) ?? "";
+    const count = docCounts.get(docTitle) ?? 0;
+    if (count < MAX_CHUNKS_PER_DOC) {
       selected.push(chunk);
+      docCounts.set(docTitle, count + 1);
     }
   }
 
@@ -508,8 +507,8 @@ export async function retrieveRelevantChunks(
   // Step 6: Rerank using the full expanded query for better keyword overlap scoring
   const reranked = rerankChunks(chunks, fullExpandedQuery, detectedDepartment);
 
-  // Step 7: Select diverse chunks
-  const diverse = selectDiverseChunks(reranked, finalCount);
+  // Step 7: Select top chunks by reranked score
+  const diverse = selectTopChunks(reranked, finalCount);
 
   return diverse;
 }
