@@ -388,25 +388,71 @@ function rerankChunks(
   return scored;
 }
 
-// Select top chunks by reranked score, capping per-document chunks to
-// prevent near-duplicate content from flooding the results. Without this
-// cap, pages crawled from multiple URLs with the same title (e.g.
-// "Recycling & Solid Waste Division") can consume most slots and crowd
-// out relevant sibling chunks from other documents.
+// Select top chunks with a two-pass strategy:
+//   Pass 1 — fill ~80% of slots with a per-doc cap to maintain diversity.
+//   Pass 2 — fill remaining slots preferring *sibling* chunks (same
+//            document_url, adjacent chunk_index) of already-selected chunks.
+//            This ensures multi-section answers (e.g. "In Person" + "By Mail")
+//            stay together. Falls back to next-best-ranked if no siblings.
 const MAX_CHUNKS_PER_DOC = 3;
 
 function selectTopChunks(chunks: RetrievedChunk[], maxCount: number): RetrievedChunk[] {
+  const primaryCount = Math.ceil(maxCount * 0.8); // e.g. 8 of 10
+
+  // --- Pass 1: primary selection with per-doc cap ---
   const selected: RetrievedChunk[] = [];
   const docCounts = new Map<string, number>();
 
   for (const chunk of chunks) {
-    if (selected.length >= maxCount) break;
+    if (selected.length >= primaryCount) break;
     const docTitle = readString(chunk.metadata, ["document_title", "title"]) ?? "";
     const count = docCounts.get(docTitle) ?? 0;
     if (count < MAX_CHUNKS_PER_DOC) {
       selected.push(chunk);
       docCounts.set(docTitle, count + 1);
     }
+  }
+
+  if (selected.length >= maxCount) return selected.slice(0, maxCount);
+
+  // --- Pass 2: sibling expansion ---
+  // Build an index of document_url → Set<chunk_index> for selected chunks
+  const selectedIds = new Set(selected.map((c) => c.id));
+  const docChunkIndices = new Map<string, Set<number>>();
+
+  for (const chunk of selected) {
+    const url = readString(chunk.metadata, ["document_url", "url"]) ?? "";
+    const idx = readNumber(chunk.metadata, ["chunk_index"]);
+    if (url && idx !== undefined) {
+      if (!docChunkIndices.has(url)) docChunkIndices.set(url, new Set());
+      docChunkIndices.get(url)!.add(idx);
+    }
+  }
+
+  // Partition remaining candidates into siblings vs others
+  const siblings: RetrievedChunk[] = [];
+  const others: RetrievedChunk[] = [];
+
+  for (const chunk of chunks) {
+    if (selectedIds.has(chunk.id)) continue;
+    const url = readString(chunk.metadata, ["document_url", "url"]) ?? "";
+    const idx = readNumber(chunk.metadata, ["chunk_index"]);
+    const docIndices = url ? docChunkIndices.get(url) : undefined;
+
+    if (docIndices && idx !== undefined) {
+      const isAdjacent = Array.from(docIndices).some((si) => Math.abs(idx - si) <= 1);
+      if (isAdjacent) {
+        siblings.push(chunk);
+        continue;
+      }
+    }
+    others.push(chunk);
+  }
+
+  // Fill remaining slots: siblings first, then next-best-ranked
+  for (const chunk of [...siblings, ...others]) {
+    if (selected.length >= maxCount) break;
+    selected.push(chunk);
   }
 
   return selected;

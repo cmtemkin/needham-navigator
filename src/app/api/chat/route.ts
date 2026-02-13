@@ -143,7 +143,6 @@ export async function POST(request: Request): Promise<Response> {
       chunks = await retrieveRelevantChunks(latestUserMessage.content, {
         townId,
         matchThreshold: 0.30,
-        matchCount: 20,
       });
     } catch (retrievalError) {
       console.error("[api/chat] Retrieval failed, returning fallback:", retrievalError);
