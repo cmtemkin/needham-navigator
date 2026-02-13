@@ -154,7 +154,7 @@ import {
 import { dedupeSources, buildContextDocuments } from "@/lib/rag";
 import {
     buildChatSystemPrompt,
-    FIRST_MESSAGE_DISCLAIMER,
+    getFirstMessageDisclaimer,
 } from "@/lib/prompts";
 
 // ===========================================================================
@@ -432,10 +432,12 @@ describe("Test 10 — Legal Disclaimer", () => {
         const prompt = buildChatSystemPrompt({
             contextDocuments: [],
             includeDisclaimer: true,
+            townName: "Needham, MA",
+            townHallPhone: "(781) 455-7500",
         });
 
-        // The disclaimer constant as defined in prompts.ts
-        expect(prompt).toContain(FIRST_MESSAGE_DISCLAIMER);
+        // The disclaimer should be generated dynamically with the town phone
+        expect(prompt).toContain(getFirstMessageDisclaimer("(781) 455-7500"));
         expect(prompt).toContain(
             "This tool uses AI and may provide inaccurate information",
         );
@@ -446,6 +448,8 @@ describe("Test 10 — Legal Disclaimer", () => {
         const prompt = buildChatSystemPrompt({
             contextDocuments: [],
             includeDisclaimer: false,
+            townName: "Needham, MA",
+            townHallPhone: "(781) 455-7500",
         });
 
         expect(prompt).not.toContain("FIRST-MESSAGE DISCLAIMER");

@@ -166,7 +166,7 @@ const TOWN_SYNONYMS: Record<string, SynonymDictionary> = {
   needham: [
     {
       triggers: ["the dump", "rts"],
-      expansions: ["Needham Transfer Station", "1421 Central Avenue", "recycling and transfer station"],
+      expansions: ["Needham Transfer Station", "recycling and transfer station"],
     },
     {
       triggers: ["the rec", "rec center"],
@@ -190,7 +190,7 @@ const TOWN_SYNONYMS: Record<string, SynonymDictionary> = {
     },
     {
       triggers: ["town meeting"],
-      expansions: ["Needham Town Meeting", "first Monday in May"],
+      expansions: ["Needham Town Meeting", "annual town meeting"],
     },
     {
       triggers: ["override", "prop 2.5", "proposition 2 1/2"],

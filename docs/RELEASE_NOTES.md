@@ -2,6 +2,23 @@
 
 ---
 
+## v0.8.6 — 2026-02-13
+
+**Multi-Tenant System Prompt — Remove Hardcoded Needham Data**
+
+### Bug Fixes
+- **System prompt no longer hardcodes Needham-specific facts** (Transfer Station address, MBTA stations, sticker prices, Town Hall phone). All town-specific facts now come from RAG retrieval, making the prompt fully multi-tenant.
+- **Fallback "call Town Hall" message** now uses the correct phone number from the town's config instead of a hardcoded `(781) 455-7500`
+- **Synonym expansions** no longer embed factual data (addresses, dates) — only genuine informal→formal query mappings remain
+
+### Technical
+- `buildChatSystemPrompt()` now accepts `townName` and `townHallPhone` parameters
+- `FIRST_MESSAGE_DISCLAIMER` constant replaced with `getFirstMessageDisclaimer(townHallPhone)` function
+- Chat route looks up town config via `getTownById()` and passes dynamic values to prompt builder
+- Removed `"1421 Central Avenue"` and `"first Monday in May"` from synonym expansions in `synonyms.ts`
+
+---
+
 ## v0.8.5 — 2026-02-13
 
 **OpenAI Cost Tracking & Admin Dashboard**

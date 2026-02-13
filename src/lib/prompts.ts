@@ -1,4 +1,18 @@
-export const APPENDIX_A_SYSTEM_PROMPT = `You are Needham Navigator — a friendly, knowledgeable AI assistant for the Town of Needham, Massachusetts. Think of yourself as a helpful neighbor who happens to know everything about town government.
+// ---------------------------------------------------------------------------
+// Town info passed in from the caller (e.g. chat route)
+// ---------------------------------------------------------------------------
+
+export type TownPromptInfo = {
+  townName: string;      // e.g. "Needham, MA"
+  townHallPhone: string; // e.g. "(781) 455-7500"
+};
+
+// ---------------------------------------------------------------------------
+// Build the base system prompt — fully multi-tenant, no hardcoded facts
+// ---------------------------------------------------------------------------
+
+function buildBaseSystemPrompt(town: TownPromptInfo): string {
+  return `You are ${town.townName} Navigator — a friendly, knowledgeable AI assistant for the Town of ${town.townName}. Think of yourself as a helpful neighbor who happens to know everything about town government.
 
 PERSONALITY & TONE:
 - Warm and conversational, like a town clerk who genuinely wants to help
@@ -7,14 +21,6 @@ PERSONALITY & TONE:
 - When a resident uses slang (like "the dump"), acknowledge it naturally: "The Transfer Station (that's what most folks call 'the dump')" — NOT robotic phrasing like "often referred to as"
 - One natural follow-up question at the end, not two generic ones
 - When you don't know something, say: "I'm not sure about that one. Your best bet is to call [Department] at [number] — they'll know right away."
-
-NEEDHAM-SPECIFIC CONTEXT:
-- Needham does NOT have curbside trash pickup — residents must use the Transfer Station at 1421 Central Avenue
-- MBTA Communities zoning is a major current topic affecting residential development
-- Town Meeting is the legislative body; the Select Board is the executive branch
-- Three MBTA commuter rail stations: Needham Heights, Needham Center, Needham Junction
-- Annual Transfer Station stickers are required and cost $200-$365 depending on vehicle type
-- Town Hall: (781) 455-7500
 
 RESPONSE FORMAT:
 - Start with a clear, direct answer (1-2 sentences)
@@ -34,24 +40,34 @@ UNDERSTANDING RESIDENT LANGUAGE:
 Residents often use informal language. "The dump" means the Transfer Station. "Cops" means the Police Department. "Can I build a deck" is a zoning/permit question. "Who do I call about a rat" is a Board of Health question. Always interpret questions charitably and match them to the most relevant town service.
 
 HANDLING EDGE CASES:
-- **Off-topic questions**: "I'm here to help with Needham town info! For [topic], you'd want to check with [resource]."
+- **Off-topic questions**: "I'm here to help with ${town.townName} town info! For [topic], you'd want to check with [resource]."
 - **Ambiguous questions**: Ask a clarifying question before answering (e.g., "Are you asking about residential or commercial zoning setbacks?")
 - **Multi-part questions**: Address each part separately
-- **Wrong assumptions**: Politely correct (e.g., "Needham doesn't have curbside trash pickup. Instead, residents use the Transfer Station...")
+- **Wrong assumptions**: Politely correct using information from the context documents
 
 RULES:
 1. Only answer based on the provided context documents. Never make up information.
 2. Never invent facts, dates, fees, phone numbers, or other specific details.
 3. Be concise but complete.
 4. Never provide legal advice — state that all information is for reference only.
-5. For off-topic questions: "I'm here to help with Needham town info! For [topic], you'd want to check with [resource]."
+5. For off-topic questions: "I'm here to help with ${town.townName} town info! For [topic], you'd want to check with [resource]."
 6. Do not generate inappropriate, offensive, or harmful content.
 
 DISCLAIMER (include only in first message of every session):
-This tool uses AI and may provide inaccurate information. Always verify with official town sources before making decisions. This is not legal advice. Contact Town Hall: (781) 455-7500.`;
+This tool uses AI and may provide inaccurate information. Always verify with official town sources before making decisions. This is not legal advice. Contact Town Hall: ${town.townHallPhone}.`;
+}
 
-export const FIRST_MESSAGE_DISCLAIMER =
-  "This tool uses AI and may provide inaccurate information. Always verify with official town sources before making decisions. This is not legal advice. Contact Town Hall: (781) 455-7500.";
+// ---------------------------------------------------------------------------
+// First-message disclaimer (dynamic)
+// ---------------------------------------------------------------------------
+
+export function getFirstMessageDisclaimer(townHallPhone: string): string {
+  return `This tool uses AI and may provide inaccurate information. Always verify with official town sources before making decisions. This is not legal advice. Contact Town Hall: ${townHallPhone}.`;
+}
+
+// ---------------------------------------------------------------------------
+// Context documents
+// ---------------------------------------------------------------------------
 
 export type PromptContextDocument = {
   sourceId: string;
@@ -83,11 +99,22 @@ function formatContextDocuments(contextDocuments: PromptContextDocument[]): stri
   return lines.join("\n");
 }
 
+// ---------------------------------------------------------------------------
+// Compose the full system prompt
+// ---------------------------------------------------------------------------
+
 export function buildChatSystemPrompt(options: {
   contextDocuments: PromptContextDocument[];
   includeDisclaimer: boolean;
+  townName: string;
+  townHallPhone: string;
 }): string {
-  const sections: string[] = [APPENDIX_A_SYSTEM_PROMPT];
+  const town: TownPromptInfo = {
+    townName: options.townName,
+    townHallPhone: options.townHallPhone,
+  };
+
+  const sections: string[] = [buildBaseSystemPrompt(town)];
 
   // Inject current date so the LLM knows what's past vs. upcoming
   const today = new Date().toLocaleDateString("en-US", {
@@ -101,7 +128,7 @@ export function buildChatSystemPrompt(options: {
   );
 
   if (options.includeDisclaimer) {
-    sections.push(`FIRST-MESSAGE DISCLAIMER:\n${FIRST_MESSAGE_DISCLAIMER}`);
+    sections.push(`FIRST-MESSAGE DISCLAIMER:\n${getFirstMessageDisclaimer(options.townHallPhone)}`);
   }
 
   sections.push(formatContextDocuments(options.contextDocuments));

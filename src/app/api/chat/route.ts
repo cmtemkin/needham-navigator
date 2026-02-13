@@ -12,6 +12,7 @@ import {
   type RetrievedChunk,
 } from "@/lib/rag";
 import { getSupabaseClient } from "@/lib/supabase";
+import { getTownById } from "@/lib/towns";
 
 const DEFAULT_CHAT_MODEL = "gpt-5-nano";
 const ALLOWED_MODELS = new Set([
@@ -133,6 +134,11 @@ export async function POST(request: Request): Promise<Response> {
     (typeof body.townId === "string" && body.townId.trim()) ||
     DEFAULT_TOWN_ID;
 
+  const townConfig = getTownById(townId);
+  const townName = townConfig?.name ?? "Your Town";
+  const townHallPhone =
+    townConfig?.departments.find((d) => d.name === "Town Hall")?.phone ?? "";
+
   const includeDisclaimer = messages.every((message) => message.role !== "assistant");
   const responseId = randomUUID();
 
@@ -161,9 +167,10 @@ export async function POST(request: Request): Promise<Response> {
     }));
 
     if (chunks.length === 0) {
+      const fallbackPhone = townHallPhone ? ` at ${townHallPhone}` : "";
       return staticStreamResponse({
         text: [
-          "I'm not sure about that one. Your best bet is to call Town Hall at (781) 455-7500 — they'll know right away or can point you to the right department.",
+          `I'm not sure about that one. Your best bet is to call Town Hall${fallbackPhone} — they'll know right away or can point you to the right department.`,
           "You can also try asking me about permits, zoning, the Transfer Station, schools, taxes, or other town services.",
         ].join("\n\n"),
         confidence,
@@ -192,6 +199,8 @@ export async function POST(request: Request): Promise<Response> {
     const systemPrompt = buildChatSystemPrompt({
       contextDocuments: buildContextDocuments(chunks),
       includeDisclaimer,
+      townName,
+      townHallPhone,
     });
 
     const result = streamText({
