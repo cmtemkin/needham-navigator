@@ -73,6 +73,12 @@ jobs:
               merge_method: 'squash'
             });
 
+      - name: Delete merged branch
+        if: success()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: gh api -X DELETE "repos/${{ github.repository }}/git/refs/heads/${{ github.event.pull_request.head.ref }}" || true
+
   on-failure:
     needs: build-and-test
     runs-on: ubuntu-latest
