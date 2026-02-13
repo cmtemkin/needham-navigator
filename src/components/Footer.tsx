@@ -1,10 +1,14 @@
 "use client";
 
+import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
-import { useTown } from "@/lib/town-context";
+import { useTown, useTownHref } from "@/lib/town-context";
+
+const FOOTER_VERSION_LABEL = "v0.1.0";
 
 export function Footer() {
   const town = useTown();
+  const releasesHref = useTownHref("/releases");
   const { t } = useI18n();
   const shortTownName = town.name.replace(/,\s*[A-Z]{2}$/i, "");
   const appName = `${shortTownName} Navigator`;
@@ -37,6 +41,15 @@ export function Footer() {
         {afterWebsite}
         <span className="text-text-muted"> {t("footer.terms_privacy")}</span>
       </p>
+      <div className="mt-2">
+        <Link
+          href={releasesHref}
+          className="text-[10.5px] font-medium text-text-muted opacity-80 transition-all hover:text-primary hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
+          aria-label={`View release notes (${FOOTER_VERSION_LABEL})`}
+        >
+          {FOOTER_VERSION_LABEL}
+        </Link>
+      </div>
     </footer>
   );
 }
