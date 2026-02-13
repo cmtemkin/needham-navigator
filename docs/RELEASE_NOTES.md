@@ -2,6 +2,32 @@
 
 ---
 
+## v0.8.5 — 2026-02-13
+
+**OpenAI Cost Tracking & Admin Dashboard**
+
+### New Features
+- **Automatic cost logging**: Every chat API call now logs token usage (input/output tokens) and estimated USD cost to the `api_costs` table — fully async, does not slow down responses
+- **Cost monitor dashboard**: New "Costs" tab in `/admin` with:
+  - Today / This Week / This Month summary cards
+  - Projected monthly cost (extrapolated from daily average)
+  - Average cost per query, total requests, total tokens
+  - Daily cost bar chart (last 30 days) with hover tooltips
+  - Cost-by-model breakdown with progress bars
+  - Friendly empty state when no data exists yet
+- **Cost API endpoint**: `GET /api/admin/costs` returns cost summary JSON (admin-protected)
+- **Model pricing constants**: `MODEL_COSTS` in `src/lib/cost-tracker.ts` maps all supported models to per-token pricing for easy updates
+
+### Database
+- **Migration:** `002_cost_tracking.sql` — creates `api_costs` table with indexes on `created_at`, `endpoint`, and `town_id`
+
+### Technical
+- Uses Vercel AI SDK v6 `result.usage` promise for non-blocking token tracking
+- Gracefully handles missing `api_costs` table (shows empty state, no errors)
+- Fire-and-forget logging pattern — cost tracking failures never affect chat responses
+
+---
+
 ## v0.8.4 — 2026-02-12
 
 **Embedding Model Migration: text-embedding-3-small → text-embedding-3-large**
