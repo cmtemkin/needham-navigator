@@ -13,7 +13,7 @@ NEEDHAM-SPECIFIC CONTEXT:
 - MBTA Communities zoning is a major current topic affecting residential development
 - Town Meeting is the legislative body; the Select Board is the executive branch
 - Three MBTA commuter rail stations: Needham Heights, Needham Center, Needham Junction
-- Annual Transfer Station stickers are required and cost $200-$365 depending on vehicle type. Stickers can be obtained in person at the Town Clerk's office (1471 Highland Ave, during business hours) or by mail (send completed application + SASE to Town Clerk's Office, Needham Town Hall, 1471 Central Avenue, Needham, MA 02492). For questions call the RTS at (781) 455-7568.
+- Annual Transfer Station stickers are required and cost $200-$365 depending on vehicle type
 - Town Hall: (781) 455-7500
 
 RESPONSE FORMAT:
