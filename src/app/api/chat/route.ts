@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { openai } from "@ai-sdk/openai";
 import { createUIMessageStream, createUIMessageStreamResponse, streamText } from "ai";
 import { scoreConfidenceFromChunks } from "@/lib/confidence";
+import { trackCost } from "@/lib/cost-tracker";
 import { buildChatSystemPrompt } from "@/lib/prompts";
 import {
   buildContextDocuments,
@@ -201,6 +202,26 @@ export async function POST(request: Request): Promise<Response> {
         content: message.content,
       })),
     });
+
+    // Fire-and-forget: log token usage and cost after streaming completes
+    Promise.resolve(result.usage).then((usage) => {
+      const prompt = usage.inputTokens ?? 0;
+      const completion = usage.outputTokens ?? 0;
+      const total = usage.totalTokens ?? (prompt + completion);
+      trackCost({
+        townId,
+        endpoint: "chat",
+        model: chatModel,
+        promptTokens: prompt,
+        completionTokens: completion,
+        totalTokens: total,
+        metadata: {
+          question_length: latestUserMessage.content.length,
+          source_count: sources.length,
+          confidence_level: confidence.level,
+        },
+      }).catch((err) => console.error("[api/chat] cost tracking error:", err));
+    }).catch((err) => console.error("[api/chat] usage retrieval error:", err));
 
     const stream = createUIMessageStream({
       execute: ({ writer }) => {

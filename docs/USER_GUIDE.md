@@ -96,6 +96,7 @@ The home page lists key town departments with phone numbers. Click any departmen
 Visit `/admin` to access:
 
 - **Analytics** — feedback trends, query volume, response quality metrics
+- **Costs** — OpenAI API spend monitoring: today/week/month totals, projected monthly cost, daily cost chart (last 30 days), cost-by-model breakdown, average cost per query
 - **System Logs** — ingestion status, error tracking, sync history
 - **Document Management** — view indexed content and sources
 - **Settings** — configure the AI chat model (GPT-5 Nano, GPT-5 Mini, GPT-4o Mini, GPT-4.1 Mini) with pricing info; changes take effect immediately

@@ -25,13 +25,14 @@ import {
   Settings,
   Save,
   Cpu,
+  DollarSign,
 } from "lucide-react";
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-type Tab = "documents" | "analytics" | "logs" | "settings";
+type Tab = "documents" | "analytics" | "costs" | "logs" | "settings";
 
 interface AdminDocument {
   id: string;
@@ -69,6 +70,20 @@ interface IngestionLog {
   duration_ms: number;
   details: Record<string, unknown>;
   created_at: string;
+}
+
+interface CostPeriodSummary {
+  total_cost: number;
+  total_requests: number;
+  total_tokens: number;
+}
+
+interface CostSummaryData {
+  today: CostPeriodSummary;
+  week: CostPeriodSummary;
+  month: CostPeriodSummary;
+  daily: Array<{ date: string; cost: number; requests: number; tokens: number }>;
+  by_model: Array<{ model: string; cost: number; requests: number }>;
 }
 
 // ---------------------------------------------------------------------------
@@ -546,6 +561,153 @@ function LogsTab({ password }: { password: string }) {
 }
 
 // ---------------------------------------------------------------------------
+// Costs Tab
+// ---------------------------------------------------------------------------
+
+function formatUsd(n: number): string {
+  if (n === 0) return "$0.00";
+  if (n < 0.01) return `$${n.toFixed(4)}`;
+  return `$${n.toFixed(2)}`;
+}
+
+function CostsTab({ password }: { password: string }) {
+  const [costs, setCosts] = useState<CostSummaryData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const res = await adminFetch("/api/admin/costs", password);
+      if (res.ok) setCosts(await res.json());
+      else setError(true);
+      setLoading(false);
+    })();
+  }, [password]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <RefreshCw size={24} className="animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error || !costs) {
+    return <div className="text-center py-12 text-text-muted text-sm">Unable to load cost data.</div>;
+  }
+
+  const hasData = costs.month.total_requests > 0;
+
+  if (!hasData) {
+    return (
+      <div className="text-center py-16">
+        <DollarSign size={40} className="mx-auto text-text-muted mb-3 opacity-40" />
+        <p className="text-sm text-text-muted">No cost data yet</p>
+        <p className="text-xs text-text-muted mt-1">
+          Costs will appear here after users start asking questions.
+        </p>
+      </div>
+    );
+  }
+
+  const avgCostPerQuery = costs.month.total_requests > 0
+    ? costs.month.total_cost / costs.month.total_requests
+    : 0;
+
+  const daysInMonth = new Date().getDate();
+  const dailyAvg = daysInMonth > 0 ? costs.month.total_cost / daysInMonth : 0;
+  const daysRemaining = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+  const projectedMonthly = dailyAvg * daysRemaining;
+
+  const maxDailyCost = Math.max(...costs.daily.map((d) => d.cost), 0.0001);
+
+  return (
+    <div>
+      {/* Summary Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <KpiCard icon={DollarSign} label="Today" value={formatUsd(costs.today.total_cost)} />
+        <KpiCard icon={DollarSign} label="This Week" value={formatUsd(costs.week.total_cost)} />
+        <KpiCard icon={DollarSign} label="This Month" value={formatUsd(costs.month.total_cost)} />
+        <KpiCard icon={TrendingUp} label="Projected Monthly" value={formatUsd(projectedMonthly)} />
+      </div>
+
+      {/* Stats Row */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+        <div className="bg-white border border-border-default rounded-lg p-4">
+          <span className="text-xs text-text-secondary">Avg Cost / Query</span>
+          <div className="text-lg font-bold text-text-primary mt-1">{formatUsd(avgCostPerQuery)}</div>
+        </div>
+        <div className="bg-white border border-border-default rounded-lg p-4">
+          <span className="text-xs text-text-secondary">Month Requests</span>
+          <div className="text-lg font-bold text-text-primary mt-1">{costs.month.total_requests.toLocaleString()}</div>
+        </div>
+        <div className="bg-white border border-border-default rounded-lg p-4">
+          <span className="text-xs text-text-secondary">Month Tokens</span>
+          <div className="text-lg font-bold text-text-primary mt-1">{costs.month.total_tokens.toLocaleString()}</div>
+        </div>
+      </div>
+
+      {/* Daily Cost Chart (CSS bars) */}
+      {costs.daily.length > 0 && (
+        <div className="bg-white border border-border-default rounded-lg p-5 mb-4">
+          <h3 className="text-sm font-semibold text-text-primary mb-4 flex items-center gap-2">
+            <BarChart3 size={15} className="text-primary" />
+            Daily Cost (Last 30 Days)
+          </h3>
+          <div className="flex items-end gap-[3px] h-32">
+            {costs.daily.map((day) => {
+              const pct = (day.cost / maxDailyCost) * 100;
+              return (
+                <div
+                  key={day.date}
+                  className="flex-1 bg-primary/70 hover:bg-primary rounded-t transition-colors min-w-[4px] group relative"
+                  style={{ height: `${Math.max(pct, 2)}%` }}
+                  title={`${day.date}: ${formatUsd(day.cost)} (${day.requests} req)`}
+                >
+                  <div className="hidden group-hover:block absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-gray-900 text-white text-[10px] rounded px-2 py-1 whitespace-nowrap z-10">
+                    {day.date.slice(5)}: {formatUsd(day.cost)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="flex justify-between mt-2 text-[10px] text-text-muted">
+            <span>{costs.daily[0]?.date.slice(5)}</span>
+            <span>{costs.daily[costs.daily.length - 1]?.date.slice(5)}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Cost by Model */}
+      {costs.by_model.length > 0 && (
+        <div className="bg-white border border-border-default rounded-lg p-5">
+          <h3 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
+            <Cpu size={15} className="text-primary" />
+            Cost by Model
+          </h3>
+          <div className="space-y-2">
+            {costs.by_model.map((m) => {
+              const pct = costs.month.total_cost > 0 ? (m.cost / costs.month.total_cost) * 100 : 0;
+              return (
+                <div key={m.model} className="flex items-center gap-3">
+                  <code className="text-xs text-text-secondary w-40 truncate">{m.model}</code>
+                  <div className="flex-1 bg-gray-100 rounded-full h-2">
+                    <div className="bg-primary h-2 rounded-full transition-all" style={{ width: `${pct}%` }} />
+                  </div>
+                  <span className="text-xs text-text-secondary w-24 text-right">
+                    {formatUsd(m.cost)} ({m.requests})
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Settings Tab
 // ---------------------------------------------------------------------------
 
@@ -702,6 +864,7 @@ export default function AdminPage() {
   const tabs: { id: Tab; label: string; icon: React.ComponentType<any> }[] = [
     { id: "documents", label: "Documents", icon: FileText },
     { id: "analytics", label: "Analytics", icon: BarChart3 },
+    { id: "costs", label: "Costs", icon: DollarSign },
     { id: "logs", label: "Ingestion Logs", icon: Activity },
     { id: "settings", label: "Settings", icon: Settings },
   ];
@@ -752,6 +915,7 @@ export default function AdminPage() {
       <main className="max-w-5xl mx-auto px-6 py-6">
         {activeTab === "documents" && <DocumentsTab password={password} />}
         {activeTab === "analytics" && <AnalyticsTab password={password} />}
+        {activeTab === "costs" && <CostsTab password={password} />}
         {activeTab === "logs" && <LogsTab password={password} />}
         {activeTab === "settings" && <SettingsTab password={password} />}
       </main>
