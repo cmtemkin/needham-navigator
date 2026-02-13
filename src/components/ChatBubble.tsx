@@ -138,7 +138,7 @@ function formatMarkdown(text: string): string {
 
   for (const line of lines) {
     const bulletMatch = line.match(/^\s*[-*]\s+(.+)/);
-    const numberedMatch = line.match(/^\s*\d+\.\s+(.+)/);
+    const numberedMatch = line.match(/^\s*\d+[.)]\s+(.+)/);
 
     if (bulletMatch) {
       if (inList !== "ul") {

@@ -84,7 +84,8 @@ npx tsc --noEmit
 After all checks pass, you MUST let the user preview before pushing:
 1. Start the dev server: `npx next dev -p 3000`
 2. Tell the user: "All checks pass. Preview your changes at http://localhost:3000/needham - let me know if it looks good or if you want changes."
-3. **STOP and WAIT** for the user to respond.
+3. **Include a specific change summary** listing every file changed, what was modified (before → after), and why. The user should know exactly what to look for when previewing.
+4. **STOP and WAIT** for the user to respond.
 4. If the user requests changes, make them and go back to Step 1.
 5. Only proceed to Step 4 after the user explicitly approves.
 
