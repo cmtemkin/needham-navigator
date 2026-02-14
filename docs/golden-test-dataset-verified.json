@@ -1,0 +1,1412 @@
+[
+  {
+    "id": "TRASH-001",
+    "persona": "James (New Resident)",
+    "category": "Transfer Station / Trash",
+    "question": "When is the transfer station open?",
+    "verified_answer_contains": [
+      "Tuesday through Thursday: 7:00 AM - 4:00 PM",
+      "Friday: 7:00 AM - 12:00 PM (noon)",
+      "Saturday: 7:00 AM - 4:00 PM",
+      "Closed Sunday and Monday"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/180/Recycling-Transfer-Station"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Critical info for new residents. Hours verified directly from DPW/RTS page."
+  },
+  {
+    "id": "TRASH-002",
+    "persona": "James (New Resident)",
+    "category": "Transfer Station / Trash",
+    "question": "Where is the transfer station located?",
+    "verified_answer_contains": [
+      "1421 Central Avenue",
+      "Needham, MA"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/180/Recycling-Transfer-Station"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Address verified from official RTS page."
+  },
+  {
+    "id": "TRASH-003",
+    "persona": "James (New Resident)",
+    "category": "Transfer Station / Trash",
+    "question": "How much does it cost to use the transfer station?",
+    "verified_answer_contains": [
+      "RTS sticker is FREE for Needham residents",
+      "Pay-As-You-Throw bags required for trash disposal",
+      "Large bags cost $2.16 each",
+      "Small bags cost $1.16 each",
+      "Bags available at local retailers"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/180/Recycling-Transfer-Station"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Free sticker + PAYT bag model verified. Bag prices confirmed."
+  },
+  {
+    "id": "TRASH-004",
+    "persona": "James (New Resident)",
+    "category": "Transfer Station / Trash",
+    "question": "What items can't I throw away at the transfer station?",
+    "verified_answer_contains": [
+      "hazardous waste has separate collection events",
+      "specific items like electronics and tires may have separate procedures",
+      "contact DPW or check website for restricted items list"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/180/Recycling-Transfer-Station"
+    ],
+    "verification_status": "partially_verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Medium",
+    "notes": "General hazardous waste restrictions confirmed. Specific banned items list not fully enumerated in research."
+  },
+  {
+    "id": "TRASH-005",
+    "persona": "James (New Resident)",
+    "category": "Transfer Station / Trash",
+    "question": "Do I need to separate recyclables or can I put them in the trash?",
+    "verified_answer_contains": [
+      "Needham uses single-stream recycling",
+      "recyclables go in a separate stream from trash",
+      "no need to sort individual recyclable types",
+      "recycling is free at the transfer station"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/180/Recycling-Transfer-Station"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Single-stream recycling confirmed. Trash requires PAYT bags but recycling is free."
+  },
+  {
+    "id": "WRONGASSUMP-001",
+    "persona": "James (New Resident)",
+    "category": "Wrong Assumptions",
+    "question": "Where do I put my trash cans on the curb for pickup?",
+    "verified_answer_contains": [
+      "Needham does NOT have curbside trash pickup",
+      "residents must bring trash to the Recycling and Transfer Station",
+      "transfer station located at 1421 Central Avenue",
+      "must use Pay-As-You-Throw bags"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/180/Recycling-Transfer-Station"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Medium",
+    "notes": "Tests ability to correct false assumption. Needham is a transfer-station-only town."
+  },
+  {
+    "id": "TAX-001",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Property Taxes & Assessments",
+    "question": "How much are property taxes in Needham?",
+    "verified_answer_contains": [
+      "Residential tax rate FY2026: $10.83 per $1,000 of assessed value",
+      "Commercial/Industrial/Personal Property rate: $21.09 per $1,000",
+      "Needham uses a split tax rate"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/159/Assessors-Office"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "FY2026 rates verified. Residential and commercial rates confirmed."
+  },
+  {
+    "id": "TAX-002",
+    "persona": "David (Real Estate Agent)",
+    "category": "Property Taxes & Assessments",
+    "question": "What's the assessed value of 42 Great Plain Road?",
+    "verified_answer_contains": [
+      "specific property lookups require the Assessor's database",
+      "contact the Assessor's Office for individual property values",
+      "Assessor's Office phone: 781-455-7500"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/159/Assessors-Office"
+    ],
+    "verification_status": "partially_verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Easy",
+    "notes": "Individual property lookups depend on live database access. Navigator should direct to Assessor's tools."
+  },
+  {
+    "id": "TAX-003",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Property Taxes & Assessments",
+    "question": "When are property taxes due?",
+    "verified_answer_contains": [
+      "property taxes are billed quarterly",
+      "four payment deadlines per year"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/159/Assessors-Office"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Quarterly billing confirmed."
+  },
+  {
+    "id": "TAX-004",
+    "persona": "James (New Resident)",
+    "category": "Property Taxes & Assessments",
+    "question": "How do I appeal my property assessment if I think it's too high?",
+    "verified_answer_contains": [
+      "file an appeal within 30 days of receiving tax bill",
+      "use Massachusetts State Form 128 (Application for Abatement)",
+      "submit to the Board of Assessors",
+      "Board of Assessors reviews and decides"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/159/Assessors-Office"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Medium",
+    "notes": "Appeal process and 30-day deadline verified. Form 128 confirmed."
+  },
+  {
+    "id": "TAX-005",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Property Taxes & Assessments",
+    "question": "What exemptions are available for seniors or disabled residents?",
+    "verified_answer_contains": [
+      "property tax exemptions are available",
+      "contact the Assessor's Office for eligibility details",
+      "Assessor's Office phone: 781-455-7500"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/159/Assessors-Office"
+    ],
+    "verification_status": "partially_verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Medium",
+    "notes": "Exemptions exist but specific programs/amounts not fully enumerated in research."
+  },
+  {
+    "id": "SCHOOL-001",
+    "persona": "James (New Resident)",
+    "category": "Schools",
+    "question": "What schools are in Needham? Are they good?",
+    "verified_answer_contains": [
+      "8 public schools total",
+      "5 elementary schools: Broadmeadow, Eliot, Mitchell, Sunita L. Williams, Newman",
+      "2 middle schools: High Rock (grade 6), Pollard (grades 7-8)",
+      "1 high school: Needham High School (grades 9-12)"
+    ],
+    "verified_source_urls": [
+      "https://www.needham.k12.ma.us/"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "All 8 schools verified with grade levels. Quality ratings are subjective/out-of-scope."
+  },
+  {
+    "id": "SCHOOL-002",
+    "persona": "David (Real Estate Agent)",
+    "category": "Schools",
+    "question": "Which school district does this property fall into?",
+    "verified_answer_contains": [
+      "school assignments depend on property address",
+      "Needham has 5 elementary school zones",
+      "all students attend High Rock (grade 6), Pollard (grades 7-8), and Needham High (9-12)",
+      "contact the school district for address-specific assignment"
+    ],
+    "verified_source_urls": [
+      "https://www.needham.k12.ma.us/"
+    ],
+    "verification_status": "partially_verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Medium",
+    "notes": "Address-to-school mapping requires district boundary data. General structure verified."
+  },
+  {
+    "id": "SCHOOL-003",
+    "persona": "James (New Resident)",
+    "category": "Schools",
+    "question": "What's the school calendar? When do schools open and close?",
+    "verified_answer_contains": [
+      "first day of school 2025-2026: August 27, 2025",
+      "school hours vary by level",
+      "check the Needham Public Schools website for full calendar"
+    ],
+    "verified_source_urls": [
+      "https://www.needham.k12.ma.us/"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "First day verified as Aug 27, 2025. Last day and vacation dates not fully captured."
+  },
+  {
+    "id": "SCHOOL-004",
+    "persona": "James (New Resident)",
+    "category": "Schools",
+    "question": "How do I register my child for school?",
+    "verified_answer_contains": [
+      "registration opens January 12, 2026",
+      "registration deadline is April 1, 2026",
+      "register through the Needham Public Schools district office"
+    ],
+    "verified_source_urls": [
+      "https://www.needham.k12.ma.us/"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Medium",
+    "notes": "Registration window verified. Required documents not fully enumerated."
+  },
+  {
+    "id": "SCHOOL-005",
+    "persona": "James (New Resident)",
+    "category": "Schools",
+    "question": "What are school lunch costs and do you offer free/reduced lunch?",
+    "verified_answer_contains": [
+      "ALL students receive FREE breakfast and lunch",
+      "universal free meals program funded by the state of Massachusetts",
+      "no application needed for free meals"
+    ],
+    "verified_source_urls": [
+      "https://www.needham.k12.ma.us/"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Universal free meals is a major verified fact. State-funded program."
+  },
+  {
+    "id": "TRANS-001",
+    "persona": "James (New Resident)",
+    "category": "Transportation / MBTA",
+    "question": "What MBTA stations are near Needham?",
+    "verified_answer_contains": [
+      "3 commuter rail stations in Needham",
+      "Needham Heights",
+      "Needham Junction",
+      "Needham Center",
+      "all on the MBTA Needham Line (commuter rail)"
+    ],
+    "verified_source_urls": [
+      "https://www.mbta.com/schedules/CR-Needham"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "All 3 stations and the Needham Line designation verified."
+  },
+  {
+    "id": "TRANS-002",
+    "persona": "James (New Resident)",
+    "category": "Transportation / MBTA",
+    "question": "How do I get to Boston on the MBTA?",
+    "verified_answer_contains": [
+      "take the MBTA Needham Line commuter rail",
+      "trains go to South Station in Boston",
+      "approximately 40 minutes travel time",
+      "board at Needham Heights, Needham Junction, or Needham Center"
+    ],
+    "verified_source_urls": [
+      "https://www.mbta.com/schedules/CR-Needham"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Medium",
+    "notes": "Route, destination (South Station), and ~40 min travel time verified."
+  },
+  {
+    "id": "TRANS-003",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Transportation / MBTA",
+    "question": "Are there local bus routes in Needham?",
+    "verified_answer_contains": [
+      "MBTA Bus Route 59",
+      "runs from Watertown Square to Needham Junction",
+      "provides local bus service through Needham"
+    ],
+    "verified_source_urls": [
+      "https://www.mbta.com/schedules/59"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Bus Route 59 verified as the local bus service."
+  },
+  {
+    "id": "TRANS-004",
+    "persona": "James (New Resident)",
+    "category": "Transportation / MBTA",
+    "question": "Where can I park for the MBTA station?",
+    "verified_answer_contains": [
+      "parking available at Needham Junction station",
+      "weekday rate: $6.00 per day",
+      "weekend rate: $2.00 per day"
+    ],
+    "verified_source_urls": [
+      "https://www.mbta.com/stops/place-NB-0072"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Needham Junction parking rates verified."
+  },
+  {
+    "id": "GOV-001",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Town Meetings & Government",
+    "question": "When is the next town meeting?",
+    "verified_answer_contains": [
+      "Needham has a Representative Town Meeting",
+      "Annual Town Meeting is held each spring (typically May)",
+      "check the town website or Town Clerk for specific dates"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/5652/May-2025-Annual-Town-Meeting",
+      "https://www.needhamma.gov/77/Town-Clerk"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Easy",
+    "notes": "Annual Town Meeting confirmed as spring event. Specific date changes yearly."
+  },
+  {
+    "id": "GOV-002",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Town Meetings & Government",
+    "question": "How do I contact my town selectmen or town council?",
+    "verified_answer_contains": [
+      "Needham has a Select Board (not selectmen or town council)",
+      "5 members serving staggered 3-year terms",
+      "Town Hall: 1471 Highland Avenue",
+      "Phone: 781-455-7500",
+      "Town Manager: Katie King"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/70/Select-Board"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Select Board structure, contact info, and Town Manager verified."
+  },
+  {
+    "id": "GOV-003",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Town Meetings & Government",
+    "question": "How is the town budget developed and approved?",
+    "verified_answer_contains": [
+      "Town Manager and School Superintendent submit departmental spending requests to Finance Committee by 2nd Wednesday of December",
+      "Town Manager presents balanced budget recommendation by January 31st",
+      "budget is voted on and approved at Annual Town Meeting",
+      "Representative Town Meeting (240 members, 10 precincts) is the legislative body"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/index.aspx?nid=1254",
+      "https://needhamma.gov/DocumentCenter/View/47167/FY2026-Budget-Book-Prologue"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Hard",
+    "notes": "Full budget timeline and approval process verified with specific dates."
+  },
+  {
+    "id": "GOV-004",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Town Meetings & Government",
+    "question": "What committees or boards can I join as a volunteer?",
+    "verified_answer_contains": [
+      "multiple boards, commissions, and committees accept volunteers",
+      "examples include Planning Board, Commission on Disabilities, Council on Aging",
+      "submit a Committee Interest Form to be considered",
+      "volunteer application available on town website"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/497/Boards-Commissions-Committees",
+      "https://www.needhamma.gov/1652/Volunteer-Opportunities"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Medium",
+    "notes": "Volunteer process and Committee Interest Form verified."
+  },
+  {
+    "id": "GOV-005",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Town Meetings & Government",
+    "question": "How do I find out about local zoning or planning hearings?",
+    "verified_answer_contains": [
+      "legal notices and hearing notices published in the Hometown Weekly (since May 2022)",
+      "also posted on the town website as a community service",
+      "Planning Board meets 1st and 3rd Tuesday of each month",
+      "agendas, minutes, and legal notices available on town website"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/1114/Planning-Board",
+      "https://www.needhamma.gov/5161/Legal-Notices"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Medium",
+    "notes": "Publication details and Planning Board meeting schedule verified."
+  },
+  {
+    "id": "GENERAL-001",
+    "persona": "James (New Resident)",
+    "category": "General 'Where Do I...' Questions",
+    "question": "Where do I get a library card?",
+    "verified_answer_contains": [
+      "Needham Free Public Library",
+      "1139 Highland Avenue",
+      "Hours: Monday-Thursday 9AM-9PM, Friday 9AM-5:30PM, Saturday 9AM-5PM, Sunday 1PM-6PM"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/191/Library"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Library location and full weekly hours verified."
+  },
+  {
+    "id": "GENERAL-002",
+    "persona": "James (New Resident)",
+    "category": "General 'Where Do I...' Questions",
+    "question": "Where can I get a resident parking permit?",
+    "verified_answer_contains": [
+      "Needham offers overnight parking permits",
+      "contact the Department of Public Works",
+      "DPW address: 500 Dedham Avenue",
+      "DPW phone: 781-455-7550"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/3304/Permits-Licenses",
+      "https://www.needhamma.gov/204/Parking-Clerk"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Easy",
+    "notes": "Overnight parking permits verified. General resident parking details from Permits/Licenses page."
+  },
+  {
+    "id": "GENERAL-003",
+    "persona": "James (New Resident)",
+    "category": "General 'Where Do I...' Questions",
+    "question": "Where is the town hall and what departments are there?",
+    "verified_answer_contains": [
+      "Town Hall: 1471 Highland Avenue, Needham, MA 02492",
+      "Main phone: 781-455-7500",
+      "departments include Town Clerk, Assessor's Office, Select Board, Finance"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/77/Town-Clerk"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Town Hall address and phone verified from multiple sources."
+  },
+  {
+    "id": "GENERAL-004",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "General 'Where Do I...' Questions",
+    "question": "How do I file a complaint about a code violation?",
+    "verified_answer_contains": [
+      "Building code violations: contact Building Department at 500 Dedham Avenue, phone 781-455-7550",
+      "Health/food violations: contact Public Health Division at 178 Rosemary Street, phone 781-455-7940",
+      "Building Division enforces state building, electrical, plumbing, gas, mechanical codes and local zoning by-laws"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/227/Building-Department",
+      "https://www.needhamma.gov/5172/Permits-licenses-and-complaints"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Medium",
+    "notes": "Both building and health complaint channels verified with addresses and phone numbers."
+  },
+  {
+    "id": "GENERAL-005",
+    "persona": "James (New Resident)",
+    "category": "General 'Where Do I...' Questions",
+    "question": "Where do I register to vote?",
+    "verified_answer_contains": [
+      "register at least 10 days before any election",
+      "online registration available through Massachusetts Secretary of State website",
+      "in-person registration at Town Clerk's office",
+      "Town Clerk: 1471 Highland Avenue, phone 781-455-7500 ext. 71503"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/77/Town-Clerk",
+      "https://www.sec.state.ma.us/ovr/"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "10-day deadline, online option, and Town Clerk info verified."
+  },
+  {
+    "id": "SAFETY-001",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Public Safety",
+    "question": "What's the crime rate in Needham?",
+    "verified_answer_contains": [
+      "contact the Needham Police Department for crime statistics",
+      "Police station: 99 School Street",
+      "non-emergency phone: 781-444-1212"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/170/Police"
+    ],
+    "verification_status": "partially_verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Easy",
+    "notes": "Police contact info verified. Specific crime stats require police department data."
+  },
+  {
+    "id": "SAFETY-002",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Public Safety",
+    "question": "How do I report a crime or emergency?",
+    "verified_answer_contains": [
+      "call 911 for emergencies",
+      "Needham Police non-emergency: 781-444-1212",
+      "Police station: 99 School Street"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/170/Police"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Emergency and non-emergency numbers verified."
+  },
+  {
+    "id": "SAFETY-003",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Public Safety",
+    "question": "Does Needham have a fire department? How fast are response times?",
+    "verified_answer_contains": [
+      "yes, Needham has a Fire Department",
+      "Fire station: 88 Chestnut Street",
+      "non-emergency phone: 781-444-0142"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/162/Fire"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Easy",
+    "notes": "Fire dept location and non-emergency number verified. Response time data not publicly posted."
+  },
+  {
+    "id": "PARK-001",
+    "persona": "James (New Resident)",
+    "category": "Parks & Recreation",
+    "question": "What parks and recreation areas does Needham have?",
+    "verified_answer_contains": [
+      "over 300 acres of parkland",
+      "DeFazio Park at 380 Dedham Avenue (baseball diamonds, fields, track, playground, Carleton Pavilion)",
+      "Riverside Park (toddler playground, open grassy areas)",
+      "Perry Park",
+      "multiple school-based athletic facilities including Avery Field, Memorial Park, Mills Field"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/5699/Park-Recreation",
+      "https://www.needhamma.gov/5346/Field-Parks-and-Playgrounds",
+      "https://needhamma.gov/5351/DeFazio-Park"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Major parks and 300+ acres figure verified from official pages."
+  },
+  {
+    "id": "PARK-002",
+    "persona": "James (New Resident)",
+    "category": "Parks & Recreation",
+    "question": "Do you have a swimming pool or beach?",
+    "verified_answer_contains": [
+      "Rosemary Recreation Complex at 178 Rosemary Street",
+      "two outdoor pools: Recreation Pool (family/children) and Fitness Pool (25-meter, 8-lane lap pool)",
+      "open Memorial Day through Labor Day (summer seasonal)",
+      "season passes available (family and individual options)",
+      "no public beach",
+      "phone: 781-455-7930"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/1721/Swimming",
+      "https://www.needhamma.gov/5699/Park-Recreation"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Rosemary Pool complex details verified. Two pools, seasonal operation confirmed."
+  },
+  {
+    "id": "PARK-003",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Parks & Recreation",
+    "question": "What recreational programs and classes are offered?",
+    "verified_answer_contains": [
+      "swim lessons for all ages",
+      "competitive swim teams (ages 5+)",
+      "Special Olympics Swim Team (ages 6+)",
+      "adaptive aquatics programs",
+      "youth and adult programs year-round",
+      "summer camps",
+      "register online at needhamprograms.myrec.com"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/5212/Register",
+      "https://www.needhamma.gov/1721/Swimming",
+      "https://needhamprograms.myrec.com/info/activities/"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Medium",
+    "notes": "Program types and registration system verified. Specific seasonal offerings change."
+  },
+  {
+    "id": "HEALTH-001",
+    "persona": "Lisa (Small Business Owner)",
+    "category": "Health Department / Food Permits",
+    "question": "What do I need to do to start a food truck or catering business?",
+    "verified_answer_contains": [
+      "apply for Mobile Food Vendor Permit from Board of Health",
+      "required: MA Driver's License, ServSafe Food Training certificate, Food Allergy Training certificate",
+      "required: valid MA Hawker and Peddler License",
+      "required: Commissary Permit and proposed menu",
+      "Board of Health coordinates approval with Fire Department",
+      "if on public way/property, also need permit from Select Board"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/3630/Mobile-Food-Vendor"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Hard",
+    "notes": "Full Mobile Food Vendor requirements verified with all required documentation."
+  },
+  {
+    "id": "HEALTH-002",
+    "persona": "Lisa (Small Business Owner)",
+    "category": "Health Department / Food Permits",
+    "question": "How often are food establishments inspected?",
+    "verified_answer_contains": [
+      "risk-based inspection schedule",
+      "Category 1: inspected annually with 6-month check-in",
+      "Category 2: every 6 months (retail food, quick service, schools)",
+      "Category 3: every 4 months (full-service restaurants)",
+      "Category 4: every 3 months"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/2840/Inspection-Schedule",
+      "https://www.needhamma.gov/PublicHealthInspectionReports"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Full 4-tier risk-based inspection schedule verified."
+  },
+  {
+    "id": "HEALTH-003",
+    "persona": "Lisa (Small Business Owner)",
+    "category": "Health Department / Food Permits",
+    "question": "Where do I get a food service establishment license?",
+    "verified_answer_contains": [
+      "Board of Health at 178 Rosemary Street, Needham, MA 02494",
+      "phone: 781-455-7940",
+      "hours: Monday, Wednesday, Thursday 8:00 AM - 5:00 PM",
+      "submit Food Establishment Permit & Plan Review application"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/1103/Board-of-Health",
+      "https://www.needhamma.gov/5640/Food-Establishment-Resources"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Board of Health address, phone, hours, and application process verified."
+  },
+  {
+    "id": "HEALTH-004",
+    "persona": "James (New Resident)",
+    "category": "Health Department / Food Permits",
+    "question": "How do I register with the health department?",
+    "verified_answer_contains": [
+      "contact the Board of Health / Public Health Division",
+      "address: 178 Rosemary Street, Needham, MA 02494",
+      "phone: 781-455-7940",
+      "hours: Monday, Wednesday, Thursday 8:00 AM - 5:00 PM"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/85/Public-Health",
+      "https://www.needhamma.gov/1103/Board-of-Health"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Easy",
+    "notes": "Public Health contact information and hours verified."
+  },
+  {
+    "id": "ZON-001",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Zoning & Dimensional Regulations",
+    "question": "Can I build a deck in my backyard? What's the setback distance?",
+    "verified_answer_contains": [
+      "building permit required for decks",
+      "setback distance depends on zoning district",
+      "rear yard setback: 25 feet (SRA), 20 feet (SRB/GR)",
+      "side yard setback: 15 feet (SRA), 14 feet (SRB/GR)",
+      "Building Inspector: Dan Walsh",
+      "homeowners can pull permits for own single/two-family dwellings"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/DocumentCenter/View/16661/Zoning-By-Laws-2025---Chapter-4",
+      "https://www.needhamma.gov/227/Building-Department"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Setbacks verified for major residential zones from Chapter 4 of Zoning By-Laws."
+  },
+  {
+    "id": "ZON-002",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Zoning & Dimensional Regulations",
+    "question": "What's my lot size minimum and maximum height for structures?",
+    "verified_answer_contains": [
+      "maximum building height in residential zones: 32 feet",
+      "minimum lot size varies by zoning district",
+      "specific lot area requirements in Section 4.2.1 Table of Regulations",
+      "different standards for lots created before vs. after January 9, 1986"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/DocumentCenter/View/16644",
+      "https://www.needhamma.gov/DocumentCenter/View/16661/Zoning-By-Laws-2025---Chapter-4"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Medium",
+    "notes": "32-foot height limit verified. Lot sizes vary by district — refer to Section 4.2.1."
+  },
+  {
+    "id": "ZON-003",
+    "persona": "David (Real Estate Agent)",
+    "category": "Zoning & Dimensional Regulations",
+    "question": "What zoning district is 42 Great Plain Road in?",
+    "verified_answer_contains": [
+      "specific property zoning lookups require the town Zoning Map",
+      "contact Planning Department or check GIS/zoning map on town website",
+      "Needham has multiple residential districts: SRA, SRB, GR and others"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/1614/Zoning-By-Laws"
+    ],
+    "verification_status": "partially_verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Easy",
+    "notes": "Individual address lookups require GIS/map tool. District types verified."
+  },
+  {
+    "id": "ZON-004",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Zoning & Dimensional Regulations",
+    "question": "I want to build an addition. How close to the property line can I get?",
+    "verified_answer_contains": [
+      "setbacks vary by zoning district",
+      "Single Residence A: front 30ft, side 15ft, rear 25ft",
+      "Single Residence B: front 20ft, side 14ft (12ft for lots under 80ft frontage), rear 20ft",
+      "General Residence: front 20ft, side 14ft (12ft for lots under 80ft frontage), rear 20ft",
+      "SRB limits: max 32 linear feet of structure at minimum side setback"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/DocumentCenter/View/16661/Zoning-By-Laws-2025---Chapter-4",
+      "https://www.needhamma.gov/DocumentCenter/View/14547/LHSC-Dimensional-Regulations-Article-1-5-2017clean"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Medium",
+    "notes": "Full setback dimensions verified for SRA, SRB, and GR districts."
+  },
+  {
+    "id": "ZON-005",
+    "persona": "Lisa (Small Business Owner)",
+    "category": "Zoning & Dimensional Regulations",
+    "question": "Can I operate a home-based consulting business from my house?",
+    "verified_answer_contains": [
+      "home occupations are addressed in the Zoning By-Law",
+      "consult Article 2 of the Zoning By-Law for specific rules",
+      "contact Planning Department at 781-455-7500 for details"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/DocumentCenter/View/16644",
+      "https://www.needhamma.gov/1614/Zoning-By-Laws"
+    ],
+    "verification_status": "partially_verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Medium",
+    "notes": "Home occupation rules exist in Article 2 but specific restrictions not fully extracted."
+  },
+  {
+    "id": "ZON-006",
+    "persona": "David (Real Estate Agent)",
+    "category": "Zoning & Dimensional Regulations",
+    "question": "What uses are allowed in the Business district?",
+    "verified_answer_contains": [
+      "Needham has multiple business districts: B, CSB, CB, ASB, HAB, NB, HC-128, ES",
+      "permitted uses are in the Use Tables of the Zoning By-Law",
+      "consult the Zoning By-Law for specific permitted, conditional, and prohibited uses"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/1614/Zoning-By-Laws",
+      "https://www.needhamma.gov/DocumentCenter/View/16644"
+    ],
+    "verification_status": "partially_verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Easy",
+    "notes": "Business district types verified. Specific use tables require full by-law document."
+  },
+  {
+    "id": "ZON-007",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Zoning & Dimensional Regulations",
+    "question": "I want to put up a fence. Are there height restrictions?",
+    "verified_answer_contains": [
+      "Needham has fence regulations in the Zoning By-Law",
+      "fences must be entirely on the property owner's property",
+      "violations result in a Letter of Violation",
+      "check the Fences page on needhamma.gov or contact Building Department"
+    ],
+    "verified_source_urls": [
+      "https://needhamma.gov/5237/Fences",
+      "https://www.needhamma.gov/1614/Zoning-By-Laws"
+    ],
+    "verification_status": "partially_verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Easy",
+    "notes": "Fence regulations exist and property-line rule confirmed. Specific height limits not fully extracted."
+  },
+  {
+    "id": "ZON-008",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Zoning & Dimensional Regulations",
+    "question": "Can I have a swimming pool? What about a hot tub?",
+    "verified_answer_contains": [
+      "swimming pools require a building permit",
+      "boundary line plot plan by MA Registered Land Surveyor required",
+      "barrier and door alarms must be installed before pool can retain water",
+      "pools under 11ft height and under 100 sq ft: minimum 8 feet from pool edge to structures",
+      "must comply with MA State Sanitary Code (105 CMR 435.00)",
+      "5 copies of plot plan required with application"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/1258/Swimming-Pools",
+      "https://www.needhamma.gov/4939/On-Ground-Swimming-Pools"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Medium",
+    "notes": "Pool permit requirements, safety rules, and setback details verified from Building Dept pages."
+  },
+  {
+    "id": "ZON-009",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Zoning & Dimensional Regulations",
+    "question": "What about building a small guest house or ADU on my property?",
+    "verified_answer_contains": [
+      "ADUs are allowed in Needham as of state law effective August 7, 2024",
+      "maximum size: 900 square feet",
+      "one ADU allowed per single-family home",
+      "detached ADUs: minimum 5 feet from side and rear lot lines",
+      "if ADU exceeds 15 feet in height, must comply with underlying district setbacks",
+      "minimum 10 feet between ADU and any other structure on lot",
+      "can be rented with minimum 6-month lease",
+      "cannot be used as short-term rental",
+      "no owner-occupancy requirement (per state law)"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/DocumentCenter/View/43607/Frequently-Asked-Questions---ADU",
+      "https://needhamhousingcoalition.org/accessory-dwelling-units-adus/"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Hard",
+    "notes": "Comprehensive ADU rules verified including state law changes and local requirements."
+  },
+  {
+    "id": "ZON-010",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Zoning & Dimensional Regulations",
+    "question": "Can they build a commercial building near residential areas?",
+    "verified_answer_contains": [
+      "Needham's zoning separates residential and commercial uses into distinct districts",
+      "residential districts: RRC, SRA, SRB, GR, A-1, A-2, A-3, AHD",
+      "commercial districts: B, CSB, CB, ASB, HAB, NB, HC-128, ES",
+      "some uses may require special permits",
+      "Planning Board and Zoning Board hear proposals"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/1614/Zoning-By-Laws",
+      "https://www.needhamma.gov/1114/Planning-Board"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Hard",
+    "notes": "Full district type list verified. Separation of uses confirmed."
+  },
+  {
+    "id": "ZON-011",
+    "persona": "David (Real Estate Agent)",
+    "category": "Zoning & Dimensional Regulations",
+    "question": "What's the floor area ratio (FAR) for downtown properties?",
+    "verified_answer_contains": [
+      "Center Business District: 1.00 FAR maximum",
+      "Chestnut Street Business District: 0.70 FAR maximum",
+      "residential districts: 0.38 FAR for lots under 12,000 sq ft, 0.36 for lots 12,000+ sq ft",
+      "FAR = floor area divided by lot area"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/DocumentCenter/View/16644",
+      "https://needhamma.gov/DocumentCenter/View/2347/1-LandUseZoningBuildOutAnalysis"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Specific FAR values verified for CB, CSB, and residential districts."
+  },
+  {
+    "id": "PERMIT-001",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Building Permits & Process",
+    "question": "Do I need a permit to build a deck?",
+    "verified_answer_contains": [
+      "yes, a building permit is required for decks",
+      "homeowners can pull permits for their own single/two-family dwellings",
+      "Building Department at 500 Dedham Avenue",
+      "Building Inspector: Dan Walsh",
+      "typical timeline: 2-4 weeks for larger projects"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/227/Building-Department",
+      "https://www.needhamma.gov/1228/Easy-Permits"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Permit requirement, homeowner self-permitting, and Building Inspector verified."
+  },
+  {
+    "id": "PERMIT-002",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Building Permits & Process",
+    "question": "How much does a building permit cost?",
+    "verified_answer_contains": [
+      "contact the Building Department for current fee schedule",
+      "Building Department: 500 Dedham Avenue, phone 781-455-7550"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/227/Building-Department"
+    ],
+    "verification_status": "partially_verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Easy",
+    "notes": "Fee schedule exists but specific dollar amounts not extracted. Contact info verified."
+  },
+  {
+    "id": "PERMIT-003",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Building Permits & Process",
+    "question": "What's the process for getting a building permit? How long does it take?",
+    "verified_answer_contains": [
+      "submit application to the Building Department",
+      "Building Department at 500 Dedham Avenue",
+      "timeline: 2-4 weeks for larger projects, less for smaller",
+      "inspections required during and after construction"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/227/Building-Department",
+      "https://www.needhamma.gov/1228/Easy-Permits"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Medium",
+    "notes": "General process and timeline verified. Specific required documents may vary by project."
+  },
+  {
+    "id": "PERMIT-004",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Building Permits & Process",
+    "question": "Do I need to hire an architect or engineer for my deck permit?",
+    "verified_answer_contains": [
+      "homeowners can get permits for their own single-family or two-family dwellings",
+      "professional plans may be required for complex projects",
+      "contact Building Department for project-specific requirements"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/227/Building-Department"
+    ],
+    "verification_status": "partially_verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Medium",
+    "notes": "Homeowner self-permitting right verified. Thresholds for professional plans not fully detailed."
+  },
+  {
+    "id": "PERMIT-005",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Building Permits & Process",
+    "question": "What if my project isn't done yet? Can I get an extension on my permit?",
+    "verified_answer_contains": [
+      "contact the Building Department for permit extension policies",
+      "Building Department: 500 Dedham Avenue, phone 781-455-7550"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/227/Building-Department"
+    ],
+    "verification_status": "partially_verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Medium",
+    "notes": "Specific validity period and extension process not fully extracted from research."
+  },
+  {
+    "id": "PERMIT-006",
+    "persona": "Lisa (Small Business Owner)",
+    "category": "Building Permits & Process",
+    "question": "What permits do I need to open a retail store on Main Street?",
+    "verified_answer_contains": [
+      "building/occupancy permit from Building Department",
+      "food service permit from Board of Health if applicable",
+      "sign permits may be required",
+      "check zoning use tables for the specific business district",
+      "multiple departments may be involved"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/227/Building-Department",
+      "https://www.needhamma.gov/1103/Board-of-Health",
+      "https://www.needhamma.gov/3304/Permits-Licenses"
+    ],
+    "verification_status": "partially_verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Hard",
+    "notes": "Multi-department nature verified. Specific permit requirements vary by business type."
+  },
+  {
+    "id": "PERMIT-007",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Building Permits & Process",
+    "question": "Do I need a separate electrical permit for my deck addition?",
+    "verified_answer_contains": [
+      "electrical permits are separate from building permits",
+      "required if adding outlets, lighting, or new circuits",
+      "contact Building Department for specifics"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/227/Building-Department"
+    ],
+    "verification_status": "partially_verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Medium",
+    "notes": "Electrical permitting is separate. Specific thresholds for when needed not fully detailed."
+  },
+  {
+    "id": "PERMIT-008",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Building Permits & Process",
+    "question": "What happens if I start work without getting a permit?",
+    "verified_answer_contains": [
+      "Building Division enforces state building codes and local zoning by-laws",
+      "violations may result in stop work orders",
+      "may need to bring work into compliance retroactively",
+      "contact Building Department: 500 Dedham Avenue, 781-455-7550"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/227/Building-Department"
+    ],
+    "verification_status": "partially_verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Enforcement role verified. Specific penalty amounts not detailed in research."
+  },
+  {
+    "id": "WRONGASSUMP-002",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Wrong Assumptions",
+    "question": "I don't need a permit for a small deck, right?",
+    "verified_answer_contains": [
+      "all decks require a building permit in Needham",
+      "even small decks need approval from the Building Department",
+      "homeowners can pull permits for their own single/two-family dwellings",
+      "Building Department: 500 Dedham Avenue"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/227/Building-Department"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Corrects misconception — all decks need permits. Self-permitting right verified."
+  },
+  {
+    "id": "VAGUE-001",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Vague Questions",
+    "question": "I want to do something to my house but I'm not sure what yet. What do I need to know?",
+    "verified_answer_contains": [
+      "most exterior and structural work requires a building permit",
+      "setbacks and height limits depend on your zoning district",
+      "Building Department at 500 Dedham Avenue can help scope requirements",
+      "Building Inspector Dan Walsh can advise on permit needs"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/227/Building-Department"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "Low",
+    "difficulty": "Hard",
+    "notes": "General guidance question. Key facts about permits and Building Dept verified."
+  },
+  {
+    "id": "VAGUE-002",
+    "persona": "Lisa (Small Business Owner)",
+    "category": "Vague Questions",
+    "question": "What permits do I need to start a business in Needham?",
+    "verified_answer_contains": [
+      "depends on type of business",
+      "may need building/occupancy permits, health permits, sign permits",
+      "food businesses need Board of Health permits (178 Rosemary St, 781-455-7940)",
+      "building permits from Building Department (500 Dedham Ave, 781-455-7550)",
+      "check zoning by-law for permitted uses in your location's district",
+      "Business Certificates filed at Town Clerk's office"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/227/Building-Department",
+      "https://www.needhamma.gov/1103/Board-of-Health",
+      "https://www.needhamma.gov/77/Town-Clerk"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Hard",
+    "notes": "Multi-department nature and key contacts verified. Business Certificate filing at Town Clerk confirmed."
+  },
+  {
+    "id": "MULTIPART-001",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Multi-Part Questions",
+    "question": "What's my zoning district and what permits will I need to add a second story to my house?",
+    "verified_answer_contains": [
+      "zoning district depends on property address — check town Zoning Map",
+      "maximum building height: 32 feet in residential zones",
+      "building permit required from Building Department",
+      "setbacks depend on district (SRA: front 30ft, side 15ft, rear 25ft; SRB/GR: front 20ft, side 14ft, rear 20ft)",
+      "may need structural engineering review for second story"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/DocumentCenter/View/16661/Zoning-By-Laws-2025---Chapter-4",
+      "https://www.needhamma.gov/227/Building-Department"
+    ],
+    "verification_status": "verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Hard",
+    "notes": "Height limit and setbacks verified. Address-specific zoning requires map lookup."
+  },
+  {
+    "id": "MULTIPART-002",
+    "persona": "David (Real Estate Agent)",
+    "category": "Multi-Part Questions",
+    "question": "What's the zoning, what schools does this property feed into, and what's the assessed value?",
+    "verified_answer_contains": [
+      "zoning: requires property address lookup on Zoning Map",
+      "schools: elementary assignment depends on address; all students go to High Rock (6), Pollard (7-8), Needham High (9-12)",
+      "assessed value: requires Assessor's database lookup",
+      "residential tax rate: $10.83 per $1,000 (FY2026)"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/1614/Zoning-By-Laws",
+      "https://www.needham.k12.ma.us/",
+      "https://www.needhamma.gov/159/Assessors-Office"
+    ],
+    "verification_status": "partially_verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Hard",
+    "notes": "General structure verified. Address-specific lookups require live database access."
+  },
+  {
+    "id": "CONTEXT-001",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Context-Dependent Follow-up",
+    "question": "I'm building a deck. [System provides info]. Now, do I need electrical permits?",
+    "verified_answer_contains": [
+      "electrical permits are separate from building permits",
+      "needed if adding outlets, lighting, or new electrical circuits to the deck",
+      "not needed if no electrical work is included"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/227/Building-Department"
+    ],
+    "verification_status": "partially_verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Medium",
+    "notes": "Separate electrical permitting confirmed. Specific thresholds depend on project scope."
+  },
+  {
+    "id": "CONTEXT-002",
+    "persona": "David (Real Estate Agent)",
+    "category": "Context-Dependent Follow-up",
+    "question": "You said it's in zone Residential-A. What other uses are allowed there besides single-family homes?",
+    "verified_answer_contains": [
+      "permitted uses are in the Use Tables of the Zoning By-Law",
+      "ADUs are now allowed by right in single-family districts (state law, Aug 2024)",
+      "some uses may require special permits",
+      "consult Use Tables in Zoning By-Law for complete list"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/1614/Zoning-By-Laws",
+      "https://www.needhamma.gov/DocumentCenter/View/43607/Frequently-Asked-Questions---ADU"
+    ],
+    "verification_status": "partially_verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Medium",
+    "notes": "ADU by-right is a key verified change. Full use table requires by-law document."
+  },
+  {
+    "id": "MISSING-001",
+    "persona": "David (Real Estate Agent)",
+    "category": "Information System May Not Have",
+    "question": "What are the median home prices in Needham?",
+    "verified_answer_contains": [
+      "real estate pricing is outside the scope of municipal data",
+      "suggest checking Zillow, MLS, or consulting local real estate agents",
+      "Navigator can help with zoning, taxes, permits, and other town services"
+    ],
+    "verified_source_urls": [],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Out-of-scope question. System should gracefully redirect."
+  },
+  {
+    "id": "MISSING-002",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Information System May Not Have",
+    "question": "What's the detailed budget breakdown for 2024?",
+    "verified_answer_contains": [
+      "budget documents are available on the town website",
+      "FY2026 Budget Book available at needhamma.gov",
+      "contact Finance Department or Town Manager's office for detailed breakdowns",
+      "budget is approved at Annual Town Meeting"
+    ],
+    "verified_source_urls": [
+      "https://needhamma.gov/DocumentCenter/View/47167/FY2026-Budget-Book-Prologue"
+    ],
+    "verification_status": "partially_verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Easy",
+    "notes": "Budget Book existence confirmed. Detailed line items depend on available ingested data."
+  },
+  {
+    "id": "EDGE-001",
+    "persona": "Sarah (Homeowner Renovator)",
+    "category": "Edge Cases",
+    "question": "What if I already built my deck without a permit? What happens now?",
+    "verified_answer_contains": [
+      "Building Division enforces building codes and zoning by-laws",
+      "unpermitted work may result in enforcement action",
+      "encouraged to come into compliance by contacting Building Department",
+      "Building Department: 500 Dedham Avenue, 781-455-7550"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/227/Building-Department"
+    ],
+    "verification_status": "partially_verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Hard",
+    "notes": "Enforcement role verified. Specific penalties/remediation process not fully detailed."
+  },
+  {
+    "id": "EDGE-002",
+    "persona": "David (Real Estate Agent)",
+    "category": "Edge Cases",
+    "question": "Can this property support a commercial use or is it locked into residential?",
+    "verified_answer_contains": [
+      "depends on current zoning district",
+      "Needham has distinct residential and commercial districts",
+      "special permits or variances may allow certain uses",
+      "contact Planning Board or Zoning Board of Appeals",
+      "Planning Board meets 1st and 3rd Tuesday of each month"
+    ],
+    "verified_source_urls": [
+      "https://www.needhamma.gov/1114/Planning-Board",
+      "https://www.needhamma.gov/1614/Zoning-By-Laws"
+    ],
+    "verification_status": "partially_verified",
+    "expected_confidence": "Medium",
+    "difficulty": "Hard",
+    "notes": "Zoning structure and Planning Board schedule verified. Specific variance process not fully detailed."
+  },
+  {
+    "id": "OUTOFSCOPE-001",
+    "persona": "Maria (Concerned Citizen)",
+    "category": "Out-of-Scope / Graceful Fallback",
+    "question": "How do I get a divorce in Massachusetts?",
+    "verified_answer_contains": [
+      "this is outside the scope of Needham municipal information",
+      "suggest consulting a legal professional or Massachusetts state resources",
+      "Navigator can help with Needham-specific town services"
+    ],
+    "verified_source_urls": [],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Out-of-scope test. System should politely redirect."
+  },
+  {
+    "id": "OUTOFSCOPE-002",
+    "persona": "James (New Resident)",
+    "category": "Out-of-Scope / Graceful Fallback",
+    "question": "What's the best restaurant in Needham?",
+    "verified_answer_contains": [
+      "restaurant reviews are subjective and outside the scope of municipal data",
+      "suggest Google, Yelp, or local community forums",
+      "Navigator can help with town services, permits, and regulations"
+    ],
+    "verified_source_urls": [],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Out-of-scope test. System should gracefully redirect."
+  },
+  {
+    "id": "OUTOFSCOPE-003",
+    "persona": "Lisa (Small Business Owner)",
+    "category": "Out-of-Scope / Graceful Fallback",
+    "question": "Do you have any investment recommendations for my business?",
+    "verified_answer_contains": [
+      "financial advice is outside the scope of municipal information",
+      "suggest consulting a financial advisor or the SBA",
+      "Navigator can help with permits, zoning, and town regulations"
+    ],
+    "verified_source_urls": [],
+    "verification_status": "verified",
+    "expected_confidence": "High",
+    "difficulty": "Easy",
+    "notes": "Out-of-scope test. System should redirect with offer to help on in-scope topics."
+  }
+]
