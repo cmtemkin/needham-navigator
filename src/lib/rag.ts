@@ -235,10 +235,12 @@ export function dedupeSources(chunks: RetrievedChunk[]): SourceReference[] {
   for (const chunk of chunks) {
     // Skip sources with generic/meaningless titles
     if (isGenericTitle(chunk.source.documentTitle)) continue;
-    // Dedup by URL first, then by cleaned title
-    const key = chunk.source.documentUrl
-      ? chunk.source.documentUrl
-      : chunk.source.documentTitle;
+
+    // Primary dedup key: cleaned document title (not URL)
+    // This prevents "Frequently Asked Questions" from appearing 3x
+    // when it comes from different CivicPlus URLs
+    const key = chunk.source.documentTitle.toLowerCase().trim();
+
     if (!seen.has(key)) {
       seen.set(key, chunk.source);
     }
