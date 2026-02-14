@@ -8,7 +8,7 @@ import {
   forwardRef,
   useCallback,
 } from "react";
-import { MessageCircle, X, Send } from "lucide-react";
+import { MessageCircle, X, Send, Maximize2, Minimize2 } from "lucide-react";
 import { ChatBubble, type ChatMessage } from "@/components/ChatBubble";
 import { parseStreamResponse } from "@/lib/stream-parser";
 import type { MockSource } from "@/lib/mock-data";
@@ -35,17 +35,26 @@ function generateSessionId(): string {
 export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
   ({ townId, initialMessage }, ref) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [inputValue, setInputValue] = useState("");
     const [isTyping, setIsTyping] = useState(false);
-    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const messagesContainerRef = useRef<HTMLDivElement>(null);
     const sessionIdRef = useRef(generateSessionId());
     const hasProcessedInitial = useRef(false);
+    const latestAiMessageIdRef = useRef<string | null>(null);
 
-    const scrollToBottom = useCallback(() => {
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-      }, 50);
+    const scrollToLatestAiMessage = useCallback(() => {
+      if (!latestAiMessageIdRef.current || !messagesContainerRef.current) return;
+
+      requestAnimationFrame(() => {
+        const messageElement = messagesContainerRef.current?.querySelector(
+          `[data-message-id="${latestAiMessageIdRef.current}"]`
+        );
+        if (messageElement) {
+          messageElement.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      });
     }, []);
 
     const sendMessage = useCallback(
@@ -57,14 +66,24 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
         };
         setMessages((prev) => [...prev, userMessage]);
         setIsTyping(true);
-        scrollToBottom();
 
         try {
+          // Build conversation history, filtering out typing messages
+          const conversationHistory = messages
+            .filter((msg) => msg.role !== "typing")
+            .map((msg) => ({
+              role: msg.role === "ai" ? "assistant" : msg.role,
+              content: msg.text,
+            }));
+
+          // Add the new user message
+          conversationHistory.push({ role: "user", content: text });
+
           const response = await fetch("/api/chat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              messages: [{ role: "user", content: text }],
+              messages: conversationHistory,
               town_id: townId,
             }),
           });
@@ -89,43 +108,49 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
               sources = srcs;
             },
             onDone: () => {
+              const aiMessageId = `ai-${Date.now()}`;
               const aiMessage: ChatMessage = {
-                id: `ai-${Date.now()}`,
+                id: aiMessageId,
                 role: "ai",
                 text: fullText || "No response received.",
                 sources,
                 confidence,
                 followups: [],
               };
+              latestAiMessageIdRef.current = aiMessageId;
               setMessages((prev) => [...prev, aiMessage]);
               setIsTyping(false);
-              scrollToBottom();
+              scrollToLatestAiMessage();
             },
             onError: (error) => {
               console.error("Chat stream error:", error);
+              const errorMessageId = `ai-${Date.now()}`;
               const errorMessage: ChatMessage = {
-                id: `ai-${Date.now()}`,
+                id: errorMessageId,
                 role: "ai",
                 text: "Sorry, I encountered an error processing your request.",
               };
+              latestAiMessageIdRef.current = errorMessageId;
               setMessages((prev) => [...prev, errorMessage]);
               setIsTyping(false);
-              scrollToBottom();
+              scrollToLatestAiMessage();
             },
           });
         } catch (error) {
           console.error("Chat API error:", error);
+          const errorMessageId = `ai-${Date.now()}`;
           const errorMessage: ChatMessage = {
-            id: `ai-${Date.now()}`,
+            id: errorMessageId,
             role: "ai",
             text: "Sorry, I couldn't connect to the chat service.",
           };
+          latestAiMessageIdRef.current = errorMessageId;
           setMessages((prev) => [...prev, errorMessage]);
           setIsTyping(false);
-          scrollToBottom();
+          scrollToLatestAiMessage();
         }
       },
-      [townId, scrollToBottom]
+      [townId, messages, scrollToLatestAiMessage]
     );
 
     const handleSend = useCallback(() => {
@@ -159,11 +184,6 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
       }
     }, [initialMessage, openWithMessage]);
 
-    // Auto-scroll on new messages
-    useEffect(() => {
-      scrollToBottom();
-    }, [messages, isTyping, scrollToBottom]);
-
     return (
       <>
         {/* FAB Button */}
@@ -177,30 +197,65 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
           </button>
         )}
 
+        {/* Backdrop overlay (expanded mode only) */}
+        {isOpen && isExpanded && (
+          <div
+            className="fixed inset-0 bg-black/30 z-40 transition-opacity"
+            onClick={() => setIsExpanded(false)}
+          />
+        )}
+
         {/* Chat Panel */}
         {isOpen && (
-          <div className="fixed bottom-6 right-6 w-full max-w-[400px] h-[540px] bg-white rounded-2xl shadow-2xl border border-border-default z-50 flex flex-col transition-all animate-slide-up sm:max-w-[400px] max-sm:left-2 max-sm:right-2 max-sm:w-auto">
+          <div
+            className={`
+              fixed bg-white rounded-2xl shadow-2xl border border-border-default flex flex-col transition-all animate-slide-up
+              ${
+                isExpanded
+                  ? "inset-4 sm:inset-8 max-w-[900px] mx-auto h-[calc(100vh-2rem)] sm:h-[calc(100vh-4rem)] z-50 max-sm:inset-0 max-sm:rounded-none"
+                  : "bottom-6 right-6 w-full max-w-[400px] h-[540px] z-50 sm:max-w-[400px] max-sm:left-2 max-sm:right-2 max-sm:w-auto"
+              }
+            `}
+          >
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 bg-[var(--primary)] text-white rounded-t-2xl">
+            <div className="flex items-center justify-between px-4 py-3 bg-[var(--primary)] text-white rounded-t-2xl max-sm:rounded-t-none">
               <div className="flex items-center gap-2">
                 <span className="text-[15px] font-semibold">Needham AI Assistant</span>
                 <span className="inline-block w-2 h-2 rounded-full bg-success animate-pulse" />
               </div>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="w-7 h-7 rounded-md hover:bg-white/20 transition-colors flex items-center justify-center"
-                aria-label="Close chat"
-              >
-                <X size={18} />
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="w-7 h-7 rounded-md hover:bg-white/20 transition-colors flex items-center justify-center"
+                  aria-label={isExpanded ? "Collapse chat" : "Expand chat"}
+                >
+                  {isExpanded ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+                </button>
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    setIsExpanded(false);
+                  }}
+                  className="w-7 h-7 rounded-md hover:bg-white/20 transition-colors flex items-center justify-center"
+                  aria-label="Close chat"
+                >
+                  <X size={18} />
+                </button>
+              </div>
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 bg-surface">
+            <div
+              ref={messagesContainerRef}
+              className={`flex-1 overflow-y-auto bg-surface space-y-4 ${
+                isExpanded ? "px-8 py-6" : "px-4 py-4"
+              }`}
+            >
               {messages.length === 0 && !isTyping ? (
-                <div className="flex flex-col gap-3 mt-4">
-                  <p className="text-[13px] text-text-secondary text-center mb-2">
-                    Ask me anything about Needham:
+                <div className="flex flex-col gap-4 mt-4">
+                  <p className="text-[15px] text-text-primary text-center">
+                    👋 Hi! I&apos;m your Needham AI assistant. Ask me anything about town
+                    services, permits, schools, and more.
                   </p>
                   <div className="flex flex-col gap-2">
                     {SUGGESTION_CHIPS.map((chip) => (
@@ -225,15 +280,35 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
                     />
                   ))}
                   {isTyping && (
-                    <ChatBubble message={{ id: "typing", role: "typing", text: "" }} />
+                    <div className="flex gap-2.5 justify-start animate-msg-in">
+                      <div className="w-[30px] h-[30px] rounded-full bg-gradient-to-br from-primary to-primary-light flex items-center justify-center text-white text-xs font-extrabold shrink-0 mt-0.5">
+                        N
+                      </div>
+                      <div className="bg-white border border-border-light rounded-2xl rounded-bl-md px-[18px] py-3.5 shadow-xs flex items-center gap-2">
+                        <div className="inline-flex gap-1 items-center">
+                          <span className="w-1.5 h-1.5 bg-text-muted rounded-full animate-blink" />
+                          <span className="w-1.5 h-1.5 bg-text-muted rounded-full animate-blink [animation-delay:0.2s]" />
+                          <span className="w-1.5 h-1.5 bg-text-muted rounded-full animate-blink [animation-delay:0.4s]" />
+                        </div>
+                        <span className="text-[13px] text-text-secondary">
+                          Needham AI is thinking...
+                        </span>
+                      </div>
+                    </div>
                   )}
-                  <div ref={messagesEndRef} />
                 </>
               )}
             </div>
 
             {/* Input Area */}
-            <div className="px-4 py-3 border-t border-border-light bg-white rounded-b-2xl">
+            <div
+              className={`border-t border-border-light bg-white rounded-b-2xl max-sm:rounded-b-none ${
+                isExpanded ? "px-8 py-4" : "px-4 py-3"
+              }`}
+            >
+              <p className="text-[11px] text-text-muted text-center mb-2">
+                Powered by AI · Answers sourced from official town documents
+              </p>
               <div className="flex items-center bg-surface border border-border-default rounded-lg p-1 pl-3 focus-within:border-[var(--primary)] focus-within:shadow-sm transition-all">
                 <input
                   type="text"

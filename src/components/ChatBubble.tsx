@@ -27,6 +27,7 @@ export function ChatBubble({ message, onFollowupClick, sessionId }: ChatBubblePr
         className="flex gap-2.5 justify-start animate-msg-in"
         role="status"
         aria-live="polite"
+        data-message-id={message.id}
       >
         <div className="w-[30px] h-[30px] rounded-full bg-gradient-to-br from-primary to-primary-light flex items-center justify-center text-white text-xs font-extrabold shrink-0 mt-0.5">
           N
@@ -40,7 +41,7 @@ export function ChatBubble({ message, onFollowupClick, sessionId }: ChatBubblePr
 
   if (message.role === "user") {
     return (
-      <div className="flex justify-end animate-msg-in">
+      <div className="flex justify-end animate-msg-in" data-message-id={message.id}>
         <div className="max-w-[90%] sm:max-w-[80%] bg-primary text-white px-[18px] py-3.5 rounded-2xl rounded-br-md text-[14.5px] leading-relaxed">
           {message.text}
         </div>
@@ -50,7 +51,7 @@ export function ChatBubble({ message, onFollowupClick, sessionId }: ChatBubblePr
 
   // AI message
   return (
-    <div className="flex gap-2.5 justify-start animate-msg-in">
+    <div className="flex gap-2.5 justify-start animate-msg-in" data-message-id={message.id}>
       <div className="w-[30px] h-[30px] rounded-full bg-gradient-to-br from-primary to-primary-light flex items-center justify-center text-white text-xs font-extrabold shrink-0 mt-0.5">
         N
       </div>
