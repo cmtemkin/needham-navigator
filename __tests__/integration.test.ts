@@ -154,7 +154,6 @@ import {
 import { dedupeSources, buildContextDocuments } from "@/lib/rag";
 import {
     buildChatSystemPrompt,
-    getFirstMessageDisclaimer,
 } from "@/lib/prompts";
 
 // ===========================================================================
@@ -428,7 +427,7 @@ describe("Test 9 — Source Citations", () => {
 // ===========================================================================
 
 describe("Test 10 — Legal Disclaimer", () => {
-    it("includes the Appendix B disclaimer in the first-session system prompt", () => {
+    it("does NOT inject a first-message disclaimer into the system prompt (handled by UI)", () => {
         const prompt = buildChatSystemPrompt({
             contextDocuments: [],
             includeDisclaimer: true,
@@ -436,15 +435,13 @@ describe("Test 10 — Legal Disclaimer", () => {
             townHallPhone: "(781) 455-7500",
         });
 
-        // The disclaimer should be generated dynamically with the town phone
-        expect(prompt).toContain(getFirstMessageDisclaimer("(781) 455-7500"));
-        expect(prompt).toContain(
-            "This tool uses AI and may provide inaccurate information",
-        );
-        expect(prompt).toContain("(781) 455-7500");
+        // Disclaimer is now handled by the UI footer / verification badge,
+        // so the system prompt should NOT contain the old preamble text
+        expect(prompt).not.toContain("FIRST-MESSAGE DISCLAIMER");
+        expect(prompt).toContain("Do NOT start your response with a disclaimer");
     });
 
-    it("omits the disclaimer when includeDisclaimer is false", () => {
+    it("instructs the LLM to skip the preamble", () => {
         const prompt = buildChatSystemPrompt({
             contextDocuments: [],
             includeDisclaimer: false,
@@ -453,5 +450,6 @@ describe("Test 10 — Legal Disclaimer", () => {
         });
 
         expect(prompt).not.toContain("FIRST-MESSAGE DISCLAIMER");
+        expect(prompt).toContain("jump straight into answering");
     });
 });

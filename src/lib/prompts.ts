@@ -52,9 +52,7 @@ RULES:
 4. Never provide legal advice — state that all information is for reference only.
 5. For off-topic questions: "I'm here to help with ${town.townName} town info! For [topic], you'd want to check with [resource]."
 6. Do not generate inappropriate, offensive, or harmful content.
-
-DISCLAIMER (include only in first message of every session):
-This tool uses AI and may provide inaccurate information. Always verify with official town sources before making decisions. This is not legal advice. Contact Town Hall: ${town.townHallPhone}.`;
+7. Do NOT start your response with a disclaimer or preamble about AI accuracy. The UI already displays reliability indicators and a disclaimer footer — just jump straight into answering the question.`;
 }
 
 // ---------------------------------------------------------------------------
@@ -126,10 +124,6 @@ export function buildChatSystemPrompt(options: {
   sections.push(
     `TODAY'S DATE: ${today}\nDo not present past events or meetings as upcoming. If a date in the context documents is in the past, say it already happened and suggest checking the town website for the next scheduled date.`
   );
-
-  if (options.includeDisclaimer) {
-    sections.push(`FIRST-MESSAGE DISCLAIMER:\n${getFirstMessageDisclaimer(options.townHallPhone)}`);
-  }
 
   sections.push(formatContextDocuments(options.contextDocuments));
 
