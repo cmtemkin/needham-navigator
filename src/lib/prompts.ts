@@ -56,14 +56,6 @@ RULES:
 }
 
 // ---------------------------------------------------------------------------
-// First-message disclaimer (dynamic)
-// ---------------------------------------------------------------------------
-
-export function getFirstMessageDisclaimer(townHallPhone: string): string {
-  return `This tool uses AI and may provide inaccurate information. Always verify with official town sources before making decisions. This is not legal advice. Contact Town Hall: ${townHallPhone}.`;
-}
-
-// ---------------------------------------------------------------------------
 // Context documents
 // ---------------------------------------------------------------------------
 
