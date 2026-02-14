@@ -196,6 +196,17 @@ Legacy URLs like `/chat` automatically redirect to the default town.
 
 ---
 
+## SEO & Discoverability
+
+The site includes standard SEO features that work automatically:
+
+- **robots.txt** — tells search engines what to crawl (blocks admin and API routes)
+- **sitemap.xml** — lists all public pages for Google and other crawlers, auto-generated from town configs
+- **Open Graph / Twitter cards** — when the site link is shared on social media, it shows a proper title and description instead of a blank preview
+- **Branded 404 page** — visiting a bad URL shows a helpful "Page not found" page with a link back to the homepage
+
+---
+
 ## Tips
 
 - **Use everyday language** — Say "the dump", "cops", "can I build a deck" — the AI understands slang and informal phrasing, and automatically expands your search to find the right town info
