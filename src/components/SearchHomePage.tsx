@@ -11,6 +11,7 @@ import { useTown } from "@/lib/town-context";
 import { parseStreamResponse } from "@/lib/stream-parser";
 import type { SearchResponse, CachedAnswer } from "@/types/search";
 import type { MockSource } from "@/lib/mock-data";
+import { trackEvent } from "@/lib/pendo";
 
 const QUICK_LINKS = [
   { label: "Transfer Station", icon: Trash2 },
@@ -106,6 +107,16 @@ export function SearchHomePage() {
         setSearchResults(data);
         setIsSearching(false);
 
+        // Track successful search
+        trackEvent('search_performed', {
+          query_length: q.length,
+          result_count: data.results.length,
+          has_cached_answer: !!data.cached_answer,
+          top_similarity: data.results[0]?.similarity ?? 0,
+          timing_ms: data.timing_ms,
+          town_id: town.town_id,
+        });
+
         // 2. Check for cached answer
         if (data.cached_answer) {
           setAiAnswer({ type: "cached", answer: data.cached_answer });
@@ -156,6 +167,12 @@ export function SearchHomePage() {
         } else {
           // Low similarity or no results → show prompt button
           setAiAnswer({ type: "prompt" });
+          if (data.results.length === 0) {
+            trackEvent('search_no_results', {
+              query_length: q.length,
+              town_id: town.town_id,
+            });
+          }
         }
       } catch (error) {
         console.error("Search error:", error);
@@ -169,6 +186,11 @@ export function SearchHomePage() {
     if (!query) return;
 
     setAiAnswer({ type: "loading" });
+
+    trackEvent('ai_answer_requested', {
+      query_length: query.length,
+      town_id: town.town_id,
+    });
 
     try {
       const chatRes = await fetch("/api/chat", {
@@ -201,6 +223,12 @@ export function SearchHomePage() {
             html: fullText,
             sources: sources.map((s) => ({ title: s.title ?? "Source", url: s.url ?? "" })),
           });
+          trackEvent('ai_answer_generated', {
+            query_length: query.length,
+            town_id: town.town_id,
+            response_length: fullText.length,
+            source_count: sources.length,
+          });
         },
         onError: (error) => {
           console.error("AI answer stream error:", error);
@@ -214,8 +242,12 @@ export function SearchHomePage() {
   }, [query, town.town_id]);
 
   const handleAskAbout = useCallback((question: string) => {
+    trackEvent('ask_about_clicked', {
+      question_length: question.length,
+      town_id: town.town_id,
+    });
     chatRef.current?.openWithMessage(question);
-  }, []);
+  }, [town.town_id]);
 
   const handleFollowUp = useCallback((question: string) => {
     chatRef.current?.openWithMessage(question);
@@ -249,11 +281,13 @@ export function SearchHomePage() {
                 onKeyDown={(e) => e.key === "Enter" && handleSearch(query)}
                 placeholder={`Search ${shortTownName} documents...`}
                 className="flex-1 border-none bg-transparent outline-none text-[15px] text-text-primary py-2 placeholder:text-text-muted"
+                data-pendo="search-input"
               />
               <button
                 onClick={() => handleSearch(query)}
                 disabled={isSearching || !query.trim()}
                 className="px-5 py-2.5 bg-[var(--primary)] text-white text-[14px] font-medium rounded-lg hover:bg-[var(--primary-dark)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                data-pendo="search-button"
               >
                 {isSearching ? "Searching..." : "Search"}
               </button>
@@ -265,8 +299,15 @@ export function SearchHomePage() {
                 {QUICK_LINKS.map((link) => (
                   <button
                     key={link.label}
-                    onClick={() => handleSearch(link.label)}
+                    onClick={() => {
+                      trackEvent('quick_link_clicked', {
+                        label: link.label,
+                        town_id: town.town_id,
+                      });
+                      handleSearch(link.label);
+                    }}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/10 backdrop-blur-sm text-white text-[13px] font-medium rounded-full hover:bg-white/20 transition-colors border border-white/20"
+                    data-pendo={`quick-link-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
                   >
                     <link.icon size={14} />
                     {link.label}
@@ -289,8 +330,15 @@ export function SearchHomePage() {
                 {TOPIC_CARDS.map((topic) => (
                   <button
                     key={topic.title}
-                    onClick={() => handleSearch(topic.title)}
+                    onClick={() => {
+                      trackEvent('topic_card_clicked', {
+                        topic: topic.title,
+                        town_id: town.town_id,
+                      });
+                      handleSearch(topic.title);
+                    }}
                     className="text-left bg-white border border-border-default rounded-xl p-5 hover:border-[var(--primary)] hover:shadow-md transition-all group"
+                    data-pendo={`topic-${topic.title.toLowerCase().replace(/\s+/g, '-')}`}
                   >
                     <div className="text-3xl mb-3">{topic.icon}</div>
                     <h3 className="text-[16px] font-bold text-text-primary mb-2 group-hover:text-[var(--primary)] transition-colors">
@@ -313,7 +361,13 @@ export function SearchHomePage() {
                 {POPULAR_QUESTIONS.map((q) => (
                   <button
                     key={q}
-                    onClick={() => handleSearch(q)}
+                    onClick={() => {
+                      trackEvent('popular_question_clicked', {
+                        question: q,
+                        town_id: town.town_id,
+                      });
+                      handleSearch(q);
+                    }}
                     className="px-4 py-2 bg-white border border-border-default rounded-full text-[13px] text-text-secondary hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[#F5F8FC] transition-all"
                   >
                     {q}
@@ -345,7 +399,7 @@ export function SearchHomePage() {
               />
             )}
             {aiAnswer.type === "prompt" && (
-              <AIAnswerCard state="prompt" onGenerate={handleGenerateAnswer} />
+              <AIAnswerCard state="prompt" onGenerate={handleGenerateAnswer} data-pendo="generate-ai-answer" />
             )}
 
             {/* Results header */}
@@ -364,11 +418,12 @@ export function SearchHomePage() {
             {/* Result cards */}
             {searchResults && searchResults.results.length > 0 ? (
               <div className="space-y-3">
-                {searchResults.results.map((result) => (
+                {searchResults.results.map((result, index) => (
                   <SearchResultCard
                     key={result.id}
                     result={result}
                     onAskAbout={handleAskAbout}
+                    data-pendo={`result-${index}`}
                   />
                 ))}
               </div>

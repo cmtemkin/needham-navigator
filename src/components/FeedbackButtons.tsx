@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { ThumbsUp, ThumbsDown, Send, X } from "lucide-react";
+import { trackEvent } from "@/lib/pendo";
 
 interface FeedbackButtonsProps {
   responseId: string;
@@ -26,6 +27,12 @@ export function FeedbackButtons({ responseId, sessionId }: FeedbackButtonsProps)
   async function submitFeedback(helpful: boolean, feedbackComment?: string) {
     setFeedbackState("submitting");
     setSelectedVote(helpful);
+
+    trackEvent('feedback_submitted', {
+      helpful,
+      has_comment: !!feedbackComment,
+      response_id: responseId,
+    });
 
     try {
       const res = await fetch("/api/feedback", {
@@ -100,6 +107,7 @@ export function FeedbackButtons({ responseId, sessionId }: FeedbackButtonsProps)
               : "text-text-muted hover:text-success hover:bg-success/5"
           } disabled:opacity-50`}
           aria-label="Thumbs up"
+          data-pendo="feedback-thumbs-up"
         >
           <ThumbsUp size={14} />
         </button>
@@ -112,6 +120,7 @@ export function FeedbackButtons({ responseId, sessionId }: FeedbackButtonsProps)
               : "text-text-muted hover:text-warning hover:bg-warning/5"
           } disabled:opacity-50`}
           aria-label="Thumbs down"
+          data-pendo="feedback-thumbs-down"
         >
           <ThumbsDown size={14} />
         </button>

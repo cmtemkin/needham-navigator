@@ -34,6 +34,15 @@ Needham Navigator is an AI-powered municipal information hub built with Next.js 
 - **Web Crawling:** Custom scraper (cheerio + @mozilla/readability + turndown) - replaces Firecrawl ($16/mo savings). Built specifically for municipal CivicPlus sites. Entry points: `scripts/scraper.ts` (core), `scripts/scraper-config.ts` (config), `scripts/reingest-clean.ts` (full refresh), `scripts/smoke-test.ts` (validation). FIRECRAWL_API_KEY no longer needed.
 - **CI/CD:** GitHub Actions - Vercel deploy on push to main
 
+## Analytics
+- **Pendo** (free tier, 500 MAU cap): Product analytics, behavioral tracking, in-app guides
+- Set `NEXT_PUBLIC_PENDO_API_KEY` in `.env.local` and Vercel Dashboard
+- Events tracked: searches, chat messages, feedback, topic clicks, source clicks, AI answer generation
+- Anonymous visitor IDs stored in localStorage (`nn_visitor_id`)
+- Core files: `src/lib/pendo.ts` (helpers), `src/components/PendoProvider.tsx` (loader), `src/pendo.d.ts` (types)
+- Graceful degradation: all tracking no-ops when API key is missing
+- Zero PII: anonymous visitor IDs only, town ID as account ID
+
 ## Merge-to-Main Checklist
 
 Every time code is merged to `main`, complete these steps before pushing:

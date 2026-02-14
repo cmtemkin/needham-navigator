@@ -12,6 +12,7 @@ import { MessageCircle, X, Send, Maximize2, Minimize2 } from "lucide-react";
 import { ChatBubble, type ChatMessage } from "@/components/ChatBubble";
 import { parseStreamResponse } from "@/lib/stream-parser";
 import type { MockSource } from "@/lib/mock-data";
+import { trackEvent } from "@/lib/pendo";
 
 export interface FloatingChatHandle {
   openWithMessage: (message: string) => void;
@@ -58,7 +59,16 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
     }, []);
 
     const sendMessage = useCallback(
-      async (text: string) => {
+      async (text: string, options?: { isFromSearch?: boolean }) => {
+        const startTime = Date.now();
+        const isFromSearch = options?.isFromSearch ?? false;
+
+        trackEvent('chat_message_sent', {
+          message_length: text.length,
+          town_id: townId,
+          is_from_search: isFromSearch,
+        });
+
         const userMessage: ChatMessage = {
           id: `user-${Date.now()}`,
           role: "user",
@@ -121,6 +131,14 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
               setMessages((prev) => [...prev, aiMessage]);
               setIsTyping(false);
               scrollToLatestAiMessage();
+
+              trackEvent('chat_response_received', {
+                response_length: fullText.length,
+                source_count: sources.length,
+                confidence,
+                response_time_ms: Date.now() - startTime,
+                town_id: townId,
+              });
             },
             onError: (error) => {
               console.error("Chat stream error:", error);
@@ -163,13 +181,18 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
 
     const openWithMessage = useCallback(
       (message: string) => {
+        trackEvent('chat_opened_from_search', {
+          message_length: message.length,
+          town_id: townId,
+        });
+
         setIsOpen(true);
         // Wait for panel to open, then send
         setTimeout(() => {
-          sendMessage(message);
+          sendMessage(message, { isFromSearch: true });
         }, 100);
       },
-      [sendMessage]
+      [sendMessage, townId]
     );
 
     useImperativeHandle(ref, () => ({
@@ -189,9 +212,13 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
         {/* FAB Button */}
         {!isOpen && (
           <button
-            onClick={() => setIsOpen(true)}
+            onClick={() => {
+              trackEvent('chat_opened', { town_id: townId });
+              setIsOpen(true);
+            }}
             className="fixed bottom-6 right-6 w-14 h-14 bg-[var(--primary)] text-white rounded-2xl shadow-lg hover:scale-105 hover:shadow-xl transition-all z-50 flex items-center justify-center"
             aria-label="Open chat"
+            data-pendo="chat-fab"
           >
             <MessageCircle size={24} />
           </button>
@@ -233,11 +260,16 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
                 </button>
                 <button
                   onClick={() => {
+                    trackEvent('chat_closed', {
+                      messages_in_session: messages.length,
+                      town_id: townId,
+                    });
                     setIsOpen(false);
                     setIsExpanded(false);
                   }}
                   className="w-7 h-7 rounded-md hover:bg-white/20 transition-colors flex items-center justify-center"
                   aria-label="Close chat"
+                  data-pendo="chat-close"
                 >
                   <X size={18} />
                 </button>
@@ -261,7 +293,13 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
                     {SUGGESTION_CHIPS.map((chip) => (
                       <button
                         key={chip}
-                        onClick={() => sendMessage(chip)}
+                        onClick={() => {
+                          trackEvent('suggestion_chip_clicked', {
+                            chip,
+                            town_id: townId,
+                          });
+                          sendMessage(chip);
+                        }}
                         className="px-3 py-2 bg-white border border-border-default rounded-lg text-[13px] text-text-secondary hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[#F5F8FC] transition-all text-left"
                       >
                         {chip}
@@ -324,6 +362,7 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
                   disabled={isTyping || !inputValue.trim()}
                   className="w-9 h-9 rounded-md bg-[var(--primary)] text-white flex items-center justify-center hover:bg-[var(--primary-dark)] transition-colors shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
                   aria-label="Send message"
+                  data-pendo="chat-send"
                 >
                   <Send size={16} />
                 </button>

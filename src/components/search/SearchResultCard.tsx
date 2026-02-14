@@ -2,10 +2,12 @@
 
 import { ExternalLink, MessageSquare } from "lucide-react";
 import type { SearchResult } from "@/types/search";
+import { trackEvent } from "@/lib/pendo";
 
 interface SearchResultCardProps {
   result: SearchResult;
   onAskAbout: (question: string) => void;
+  "data-pendo"?: string;
 }
 
 /**
@@ -23,7 +25,7 @@ function generateAskQuestion(title: string): string {
   return `Tell me more about ${cleaned.toLowerCase()}`;
 }
 
-export function SearchResultCard({ result, onAskAbout }: SearchResultCardProps) {
+export function SearchResultCard({ result, onAskAbout, "data-pendo": dataPendo }: SearchResultCardProps) {
   const similarityPercent = Math.round(result.similarity * 100);
 
   // Determine similarity color
@@ -35,7 +37,10 @@ export function SearchResultCard({ result, onAskAbout }: SearchResultCardProps) 
       : "text-text-muted";
 
   return (
-    <div className="group bg-white border border-border-default rounded-[10px] p-4 hover:border-[var(--primary)] hover:shadow-sm transition-all">
+    <div
+      className="group bg-white border border-border-default rounded-[10px] p-4 hover:border-[var(--primary)] hover:shadow-sm transition-all"
+      data-pendo={dataPendo}
+    >
       {/* Department tag */}
       <div className="flex items-center gap-1.5 mb-2">
         <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#0891B2]" />
@@ -74,6 +79,14 @@ export function SearchResultCard({ result, onAskAbout }: SearchResultCardProps) 
               href={result.source_url}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => {
+                trackEvent('source_link_clicked', {
+                  title: result.title,
+                  department: result.department,
+                  similarity: result.similarity,
+                  source_url: result.source_url,
+                });
+              }}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-medium text-text-secondary hover:text-[var(--primary)] transition-colors"
             >
               <ExternalLink size={12} />
@@ -83,7 +96,13 @@ export function SearchResultCard({ result, onAskAbout }: SearchResultCardProps) 
 
           {/* Ask about this button */}
           <button
-            onClick={() => onAskAbout(generateAskQuestion(result.title))}
+            onClick={() => {
+              trackEvent('result_ask_about_clicked', {
+                title: result.title,
+                department: result.department,
+              });
+              onAskAbout(generateAskQuestion(result.title));
+            }}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#EBF5FF] text-[var(--primary)] text-[12px] font-medium rounded-md hover:bg-[#D1E7FF] transition-colors"
           >
             <MessageSquare size={12} />

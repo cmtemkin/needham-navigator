@@ -4,6 +4,7 @@ import { I18nProvider } from "@/lib/i18n";
 import { TownProvider } from "@/lib/town-context";
 import { getTownThemeStyle } from "@/lib/town-theme";
 import { getTownById, getTownIds, type TownConfig } from "@/lib/towns";
+import { PendoProvider } from "@/components/PendoProvider";
 
 type TownLayoutProps = Readonly<{
   children: React.ReactNode;
@@ -52,9 +53,11 @@ export default function TownLayout({ children, params }: TownLayoutProps) {
   return (
     <TownProvider town={town}>
       <I18nProvider enabled={town.feature_flags.enableMultiLanguage}>
-        <div className="min-h-screen bg-surface" style={getTownThemeStyle(town)}>
-          {children}
-        </div>
+        <PendoProvider>
+          <div className="min-h-screen bg-surface" style={getTownThemeStyle(town)}>
+            {children}
+          </div>
+        </PendoProvider>
       </I18nProvider>
     </TownProvider>
   );
