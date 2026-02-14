@@ -5,6 +5,17 @@
 
 const PENDO_API_KEY = process.env.NEXT_PUBLIC_PENDO_API_KEY;
 
+type PageType =
+  | "home"
+  | "search_home"
+  | "search_results"
+  | "news"
+  | "chat"
+  | "permits"
+  | "releases"
+  | "admin"
+  | "other";
+
 /** Generate or retrieve a persistent anonymous visitor ID */
 export function getVisitorId(): string {
   if (typeof window === 'undefined') return 'server';
@@ -48,6 +59,41 @@ export function initializePendo(townId: string, townName: string): void {
       id: townId,
       name: townName,
     },
+  });
+}
+
+/** Resolve app-level page type for stable Pendo tagging across root and town-scoped URLs */
+export function resolvePageType(pathname: string, query?: string): PageType {
+  const normalizedPath = pathname.toLowerCase();
+  const hasQuery = (query ?? "").trim().length > 0;
+
+  if (normalizedPath.endsWith("/news") || normalizedPath === "/news") return "news";
+  if (normalizedPath.endsWith("/chat") || normalizedPath === "/chat") return "chat";
+  if (normalizedPath.endsWith("/permits") || normalizedPath === "/permits") return "permits";
+  if (normalizedPath.endsWith("/releases") || normalizedPath === "/releases") return "releases";
+  if (normalizedPath.startsWith("/admin")) return "admin";
+  if (normalizedPath.endsWith("/search") || normalizedPath === "/search") {
+    return hasQuery ? "search_results" : "search_home";
+  }
+  if (hasQuery) return "search_results";
+
+  // "/" or "/needham" style roots
+  if (normalizedPath === "/" || /^\/[^/]+$/.test(normalizedPath)) return "home";
+  return "other";
+}
+
+/** Track a page view from the current browser URL */
+export function trackCurrentPageView(townId: string): void {
+  if (typeof window === "undefined") return;
+
+  const path = window.location.pathname;
+  const query = new URLSearchParams(window.location.search).get("q")?.trim() ?? "";
+
+  trackEvent("page_view", {
+    town_id: townId,
+    page_path: path,
+    page_type: resolvePageType(path, query),
+    has_search_query: query.length > 0,
   });
 }
 

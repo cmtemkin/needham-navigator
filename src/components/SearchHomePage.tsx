@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Search, FileText, Trash2, Building2, School, DollarSign, Bus } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SearchResultCard } from "@/components/search/SearchResultCard";
 import { AIAnswerCard } from "@/components/search/AIAnswerCard";
 import { FloatingChat, type FloatingChatHandle } from "@/components/search/FloatingChat";
-import { useTown } from "@/lib/town-context";
+import { useTown, useTownHref } from "@/lib/town-context";
 import { parseStreamResponse } from "@/lib/stream-parser";
 import type { SearchResponse, CachedAnswer } from "@/types/search";
 import type { MockSource } from "@/lib/mock-data";
@@ -70,18 +71,39 @@ type AIAnswerState =
   | { type: "loaded"; html: string; sources: { title: string; url: string }[] }
   | { type: "prompt" };
 
+function normalizeQuery(value: string | null): string {
+  return (value ?? "").trim();
+}
+
 export function SearchHomePage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const town = useTown();
+  const searchHref = useTownHref("/search");
   const shortTownName = town.name.replace(/,\s*[A-Z]{2}$/i, "");
   const chatRef = useRef<FloatingChatHandle>(null);
+  const latestExecutedQueryRef = useRef<string | null>(null);
 
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResponse | null>(null);
   const [aiAnswer, setAiAnswer] = useState<AIAnswerState>({ type: "idle" });
   const [isSearching, setIsSearching] = useState(false);
+  const queryFromUrl = normalizeQuery(searchParams.get("q"));
 
-  const handleSearch = useCallback(
-    async (q: string) => {
+  const executeSearch = useCallback(
+    async (rawQuery: string) => {
+      const q = normalizeQuery(rawQuery);
+      if (!q) {
+        setQuery("");
+        setSearchResults(null);
+        setAiAnswer({ type: "idle" });
+        setIsSearching(false);
+        latestExecutedQueryRef.current = null;
+        return;
+      }
+
+      latestExecutedQueryRef.current = q;
       setQuery(q);
       setIsSearching(true);
       setSearchResults(null);
@@ -182,6 +204,46 @@ export function SearchHomePage() {
     [town.town_id]
   );
 
+  const handleSearch = useCallback(
+    (rawQuery: string) => {
+      const trimmed = normalizeQuery(rawQuery);
+      if (!trimmed) {
+        return;
+      }
+
+      const currentQuery = normalizeQuery(searchParams.get("q"));
+      if (pathname === searchHref && currentQuery === trimmed) {
+        void executeSearch(trimmed);
+        return;
+      }
+
+      router.push(`${searchHref}?q=${encodeURIComponent(trimmed)}`);
+    },
+    [executeSearch, pathname, router, searchHref, searchParams]
+  );
+
+  useEffect(() => {
+    if (!queryFromUrl) {
+      latestExecutedQueryRef.current = null;
+      setQuery("");
+      setSearchResults(null);
+      setAiAnswer({ type: "idle" });
+      setIsSearching(false);
+      return;
+    }
+
+    if (pathname !== searchHref) {
+      router.replace(`${searchHref}?q=${encodeURIComponent(queryFromUrl)}`);
+      return;
+    }
+
+    if (latestExecutedQueryRef.current === queryFromUrl) {
+      return;
+    }
+
+    void executeSearch(queryFromUrl);
+  }, [executeSearch, pathname, queryFromUrl, router, searchHref]);
+
   const handleGenerateAnswer = useCallback(async () => {
     if (!query) return;
 
@@ -253,7 +315,7 @@ export function SearchHomePage() {
     chatRef.current?.openWithMessage(question);
   }, []);
 
-  const showResults = searchResults !== null;
+  const showResults = isSearching || searchResults !== null;
 
   return (
     <>

@@ -8,6 +8,7 @@ import {
   forwardRef,
   useCallback,
 } from "react";
+import { usePathname } from "next/navigation";
 import { MessageCircle, X, Send, Maximize2, Minimize2 } from "lucide-react";
 import { ChatBubble, type ChatMessage } from "@/components/ChatBubble";
 import { parseStreamResponse } from "@/lib/stream-parser";
@@ -35,6 +36,7 @@ function generateSessionId(): string {
 
 export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
   ({ townId, initialMessage }, ref) => {
+    const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -63,10 +65,13 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
         const startTime = Date.now();
         const isFromSearch = options?.isFromSearch ?? false;
 
-        trackEvent('chat_message_sent', {
+        trackEvent("chat_message_sent", {
           message_length: text.length,
           town_id: townId,
           is_from_search: isFromSearch,
+          session_id: sessionIdRef.current,
+          interaction_surface: "floating_chat",
+          page_path: pathname,
         });
 
         const userMessage: ChatMessage = {
@@ -132,12 +137,15 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
               setIsTyping(false);
               scrollToLatestAiMessage();
 
-              trackEvent('chat_response_received', {
+              trackEvent("chat_response_received", {
                 response_length: fullText.length,
                 source_count: sources.length,
                 confidence,
                 response_time_ms: Date.now() - startTime,
                 town_id: townId,
+                session_id: sessionIdRef.current,
+                interaction_surface: "floating_chat",
+                page_path: pathname,
               });
             },
             onError: (error) => {
@@ -152,6 +160,14 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
               setMessages((prev) => [...prev, errorMessage]);
               setIsTyping(false);
               scrollToLatestAiMessage();
+
+              trackEvent("chat_response_error", {
+                town_id: townId,
+                session_id: sessionIdRef.current,
+                interaction_surface: "floating_chat",
+                page_path: pathname,
+                error_stage: "stream",
+              });
             },
           });
         } catch (error) {
@@ -166,9 +182,17 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
           setMessages((prev) => [...prev, errorMessage]);
           setIsTyping(false);
           scrollToLatestAiMessage();
+
+          trackEvent("chat_response_error", {
+            town_id: townId,
+            session_id: sessionIdRef.current,
+            interaction_surface: "floating_chat",
+            page_path: pathname,
+            error_stage: "request",
+          });
         }
       },
-      [townId, messages, scrollToLatestAiMessage]
+      [townId, messages, pathname, scrollToLatestAiMessage]
     );
 
     const handleSend = useCallback(() => {
@@ -181,9 +205,12 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
 
     const openWithMessage = useCallback(
       (message: string) => {
-        trackEvent('chat_opened_from_search', {
+        trackEvent("chat_opened_from_search", {
           message_length: message.length,
           town_id: townId,
+          session_id: sessionIdRef.current,
+          interaction_surface: "floating_chat",
+          page_path: pathname,
         });
 
         setIsOpen(true);
@@ -192,7 +219,7 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
           sendMessage(message, { isFromSearch: true });
         }, 100);
       },
-      [sendMessage, townId]
+      [pathname, sendMessage, townId]
     );
 
     useImperativeHandle(ref, () => ({
@@ -213,7 +240,12 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
         {!isOpen && (
           <button
             onClick={() => {
-              trackEvent('chat_opened', { town_id: townId });
+              trackEvent("chat_opened", {
+                town_id: townId,
+                session_id: sessionIdRef.current,
+                interaction_surface: "floating_chat",
+                page_path: pathname,
+              });
               setIsOpen(true);
             }}
             className="fixed bottom-6 right-6 w-14 h-14 bg-[var(--primary)] text-white rounded-2xl shadow-lg hover:scale-105 hover:shadow-xl transition-all z-50 flex items-center justify-center"
@@ -260,9 +292,12 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
                 </button>
                 <button
                   onClick={() => {
-                    trackEvent('chat_closed', {
+                    trackEvent("chat_closed", {
                       messages_in_session: messages.length,
                       town_id: townId,
+                      session_id: sessionIdRef.current,
+                      interaction_surface: "floating_chat",
+                      page_path: pathname,
                     });
                     setIsOpen(false);
                     setIsExpanded(false);
@@ -294,9 +329,12 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
                       <button
                         key={chip}
                         onClick={() => {
-                          trackEvent('suggestion_chip_clicked', {
+                          trackEvent("suggestion_chip_clicked", {
                             chip,
                             town_id: townId,
+                            session_id: sessionIdRef.current,
+                            interaction_surface: "floating_chat",
+                            page_path: pathname,
                           });
                           sendMessage(chip);
                         }}

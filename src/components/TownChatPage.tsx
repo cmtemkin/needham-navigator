@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AlertTriangle, ChevronLeft } from "lucide-react";
 import { Header } from "@/components/Header";
@@ -12,6 +12,7 @@ import { findMockResponse } from "@/lib/mock-data";
 import { useTownHref, useTown } from "@/lib/town-context";
 import { useI18n } from "@/lib/i18n";
 import { parseStreamResponse } from "@/lib/stream-parser";
+import { trackEvent } from "@/lib/pendo";
 
 const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true";
 
@@ -35,6 +36,7 @@ function ChatLoadingFallback() {
 }
 
 function ChatContent() {
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("q");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -55,6 +57,7 @@ function ChatContent() {
 
   const callRealAPI = useCallback(
     async (question: string) => {
+      const startTime = Date.now();
       setErrorMessage(null);
       setIsTyping(true);
       scrollToBottom();
@@ -75,7 +78,7 @@ function ChatContent() {
 
         let fullText = "";
         let confidence: "high" | "medium" | "low" | undefined;
-        let sources: ChatMessage["sources"] = [];
+        let sources: NonNullable<ChatMessage["sources"]> = [];
 
         await parseStreamResponse(response, {
           onText: (delta) => {
@@ -97,25 +100,50 @@ function ChatContent() {
               followups: [], // Real API doesn't return followups yet
             };
             setMessages((prev) => [...prev, aiMessage]);
+            trackEvent("chat_response_received", {
+              town_id: town.town_id,
+              session_id: sessionIdRef.current,
+              interaction_surface: "full_chat_page",
+              page_path: pathname,
+              response_length: fullText.length,
+              source_count: sources.length,
+              confidence,
+              response_time_ms: Date.now() - startTime,
+            });
           },
           onError: (error) => {
             console.error("Chat stream error:", error);
             setErrorMessage(t("chat.error_response"));
+            trackEvent("chat_response_error", {
+              town_id: town.town_id,
+              session_id: sessionIdRef.current,
+              interaction_surface: "full_chat_page",
+              page_path: pathname,
+              error_stage: "stream",
+            });
           },
         });
       } catch (error) {
         console.error("Chat API error:", error);
         setErrorMessage(t("chat.error_response"));
+        trackEvent("chat_response_error", {
+          town_id: town.town_id,
+          session_id: sessionIdRef.current,
+          interaction_surface: "full_chat_page",
+          page_path: pathname,
+          error_stage: "request",
+        });
       } finally {
         setIsTyping(false);
         scrollToBottom();
       }
     },
-    [scrollToBottom, t, town.town_id]
+    [pathname, scrollToBottom, t, town.town_id]
   );
 
   const simulateMockResponse = useCallback(
     (question: string) => {
+      const startTime = Date.now();
       setErrorMessage(null);
       setIsTyping(true);
       scrollToBottom();
@@ -133,21 +161,48 @@ function ChatContent() {
             followups: response.followups,
           };
           setMessages((prev) => [...prev, aiMessage]);
+          trackEvent("chat_response_received", {
+            town_id: town.town_id,
+            session_id: sessionIdRef.current,
+            interaction_surface: "full_chat_page",
+            page_path: pathname,
+            response_length: response.text.length,
+            source_count: response.sources.length,
+            confidence: response.confidence,
+            response_time_ms: Date.now() - startTime,
+            mock_mode: true,
+          });
         } catch {
           setErrorMessage(t("chat.error_response"));
+          trackEvent("chat_response_error", {
+            town_id: town.town_id,
+            session_id: sessionIdRef.current,
+            interaction_surface: "full_chat_page",
+            page_path: pathname,
+            error_stage: "mock",
+          });
         } finally {
           setIsTyping(false);
           scrollToBottom();
         }
       }, delay);
     },
-    [scrollToBottom, t]
+    [pathname, scrollToBottom, t, town.town_id]
   );
 
   const handleResponse = USE_MOCK_DATA ? simulateMockResponse : callRealAPI;
 
   const handleSend = useCallback(
     (text: string) => {
+      trackEvent("chat_message_sent", {
+        town_id: town.town_id,
+        session_id: sessionIdRef.current,
+        interaction_surface: "full_chat_page",
+        page_path: pathname,
+        message_length: text.length,
+        is_from_search: initialQuery === text,
+      });
+
       const userMessage: ChatMessage = {
         id: `user-${Date.now()}`,
         role: "user",
@@ -157,8 +212,18 @@ function ChatContent() {
       scrollToBottom();
       handleResponse(text);
     },
-    [handleResponse, scrollToBottom]
+    [handleResponse, initialQuery, pathname, scrollToBottom, town.town_id]
   );
+
+  useEffect(() => {
+    trackEvent("chat_page_viewed", {
+      town_id: town.town_id,
+      session_id: sessionIdRef.current,
+      interaction_surface: "full_chat_page",
+      page_path: pathname,
+      initial_query_present: Boolean(initialQuery),
+    });
+  }, [initialQuery, pathname, town.town_id]);
 
   useEffect(() => {
     if (initialQuery && !hasProcessedInitial.current) {

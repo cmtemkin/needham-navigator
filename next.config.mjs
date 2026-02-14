@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 
-// Hostnames where root paths (/, /chat, /permits, /news) serve Needham
+// Hostnames where root paths (/, /chat, /permits, /news, /search) serve Needham
 // content directly via rewrite. On unrecognized hosts the filesystem
 // page.tsx redirect to /{DEFAULT_TOWN_ID} kicks in as a fallback.
 const NEEDHAM_HOSTS =
@@ -16,7 +16,7 @@ const nextConfig = {
           has: [{ type: "host", value: NEEDHAM_HOSTS }],
         },
         {
-          source: "/:path(chat|permits|news)",
+          source: "/:path(chat|permits|news|search)",
           destination: "/needham/:path",
           has: [{ type: "host", value: NEEDHAM_HOSTS }],
         },
