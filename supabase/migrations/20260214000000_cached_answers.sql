@@ -29,13 +29,12 @@ CREATE TABLE IF NOT EXISTS cached_answers (
   UNIQUE(town_id, normalized_query)
 );
 
--- Index for fast lookups (only non-expired entries)
-CREATE INDEX idx_cached_answers_lookup
-  ON cached_answers (town_id, normalized_query)
-  WHERE expires_at > NOW();
+-- Index for fast lookups (indexes all entries - removed WHERE clause due to NOW() immutability issue)
+CREATE INDEX IF NOT EXISTS idx_cached_answers_lookup
+  ON cached_answers (town_id, normalized_query);
 
 -- Index for cleanup jobs
-CREATE INDEX idx_cached_answers_expiry
+CREATE INDEX IF NOT EXISTS idx_cached_answers_expiry
   ON cached_answers (expires_at);
 
 -- Optional: Add comment to table
