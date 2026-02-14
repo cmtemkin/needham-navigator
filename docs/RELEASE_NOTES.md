@@ -2,6 +2,48 @@
 
 ---
 
+## v0.8.9 — 2026-02-14
+
+**Search-First UI Skin with Floating Chat**
+
+### New Features
+- **Search-first UI mode** — Alternative interface optimized for document discovery and quick lookup
+  - Large search hero with instant results from `/api/search` endpoint
+  - AI answers load asynchronously above search results
+  - Cached answers display instantly with green "Instant" badge
+  - Browse by topic cards and popular questions for discovery
+- **Floating chat panel** — Persistent bottom-right chat bubble that opens to a side panel
+  - "Ask about this" buttons on search results pre-populate the chat
+  - "Ask follow-up" buttons on AI answers open chat with context
+  - Suggestion chips before first message
+  - Full conversation history maintained while panel is open
+- **UI mode toggle** — Controlled via `uiMode: 'classic' | 'search'` flag in town config
+  - Classic mode (default): Chat-first interface (existing HomePage)
+  - Search mode: Search-first interface (new SearchHomePage)
+  - Skin router in `[town]/page.tsx` selects appropriate component
+
+### Components Added
+- `SearchHomePage` — Main search-first homepage with hero, topic cards, results
+- `SearchResultCard` — Individual search result with similarity score, "Ask about this" button
+- `AIAnswerCard` — Four states: loading, cached (instant), loaded (streamed), prompt (opt-in)
+- `FloatingChat` — Bottom-right FAB + slide-up chat panel with streaming responses
+- `src/types/search.ts` — Shared TypeScript interfaces for search API
+- `src/lib/stream-parser.ts` — Reusable SSE stream parser utility
+
+### Improvements
+- **Refactored TownChatPage** to use new `parseStreamResponse()` utility (cleaner, more maintainable)
+- Search results show department tags, dates, and similarity percentages
+- Mobile-responsive floating chat (full-width with margins on small screens)
+- Graceful fallback if `/api/search` endpoint doesn't exist yet
+
+### Technical
+- Skin routing logic in `src/app/[town]/page.tsx` checks `townConfig.feature_flags.uiMode`
+- SSE parsing logic extracted from TownChatPage into reusable utility
+- Both skins share ChatBubble, SourceChip, and other components
+- No changes to existing classic skin (HomePage) — fully backward compatible
+
+---
+
 ## v0.8.8 — 2026-02-14
 
 **Remove AI Disclaimer Preamble from Chat Responses**

@@ -11,6 +11,7 @@ import { ChatWelcome } from "@/components/ChatWelcome";
 import { findMockResponse } from "@/lib/mock-data";
 import { useTownHref, useTown } from "@/lib/town-context";
 import { useI18n } from "@/lib/i18n";
+import { parseStreamResponse } from "@/lib/stream-parser";
 
 const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true";
 
@@ -72,57 +73,36 @@ function ChatContent() {
           throw new Error("API request failed");
         }
 
-        // Simple implementation: read the full response
-        // TODO: Implement streaming for better UX
-        const reader = response.body?.getReader();
-        const decoder = new TextDecoder();
         let fullText = "";
         let confidence: "high" | "medium" | "low" | undefined;
         let sources: ChatMessage["sources"] = [];
 
-        if (reader) {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            const chunk = decoder.decode(value, { stream: true });
-            // Parse SSE data: lines from Vercel AI SDK createUIMessageStream
-            const lines = chunk.split("\n");
-            for (const line of lines) {
-              if (line.startsWith("data: ")) {
-                const jsonStr = line.slice(6);
-                try {
-                  const data = JSON.parse(jsonStr);
-                  if (data.type === "text-delta") {
-                    fullText += data.delta;
-                  } else if (data.type === "data-confidence") {
-                    confidence = data.data?.level ?? data.data;
-                  } else if (data.type === "data-sources") {
-                    // Map API source format to MockSource format used by ChatBubble
-                    sources = (data.data ?? []).map((s: Record<string, unknown>) => ({
-                      title: (s.document_title as string) ?? (s.title as string) ?? "Source",
-                      section: s.section as string | undefined,
-                      date: s.date as string | undefined,
-                      url: (s.document_url as string) ?? (s.url as string) ?? undefined,
-                    }));
-                  }
-                } catch {
-                  // Skip invalid JSON chunks
-                }
-              }
-            }
-          }
-        }
-
-        const aiMessage: ChatMessage = {
-          id: `ai-${Date.now()}`,
-          role: "ai",
-          text: fullText || "No response received.",
-          sources,
-          confidence,
-          followups: [], // Real API doesn't return followups yet
-        };
-        setMessages((prev) => [...prev, aiMessage]);
+        await parseStreamResponse(response, {
+          onText: (delta) => {
+            fullText += delta;
+          },
+          onConfidence: (level) => {
+            confidence = level;
+          },
+          onSources: (srcs) => {
+            sources = srcs;
+          },
+          onDone: () => {
+            const aiMessage: ChatMessage = {
+              id: `ai-${Date.now()}`,
+              role: "ai",
+              text: fullText || "No response received.",
+              sources,
+              confidence,
+              followups: [], // Real API doesn't return followups yet
+            };
+            setMessages((prev) => [...prev, aiMessage]);
+          },
+          onError: (error) => {
+            console.error("Chat stream error:", error);
+            setErrorMessage(t("chat.error_response"));
+          },
+        });
       } catch (error) {
         console.error("Chat API error:", error);
         setErrorMessage(t("chat.error_response"));

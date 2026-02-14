@@ -15,6 +15,21 @@ Visit your town's Navigator page:
 
 The home page shows popular questions, life-situation tiles, and department contacts. Click any tile or question to start a conversation.
 
+### UI Modes
+
+Needham Navigator supports two interface styles (configured via `uiMode` in town settings):
+
+**Classic Mode (default)** — Chat-first interface with conversational AI as the primary feature. Great for exploratory questions and interactive conversations.
+
+**Search Mode** — Search-first interface optimized for quick lookup and document discovery:
+- Large search bar with instant results from town documents
+- AI-generated answers appear above search results (cached answers show instantly with a green "Instant" badge)
+- Floating chat button in bottom-right corner for follow-up questions
+- "Ask about this" buttons on search results open the chat with context
+- Browse by topic cards and popular questions for discovery
+
+Both modes access the same underlying data and provide the same quality answers — choose based on your preferred interaction style.
+
 ---
 
 ## Features
