@@ -132,7 +132,7 @@ export const TOWNS: TownConfig[] = [
       enableSafety: true,
       enableTransit: true,
       enableWeather: true,
-      uiMode: 'classic',
+      uiMode: 'search',
       enableAnswerCache: true,
     },
     location: { lat: 42.2828, lng: -71.2337 },
