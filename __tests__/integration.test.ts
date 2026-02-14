@@ -144,7 +144,7 @@ function mockFromData(data: unknown[]) {
 import { GET as getDepartments } from "@/app/api/departments/route";
 import { GET as getCategories } from "@/app/api/categories/route";
 import { POST as postChat } from "@/app/api/chat/route";
-import { GET as getSearch } from "@/app/api/search/route";
+import { POST as postSearch } from "@/app/api/search/route";
 import { POST as postFeedback } from "@/app/api/feedback/route";
 import { GET as getAdminAnalytics } from "@/app/api/admin/analytics/route";
 import {
@@ -227,14 +227,17 @@ describe("Test 3 — Chat Endpoint", () => {
 });
 
 // ===========================================================================
-// TEST 4 — Search Endpoint: GET /api/search?q=zoning returns 200
+// TEST 4 — Search Endpoint: POST /api/search returns 200
 // ===========================================================================
 
 describe("Test 4 — Search Endpoint", () => {
     it("returns 200 for a search query", async () => {
         mockRpc.mockResolvedValue({ data: [], error: null });
 
-        const res = await getSearch(makeRequest("/api/search?q=zoning"));
+        const res = await postSearch(makeRequest("/api/search", {
+            method: "POST",
+            body: JSON.stringify({ query: "zoning", town_id: "needham" })
+        }));
         expect(res.status).toBe(200);
 
         const json = (await res.json()) as { results: unknown[] };

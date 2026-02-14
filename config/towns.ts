@@ -35,6 +35,10 @@ export type TownFeatureFlags = {
   enableSafety: boolean;
   enableTransit: boolean;
   enableWeather: boolean;
+  /** Which UI skin to use: 'classic' (current chat-first) or 'search' (search-first + floating chat) */
+  uiMode: 'classic' | 'search';
+  /** Enable cached AI answers for common queries */
+  enableAnswerCache: boolean;
 };
 
 export type TownLocation = {
@@ -128,6 +132,8 @@ export const TOWNS: TownConfig[] = [
       enableSafety: true,
       enableTransit: true,
       enableWeather: true,
+      uiMode: 'classic',
+      enableAnswerCache: true,
     },
     location: { lat: 42.2828, lng: -71.2337 },
     transit_route: "CR-Needham",
@@ -182,6 +188,8 @@ export const TOWNS: TownConfig[] = [
       enableSafety: false,
       enableTransit: false,
       enableWeather: false,
+      uiMode: 'search',
+      enableAnswerCache: true,
     },
     location: { lat: 42.0, lng: -71.0 },
   },
