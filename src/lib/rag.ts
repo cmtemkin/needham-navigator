@@ -637,6 +637,16 @@ function normalizeSimilarity(value: number): number {
   return value;
 }
 
+/**
+ * Truncate text to a max length, breaking at word boundary.
+ */
+export function truncateSnippet(text: string, maxLength: number = 300): string {
+  if (text.length <= maxLength) return text;
+  const truncated = text.slice(0, maxLength);
+  const lastSpace = truncated.lastIndexOf(' ');
+  return (lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated) + '…';
+}
+
 export async function hybridSearch(
   query: string,
   options?: {
