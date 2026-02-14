@@ -188,3 +188,34 @@ This is primarily a portfolio project, but suggestions and bug reports are welco
 ---
 
 *Questions or feedback? Open an issue or reach out via the repository.*
+
+---
+
+## RAG Quality Evaluation
+
+The project includes a golden test dataset and evaluation tooling to measure RAG pipeline quality against verified ground-truth answers from needhamma.gov.
+
+### Golden Test Dataset
+
+`docs/golden-test-dataset-verified.json` contains 73 questions spanning 14 categories (Transfer Station, Taxes, Schools, Zoning, Permits, etc.) with:
+- **Verified answer facts** — specific strings the response should contain
+- **Verification status** — `verified`, `partially_verified`
+- **Difficulty levels** — Easy, Medium, Hard
+- **Persona context** — New Resident, Concerned Citizen, Homeowner, Real Estate Agent, Small Business Owner
+
+### Running the Evaluation
+
+1. Start the dev server: `npm run dev`
+2. Run the eval: `npm run eval` — sends each question to the Chat API, scores responses, saves results to `docs/eval-results-YYYY-MM-DD.json`
+3. Generate the scorecard: `npm run eval:scorecard` — produces `docs/eval-scorecard-YYYY-MM-DD.md` with category breakdowns, worst/best questions, response time stats, and improvement recommendations
+
+### Scorecard Sections
+
+- **Overall score** (0–100%) with fact-level precision
+- **Score by category** — identifies weak topic areas
+- **Score by difficulty** — Easy vs Medium vs Hard
+- **Score by verification status** — verified vs partially_verified
+- **Top 10 worst questions** — with missing facts listed
+- **Top 10 best questions**
+- **Response time stats** — avg, P50, P95, slowest
+- **Recommendations** — actionable next steps for RAG improvement
