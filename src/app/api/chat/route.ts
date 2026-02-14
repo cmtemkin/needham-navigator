@@ -13,6 +13,7 @@ import {
 } from "@/lib/rag";
 import { getSupabaseClient } from "@/lib/supabase";
 import { getTownById } from "@/lib/towns";
+import { setCachedAnswer } from "@/lib/answer-cache";
 
 const DEFAULT_CHAT_MODEL = "gpt-5-nano";
 const ALLOWED_MODELS = new Set([
@@ -238,6 +239,16 @@ export async function POST(request: Request): Promise<Response> {
         },
       }).catch((err) => console.error("[api/chat] cost tracking error:", err));
     }).catch((err) => console.error("[api/chat] usage retrieval error:", err));
+
+    // Fire-and-forget: cache this answer for search mode
+    Promise.resolve(result.text).then((fullResponseText) => {
+      setCachedAnswer(
+        latestUserMessage.content,
+        townId,
+        fullResponseText,
+        sources.map(s => ({ title: s.document_title, url: s.document_url ?? '' }))
+      ).catch(() => {}); // silent fail
+    }).catch(() => {}); // silent fail on text retrieval too
 
     const stream = createUIMessageStream({
       execute: ({ writer }) => {

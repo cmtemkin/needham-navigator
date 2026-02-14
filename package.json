@@ -15,7 +15,8 @@
     "monitor": "tsx scripts/monitor.ts",
     "validate": "tsx scripts/validate-ingestion.ts",
     "eval": "tsx scripts/eval-golden-test.ts",
-    "eval:scorecard": "tsx scripts/eval-scorecard.ts"
+    "eval:scorecard": "tsx scripts/eval-scorecard.ts",
+    "seed-cache": "tsx scripts/seed-answer-cache.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.26",
