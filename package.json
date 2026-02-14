@@ -13,7 +13,9 @@
     "ingest": "tsx scripts/ingest.ts",
     "crawl": "tsx scripts/crawl.ts",
     "monitor": "tsx scripts/monitor.ts",
-    "validate": "tsx scripts/validate-ingestion.ts"
+    "validate": "tsx scripts/validate-ingestion.ts",
+    "eval": "tsx scripts/eval-golden-test.ts",
+    "eval:scorecard": "tsx scripts/eval-scorecard.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.26",
