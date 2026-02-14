@@ -1,0 +1,2539 @@
+{
+  "run_date": "2026-02-14T20:24:46.114Z",
+  "api_url": "http://localhost:3000/api/chat",
+  "town_id": "needham",
+  "scoring_method": "llm-as-judge (gpt-4.1-nano)",
+  "total_questions": 73,
+  "results": [
+    {
+      "id": "TRASH-001",
+      "category": "Transfer Station / Trash",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "When is the transfer station open?",
+      "response": "The Transfer Station (RTS) is open Tuesday through Saturday and closed Sunday and Monday.\n\n- Tuesday: 7:00 AM – 4:00 PM\n- Wednesday: 7:00 AM – 4:00 PM\n- Thursday: 7:00 AM – 4:00 PM\n- Friday: 7:00 AM – 12:00 PM\n- Saturday: 7:00 AM – 4:00 PM\n- Closed Sunday & Monday\n\nThe RTS is located at 1421 Central Avenue. Would you like me to check today’s hours for you or give you directions to the RTS?",
+      "facts": [
+        {
+          "fact": "Tuesday through Thursday: 7:00 AM - 4:00 PM",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Friday: 7:00 AM - 12:00 PM (noon)",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Saturday: 7:00 AM - 4:00 PM",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Closed Sunday and Monday",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 4,
+      "total_facts": 4,
+      "score": 1,
+      "response_time_ms": 13014,
+      "error": null
+    },
+    {
+      "id": "TRASH-002",
+      "category": "Transfer Station / Trash",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "Where is the transfer station located?",
+      "response": "The Recycling and Transfer Station (RTS) is located at 1421 Central Avenue in Needham.\n\nHours:\n- Tuesday: 7:00 AM – 4:00 PM\n- Wednesday: 7:00 AM – 4:00 PM\n- Thursday: 7:00 AM – 4:00 PM\n- Friday: 7:00 AM – 12:00 PM\n- Saturday: 7:00 AM – 4:00 PM\n- Closed Sunday & Monday\n\nWould you like me to pull up what items are accepted at the RTS?",
+      "facts": [
+        {
+          "fact": "1421 Central Avenue",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Needham, MA",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 2,
+      "total_facts": 2,
+      "score": 1,
+      "response_time_ms": 13634,
+      "error": null
+    },
+    {
+      "id": "TRASH-003",
+      "category": "Transfer Station / Trash",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "How much does it cost to use the transfer station?",
+      "response": "The Transfer Station (that's what most folks call the dump) charges vary by what you bring and whether you’re a resident or a commercial hauler.\n\n- Residents disposing non-recyclable trash (pay-as-you-throw bags):\n  - Large 30-gallon bags: $21.60 for a roll of ten\n  - Small 15-gallon bags: $11.60 for a roll of ten\n  - Bulky items: price varies by item; payment by check or credit card; you’ll need an RTS sticker\n\n- Yard waste (disposal by weight):\n  - Brush: $60 per ton\n  - Leaves/Grass: $50 per ton\n  - Wood Chips: $7.50 per ton\n  - Material must be free from rocks, metal, plastic bags, etc.\n\n- Commercial entities / private haulers:\n  - Disposal rate: $220 per ton with a minimum charge of $30\n  - Mattress disposal: $40\n  - Commercial stickers are required and rates apply at the RTS; weigh in/out is recorded\n\n- Access and stickers:\n  - The current gray resident sticker doesn’t need annual renewal; new residents can get a sticker at the Treasurer’s Office in Town Hall.\n\nIf you want, tell me what you’re bringing and whether you’re a resident or a contractor, and I’ll help you estimate the cost more precisely. Are you disposing as a resident or a contractor, and what materials are you bringing?",
+      "facts": [
+        {
+          "fact": "RTS sticker is FREE for Needham residents",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Pay-As-You-Throw bags required for trash disposal",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Large bags cost $2.16 each",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Small bags cost $1.16 each",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Bags available at local retailers",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 3,
+      "total_facts": 5,
+      "score": 0.6,
+      "response_time_ms": 27672,
+      "error": null
+    },
+    {
+      "id": "TRASH-004",
+      "category": "Transfer Station / Trash",
+      "difficulty": "Medium",
+      "verification_status": "partially_verified",
+      "question": "What items can't I throw away at the transfer station?",
+      "response": "Massachusetts-wide waste bans mean you can’t dispose of certain items in the transfer station trash. Here are the main categories that are prohibited and should be recycled or handled separately:\n\n- Textiles and clothing (including household textiles like curtains, towels) and mattresses\n- Paper, cardboard, and paperboard\n- Glass and metal containers\n- Ferrous and non-ferrous metals\n- Single-resin plastics\n- CRTs, TVs, and computer monitors\n- Leaves and yard waste\n- Clean gypsum wallboard\n- Asphalt pavement, brick, and concrete\n- Treated and untreated wood and wood waste\n- White goods (large appliances)\n- Whole tires (notes vary by facility; shredded tires may be handled differently)\n- Lead-acid batteries\n- Food waste for businesses and institutions (there’s a separate ban for commercial waste)\n\nImportant note: mattresses and textiles can’t go in the trash at the RTS; instead, recycle or donate where possible, and mattresses can be recycled at the RTS.\n\nFor the most up-to-date, detailed guidance, check the Waste Ban Items page. If you have a specific item in mind, tell me and I’ll help point you to the right option. Are you asking about residential or commercial use, or do you have a particular item you’re worried about?",
+      "facts": [
+        {
+          "fact": "hazardous waste has separate collection events",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "specific items like electronics and tires may have separate procedures",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "contact DPW or check website for restricted items list",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 3,
+      "total_facts": 3,
+      "score": 1,
+      "response_time_ms": 30817,
+      "error": null
+    },
+    {
+      "id": "TRASH-005",
+      "category": "Transfer Station / Trash",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "Do I need to separate recyclables or can I put them in the trash?",
+      "response": "Yes—recyclables should be separated from trash. Put recyclables in the RTS recycling stream, and non-recyclables in yellow pay-as-you-throw bags.\n\n- What’s OK to recycle (per Needham RTS guidelines): leave lids, rings, and labels on; but avoid items like Styrofoam cups/trays, plastic bags, milk/juice cartons, aseptic cartons, ceramics/porcelain, window glass, drinking glasses, and VCR tapes. For a full list and any exceptions, see the RTS “What We Take” page.\n- What not to recycle: the items listed above. If in doubt, check the full rules on the RTS page.\n- Trash disposal basics: non-recyclables go into yellow bags; bulky items and clean-outs have separate disposal rules and may involve fees or weigh-in.\n- Special items: mattresses are accepted for recycling at the RTS; clothing/textiles should be donated or recycled separately.\n\nIf you tell me what you’re disposing of, I can point you to the specific items on the RTS list. Are you asking about residential RTS use or a business/contractor scenario?",
+      "facts": [
+        {
+          "fact": "Needham uses single-stream recycling",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "recyclables go in a separate stream from trash",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "no need to sort individual recyclable types",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "recycling is free at the transfer station",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 2,
+      "total_facts": 4,
+      "score": 0.5,
+      "response_time_ms": 26116,
+      "error": null
+    },
+    {
+      "id": "WRONGASSUMP-001",
+      "category": "Wrong Assumptions",
+      "difficulty": "Medium",
+      "verification_status": "verified",
+      "question": "Where do I put my trash cans on the curb for pickup?",
+      "response": "I don’t have the exact curbside placement rules in my notes, but the RTS (Recycling and Transfer Station) rules page has the curbside guidelines you need.\n\n- Check the RTS rules for curbside pickup and hours of operation: needhamma.gov/262\n- If you’re unsure after you look it over, I can help walk you through the page\n\nWould you like me to pull up those guidelines and summarize the key points for you?",
+      "facts": [
+        {
+          "fact": "Needham does NOT have curbside trash pickup",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "residents must bring trash to the Recycling and Transfer Station",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "transfer station located at 1421 Central Avenue",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "must use Pay-As-You-Throw bags",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 0,
+      "total_facts": 4,
+      "score": 0,
+      "response_time_ms": 15477,
+      "error": null
+    },
+    {
+      "id": "TAX-001",
+      "category": "Property Taxes & Assessments",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "How much are property taxes in Needham?",
+      "response": "Property taxes in Needham are set with a split tax rate (commercial/industrial taxed at a higher rate than residential), so the exact amount varies by your property's assessed value and the current rate. On average, residential property owners see about a $1,962 tax savings from the split rate, but your own bill will depend on your assessment and any exemptions.\n\nHow the bills work and how to estimate your own amount:\n- First and second quarter bills: estimated, based on one-fourth of the prior year’s tax plus the 2.5% allowed increase and any overrides.\n- Third and fourth quarter bills: actual tax bills reflecting changes in valuation and the current tax rate; there is also a 2.0% Community Preservation Act surcharge.\n- To determine your exact amount, you’ll need your current assessed value and the town’s current rate.\n\nWho to call for specifics (lead with the number):\n- Assessor's Office: 781-455-7500 — handles your assessment, exemptions, and updates to ownership or billing address.\n- Collector / Treasurer's Office: 781-455-7500 — handles real estate and personal property tax bills and payments (and other town receivables).\n\nGive the Assessor’s or Collector’s Office a call at 781-455-7500 to confirm the details for your specific situation. You can also visit Needham Town Hall, 1471 Highland Avenue, 1st Floor, Needham, MA 02492, for in-person help.",
+      "facts": [
+        {
+          "fact": "Residential tax rate FY2026: $10.83 per $1,000 of assessed value",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Commercial/Industrial/Personal Property rate: $21.09 per $1,000",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Needham uses a split tax rate",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 2,
+      "total_facts": 3,
+      "score": 0.6666666666666666,
+      "response_time_ms": 20905,
+      "error": null
+    },
+    {
+      "id": "TAX-002",
+      "category": "Property Taxes & Assessments",
+      "difficulty": "Easy",
+      "verification_status": "partially_verified",
+      "question": "What's the assessed value of 42 Great Plain Road?",
+      "response": "I don’t have the current assessed value for 42 Great Plain Road on hand.\n\n781-455-7500 — Assessor's Office. They handle assessments, abatements, exemptions, and can provide the exact current assessed value for that address. Give them a call to confirm the details for your specific situation.",
+      "facts": [
+        {
+          "fact": "specific property lookups require the Assessor's database",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "contact the Assessor's Office for individual property values",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Assessor's Office phone: 781-455-7500",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 3,
+      "total_facts": 3,
+      "score": 1,
+      "response_time_ms": 17841,
+      "error": null
+    },
+    {
+      "id": "TAX-003",
+      "category": "Property Taxes & Assessments",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "When are property taxes due?",
+      "response": "Property taxes in Needham are due quarterly on these dates (fiscal year runs July 1 to June 30):\n\n- 1st quarter (July–Sept): due August 1\n- 2nd quarter (Oct–Dec): due November 1\n- 3rd quarter (Jan–Mar): due February 1\n- 4th quarter (Apr–Jun): due May 1\n\nPayments can be made online, by mail, or in person. Note: online payments are received the next business day; weekend payments aren’t processed until Monday. If you need specifics for your situation, Give the Treasurer/Collector's Office a call at 781-455-7500 to confirm the details.",
+      "facts": [
+        {
+          "fact": "property taxes are billed quarterly",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "four payment deadlines per year",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 2,
+      "total_facts": 2,
+      "score": 1,
+      "response_time_ms": 11010,
+      "error": null
+    },
+    {
+      "id": "TAX-004",
+      "category": "Property Taxes & Assessments",
+      "difficulty": "Medium",
+      "verification_status": "verified",
+      "question": "How do I appeal my property assessment if I think it's too high?",
+      "response": "Yes. You can appeal by filing an abatement with the Town Assessor’s Office if you think your property is overvalued.\n\nSteps to appeal\n1) Get the abatement form from the Town Assessor’s Office (or the Assessing page on the town website) and complete it with your reasons for the appeal.  \n2) Submit the completed form to the Assessor’s Office by February 1.  \n3) The Assessor’s Office will review your submission and may contact you to set up a time to discuss, or to request additional information. Note: you do not have to allow interior entry for a cyclical inspection, but if you file for an abatement and then refuse entry, any formal appeal could be denied.  \n4) If you believe the tax bill itself is incorrect, you can also file a dispute with the DPW within 30 days of the billing date (and you can apply for the abatement through the Assessor’s Office). DPW can be reached at 781-455-7550.\n\nIf you want to discuss the specifics for your situation, give the Town Assessor’s Office a call at the number listed on the Town Assessing page to confirm the details.",
+      "facts": [
+        {
+          "fact": "file an appeal within 30 days of receiving tax bill",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "use Massachusetts State Form 128 (Application for Abatement)",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "submit to the Board of Assessors",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Board of Assessors reviews and decides",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 1,
+      "total_facts": 4,
+      "score": 0.25,
+      "response_time_ms": 32471,
+      "error": null
+    },
+    {
+      "id": "TAX-005",
+      "category": "Property Taxes & Assessments",
+      "difficulty": "Medium",
+      "verification_status": "partially_verified",
+      "question": "What exemptions are available for seniors or disabled residents?",
+      "response": "Needham offers several tax relief options for seniors and the disabled, including exemptions and a Tax Relief Fund, plus the Senior Tax Work Off program.\n\n- Exemptions (may release all or part of your real estate tax):\n  - Elderly\n  - Blind\n  - Disabled Veterans\n  - Widows / Widowers\n  - Minor Children of Deceased / Deceased Public Safety\n- Deferrals and temporary deferrals (postpone payment of taxes)\n- Property Tax Relief Fund (helps with real estate taxes; up to $600 for qualifying elderly and disabled residents)\n- Senior Tax Work Off program (Council on Aging administers this)\n\nHow to apply (steps)\n1. Get the application forms from the Town Assessor’s Office, Town Treasurer’s Office, Tax Collector’s Office, Council on Aging, Needham Public Library, or the Town website.\n2. File the application with the Town Assessor’s Office by the deadline; it will be reviewed by the Taxation Aid Committee.\n3. If you need help, the Council on Aging can assist with the applications.\n\nGive the Assessing Office a call at 781-455-7500, ext. 238, to confirm the details for your situation. All information is for reference only.",
+      "facts": [
+        {
+          "fact": "property tax exemptions are available",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "contact the Assessor's Office for eligibility details",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Assessor's Office phone: 781-455-7500",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 3,
+      "total_facts": 3,
+      "score": 1,
+      "response_time_ms": 31520,
+      "error": null
+    },
+    {
+      "id": "SCHOOL-001",
+      "category": "Schools",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "What schools are in Needham? Are they good?",
+      "response": "I don’t have a current list of Needham schools or a formal quality assessment in the documents I can access here.\n\nYour best bet is to call Town Hall at 781-455-7500 to be connected with the School Department or the district office for the most up-to-date list and information on how the schools are doing. Are you asking about the public Needham Public Schools or private/charter options in town?",
+      "facts": [
+        {
+          "fact": "8 public schools total",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "5 elementary schools: Broadmeadow, Eliot, Mitchell, Sunita L. Williams, Newman",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "2 middle schools: High Rock (grade 6), Pollard (grades 7-8)",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "1 high school: Needham High School (grades 9-12)",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 0,
+      "total_facts": 4,
+      "score": 0,
+      "response_time_ms": 26408,
+      "error": null
+    },
+    {
+      "id": "SCHOOL-002",
+      "category": "Schools",
+      "difficulty": "Medium",
+      "verification_status": "partially_verified",
+      "question": "Which school district does this property fall into?",
+      "response": "I'm not sure about that one. Your best bet is to call Town Hall at (781) 455-7500 — they'll know right away or can point you to the right department.\n\nYou can also try asking me about permits, zoning, the Transfer Station, schools, taxes, or other town services.",
+      "facts": [
+        {
+          "fact": "school assignments depend on property address",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Needham has 5 elementary school zones",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "all students attend High Rock (grade 6), Pollard (grades 7-8), and Needham High (9-12)",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "contact the school district for address-specific assignment",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 0,
+      "total_facts": 4,
+      "score": 0,
+      "response_time_ms": 525,
+      "error": null
+    },
+    {
+      "id": "SCHOOL-003",
+      "category": "Schools",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "What's the school calendar? When do schools open and close?",
+      "response": "I don’t have the Needham school calendar in my notes here. For the exact start and end dates (and holidays), please check the Needham Public Schools calendar on the district’s website.\n\nWould you like me to guide you to the calendar page or pull up the link for you?",
+      "facts": [
+        {
+          "fact": "first day of school 2025-2026: August 27, 2025",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "school hours vary by level",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "check the Needham Public Schools website for full calendar",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 2,
+      "total_facts": 3,
+      "score": 0.6666666666666666,
+      "response_time_ms": 17297,
+      "error": null
+    },
+    {
+      "id": "SCHOOL-004",
+      "category": "Schools",
+      "difficulty": "Medium",
+      "verification_status": "verified",
+      "question": "How do I register my child for school?",
+      "response": "I'm not sure about that one. Your best bet is to call Town Hall at (781) 455-7500 — they'll know right away or can point you to the right department.\n\nYou can also try asking me about permits, zoning, the Transfer Station, schools, taxes, or other town services.",
+      "facts": [
+        {
+          "fact": "registration opens January 12, 2026",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "registration deadline is April 1, 2026",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "register through the Needham Public Schools district office",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 0,
+      "total_facts": 3,
+      "score": 0,
+      "response_time_ms": 621,
+      "error": null
+    },
+    {
+      "id": "SCHOOL-005",
+      "category": "Schools",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "What are school lunch costs and do you offer free/reduced lunch?",
+      "response": "I'm not sure about that one. Your best bet is to call Town Hall at (781) 455-7500 — they'll know right away or can point you to the right department.\n\nYou can also try asking me about permits, zoning, the Transfer Station, schools, taxes, or other town services.",
+      "facts": [
+        {
+          "fact": "ALL students receive FREE breakfast and lunch",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "universal free meals program funded by the state of Massachusetts",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "no application needed for free meals",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 0,
+      "total_facts": 3,
+      "score": 0,
+      "response_time_ms": 659,
+      "error": null
+    },
+    {
+      "id": "TRANS-001",
+      "category": "Transportation / MBTA",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "What MBTA stations are near Needham?",
+      "response": "The MBTA stations near Needham are four commuter rail stops: Needham Heights, Needham Center, Needham Junction, and Hersey.\n\n- Needham Heights\n- Needham Center\n- Needham Junction\n- Hersey\n\nFor schedules, you can check the MBTA Commuter Rail Schedule. These stops connect to Back Bay Station and South Station in Boston. If you’d like, I can help you find the fastest option to a specific destination. Are you planning to travel to a particular Boston destination?",
+      "facts": [
+        {
+          "fact": "3 commuter rail stations in Needham",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Needham Heights",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Needham Junction",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Needham Center",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "all on the MBTA Needham Line (commuter rail)",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 4,
+      "total_facts": 5,
+      "score": 0.8,
+      "response_time_ms": 11090,
+      "error": null
+    },
+    {
+      "id": "TRANS-002",
+      "category": "Transportation / MBTA",
+      "difficulty": "Medium",
+      "verification_status": "verified",
+      "question": "How do I get to Boston on the MBTA?",
+      "response": "You can get to Boston by riding the MBTA Commuter Rail from Needham. There are four Needham stops, and you’ll ride into Boston from one of them.\n\n- Needham Heights, Needham Center, Needham Junction, or Hersey – choose the one closest to you.\n- Check the MBTA Commuter Rail Schedule for times and to see which Boston terminal you’ll reach.\n- If you’d rather not ride the rail, you can also look at MBTA Bus 59 options for a route into the city.\n- If you can’t walk to a stop, MBTA RIDE might be available—call the Needham Senior Center at 781-455-7555 to learn more.\n\nWhat time are you planning to travel, and which Needham stop are you near?",
+      "facts": [
+        {
+          "fact": "take the MBTA Needham Line commuter rail",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "trains go to South Station in Boston",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "approximately 40 minutes travel time",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "board at Needham Heights, Needham Junction, or Needham Center",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 2,
+      "total_facts": 4,
+      "score": 0.5,
+      "response_time_ms": 19515,
+      "error": null
+    },
+    {
+      "id": "TRANS-003",
+      "category": "Transportation / MBTA",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "Are there local bus routes in Needham?",
+      "response": "Yes—Needham has local MBTA bus service, including the 59 Bus.\n\n- MBTA 59 Bus Schedule and Maps: Check the schedule and route details on MBTA’s 59 line page.\n- Needham MBTA Commuter Rail Schedule: If you’re heading toward Boston, there are four Needham rail stops—Needham Heights, Needham Center, Needham Junction, and Hersey.\n- MBTA RIDE (for riders with mobility needs): If you can’t get to a stop, you may be eligible for The RIDE. Call the Needham Senior Center at 781-455-7555 and ask to speak to a social worker.\n- Transportation help from the COA: The Needham Council on Aging can assist with transportation and related forms. You can reach Stephan Grably at 781-455-7555 x204.\n\nAll information is for reference only. Would you like me to pull up the current 59 bus schedule or help plan a trip from a specific location?",
+      "facts": [
+        {
+          "fact": "MBTA Bus Route 59",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "runs from Watertown Square to Needham Junction",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "provides local bus service through Needham",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 3,
+      "total_facts": 3,
+      "score": 1,
+      "response_time_ms": 17206,
+      "error": null
+    },
+    {
+      "id": "TRANS-004",
+      "category": "Transportation / MBTA",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "Where can I park for the MBTA station?",
+      "response": "I'm not sure about that one. Your best bet is to call Town Hall at (781) 455-7500 — they'll know right away or can point you to the right department.\n\nYou can also try asking me about permits, zoning, the Transfer Station, schools, taxes, or other town services.",
+      "facts": [
+        {
+          "fact": "parking available at Needham Junction station",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "weekday rate: $6.00 per day",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "weekend rate: $2.00 per day",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 0,
+      "total_facts": 3,
+      "score": 0,
+      "response_time_ms": 382,
+      "error": null
+    },
+    {
+      "id": "GOV-001",
+      "category": "Town Meetings & Government",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "When is the next town meeting?",
+      "response": "I don’t have the exact next Town Meeting date in the materials here. Town Meeting dates are published by the Town Clerk and listed on the Boards & Committees Calendar on the town website.\n\n- Boards & Committees Calendar — check for the next Town Meeting date and deadlines\n- Town Clerk’s Office — they can confirm the date and provide any related information\n\nWould you like me to guide you to the calendar page on the town website?",
+      "facts": [
+        {
+          "fact": "Needham has a Representative Town Meeting",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Annual Town Meeting is held each spring (typically May)",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "check the town website or Town Clerk for specific dates",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 2,
+      "total_facts": 3,
+      "score": 0.6666666666666666,
+      "response_time_ms": 21460,
+      "error": null
+    },
+    {
+      "id": "GOV-002",
+      "category": "Town Meetings & Government",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "How do I contact my town selectmen or town council?",
+      "response": "Phone: 781-455-7500 x 503, 216, 218, 219, or 252.\n\nThe Town Clerk's Office handles inquiries about boards and commissions and can connect you with the Board of Selectmen (and other town boards) as well as provide meeting information. Would you like me to pull up the latest meeting schedule or show you where to find the member contact info on the town site?",
+      "facts": [
+        {
+          "fact": "Needham has a Select Board (not selectmen or town council)",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "5 members serving staggered 3-year terms",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Town Hall: 1471 Highland Avenue",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Phone: 781-455-7500",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Town Manager: Katie King",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 1,
+      "total_facts": 5,
+      "score": 0.2,
+      "response_time_ms": 23020,
+      "error": null
+    },
+    {
+      "id": "GOV-003",
+      "category": "Town Meetings & Government",
+      "difficulty": "Hard",
+      "verification_status": "verified",
+      "question": "How is the town budget developed and approved?",
+      "response": "The town budget in Needham is developed under the Town Manager’s leadership and approved by a representative Town Meeting, with ongoing oversight by the Select Board.\n\nSteps:\n1) The Town Meeting appropriates funds and sets policies for the town.\n2) The Select Board and Town Manager oversee town government and determine financial support for departments and programs (including key services like the Council on Aging).\n3) The Town Manager acts as purchasing agent, negotiates and administers all town contracts, and fixes compensation for town employees; these decisions shape the budget.\n\nFor more detail on timelines or department-specific items, check the town’s budget documents or contact the Town Manager’s Office. What specific part of the budget are you curious about (e.g., a particular department or timeline)?",
+      "facts": [
+        {
+          "fact": "Town Manager and School Superintendent submit departmental spending requests to Finance Committee by 2nd Wednesday of December",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Town Manager presents balanced budget recommendation by January 31st",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "budget is voted on and approved at Annual Town Meeting",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Representative Town Meeting (240 members, 10 precincts) is the legislative body",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 2,
+      "total_facts": 4,
+      "score": 0.5,
+      "response_time_ms": 18671,
+      "error": null
+    },
+    {
+      "id": "GOV-004",
+      "category": "Town Meetings & Government",
+      "difficulty": "Medium",
+      "verification_status": "verified",
+      "question": "What committees or boards can I join as a volunteer?",
+      "response": "There are several volunteer boards and committees you can join, plus general town volunteering opportunities.\n\n- Council on Aging Board Member — helps advocate for aging issues and programs. Monthly meetings Sept–June. Contact LaTanya Steele at 781-455-7555, ext. 208 or lsteele@needhamma.gov.\n- Tree Preservation Planning Committee — focuses on preserving Needham’s tree canopy and related planning work. Details on how to join are on the TPPC page.\n- Envision Needham Center Working Group — information on membership and activities is on the ENC Working Group page.\n- Large House Review (LHR) Study Committee — a town committee reviewing zoning/Housing Plan-related topics; information and meeting materials are on the LHR committee page.\n- Fall/Winter/Spring Volunteering — Needham Park and Recreation also recruits volunteers for programs and events; see the Volunteer Opportunities page or email cburnham@needhamma.gov for placements.\n\nIf you tell me which area you’re most drawn to (aging services, environmental planning, community development, etc.), I can point you to the best page to start with. What are you most interested in?",
+      "facts": [
+        {
+          "fact": "multiple boards, commissions, and committees accept volunteers",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "examples include Planning Board, Commission on Disabilities, Council on Aging",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "submit a Committee Interest Form to be considered",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "volunteer application available on town website",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 1,
+      "total_facts": 4,
+      "score": 0.25,
+      "response_time_ms": 20196,
+      "error": null
+    },
+    {
+      "id": "GOV-005",
+      "category": "Town Meetings & Government",
+      "difficulty": "Medium",
+      "verification_status": "verified",
+      "question": "How do I find out about local zoning or planning hearings?",
+      "response": "The Planning Board page and the town’s notification system are your quickest routes to hearing news. You can also ask Planning staff for specifics.\n\n1) Check the Planning Board Materials page for agendas, minutes, legal notices, and hearing packets.\n2) Sign up for email alerts with the town’s Notify Me feature (choose Planning Board Agendas and Planning Board public hearing notices).\n3) Look for upcoming hearings in the Planning Board section of the town site or calendar (hearings are usually at Broadmeadow School or via Zoom; details appear in the notices).\n4) To comment or ask about a specific hearing, email planning@needhamma.gov or attend the meeting.\n5) For a quick confirmation by phone, Planning & Community Development can be reached at 781-455-7550.\n\nNote: MBTA Communities hearings from previous years have already occurred; check the town website for the next scheduled date.\n\nWould you like me to sign you up for Planning Board email notices?",
+      "facts": [
+        {
+          "fact": "legal notices and hearing notices published in the Hometown Weekly (since May 2022)",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "also posted on the town website as a community service",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Planning Board meets 1st and 3rd Tuesday of each month",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "agendas, minutes, and legal notices available on town website",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 2,
+      "total_facts": 4,
+      "score": 0.5,
+      "response_time_ms": 22724,
+      "error": null
+    },
+    {
+      "id": "GENERAL-001",
+      "category": "General 'Where Do I...' Questions",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "Where do I get a library card?",
+      "response": "I'm not sure about that one. Your best bet is to call Town Hall at (781) 455-7500 — they'll know right away or can point you to the right department.\n\nYou can also try asking me about permits, zoning, the Transfer Station, schools, taxes, or other town services.",
+      "facts": [
+        {
+          "fact": "Needham Free Public Library",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "1139 Highland Avenue",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Hours: Monday-Thursday 9AM-9PM, Friday 9AM-5:30PM, Saturday 9AM-5PM, Sunday 1PM-6PM",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 0,
+      "total_facts": 3,
+      "score": 0,
+      "response_time_ms": 706,
+      "error": null
+    },
+    {
+      "id": "GENERAL-002",
+      "category": "General 'Where Do I...' Questions",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "Where can I get a resident parking permit?",
+      "response": "I don’t have parking-permit details in the documents I’ve got here.\n\nTypically, resident parking permits are handled by the Needham Town Clerk’s Office or the Police Department’s Traffic Division. Your best bet is to check the Town of Needham website for a Parking Permits page or call the appropriate office to confirm the exact steps for your situation. \n\nAre you asking about on-street resident parking permits near your home or a permit for a specific lot?",
+      "facts": [
+        {
+          "fact": "Needham offers overnight parking permits",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "contact the Department of Public Works",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "DPW address: 500 Dedham Avenue",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "DPW phone: 781-455-7550",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 0,
+      "total_facts": 4,
+      "score": 0,
+      "response_time_ms": 15669,
+      "error": null
+    },
+    {
+      "id": "GENERAL-003",
+      "category": "General 'Where Do I...' Questions",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "Where is the town hall and what departments are there?",
+      "response": "Town Hall is located at 1471 Highland Avenue, Needham, MA 02492.\n\nDepartments you’ll find there include:\n- Accounting\n- Assessors Office\n- Economic Development\n- Finance (Finance Director)\n- Human Resources\n- Parking Clerk\n- Purchasing\n- Retirement\n- Select Board\n- Tax Collector\n- Town Clerk\n- Town Manager\n- Treasurers Office\n- Youth and Family Services\n\nWould you like me to pull the phone numbers or hours for any of these departments?",
+      "facts": [
+        {
+          "fact": "Town Hall: 1471 Highland Avenue, Needham, MA 02492",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Main phone: 781-455-7500",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "departments include Town Clerk, Assessor's Office, Select Board, Finance",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 2,
+      "total_facts": 3,
+      "score": 0.6666666666666666,
+      "response_time_ms": 13375,
+      "error": null
+    },
+    {
+      "id": "GENERAL-004",
+      "category": "General 'Where Do I...' Questions",
+      "difficulty": "Medium",
+      "verification_status": "verified",
+      "question": "How do I file a complaint about a code violation?",
+      "response": "I don’t have the exact code-violation filing steps in my current information. I’m not sure about that one. Your best bet is to call [Department] at [number] — they’ll know right away.\n\nIf you’d like, I can help look up the correct department and contact info on the town website once you share what kind of code violation you’re seeing (for example, housing, building, or health-related). Would you like me to help look that up for you?",
+      "facts": [
+        {
+          "fact": "Building code violations: contact Building Department at 500 Dedham Avenue, phone 781-455-7550",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Health/food violations: contact Public Health Division at 178 Rosemary Street, phone 781-455-7940",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Building Division enforces state building, electrical, plumbing, gas, mechanical codes and local zoning by-laws",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 0,
+      "total_facts": 3,
+      "score": 0,
+      "response_time_ms": 24282,
+      "error": null
+    },
+    {
+      "id": "GENERAL-005",
+      "category": "General 'Where Do I...' Questions",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "Where do I register to vote?",
+      "response": "You can register to vote in Needham in person at the Town Clerk’s Office in Town Hall, online through the Secretary of State, or by mail.\n\n- In person: Town Clerk’s Office, Town Hall, 1471 Highland Avenue, during regular business hours.\n- Online: Register online at the Secretary of State’s website: https://www.sec.state.ma.us/OVR/\n- By mail: Request that a voter registration form be mailed to you, fill it out, and return it.\n\nIf you have questions, call the Town Clerk’s Office at 781-455-7500 x503 or email TownClerk@NeedhamMa.gov.",
+      "facts": [
+        {
+          "fact": "register at least 10 days before any election",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "online registration available through Massachusetts Secretary of State website",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "in-person registration at Town Clerk's office",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Town Clerk: 1471 Highland Avenue, phone 781-455-7500 ext. 71503",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 2,
+      "total_facts": 4,
+      "score": 0.5,
+      "response_time_ms": 14829,
+      "error": null
+    },
+    {
+      "id": "SAFETY-001",
+      "category": "Public Safety",
+      "difficulty": "Easy",
+      "verification_status": "partially_verified",
+      "question": "What's the crime rate in Needham?",
+      "response": "I don’t have the current crime rate data on hand.\n\nYour best bet is to call the Needham Police Department Records at 781-455-7570, option 2. They handle police records and can provide the latest crime statistics or point you to where to find them. Hours are Monday–Friday, 8 a.m.–4 p.m.\n\nWould you like me to look up the town’s non-emergency police contact as well?",
+      "facts": [
+        {
+          "fact": "contact the Needham Police Department for crime statistics",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Police station: 99 School Street",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "non-emergency phone: 781-444-1212",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 1,
+      "total_facts": 3,
+      "score": 0.3333333333333333,
+      "response_time_ms": 25582,
+      "error": null
+    },
+    {
+      "id": "SAFETY-002",
+      "category": "Public Safety",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "How do I report a crime or emergency?",
+      "response": "Call the Needham Police Department at 781-455-7570 for emergencies or crimes in progress (they handle immediate threats and dispatch). If it’s during business hours and you’re dealing with an issue that needs DPW services, call the Needham Department of Public Works at 781-455-7550.\n\n- 781-455-7570 — Needham Police Department: emergencies or crimes in progress (including after hours and weekends)\n- 781-455-7550 — Needham Department of Public Works: emergencies during business hours that involve DPW (e.g., road hazards, water/sewer issues)\n\nFor health-related emergencies, dial 911. Are you reporting a crime in progress or a non-emergency safety issue at the moment?",
+      "facts": [
+        {
+          "fact": "call 911 for emergencies",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Needham Police non-emergency: 781-444-1212",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Police station: 99 School Street",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 0,
+      "total_facts": 3,
+      "score": 0,
+      "response_time_ms": 23006,
+      "error": null
+    },
+    {
+      "id": "SAFETY-003",
+      "category": "Public Safety",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "Does Needham have a fire department? How fast are response times?",
+      "response": "Yes. Needham does have a Fire Department, and they provide both fire protection and emergency medical services. They operate two ambulances staffed with EMTs and Paramedics, and EMS calls are dispatched 24/7 through Public Safety Dispatch.\n\nI don’t have specific response-time figures in the documents. Response times can vary by location and incident. I’m not sure about the exact numbers—your best bet is to call Public Safety Dispatch (fire/EMS) and ask for current or typical response times. Would you like me to help you find the Dispatch contact page so you can get the latest info?",
+      "facts": [
+        {
+          "fact": "yes, Needham has a Fire Department",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Fire station: 88 Chestnut Street",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "non-emergency phone: 781-444-0142",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 1,
+      "total_facts": 3,
+      "score": 0.3333333333333333,
+      "response_time_ms": 15328,
+      "error": null
+    },
+    {
+      "id": "PARK-001",
+      "category": "Parks & Recreation",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "What parks and recreation areas does Needham have?",
+      "response": "Needham has a network of parks, athletic fields, trails, and playgrounds managed by the Park and Recreation Department.\n\n- Parks and open spaces across town\n- Athletic fields for team sports\n- Trails and outdoor recreation areas\n- Playgrounds for families\n- Camps, pools, and programs offered seasonally\n\nFor the full list and current offerings, you can check the Park and Recreation pages on the town site (Trails, Field & Special Event Permitting, Camps/Pools/Programs). If you want specifics right away, call Park and Recreation at 781-455-7930 or email parkandrecreation@needhamma.gov. Give Park and Recreation a call at 781-455-7930 to confirm the details for your specific plans. Are you looking for a particular type of park or location (neighborhood park, field, or trail)?",
+      "facts": [
+        {
+          "fact": "over 300 acres of parkland",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "DeFazio Park at 380 Dedham Avenue (baseball diamonds, fields, track, playground, Carleton Pavilion)",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Riverside Park (toddler playground, open grassy areas)",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Perry Park",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "multiple school-based athletic facilities including Avery Field, Memorial Park, Mills Field",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 4,
+      "total_facts": 5,
+      "score": 0.8,
+      "response_time_ms": 20811,
+      "error": null
+    },
+    {
+      "id": "PARK-002",
+      "category": "Parks & Recreation",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "Do you have a swimming pool or beach?",
+      "response": "Yes—Needham has public/semi-public swimming pools, overseen by the Environmental Health team.\n\nIf you’re after locations, hours, or any pool-related requirements, check the Environmental Health pages on needhamma.gov or contact that department for specifics. Are you asking about a specific pool or just general info?",
+      "facts": [
+        {
+          "fact": "Rosemary Recreation Complex at 178 Rosemary Street",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "two outdoor pools: Recreation Pool (family/children) and Fitness Pool (25-meter, 8-lane lap pool)",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "open Memorial Day through Labor Day (summer seasonal)",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "season passes available (family and individual options)",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "no public beach",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "phone: 781-455-7930",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 1,
+      "total_facts": 6,
+      "score": 0.16666666666666666,
+      "response_time_ms": 16959,
+      "error": null
+    },
+    {
+      "id": "PARK-003",
+      "category": "Parks & Recreation",
+      "difficulty": "Medium",
+      "verification_status": "verified",
+      "question": "What recreational programs and classes are offered?",
+      "response": "Needham offers a broad range of recreational programs across several town departments, with easy online registration.\n\n- Center at The Heights (Council on Aging)  \n  - What’s offered: cards, crafts, and many other activities for seniors.  \n  - How to register: online via the Center’s portal at myactivecenter; or call 781-455-7555 (8:30 am–4:00 pm) for help.\n\n- Park & Recreation programs  \n  - What’s offered: youth and adult recreation programs (details vary season to season).  \n  - How to register: online at needhamprograms.myrec.com (instructions are on the Park & Recreation pages).\n\n- Council on Aging programs  \n  - What’s offered: recreational, educational, wellness classes, special events and trips.  \n  - How to view/register: check the Compass Newsletter for monthly offerings, or call the Center at 781-455-7555.\n\n- Summer camps and programs  \n  - What’s offered: camps and related programs; refer to the Summer Camp Guide for specifics.  \n  - How to access: see the Summer Brochure for details; registration typically goes through the same online avenues.\n\n- North Central & MetroWest Local Public Health Training Hub  \n  - What’s coming: recreational camps, swimming pools, and more (coming soon).\n\nWould you like me to pull up the latest registration links or the Compass newsletter for you?",
+      "facts": [
+        {
+          "fact": "swim lessons for all ages",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "competitive swim teams (ages 5+)",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Special Olympics Swim Team (ages 6+)",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "adaptive aquatics programs",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "youth and adult programs year-round",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "summer camps",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "register online at needhamprograms.myrec.com",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 3,
+      "total_facts": 7,
+      "score": 0.42857142857142855,
+      "response_time_ms": 32187,
+      "error": null
+    },
+    {
+      "id": "HEALTH-001",
+      "category": "Health Department / Food Permits",
+      "difficulty": "Hard",
+      "verification_status": "verified",
+      "question": "What do I need to do to start a food truck or catering business?",
+      "response": "You’ll need to follow Needham’s food-safety rules and start with the Public Health Office’s guidance for mobile food operations. The town’s Food Code Enforcement Policy (part of the Food Safety Excellence Program) outlines how food businesses are expected to operate, and it’s the key starting point.\n\nSteps to start a food truck or catering business:\n1) Review the Food Code Enforcement Policy (PDF) and related materials on the Public Health pages.\n2) Look at the Food Safety Excellence Program information to understand best practices and expectations for mobile units.\n3) Check the Public Health Inspection Reports for any relevant guidance or recent findings that could affect your operation.\n4) Contact the Needham Public Health Office to discuss permits, inspections, and any specific requirements for a mobile food operation, then schedule any required inspections and maintain ongoing compliance.\n\nI’m not sure about that one. Your best bet is to call the Needham Health Department at the town’s main line — they’ll know right away. Give them a call to confirm the exact steps and requirements for your situation.",
+      "facts": [
+        {
+          "fact": "apply for Mobile Food Vendor Permit from Board of Health",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "required: MA Driver's License, ServSafe Food Training certificate, Food Allergy Training certificate",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "required: valid MA Hawker and Peddler License",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "required: Commissary Permit and proposed menu",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Board of Health coordinates approval with Fire Department",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "if on public way/property, also need permit from Select Board",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 0,
+      "total_facts": 6,
+      "score": 0,
+      "response_time_ms": 30578,
+      "error": null
+    },
+    {
+      "id": "HEALTH-002",
+      "category": "Health Department / Food Permits",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "How often are food establishments inspected?",
+      "response": "They’re inspected at least twice a year, with more frequent inspections if the risk level or prior violations require closer monitoring.\n\nIf you’d like to review specific reports, copies from Sept 1, 2024 onward are posted online, and you can request the original full report by contacting the Health Division. If you have questions about the reports, you can email HealthDivision@needhamma.gov or call 781-455-7940.\n\nWould you like me to look up the inspection results for a particular restaurant?",
+      "facts": [
+        {
+          "fact": "risk-based inspection schedule",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Category 1: inspected annually with 6-month check-in",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Category 2: every 6 months (retail food, quick service, schools)",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Category 3: every 4 months (full-service restaurants)",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Category 4: every 3 months",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 0,
+      "total_facts": 5,
+      "score": 0,
+      "response_time_ms": 13251,
+      "error": null
+    },
+    {
+      "id": "HEALTH-003",
+      "category": "Health Department / Food Permits",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "Where do I get a food service establishment license?",
+      "response": "The Needham Health Division (Public Health) handles licensing for food service establishments.\n\nTo start, call 781-455-7940 to confirm the licensing requirements and where to submit your application. You can also email HealthDivision@needhamma.gov with any questions. Steps you’ll likely follow: \n1) Confirm the exact license type and required forms with the Health Division. \n2) Submit the application as theyDirect you. \n3) Complete any follow-up items they outline.\n\nAll information here is for reference only. Would you like me to pull the Health Division’s current contact details and draft a quick inquiry for you?",
+      "facts": [
+        {
+          "fact": "Board of Health at 178 Rosemary Street, Needham, MA 02494",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "phone: 781-455-7940",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "hours: Monday, Wednesday, Thursday 8:00 AM - 5:00 PM",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "submit Food Establishment Permit & Plan Review application",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 2,
+      "total_facts": 4,
+      "score": 0.5,
+      "response_time_ms": 14413,
+      "error": null
+    },
+    {
+      "id": "HEALTH-004",
+      "category": "Health Department / Food Permits",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "How do I register with the health department?",
+      "response": "It depends on what you mean by “register”—the Medical Reserve Corps, or signing up for health department programs in general. Here are the two main paths:\n\n- Medical Reserve Corps (MRC) registration\n  - Email healthdepartment@needhamma.gov with questions or to start the registration process.\n  - They’ll guide you through the steps and any forms you need.\n\n- General health department inquiries or program sign-ups\n  - Use the Public Health page and click “Contact Health Division and Board of Health” to submit a question or comment.\n  - You can also email Health Division at HealthDivision@needhamma.gov for general inquiries or information about environmental health permits and inspections.\n\nWhat exactly are you hoping to register for—Medical Reserve Corps or a general health department program?",
+      "facts": [
+        {
+          "fact": "contact the Board of Health / Public Health Division",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "address: 178 Rosemary Street, Needham, MA 02494",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "phone: 781-455-7940",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "hours: Monday, Wednesday, Thursday 8:00 AM - 5:00 PM",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 0,
+      "total_facts": 4,
+      "score": 0,
+      "response_time_ms": 20102,
+      "error": null
+    },
+    {
+      "id": "ZON-001",
+      "category": "Zoning & Dimensional Regulations",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "Can I build a deck in my backyard? What's the setback distance?",
+      "response": "Yes—most decks are allowed in Needham, but the exact setback distance depends on your lot’s zoning and you’ll need a building permit.\n\nWhat you need to know and do\n- Setback distance: It varies by zoning district and lot, so you’ll need to check your property’s zoning district and review the Zoning By-Law for the exact setback for a deck on your lot. The permit review will use your plot plan to verify setbacks.\n- Permit requirement: A building permit is required for construction of a deck (and for any change of use or structural work).\n- Deck plan requirements: Your deck plans must include the details outlined in the Information for Deck Plans.\n- How to apply:\n  1) Confirm permit needs with the Conservation Department during business hours at 781-455-7550, ext. 248.\n  2) Prepare your deck plans with the required information.\n  3) Submit the Building Permit application online via Open/Gov.\n  4) Attach a plot plan and any other required documents; you can look up related forms on the Building page.\n  5) Pay the permit fees online or by other accepted methods.\n- Getting exact setback info for your property: Give the Building Department a call to confirm the exact setback for your address and any site-specific requirements.\n\nIf you’d like, tell me your street address and I’ll help you identify the likely zoning district and next steps. Would you like to proceed with that?",
+      "facts": [
+        {
+          "fact": "building permit required for decks",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "setback distance depends on zoning district",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "rear yard setback: 25 feet (SRA), 20 feet (SRB/GR)",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "side yard setback: 15 feet (SRA), 14 feet (SRB/GR)",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Building Inspector: Dan Walsh",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "homeowners can pull permits for own single/two-family dwellings",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 3,
+      "total_facts": 6,
+      "score": 0.5,
+      "response_time_ms": 35669,
+      "error": null
+    },
+    {
+      "id": "ZON-002",
+      "category": "Zoning & Dimensional Regulations",
+      "difficulty": "Medium",
+      "verification_status": "verified",
+      "question": "What's my lot size minimum and maximum height for structures?",
+      "response": "The exact lot size minimum and building height depend on your zoning district (Needham uses SRB and GR for residential areas), and the Zoning By-Law has the precise numbers.\n\nSteps to find your exact figures:\n1) Identify your zoning district for the property (e.g., SRB or GR).  \n2) Look up the dimensional requirements in the Zoning By-Law for that district—focus on the minimum lot size and the height limits.  \n3) Check for any overlays or special rules that could apply to your property (e.g., MBTA-related provisions).  \n4) If you want confirmation for your specific lot, contact the Planning Department.\n\nWould you like me to help locate the exact by-law section for your district if you share your address or zoning district? If you’re unsure, I can point you to the right resources to verify this.",
+      "facts": [
+        {
+          "fact": "maximum building height in residential zones: 32 feet",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "minimum lot size varies by zoning district",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "specific lot area requirements in Section 4.2.1 Table of Regulations",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "different standards for lots created before vs. after January 9, 1986",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 1,
+      "total_facts": 4,
+      "score": 0.25,
+      "response_time_ms": 32000,
+      "error": null
+    },
+    {
+      "id": "ZON-003",
+      "category": "Zoning & Dimensional Regulations",
+      "difficulty": "Easy",
+      "verification_status": "partially_verified",
+      "question": "What zoning district is 42 Great Plain Road in?",
+      "response": "I don’t have the zoning district for 42 Great Plain Road in my records.\n\nYour best bet is to call Planning & Community Development at 781-455-7550 to confirm the exact zoning for that address, since they handle zoning determinations and by-law questions.\n\nPlanning & Community Development hours:\n- Monday: 8:00 am – 5:00 pm\n- Tuesday: 8:00 am – 6:00 pm\n- Wednesday: 8:00 am – 5:00 pm\n- Thursday: 8:00 am – 5:00 pm\n- Friday: 8:00 am – 12:30 pm\n\nGive Planning & Community Development a call to confirm the details for your specific situation. Would you like me to draft a quick note you can copy-paste to their office?",
+      "facts": [
+        {
+          "fact": "specific property zoning lookups require the town Zoning Map",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "contact Planning Department or check GIS/zoning map on town website",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Needham has multiple residential districts: SRA, SRB, GR and others",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 1,
+      "total_facts": 3,
+      "score": 0.3333333333333333,
+      "response_time_ms": 22927,
+      "error": null
+    },
+    {
+      "id": "ZON-004",
+      "category": "Zoning & Dimensional Regulations",
+      "difficulty": "Medium",
+      "verification_status": "verified",
+      "question": "I want to build an addition. How close to the property line can I get?",
+      "response": "I'm not sure about that one. Your best bet is to call Town Hall at (781) 455-7500 — they'll know right away or can point you to the right department.\n\nYou can also try asking me about permits, zoning, the Transfer Station, schools, taxes, or other town services.",
+      "facts": [
+        {
+          "fact": "setbacks vary by zoning district",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Single Residence A: front 30ft, side 15ft, rear 25ft",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Single Residence B: front 20ft, side 14ft (12ft for lots under 80ft frontage), rear 20ft",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "General Residence: front 20ft, side 14ft (12ft for lots under 80ft frontage), rear 20ft",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "SRB limits: max 32 linear feet of structure at minimum side setback",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 0,
+      "total_facts": 5,
+      "score": 0,
+      "response_time_ms": 433,
+      "error": null
+    },
+    {
+      "id": "ZON-005",
+      "category": "Zoning & Dimensional Regulations",
+      "difficulty": "Medium",
+      "verification_status": "partially_verified",
+      "question": "Can I operate a home-based consulting business from my house?",
+      "response": "I'm not sure about that one. Your best bet is to call Town Hall at (781) 455-7500 — they'll know right away or can point you to the right department.\n\nYou can also try asking me about permits, zoning, the Transfer Station, schools, taxes, or other town services.",
+      "facts": [
+        {
+          "fact": "home occupations are addressed in the Zoning By-Law",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "consult Article 2 of the Zoning By-Law for specific rules",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "contact Planning Department at 781-455-7500 for details",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 1,
+      "total_facts": 3,
+      "score": 0.3333333333333333,
+      "response_time_ms": 386,
+      "error": null
+    },
+    {
+      "id": "ZON-006",
+      "category": "Zoning & Dimensional Regulations",
+      "difficulty": "Easy",
+      "verification_status": "partially_verified",
+      "question": "What uses are allowed in the Business district?",
+      "response": "I don’t have the Business district uses listed in the documents you provided.\n\nThat info is typically in Needham’s zoning bylaw or Planning Department materials. I’m not sure about that one. Your best bet is to call the Planning Department at Needham Town Hall — they’ll know right away. Would you like me to point you to the Planning Department page or help you figure out if you’re looking at residential vs commercial uses?",
+      "facts": [
+        {
+          "fact": "Needham has multiple business districts: B, CSB, CB, ASB, HAB, NB, HC-128, ES",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "permitted uses are in the Use Tables of the Zoning By-Law",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "consult the Zoning By-Law for specific permitted, conditional, and prohibited uses",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 0,
+      "total_facts": 3,
+      "score": 0,
+      "response_time_ms": 16012,
+      "error": null
+    },
+    {
+      "id": "ZON-007",
+      "category": "Zoning & Dimensional Regulations",
+      "difficulty": "Easy",
+      "verification_status": "partially_verified",
+      "question": "I want to put up a fence. Are there height restrictions?",
+      "response": "I'm not sure about that one. Your best bet is to call Town Hall at (781) 455-7500 — they'll know right away or can point you to the right department.\n\nYou can also try asking me about permits, zoning, the Transfer Station, schools, taxes, or other town services.",
+      "facts": [
+        {
+          "fact": "Needham has fence regulations in the Zoning By-Law",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "fences must be entirely on the property owner's property",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "violations result in a Letter of Violation",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "check the Fences page on needhamma.gov or contact Building Department",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 0,
+      "total_facts": 4,
+      "score": 0,
+      "response_time_ms": 598,
+      "error": null
+    },
+    {
+      "id": "ZON-008",
+      "category": "Zoning & Dimensional Regulations",
+      "difficulty": "Medium",
+      "verification_status": "verified",
+      "question": "Can I have a swimming pool? What about a hot tub?",
+      "response": "The documents I have don’t include pool or hot tub permit specifics. There’s a note about Recreational Pools coming soon to local health resources.\n\nI’m not sure about the exact rules. Your best bet is to call the Needham Health Department at the town’s main number; they handle permits, inspections, and safety requirements for pools and hot tubs. Give them a call to confirm the details for your situation. Are you asking about a residential pool on your property or a hot tub installation somewhere else?",
+      "facts": [
+        {
+          "fact": "swimming pools require a building permit",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "boundary line plot plan by MA Registered Land Surveyor required",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "barrier and door alarms must be installed before pool can retain water",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "pools under 11ft height and under 100 sq ft: minimum 8 feet from pool edge to structures",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "must comply with MA State Sanitary Code (105 CMR 435.00)",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "5 copies of plot plan required with application",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 0,
+      "total_facts": 6,
+      "score": 0,
+      "response_time_ms": 20772,
+      "error": null
+    },
+    {
+      "id": "ZON-009",
+      "category": "Zoning & Dimensional Regulations",
+      "difficulty": "Hard",
+      "verification_status": "verified",
+      "question": "What about building a small guest house or ADU on my property?",
+      "response": "Yes, you can potentially add a small guest house or ADU, but it has to fit Needham’s zoning and building rules for your property.\n\nHere’s how to move forward:\n1) Identify your zoning district (SRB, GR, etc.) and review the Zoning By-Law for ADU allowances, size limits, setbacks, height, and parking requirements.\n2) Check any MBTA Communities guidelines that might apply to your area and intended use.\n3) Schedule a pre-submittal meeting with the Planning Department and/or Building Department to confirm eligibility and required plans.\n4) Prepare and submit a permit package (site plan, floor plans, elevations, etc.) for zoning and building review; be prepared for possible conditions.\n5) If the project triggers a special permit or variance, follow the appropriate process with the ZBA or Planning Board.\n6) Complete required inspections and obtain a Certificate of Occupancy.\n\nIf you’d like, I can help you locate the exact by-law sections or housing plan guidance relevant to your property. What street is your lot on, and do you know your zoning district?",
+      "facts": [
+        {
+          "fact": "ADUs are allowed in Needham as of state law effective August 7, 2024",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "maximum size: 900 square feet",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "one ADU allowed per single-family home",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "detached ADUs: minimum 5 feet from side and rear lot lines",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "if ADU exceeds 15 feet in height, must comply with underlying district setbacks",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "minimum 10 feet between ADU and any other structure on lot",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "can be rented with minimum 6-month lease",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "cannot be used as short-term rental",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "no owner-occupancy requirement (per state law)",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 0,
+      "total_facts": 9,
+      "score": 0,
+      "response_time_ms": 23800,
+      "error": null
+    },
+    {
+      "id": "ZON-010",
+      "category": "Zoning & Dimensional Regulations",
+      "difficulty": "Hard",
+      "verification_status": "verified",
+      "question": "Can they build a commercial building near residential areas?",
+      "response": "Zoning rules about placing a commercial building near residential areas aren’t covered in the documents I have. For this, you’ll want to check with Needham’s Planning Department and the Zoning Board of Appeals, since they handle site plans, setbacks, and any special permits.\n\nThe Planning Department is the right next stop for questions like whether a project can move forward, what variances or conditions might apply, and what approvals are needed. Would you like me to pull up the Planning Department page or help you find the right contact for their office?",
+      "facts": [
+        {
+          "fact": "Needham's zoning separates residential and commercial uses into distinct districts",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "residential districts: RRC, SRA, SRB, GR, A-1, A-2, A-3, AHD",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "commercial districts: B, CSB, CB, ASB, HAB, NB, HC-128, ES",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "some uses may require special permits",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Planning Board and Zoning Board hear proposals",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 5,
+      "total_facts": 5,
+      "score": 1,
+      "response_time_ms": 15446,
+      "error": null
+    },
+    {
+      "id": "ZON-011",
+      "category": "Zoning & Dimensional Regulations",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "What's the floor area ratio (FAR) for downtown properties?",
+      "response": "I'm not sure about that one. Your best bet is to call Town Hall at (781) 455-7500 — they'll know right away or can point you to the right department.\n\nYou can also try asking me about permits, zoning, the Transfer Station, schools, taxes, or other town services.",
+      "facts": [
+        {
+          "fact": "Center Business District: 1.00 FAR maximum",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Chestnut Street Business District: 0.70 FAR maximum",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "residential districts: 0.38 FAR for lots under 12,000 sq ft, 0.36 for lots 12,000+ sq ft",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "FAR = floor area divided by lot area",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 0,
+      "total_facts": 4,
+      "score": 0,
+      "response_time_ms": 471,
+      "error": null
+    },
+    {
+      "id": "PERMIT-001",
+      "category": "Building Permits & Process",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "Do I need a permit to build a deck?",
+      "response": "Yes—decks usually require a building permit in Needham.\n\nHow to proceed:\n- 1) Confirm permit requirement: If you’re not sure, contact the Conservation Department at 781-455-7550, ext. 248, to confirm whether a permit is needed for your project.\n- 2) Prepare your deck plans: Include all details required in the Information for Deck Plans when you submit your plans.\n- 3) Submit the permit online: Building permits are filed online through Open/Gov. You can look up an address and track activity as you go.\n- 4) Payment: Fees can be paid by check, e‑check, credit card, or cash.\n\nGive the department a call to confirm details for your specific situation, and I can help you with the exact steps or the checklist if you’d like. Would you like me to pull up the deck-plans checklist for you or help you start the online application?",
+      "facts": [
+        {
+          "fact": "yes, a building permit is required for decks",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "homeowners can pull permits for their own single/two-family dwellings",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Building Department at 500 Dedham Avenue",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Building Inspector: Dan Walsh",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "typical timeline: 2-4 weeks for larger projects",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 0,
+      "total_facts": 5,
+      "score": 0,
+      "response_time_ms": 18560,
+      "error": null
+    },
+    {
+      "id": "PERMIT-002",
+      "category": "Building Permits & Process",
+      "difficulty": "Easy",
+      "verification_status": "partially_verified",
+      "question": "How much does a building permit cost?",
+      "response": "Building permit costs vary by project, so there isn’t a single price you can rely on.\n\nHere’s how to get the exact fee for your project:\n1) Start your permit application online through ViewPoint Cloud at needhamma.viewpointcloud.com. The portal will calculate and display the permit fee as you attach documents.\n2) When you’re ready to pay, the Building Department accepts checks, e-checks, credit cards, or cash.\n3) If you’d like help or want to confirm the exact fee for your specifics, give the Building Department a call at 781-455-7550, Ext. 1.\n\nOffice hours to keep in mind:\n- Monday, Wednesday, Thursday: 7:30 am – 5:00 pm\n- Tuesday: 7:30 am – 6:00 pm\n- Friday: 7:30 am – 12:30 pm\n\nAll information is for reference only. What kind of project are you planning (e.g., a deck, kitchen remodel, or addition) so I can tailor the next steps?",
+      "facts": [
+        {
+          "fact": "contact the Building Department for current fee schedule",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Building Department: 500 Dedham Avenue, phone 781-455-7550",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 1,
+      "total_facts": 2,
+      "score": 0.5,
+      "response_time_ms": 31353,
+      "error": null
+    },
+    {
+      "id": "PERMIT-003",
+      "category": "Building Permits & Process",
+      "difficulty": "Medium",
+      "verification_status": "verified",
+      "question": "What's the process for getting a building permit? How long does it take?",
+      "response": "The quick path: you apply online, and if your materials are complete, a building permit is usually issued within about a week.\n\nSteps\n1) Confirm you need a permit with a Building Department inspector.\n2) Gather required documents (permit application, plot plan, and attachments). Our Plot Plan Form is available for download.\n3) Submit online through ViewPoint Cloud/Open Gov (no paper permits accepted); you can look up an address to see activity.\n4) Pay the permit fees online (credit card or e-check; other options may be available).\n5) If your project involves demolition, Health Department approvals for asbestos/rodent removal may apply and can add time.\n6) After the review is complete and there are no issues, the permit is issued (typical turnaround ~1 week if everything is in order).\n7) Schedule and complete inspections after the permit is active; inspections are performed daily—schedule at least 3+ days in advance by calling 781-455-7550, Ext. 1.\n\nHours (Building Department)\n- Monday, Wednesday, Thursday: 7:30 am–5:00 pm\n- Tuesday: 7:30 am–6:00 pm\n- Friday: 7:30 am–12:30 pm\n\nGive the Building Department a call at 781-455-7550 to confirm the details for your specific situation. Would you like me to check the permit requirements for your exact project type (residential vs. commercial)?",
+      "facts": [
+        {
+          "fact": "submit application to the Building Department",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Building Department at 500 Dedham Avenue",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "timeline: 2-4 weeks for larger projects, less for smaller",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "inspections required during and after construction",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 1,
+      "total_facts": 4,
+      "score": 0.25,
+      "response_time_ms": 50524,
+      "error": null
+    },
+    {
+      "id": "PERMIT-004",
+      "category": "Building Permits & Process",
+      "difficulty": "Medium",
+      "verification_status": "partially_verified",
+      "question": "Do I need to hire an architect or engineer for my deck permit?",
+      "response": "A deck generally needs a Building Permit. The town’s deck information doesn’t specifically require an architect or engineer, so your best bet is to check with the Building Department to confirm.\n\nGive the Building Department a call at 781-455-7550 to confirm the details for your specific situation.\n\nHere are the typical steps to move forward:\n1) Confirm permit requirements and whether a design professional is needed (talk to a building inspector).\n2) Prepare deck plans with the required details (as outlined in the Information for Deck Plans).\n3) Apply online for the permit via the Open/Gov portal and upload your plans.\n4) Schedule any required inspections (some projects note scheduling 24–48 hours ahead).\n5) Address any conditions or corrections noted by the department.\n\nAre you planning an attached deck or a freestanding deck?",
+      "facts": [
+        {
+          "fact": "homeowners can get permits for their own single-family or two-family dwellings",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "professional plans may be required for complex projects",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "contact Building Department for project-specific requirements",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 3,
+      "total_facts": 3,
+      "score": 1,
+      "response_time_ms": 28074,
+      "error": null
+    },
+    {
+      "id": "PERMIT-005",
+      "category": "Building Permits & Process",
+      "difficulty": "Medium",
+      "verification_status": "partially_verified",
+      "question": "What if my project isn't done yet? Can I get an extension on my permit?",
+      "response": "I’m not sure about that one. The town’s permit information doesn’t spell out a formal permit extension option.\n\nHere’s how to check:\n1) Find your permit number and current status.\n2) Call the Building Department during posted hours to ask if extensions are allowed and what the steps are.\n3) If an extension is possible, get the new expiration date in writing; if not, ask about alternatives (like re-applying or closing the permit when appropriate).\n\nGive the Building Department a call to confirm the policy for your situation. Is your project residential or commercial?",
+      "facts": [
+        {
+          "fact": "contact the Building Department for permit extension policies",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Building Department: 500 Dedham Avenue, phone 781-455-7550",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 1,
+      "total_facts": 2,
+      "score": 0.5,
+      "response_time_ms": 24192,
+      "error": null
+    },
+    {
+      "id": "PERMIT-006",
+      "category": "Building Permits & Process",
+      "difficulty": "Hard",
+      "verification_status": "partially_verified",
+      "question": "What permits do I need to open a retail store on Main Street?",
+      "response": "You’ll need a Building Permit for changing the space to retail, and you must make sure the use is allowed by Needham’s zoning for Main Street.\n\nHere’s how to get started:\n1) Confirm zoning and use: Make sure the storefront is zoned for retail use and that your planned use complies with local zoning bylaws. The Building Department enforces these rules.\n2) Apply for a Building Permit online: All permit applications are now online. Use ViewPoint Cloud (needhamma.viewpointcloud.com) to apply and use the town’s Open/Gov portal (needhamma.portal.opengov.com/search) to look up the address and permit history.\n3) Submit plans and pay: Upload the required plans/attachments and pay the permit in full.\n4) Schedule inspections: Inspections are conducted daily; schedule at least 3+ days in advance by calling 781-455-7550, Ext. 1. Do not leave a voicemail to schedule.\n5) If you’ll work in the public way: If the project involves street or sidewalk work or occupying the public way, you’ll need a Street & Sidewalk Opening/Occupying/Obstructing Permit.\n\nGive the Building Department a call at 781-455-7550, Ext. 1, to confirm the details for your specific situation. Would you like me to look up the current zoning for that Main Street storefront?",
+      "facts": [
+        {
+          "fact": "building/occupancy permit from Building Department",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "food service permit from Board of Health if applicable",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "sign permits may be required",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "check zoning use tables for the specific business district",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "multiple departments may be involved",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 4,
+      "total_facts": 5,
+      "score": 0.8,
+      "response_time_ms": 38678,
+      "error": null
+    },
+    {
+      "id": "PERMIT-007",
+      "category": "Building Permits & Process",
+      "difficulty": "Medium",
+      "verification_status": "partially_verified",
+      "question": "Do I need a separate electrical permit for my deck addition?",
+      "response": "Yes. A deck addition requires a Building Permit, and if you’re doing electrical work on the deck you’ll likely need a separate electrical permit as well.\n\nHow to move forward:\n- Confirm with an Inspector whether your deck project, and any electrical work, needs permits.\n- Apply online: all permit applications are submitted through Open/Gov. You can apply and look up your address here: https://needhamma.viewpointcloud.com.\n- For electrical specifics, the Building Department can confirm if an electrical permit is needed and what forms you’ll need.\n\nWould you like me to pull up the online portal for your address or help you outline the electrical work you’re planning so the inspector can advise?",
+      "facts": [
+        {
+          "fact": "electrical permits are separate from building permits",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "required if adding outlets, lighting, or new circuits",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "contact Building Department for specifics",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 3,
+      "total_facts": 3,
+      "score": 1,
+      "response_time_ms": 41570,
+      "error": null
+    },
+    {
+      "id": "PERMIT-008",
+      "category": "Building Permits & Process",
+      "difficulty": "Easy",
+      "verification_status": "partially_verified",
+      "question": "What happens if I start work without getting a permit?",
+      "response": "Starting work without a permit is illegal in Needham. It also means the work won’t be reviewed for code compliance or safety.\n\nIf you’ve already started, stop and contact the Building Department to discuss getting the proper permit and any steps you need to take to bring things into compliance. Open or outstanding permits can cause problems later, including delays or issues with future permits.\n\nFor specifics about your situation, give the Building Department a call to confirm the details. Would you like me to pull up their current contact information for you?",
+      "facts": [
+        {
+          "fact": "Building Division enforces state building codes and local zoning by-laws",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "violations may result in stop work orders",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "may need to bring work into compliance retroactively",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "contact Building Department: 500 Dedham Avenue, 781-455-7550",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 4,
+      "total_facts": 4,
+      "score": 1,
+      "response_time_ms": 30811,
+      "error": null
+    },
+    {
+      "id": "WRONGASSUMP-002",
+      "category": "Wrong Assumptions",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "I don't need a permit for a small deck, right?",
+      "response": "In general, you do need a building permit to install a deck in Needham, even for a small one.\n\nIf you’re unsure, here are the steps:\n1) Call the Conservation Department to confirm whether your specific deck project requires a permit: 781-455-7550, ext. 248.\n2) If a permit is required, apply online for Building Permits at needhamma.viewpointcloud.com (paper permits aren’t accepted).\n3) Include the required drawings and a plot/deck plan as part of your submission.\n4) Pay the permit fee and schedule any required inspections (payment options include check, e-check, credit card, or cash).\n\nGive the Conservation Department a call at 781-455-7550, ext. 248 to confirm the details for your situation. Are you planning an attached deck or a freestanding one?",
+      "facts": [
+        {
+          "fact": "all decks require a building permit in Needham",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "even small decks need approval from the Building Department",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "homeowners can pull permits for their own single/two-family dwellings",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Building Department: 500 Dedham Avenue",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 1,
+      "total_facts": 4,
+      "score": 0.25,
+      "response_time_ms": 21414,
+      "error": null
+    },
+    {
+      "id": "VAGUE-001",
+      "category": "Vague Questions",
+      "difficulty": "Hard",
+      "verification_status": "verified",
+      "question": "I want to do something to my house but I'm not sure what yet. What do I need to know?",
+      "response": "I'm not sure about that one. Your best bet is to call Town Hall at (781) 455-7500 — they'll know right away or can point you to the right department.\n\nYou can also try asking me about permits, zoning, the Transfer Station, schools, taxes, or other town services.",
+      "facts": [
+        {
+          "fact": "most exterior and structural work requires a building permit",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "setbacks and height limits depend on your zoning district",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Building Department at 500 Dedham Avenue can help scope requirements",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Building Inspector Dan Walsh can advise on permit needs",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 0,
+      "total_facts": 4,
+      "score": 0,
+      "response_time_ms": 481,
+      "error": null
+    },
+    {
+      "id": "VAGUE-002",
+      "category": "Vague Questions",
+      "difficulty": "Hard",
+      "verification_status": "verified",
+      "question": "What permits do I need to start a business in Needham?",
+      "response": "Generally, you’ll need a Building Permit if your business project involves construction, reconstruction, alteration, or a change of use. The town’s permit applications are now handled online.\n\nSteps to get started:\n1) Confirm permit needs: A Building Permit is required for construction, reconstruction, alteration, repair, removal or demolition of a structure, or for any change of use.\n2) Apply online: All Building Permit Applications are submitted through Open/Gov (ViewPoint Cloud) at needhamma.viewpointcloud.com.\n3) Plan for inspections (if required): Inspections are performed daily; schedule 3+ days in advance by calling the Building Department at 781-455-7550, Ext. 1.\n4) If you need to amend an active permit, submit a new Permit Application through the same online portal.\n\nGive the Building Department a call at 781-455-7550 to confirm the details for your specific situation. Is your plan to lease a space or to construct/remodel a building?",
+      "facts": [
+        {
+          "fact": "depends on type of business",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "may need building/occupancy permits, health permits, sign permits",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "food businesses need Board of Health permits (178 Rosemary St, 781-455-7940)",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "building permits from Building Department (500 Dedham Ave, 781-455-7550)",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "check zoning by-law for permitted uses in your location's district",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Business Certificates filed at Town Clerk's office",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 3,
+      "total_facts": 6,
+      "score": 0.5,
+      "response_time_ms": 21560,
+      "error": null
+    },
+    {
+      "id": "MULTIPART-001",
+      "category": "Multi-Part Questions",
+      "difficulty": "Hard",
+      "verification_status": "verified",
+      "question": "What's my zoning district and what permits will I need to add a second story to my house?",
+      "response": "I can’t tell your zoning district without the exact address. Please share your property address so I can look up the district for you. For adding a second story, here’s what you’ll typically need and who to call.\n\nWhat to do and who to call\n- Zoning district\n  - Planning & Community Development: 781-455-7550\n  - They handle zoning districts and any planning approvals you may need\n  - Hours: Mon 8:00–5:00, Tue 8:00–6:00, Wed 8:00–5:00, Thu 8:00–5:00, Fri 8:00–12:30\n- Permits to add a second story\n  - Building permits: Apply online (no paper permits accepted) via ViewPoint Cloud\n  - If you’re unsure whether a permit is needed, always speak with a Building Inspector to confirm\n  - Scheduling inspections: after permit is paid in full, schedule inspections by contacting the Building Department at 781-455-7550, Ext. 1; inspections are performed daily and should be scheduled 3+ days in advance\n  - If the project impacts setbacks or height, you may also need Zoning Board/Planning approvals\n  - Department to call for permits: Building Department (for the permit process) and Planning (for zoning/approval questions)\n  - Hours/notes: Building permits are online; the Building Department typically closes around 4:30 p.m. on weekdays\n\nOne quick thing: once you share your address, I’ll look up the exact zoning district and can give you a precise list of any local approvals you’ll need. Give Planning & Community Development a call at 781-455-7550 to confirm the zoning details for your specific property. Do you want to share your address so I can pull the exact zoning district for you? All information here is for reference only.",
+      "facts": [
+        {
+          "fact": "zoning district depends on property address — check town Zoning Map",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "maximum building height: 32 feet in residential zones",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "building permit required from Building Department",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "setbacks depend on district (SRA: front 30ft, side 15ft, rear 25ft; SRB/GR: front 20ft, side 14ft, rear 20ft)",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "may need structural engineering review for second story",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 1,
+      "total_facts": 5,
+      "score": 0.2,
+      "response_time_ms": 29107,
+      "error": null
+    },
+    {
+      "id": "MULTIPART-002",
+      "category": "Multi-Part Questions",
+      "difficulty": "Hard",
+      "verification_status": "partially_verified",
+      "question": "What's the zoning, what schools does this property feed into, and what's the assessed value?",
+      "response": "I can help with that, but I need the property's street address to pull the exact details. \n\nOnce you share the address, I’ll pull:\n- The zoning district from the Zoning By-Law\n- Which Needham Public Schools feeder this property feeds into\n- The current assessed value from the Assessor’s records\n\nWhat’s the property's address?",
+      "facts": [
+        {
+          "fact": "zoning: requires property address lookup on Zoning Map",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "schools: elementary assignment depends on address; all students go to High Rock (6), Pollard (7-8), Needham High (9-12)",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "assessed value: requires Assessor's database lookup",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "residential tax rate: $10.83 per $1,000 (FY2026)",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 3,
+      "total_facts": 4,
+      "score": 0.75,
+      "response_time_ms": 23348,
+      "error": null
+    },
+    {
+      "id": "CONTEXT-001",
+      "category": "Context-Dependent Follow-up",
+      "difficulty": "Medium",
+      "verification_status": "partially_verified",
+      "question": "I'm building a deck. [System provides info]. Now, do I need electrical permits?",
+      "response": "Yes. For a deck, you’ll typically need a Building Permit, and if you plan any electrical work on the deck (lighting, outlets), you’ll likely need an electrical permit as well.\n\nHow to get started:\n1) Confirm permit needs: Building permits are usually required for deck construction; electrical work is governed by the State Building Code, so an electrical permit may be needed if you’re wiring the deck.\n2) Apply online: All permit applications are submitted online through Open/Gov (ViewPoint Cloud) at needhamma.viewpointcloud.com.\n3) Attach plans: Upload plans and any required attachments with your application.\n4) Pay the fee: You can pay by check, e-check, credit card, or cash.\n5) Amend if needed: If you already have a permit and need changes, submit a new permit application.\n6) Schedule inspections: After payment, schedule inspections at least 3+ days ahead by calling 781-455-7550, Ext. 1; inspections are posted on the town site, and you’ll need the permit number and address.\n\nGive the Building Department a call at 781-455-7550 to confirm the details for your specific situation, especially about electrical work. Are you planning any deck lighting or outlets that would require wiring?",
+      "facts": [
+        {
+          "fact": "electrical permits are separate from building permits",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "needed if adding outlets, lighting, or new electrical circuits to the deck",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "not needed if no electrical work is included",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 3,
+      "total_facts": 3,
+      "score": 1,
+      "response_time_ms": 32114,
+      "error": null
+    },
+    {
+      "id": "CONTEXT-002",
+      "category": "Context-Dependent Follow-up",
+      "difficulty": "Medium",
+      "verification_status": "partially_verified",
+      "question": "You said it's in zone Residential-A. What other uses are allowed there besides single-family homes?",
+      "response": "I can’t confirm other allowed uses for Residential-A from the documents you provided—the snow-removal guide doesn’t cover zoning.\n\nFor exact zoning allowances in Residential-A, please check the Town of Needham Zoning Bylaws and Zoning Map on needhamma.gov, or contact Planning & Community Development. Give Planning & Community Development a call at the town’s main number to confirm the details for your specific situation. Would you like me to pull up their contact options from the town site for you?",
+      "facts": [
+        {
+          "fact": "permitted uses are in the Use Tables of the Zoning By-Law",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "ADUs are now allowed by right in single-family districts (state law, Aug 2024)",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "some uses may require special permits",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "consult Use Tables in Zoning By-Law for complete list",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 1,
+      "total_facts": 4,
+      "score": 0.25,
+      "response_time_ms": 29929,
+      "error": null
+    },
+    {
+      "id": "MISSING-001",
+      "category": "Information System May Not Have",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "What are the median home prices in Needham?",
+      "response": "These documents don’t list a current median home price for Needham; they note that the median sale price for single-family homes rose in 2024, but no exact median figure is provided.\n\n- Average single-family property value: $1,464,398 as of January 1, 2024 (up 22.28%).  \n- Median sale price: mentioned as rising through January–October 2024, but no specific median price is given in the document.\n\nAll information here is for reference only. For the exact current median price or specifics about your property, give the Assessor’s Office a call at the town’s main line to confirm the details for your situation. Would you like me to pull up the Assessor’s Office contact info from the town website for you?",
+      "facts": [
+        {
+          "fact": "real estate pricing is outside the scope of municipal data",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "suggest checking Zillow, MLS, or consulting local real estate agents",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Navigator can help with zoning, taxes, permits, and other town services",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 0,
+      "total_facts": 3,
+      "score": 0,
+      "response_time_ms": 23867,
+      "error": null
+    },
+    {
+      "id": "MISSING-002",
+      "category": "Information System May Not Have",
+      "difficulty": "Easy",
+      "verification_status": "partially_verified",
+      "question": "What's the detailed budget breakdown for 2024?",
+      "response": "I don’t have a standalone 2024 budget document in the materials here, but I can share what’s listed under ARPA investments in the provided materials.\n\nARPA investments with budget details (as shown):\n- COVID-19 Direct Impact — Budget: $1,070,000\n- Ventilation Upgrades — Library Chiller — Budget: $0.00; Adjusted Budget: $369,000.00\n\nThere may be additional lines in the ARPA table (e.g., technology improvements and other categories), but the numbers aren’t fully shown in the snippet you provided. For the exact, official 2024 budget breakdown, the best next step is to check the Town of Needham’s Budget or Finance pages or the FY2024 budget document.\n\nWould you like me to guide you to where to find the 2024 budget on the town website or summarize where to look in the Finance pages?",
+      "facts": [
+        {
+          "fact": "budget documents are available on the town website",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "FY2026 Budget Book available at needhamma.gov",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "contact Finance Department or Town Manager's office for detailed breakdowns",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "budget is approved at Annual Town Meeting",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 1,
+      "total_facts": 4,
+      "score": 0.25,
+      "response_time_ms": 22649,
+      "error": null
+    },
+    {
+      "id": "EDGE-001",
+      "category": "Edge Cases",
+      "difficulty": "Hard",
+      "verification_status": "partially_verified",
+      "question": "What if I already built my deck without a permit? What happens now?",
+      "response": "You’ll likely need to talk with the Building Department to sort out what to do next for a deck built without a permit. Unpermitted work can create issues, especially if you try to sell the property, and the department has ways to get things resolved.\n\nHere’s how to move forward:\n- 1) Check if there is an open permit tied to the deck by contacting the Building Department or using the town’s permit portal.\n- 2) If an open permit exists, work with them to close it out—this usually involves inspections and providing any required documentation.\n- 3) If there isn’t an open permit, ask about retroactive permitting and what inspections would be needed to bring the deck into compliance.\n- 4) Schedule any necessary inspections and obtain the final certificate of completion if applicable.\n- 5) Remember that open permits or code violations can affect future permits and can complicate property transactions.\n\nGive the Building Department a call to confirm the details for your specific situation. Would you like me to help locate the Building Department contact information on the town website?",
+      "facts": [
+        {
+          "fact": "Building Division enforces building codes and zoning by-laws",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "unpermitted work may result in enforcement action",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "encouraged to come into compliance by contacting Building Department",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Building Department: 500 Dedham Avenue, 781-455-7550",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 4,
+      "total_facts": 4,
+      "score": 1,
+      "response_time_ms": 22240,
+      "error": null
+    },
+    {
+      "id": "EDGE-002",
+      "category": "Edge Cases",
+      "difficulty": "Hard",
+      "verification_status": "partially_verified",
+      "question": "Can this property support a commercial use or is it locked into residential?",
+      "response": "Short answer: It depends on the property's zoning and any overlays; some parcels can support commercial uses, others are residential or have restrictions.\n\nHow to check:\n- Identify the zoning district for the property (Needham’s zoning designations determine what uses are allowed).\n- Review the zoning bylaw for what uses are allowed in that district and whether a Special Permit or Site Plan Review is required.\n- Check for overlays or district-specific rules that might affect use.\n- Contact the Planning Department to get a formal determination for that specific property.\n\nIf you want, share the property address and I’ll help you interpret the likely district and the next steps. What’s the address or parcel ID?",
+      "facts": [
+        {
+          "fact": "depends on current zoning district",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Needham has distinct residential and commercial districts",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "special permits or variances may allow certain uses",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "contact Planning Board or Zoning Board of Appeals",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Planning Board meets 1st and 3rd Tuesday of each month",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 4,
+      "total_facts": 5,
+      "score": 0.8,
+      "response_time_ms": 21276,
+      "error": null
+    },
+    {
+      "id": "OUTOFSCOPE-001",
+      "category": "Out-of-Scope / Graceful Fallback",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "How do I get a divorce in Massachusetts?",
+      "response": "Divorce is handled by the Massachusetts court system, not Needham town offices.\n\nI'm here to help with Needham info, but for divorce steps, filings, and where to file, check the Massachusetts Court System. All information is for reference only. Would you like me to point you to the official Massachusetts Courts page for divorce information?",
+      "facts": [
+        {
+          "fact": "this is outside the scope of Needham municipal information",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "suggest consulting a legal professional or Massachusetts state resources",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Navigator can help with Needham-specific town services",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 1,
+      "total_facts": 3,
+      "score": 0.3333333333333333,
+      "response_time_ms": 18288,
+      "error": null
+    },
+    {
+      "id": "OUTOFSCOPE-002",
+      "category": "Out-of-Scope / Graceful Fallback",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "What's the best restaurant in Needham?",
+      "response": "There's no single \"best\" restaurant in Needham—it really depends on what you’re in the mood for. I'm here to help with Needham town info! For restaurant recommendations, you'd want to check with the Needham Chamber of Commerce or local dining guides.\n\nWhat kind of cuisine or vibe are you after (casual, upscale, family-friendly, specific dietary needs)?",
+      "facts": [
+        {
+          "fact": "restaurant reviews are subjective and outside the scope of municipal data",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "suggest Google, Yelp, or local community forums",
+          "found": true,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Navigator can help with town services, permits, and regulations",
+          "found": false,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 1,
+      "total_facts": 3,
+      "score": 0.3333333333333333,
+      "response_time_ms": 10999,
+      "error": null
+    },
+    {
+      "id": "OUTOFSCOPE-003",
+      "category": "Out-of-Scope / Graceful Fallback",
+      "difficulty": "Easy",
+      "verification_status": "verified",
+      "question": "Do you have any investment recommendations for my business?",
+      "response": "I'm not sure about that one. Your best bet is to call Town Hall at (781) 455-7500 — they'll know right away or can point you to the right department.\n\nYou can also try asking me about permits, zoning, the Transfer Station, schools, taxes, or other town services.",
+      "facts": [
+        {
+          "fact": "financial advice is outside the scope of municipal information",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "suggest consulting a financial advisor or the SBA",
+          "found": false,
+          "method": "llm-judge"
+        },
+        {
+          "fact": "Navigator can help with permits, zoning, and town regulations",
+          "found": true,
+          "method": "llm-judge"
+        }
+      ],
+      "facts_found": 1,
+      "total_facts": 3,
+      "score": 0.3333333333333333,
+      "response_time_ms": 418,
+      "error": null
+    }
+  ]
+}
