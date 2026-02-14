@@ -2,6 +2,22 @@
 
 ---
 
+## v0.8.8 — 2026-02-14
+
+**Remove AI Disclaimer Preamble from Chat Responses**
+
+### Improvements
+- **Chat responses no longer start with an AI accuracy disclaimer** — the UI already displays a verification badge and disclaimer footer, so the redundant LLM-generated preamble ("This tool uses AI and may provide inaccurate information...") has been removed
+- System prompt now explicitly instructs the LLM to jump straight into answering the question
+
+### Technical
+- Removed `FIRST-MESSAGE DISCLAIMER` section from system prompt in `src/lib/prompts.ts`
+- Removed `getFirstMessageDisclaimer()` usage from `buildChatSystemPrompt()`
+- Added rule 7: "Do NOT start your response with a disclaimer or preamble"
+- Updated integration tests to verify new behavior
+
+---
+
 ## v0.8.7 — 2026-02-14
 
 **SEO Fundamentals & Branded 404 Page**
