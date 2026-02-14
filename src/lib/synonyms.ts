@@ -156,6 +156,34 @@ const UNIVERSAL_SYNONYMS: SynonymDictionary = [
     triggers: ["pothole", "road repair"],
     expansions: ["DPW", "public works", "highway department"],
   },
+  {
+    triggers: ["pool", "swimming", "swim lessons"],
+    expansions: ["swimming pool", "aquatics", "recreation"],
+  },
+  {
+    triggers: ["adu", "in-law apartment", "in-law suite", "granny flat", "guest house"],
+    expansions: ["accessory dwelling unit", "ADU", "zoning bylaw"],
+  },
+  {
+    triggers: ["food truck", "catering"],
+    expansions: ["mobile food vendor", "board of health", "food establishment"],
+  },
+  {
+    triggers: ["compost", "yard waste", "leaves", "leaf pickup"],
+    expansions: ["transfer station", "DPW", "yard waste disposal"],
+  },
+  {
+    triggers: ["property tax rate", "mill rate", "tax rate"],
+    expansions: ["assessor", "tax rate", "residential tax rate"],
+  },
+  {
+    triggers: ["curbside pickup", "trash pickup", "garbage pickup"],
+    expansions: ["transfer station", "no curbside", "pay as you throw", "PAYT"],
+  },
+  {
+    triggers: ["parking ticket", "parking fine"],
+    expansions: ["parking clerk", "town clerk"],
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -199,6 +227,34 @@ const TOWN_SYNONYMS: Record<string, SynonymDictionary> = {
     {
       triggers: ["sticker", "transfer station sticker"],
       expansions: ["RTS sticker", "transfer station permit", "annual sticker"],
+    },
+    {
+      triggers: ["rosemary pool", "the pool"],
+      expansions: ["Rosemary Recreation Complex", "swimming pool", "aquatics"],
+    },
+    {
+      triggers: ["payt", "pay as you throw", "trash bags"],
+      expansions: ["Pay-As-You-Throw", "PAYT bags", "transfer station"],
+    },
+    {
+      triggers: ["high rock", "pollard"],
+      expansions: ["High Rock School", "Pollard Middle School", "middle school"],
+    },
+    {
+      triggers: ["broadmeadow", "eliot", "mitchell", "sunita williams", "newman"],
+      expansions: ["elementary school", "Needham Public Schools"],
+    },
+    {
+      triggers: ["katie king"],
+      expansions: ["Town Manager", "Select Board"],
+    },
+    {
+      triggers: ["dan walsh"],
+      expansions: ["Building Inspector", "Building Department"],
+    },
+    {
+      triggers: ["needham line", "commuter rail"],
+      expansions: ["MBTA Needham Line", "Needham Heights station", "Needham Junction station", "Needham Center station", "South Station"],
     },
   ],
 };
