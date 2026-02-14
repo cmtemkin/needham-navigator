@@ -8,7 +8,7 @@ import {
   buildContextDocuments,
   dedupeSources,
   DEFAULT_TOWN_ID,
-  retrieveRelevantChunks,
+  hybridSearch,
   type RetrievedChunk,
 } from "@/lib/rag";
 import { getSupabaseClient } from "@/lib/supabase";
@@ -147,10 +147,17 @@ export async function POST(request: Request): Promise<Response> {
     // degrade gracefully to the "call Town Hall" fallback instead of a 500
     let chunks: RetrievedChunk[] = [];
     try {
-      chunks = await retrieveRelevantChunks(latestUserMessage.content, {
+      const hybridResults = await hybridSearch(latestUserMessage.content, {
         townId,
-        matchThreshold: 0.30,
+        limit: 10,
       });
+      chunks = hybridResults.map((r, i) => ({
+        id: r.id,
+        chunkText: r.chunk_text,
+        similarity: r.similarity,
+        metadata: r.metadata,
+        source: { ...r.source, sourceId: r.source.sourceId || `S${i + 1}` },
+      }));
     } catch (retrievalError) {
       console.error("[api/chat] Retrieval failed, returning fallback:", retrievalError);
     }
