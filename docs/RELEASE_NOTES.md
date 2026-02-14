@@ -2,6 +2,24 @@
 
 ---
 
+## v0.8.7 — 2026-02-14
+
+**SEO Fundamentals & Branded 404 Page**
+
+### New Features
+- **robots.txt**: Allows all crawlers, blocks `/admin` and `/api/` paths, points to sitemap
+- **Dynamic sitemap.xml**: Auto-generates URLs from town configs — adding a new town to `config/towns.ts` automatically adds its routes to the sitemap. Feature-flagged routes (e.g., news) included only when enabled.
+- **Open Graph & Twitter meta tags**: Social media sharing now shows title, description, and site name instead of blank previews
+- **Branded 404 page**: Clean "Page not found" page with the Navigator logo and a link back to the homepage
+
+### Technical
+- `src/app/robots.ts` — Next.js Metadata API robots file
+- `src/app/sitemap.ts` — Dynamic sitemap from `TOWN_CONFIGS`, skips test towns
+- `src/app/layout.tsx` — Enhanced metadata with `metadataBase`, OG, Twitter, and robots tags
+- `src/app/not-found.tsx` — Styled 404 page matching site design language
+
+---
+
 ## v0.8.6 — 2026-02-13
 
 **Multi-Tenant System Prompt — Remove Hardcoded Needham Data**
