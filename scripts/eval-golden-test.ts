@@ -382,6 +382,7 @@ async function main() {
   console.log(`\n=== Summary ===`);
   console.log(`Overall Score: ${Math.round(overallScore * 100)}%`);
   console.log(`Pass (>=50%): ${passCount}/${results.length}`);
+  console.log(`Query rewriting: enabled (gpt-4.1-nano)`);
 
   const dateStr = new Date().toISOString().split("T")[0];
   const outputPath = resolve(__dirname, `../docs/eval-results-${dateStr}.json`);
