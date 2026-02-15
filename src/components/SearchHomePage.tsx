@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Search, FileText, Trash2, Building2, School, DollarSign, Bus, Sparkles } from "lucide-react";
+import { Search, Trash2, Building2, School, DollarSign, Bus, Sparkles } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SearchResultCard } from "@/components/search/SearchResultCard";
@@ -201,65 +201,6 @@ export function SearchHomePage() {
 
     void executeSearch(queryFromUrl);
   }, [executeSearch, pathname, queryFromUrl, router, searchHref]);
-
-  const handleGenerateAnswer = useCallback(async () => {
-    if (!query) return;
-
-    setAiAnswer({ type: "loading" });
-
-    trackEvent('ai_answer_requested', {
-      query_length: query.length,
-      town_id: town.town_id,
-    });
-
-    try {
-      const chatRes = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: [{ role: "user", content: query }],
-          town_id: town.town_id,
-        }),
-      });
-
-      if (!chatRes.ok) {
-        setAiAnswer({ type: "idle" });
-        return;
-      }
-
-      let fullText = "";
-      let sources: MockSource[] = [];
-
-      await parseStreamResponse(chatRes, {
-        onText: (delta) => {
-          fullText += delta;
-        },
-        onSources: (srcs) => {
-          sources = srcs;
-        },
-        onDone: () => {
-          setAiAnswer({
-            type: "loaded",
-            html: fullText,
-            sources: sources.map((s) => ({ title: s.title ?? "Source", url: s.url ?? "" })),
-          });
-          trackEvent('ai_answer_generated', {
-            query_length: query.length,
-            town_id: town.town_id,
-            response_length: fullText.length,
-            source_count: sources.length,
-          });
-        },
-        onError: (error) => {
-          console.error("AI answer stream error:", error);
-          setAiAnswer({ type: "idle" });
-        },
-      });
-    } catch (error) {
-      console.error("Generate answer error:", error);
-      setAiAnswer({ type: "idle" });
-    }
-  }, [query, town.town_id]);
 
   const handleAskAbout = useCallback((question: string) => {
     trackEvent('ask_about_clicked', {
