@@ -2,6 +2,8 @@ import { generateEmbedding } from "@/lib/embeddings";
 import { getSupabaseClient } from "@/lib/supabase";
 import { DEFAULT_TOWN_ID as DEFAULT_TOWN_ID_FROM_CONFIG } from "@/lib/towns";
 import { expandQuery } from "@/lib/synonyms";
+import { rewriteQuery } from "@/lib/query-rewriter";
+import { trackEvent } from "@/lib/pendo";
 
 export const DEFAULT_TOWN_ID = DEFAULT_TOWN_ID_FROM_CONFIG;
 
@@ -518,7 +520,11 @@ export async function retrieveRelevantChunks(
   // Step 3: Detect department for reranking (use expanded terms for better detection)
   const detectedDepartment = detectDepartment(fullExpandedQuery);
 
-  // Step 4: Run vector searches in parallel — original query + expanded query
+  // Step 4: LLM query rewriting (runs in parallel with vector searches)
+  // This catches queries the synonym dictionary can't handle
+  const rewrittenQueryPromise = rewriteQuery(trimmedQuery, townId);
+
+  // Step 5: Run vector searches in parallel — original + expanded + LLM-rewritten
   const hasExpansions = expanded.length > 0 || intentKeywords.length > 0;
 
   const searchPromises: Promise<MatchDocumentRow[]>[] = [
@@ -531,9 +537,29 @@ export async function retrieveRelevantChunks(
     );
   }
 
+  // Wait for the LLM rewrite, then add a third search if it produced something
+  const rewrittenQuery = await rewrittenQueryPromise;
+  if (rewrittenQuery) {
+    searchPromises.push(
+      vectorSearch(rewrittenQuery, townId, matchThreshold, matchCount),
+    );
+
+    // Track query rewrites for analytics (non-blocking, fire-and-forget)
+    try {
+      trackEvent("query_rewritten", {
+        original_length: trimmedQuery.length,
+        rewritten_length: rewrittenQuery.length,
+        had_synonyms: expanded.length > 0,
+        had_intents: intentKeywords.length > 0,
+      });
+    } catch {
+      // Non-critical — don't let tracking failures affect search
+    }
+  }
+
   const searchResults = await Promise.all(searchPromises);
 
-  // Step 5: Merge and deduplicate, keeping the highest similarity per chunk
+  // Step 6: Merge and deduplicate, keeping the highest similarity per chunk
   const bestByChunkId = new Map<string, MatchDocumentRow>();
 
   for (const rows of searchResults) {
@@ -552,10 +578,10 @@ export async function retrieveRelevantChunks(
   // Filter out noise — chunks below the similarity floor are irrelevant
   const chunks = allChunks.filter((c) => c.similarity >= MIN_SIMILARITY_FLOOR);
 
-  // Step 6: Rerank using the full expanded query for better keyword overlap scoring
+  // Step 7: Rerank using the full expanded query for better keyword overlap scoring
   const reranked = rerankChunks(chunks, fullExpandedQuery, detectedDepartment);
 
-  // Step 7: Select top chunks by reranked score
+  // Step 8: Select top chunks by reranked score
   const diverse = selectTopChunks(reranked, finalCount);
 
   return diverse;
