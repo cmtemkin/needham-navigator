@@ -1,0 +1,93 @@
+[
+  {
+    "id": "permits-building",
+    "category": "permits",
+    "question": "How do I get a building permit in Needham?",
+    "expectedKeywords": ["ViewPoint Cloud", "viewpointcloud.com", "Building Department", "781-455-7550"],
+    "expectedSourceRelevance": ["permits", "building", "applications"],
+    "forbiddenContent": [],
+    "minSourceCount": 1,
+    "maxSourceCount": 6
+  },
+  {
+    "id": "dpw-transfer-station",
+    "category": "dpw",
+    "question": "What are the transfer station hours?",
+    "expectedKeywords": ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "7:00", "1421 Central"],
+    "expectedSourceRelevance": ["transfer station", "recycling", "RTS"],
+    "forbiddenContent": [],
+    "minSourceCount": 1,
+    "maxSourceCount": 4
+  },
+  {
+    "id": "schools-enrollment",
+    "category": "schools",
+    "question": "How do I enroll my child in Needham public schools?",
+    "expectedKeywords": [],
+    "expectedSourceRelevance": ["school", "enrollment", "education"],
+    "forbiddenContent": ["Medical Reserve Corps"],
+    "minSourceCount": 0,
+    "maxSourceCount": 4,
+    "notes": "Known gap — school enrollment data not yet ingested. Should NOT return irrelevant sources."
+  },
+  {
+    "id": "taxes-property",
+    "category": "taxes",
+    "question": "How do I pay my property taxes in Needham?",
+    "expectedKeywords": ["Collector", "Treasurer", "online", "mail", "in person", "1471 Highland"],
+    "expectedSourceRelevance": ["tax", "payment", "collector", "treasurer"],
+    "forbiddenContent": [],
+    "minSourceCount": 1,
+    "maxSourceCount": 6
+  },
+  {
+    "id": "zoning-lookup",
+    "category": "zoning",
+    "question": "What is my property zoned as and what can I build?",
+    "expectedKeywords": ["Planning", "Community Development", "zoning"],
+    "expectedSourceRelevance": ["zoning", "planning", "building"],
+    "forbiddenContent": [],
+    "minSourceCount": 1,
+    "maxSourceCount": 6
+  },
+  {
+    "id": "new-resident",
+    "category": "general",
+    "question": "I just moved to Needham. What do I need to know?",
+    "expectedKeywords": ["Town Hall", "1471 Highland"],
+    "expectedSourceRelevance": ["resident", "town", "services"],
+    "forbiddenContent": [],
+    "minSourceCount": 1,
+    "maxSourceCount": 8
+  },
+  {
+    "id": "town-meeting",
+    "category": "government",
+    "question": "When is the next town meeting?",
+    "expectedKeywords": ["Town Meeting", "calendar"],
+    "expectedSourceRelevance": ["meeting", "town meeting", "calendar", "governance"],
+    "forbiddenContent": [],
+    "minSourceCount": 0,
+    "maxSourceCount": 6
+  },
+  {
+    "id": "recreation-kids",
+    "category": "recreation",
+    "question": "What recreation programs are available for kids in Needham?",
+    "expectedKeywords": ["Park and Recreation", "recreation"],
+    "expectedSourceRelevance": ["recreation", "park", "program", "camp"],
+    "forbiddenContent": [],
+    "minSourceCount": 1,
+    "maxSourceCount": 6
+  },
+  {
+    "id": "dpw-snow",
+    "category": "dpw",
+    "question": "When does Needham plow the streets after a snowstorm?",
+    "expectedKeywords": ["Snow", "Ice", "DPW", "Public Works"],
+    "expectedSourceRelevance": ["snow", "plow", "ice", "DPW"],
+    "forbiddenContent": [],
+    "minSourceCount": 1,
+    "maxSourceCount": 6
+  }
+]

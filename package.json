@@ -16,6 +16,9 @@
     "validate": "tsx scripts/validate-ingestion.ts",
     "eval": "tsx scripts/eval-golden-test.ts",
     "eval:scorecard": "tsx scripts/eval-scorecard.ts",
+    "eval:new": "tsx scripts/eval/run-eval.ts",
+    "eval:new:prod": "EVAL_BASE_URL=https://www.needhamnavigator.com tsx scripts/eval/run-eval.ts",
+    "eval:new:local": "EVAL_BASE_URL=http://localhost:3000 tsx scripts/eval/run-eval.ts",
     "seed-cache": "tsx scripts/seed-answer-cache.ts"
   },
   "dependencies": {
