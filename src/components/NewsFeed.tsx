@@ -78,6 +78,7 @@ function NewsCard({ item }: { item: ContentItem }) {
       <div className="flex items-start gap-4">
         {item.image_url && (
           <div className="hidden h-20 w-28 shrink-0 overflow-hidden rounded-lg sm:block">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={item.image_url}
               alt=""

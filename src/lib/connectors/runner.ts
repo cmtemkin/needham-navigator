@@ -235,9 +235,7 @@ export async function runConnectors(
         durationMs: Date.now() - startTime,
       });
 
-      console.log(
-        `[runner] ${config.id}: ${upserted} upserted, ${skipped} skipped (${Date.now() - startTime}ms)`
-      );
+      // Logging suppressed to comply with ESLint no-console rule
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : String(err);
       console.error(`[runner] ${config.id} FAILED: ${errorMsg}`);

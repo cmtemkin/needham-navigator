@@ -95,7 +95,7 @@ async function checkRssFeed(rssFeedUrl: string): Promise<string[]> {
       const url = match[1].trim();
       if (url.startsWith("http")) urls.push(url);
     }
-    console.log(`[monitor] RSS feed returned ${urls.length} URLs`);
+    // RSS feed URL count logged in ingestion_log table
     return urls;
   } catch (err) {
     console.error("[monitor] RSS check failed:", err);
@@ -116,7 +116,6 @@ export async function runChangeDetection(
   let errorCount = 0;
 
   // Stage 1: Fetch tracked documents
-  console.log(`[monitor] Fetching tracked documents for town: ${townId}`);
   const { data: documents, error: fetchError } = await supabase
     .from("documents")
     .select("id, url, content_hash, source_type, metadata")
@@ -127,7 +126,6 @@ export async function runChangeDetection(
   }
 
   const tracked = (documents || []) as TrackedDocument[];
-  console.log(`[monitor] Found ${tracked.length} tracked documents`);
 
   // Stage 2: Content-hash change detection
   const changedUrls: string[] = [];
@@ -164,13 +162,13 @@ export async function runChangeDetection(
     }
   }
 
-  console.log(`[monitor] ${changedUrls.length} changed, ${errorCount} errors`);
+  // Change detection results logged to ingestion_log table
 
   // Stage 3: RSS feed check
   const rssUrls = await checkRssFeed("https://www.needhamma.gov/rss.aspx");
   const existingUrls = new Set(tracked.map((d) => d.url));
   const newUrls = rssUrls.filter((u) => !existingUrls.has(u));
-  console.log(`[monitor] ${newUrls.length} new URLs from RSS`);
+  // New URLs logged to ingestion_log table
 
   // Stage 4: Staleness flagging
   const ninetyDaysAgo = new Date();
@@ -203,7 +201,7 @@ export async function runChangeDetection(
     },
   });
 
-  console.log(`[monitor] Complete in ${durationMs}ms`);
+  // Monitor completion logged to ingestion_log table
 
   return {
     checkedUrls: tracked.length,

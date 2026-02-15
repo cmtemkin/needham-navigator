@@ -34,17 +34,20 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npx tsc --noEmit
+
       - name: Build
         run: npm run build
 
       - name: Run tests
-        run: npm test || true
-        # "|| true" for now since tests may not be fully set up
-        # Remove "|| true" once test suite is stable
+        run: npm test
 
-      - name: Type check
-        run: npx tsc --noEmit || true
-        # Same — remove "|| true" once types are clean
+      - name: Security audit
+        run: npm audit --production --audit-level=critical
 
   auto-merge:
     needs: build-and-test

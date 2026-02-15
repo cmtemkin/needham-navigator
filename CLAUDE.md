@@ -100,11 +100,13 @@ Every time code is merged to `main`, complete these steps before pushing:
 
 Before pushing ANY code to your branch, you MUST complete this loop. This is non-negotiable.
 
-**Step 1: Run all three checks**
+**Step 1: Run all checks**
 ```
+npm run lint
+npx tsc --noEmit
 npm run build
 npm test
-npx tsc --noEmit
+npm audit --production --audit-level=critical
 ```
 
 **Step 2: If ANY check fails**
