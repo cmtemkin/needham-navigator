@@ -46,6 +46,9 @@ export interface ScraperConfig {
 
   /** File to store crawl progress for resume capability */
   progressFile: string;
+
+  /** Direct PDF URLs to always ingest (not discovered by crawling) */
+  directPdfUrls?: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -57,15 +60,32 @@ export const NEEDHAM_CONFIG: ScraperConfig = {
 
   seedUrls: [
     "https://www.needhamma.gov",
+    // Schools — 4 eval failures, 0% score
+    "https://www.needham.k12.ma.us",
+    // Library — dedicated pages with hours, services, programs
+    "https://www.needhamma.gov/library",
+    // Public Safety — police and fire non-emergency contacts
+    "https://www.needhamma.gov/police",
+    "https://www.needhamma.gov/fire",
+    // Board of Health — food permits, inspections
+    "https://www.needhamma.gov/health",
+    // DPW — contact info, services
+    "https://www.needhamma.gov/dpw",
+    // Zoning — the full by-law lives here
+    "https://www.needhamma.gov/planning",
+    "https://www.needhamma.gov/zoning",
   ],
 
   allowedDomains: [
     "www.needhamma.gov",
     "needhamma.gov",
+    // Needham Public Schools
+    "www.needham.k12.ma.us",
+    "needham.k12.ma.us",
   ],
 
   maxDepth: 5,
-  maxPages: 500,
+  maxPages: 800,  // was 500 — schools site adds ~200 pages
   crawlDelayMs: 1000, // 1 second between requests — polite to town servers
   maxRetries: 3,
 
@@ -115,6 +135,12 @@ export const NEEDHAM_CONFIG: ScraperConfig = {
 
     // Archive pagination (too many pages)
     /\/Archive\.aspx\?/i,
+
+    // School-specific skip patterns (avoid calendar/staff directory bloat)
+    /\/staff-directory/i,
+    /\/calendar-events/i,
+    /\/lunch-menu/i,
+    /\/employment/i,
   ],
 
   departmentPatterns: [
@@ -138,10 +164,22 @@ export const NEEDHAM_CONFIG: ScraperConfig = {
     { pattern: /\/fee/i, department: "Finance" },
     { pattern: /\/voter|\/election/i, department: "Town Clerk" },
     { pattern: /\/transfer-?station|\/rts/i, department: "Public Works" },
+    // School-specific patterns
+    { pattern: /needham\.k12\.ma\.us/i, department: "Schools" },
+    { pattern: /\/registration/i, department: "Schools" },
+    { pattern: /\/transportation/i, department: "Schools" },
+    { pattern: /\/lunch|\/food-?service/i, department: "Schools" },
   ],
 
   outputFile: "scripts/scraped-data.json",
   progressFile: "scripts/scrape-progress.json",
+
+  // TODO: Add directPdfUrls after verifying actual PDF URLs
+  // directPdfUrls: [
+  //   // Zoning By-Law — full text, 6 eval failures from missing dimensional tables
+  //   // Need to verify URL on needhamma.gov/planning or needhamma.gov/zoning
+  //   // Common patterns: /DocumentCenter/View/XXXX/filename
+  // ],
 };
 
 // ---------------------------------------------------------------------------
