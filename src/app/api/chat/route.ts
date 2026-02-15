@@ -178,11 +178,20 @@ export async function POST(request: Request): Promise<Response> {
       const fallbackPhone = townHallPhone ? ` at ${townHallPhone}` : "";
       return staticStreamResponse({
         text: [
-          `I'm not sure about that one. Your best bet is to call Town Hall${fallbackPhone} — they'll know right away or can point you to the right department.`,
-          "You can also try asking me about permits, zoning, the Transfer Station, schools, taxes, or other town services.",
+          `I don't have specific information about that topic in my indexed documents.`,
+          `Your best bet is to call Town Hall${fallbackPhone} — they'll know right away or can point you to the right department.`,
+          "I can help with questions about:",
+          "- Permits and building requirements",
+          "- Trash & recycling (Transfer Station)",
+          "- Property taxes and payments",
+          "- Zoning regulations",
+          "- Schools and enrollment",
+          "- Town meetings and elections",
+          "- Recreation programs",
+          "- Department contact information",
         ].join("\n\n"),
         confidence,
-        sources,
+        sources: [], // No sources when no relevant chunks found
         responseId,
       });
     }
@@ -220,7 +229,34 @@ export async function POST(request: Request): Promise<Response> {
       })),
     });
 
-    // Fire-and-forget: log token usage and cost after streaming completes
+    // Wait for full text to parse USED_SOURCES metadata and filter sources
+    const fullResponseText = await result.text;
+
+    // Parse USED_SOURCES metadata to determine which sources were actually used
+    let filteredSources = sources;
+    const usedSourcesMatch = fullResponseText.match(/USED_SOURCES:\s*(.+?)(?:\n|$)/i);
+
+    if (usedSourcesMatch) {
+      const usedSourcesStr = usedSourcesMatch[1].trim();
+      if (usedSourcesStr.toLowerCase() === "none") {
+        // LLM indicated no sources were used
+        filteredSources = [];
+      } else {
+        // Parse comma-separated source IDs (e.g., "S1, S3, S5")
+        const usedIds = new Set(
+          usedSourcesStr.split(",").map((id) => id.trim().toUpperCase())
+        );
+        filteredSources = sources.filter((source) =>
+          usedIds.has(source.source_id.toUpperCase())
+        );
+      }
+    }
+    // If no USED_SOURCES found, fall back to showing all sources (backwards compatible)
+
+    // Strip USED_SOURCES metadata from the text before displaying
+    const cleanedText = fullResponseText.replace(/USED_SOURCES:\s*.+?(?:\n|$)/gi, "").trim();
+
+    // Fire-and-forget: log token usage and cost
     Promise.resolve(result.usage).then((usage) => {
       const prompt = usage.inputTokens ?? 0;
       const completion = usage.outputTokens ?? 0;
@@ -234,22 +270,21 @@ export async function POST(request: Request): Promise<Response> {
         totalTokens: total,
         metadata: {
           question_length: latestUserMessage.content.length,
-          source_count: sources.length,
+          source_count: filteredSources.length,
           confidence_level: confidence.level,
         },
       }).catch((err) => console.error("[api/chat] cost tracking error:", err));
     }).catch((err) => console.error("[api/chat] usage retrieval error:", err));
 
     // Fire-and-forget: cache this answer for search mode
-    Promise.resolve(result.text).then((fullResponseText) => {
-      setCachedAnswer(
-        latestUserMessage.content,
-        townId,
-        fullResponseText,
-        sources.map(s => ({ title: s.document_title, url: s.document_url ?? '' }))
-      ).catch(() => {}); // silent fail
-    }).catch(() => {}); // silent fail on text retrieval too
+    setCachedAnswer(
+      latestUserMessage.content,
+      townId,
+      cleanedText,
+      filteredSources.map(s => ({ title: s.document_title, url: s.document_url ?? '' }))
+    ).catch(() => {}); // silent fail
 
+    // Stream the cleaned text with filtered sources
     const stream = createUIMessageStream({
       execute: ({ writer }) => {
         writer.write({
@@ -259,7 +294,7 @@ export async function POST(request: Request): Promise<Response> {
         });
         writer.write({
           type: "data-sources",
-          data: sources,
+          data: filteredSources,
           transient: true,
         });
         writer.write({
@@ -267,11 +302,19 @@ export async function POST(request: Request): Promise<Response> {
           data: responseId,
           transient: true,
         });
-        writer.merge(
-          result.toUIMessageStream({
-            sendSources: true,
-          })
-        );
+
+        // Stream the cleaned text (split into chunks for smooth streaming effect)
+        const textPartId = randomUUID();
+        writer.write({ type: "text-start", id: textPartId });
+
+        // Stream text in chunks of ~50 chars for natural typing effect
+        const chunkSize = 50;
+        for (let i = 0; i < cleanedText.length; i += chunkSize) {
+          const chunk = cleanedText.slice(i, i + chunkSize);
+          writer.write({ type: "text-delta", id: textPartId, delta: chunk });
+        }
+
+        writer.write({ type: "text-end", id: textPartId });
       },
       onError: () =>
         "Something went wrong while generating the answer. Please try again.",
