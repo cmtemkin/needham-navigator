@@ -7,8 +7,8 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SearchResultCard } from "@/components/search/SearchResultCard";
 import { AIAnswerCard } from "@/components/search/AIAnswerCard";
-import { FloatingChat, type FloatingChatHandle } from "@/components/search/FloatingChat";
 import { useTown, useTownHref } from "@/lib/town-context";
+import { useChatWidget } from "@/lib/chat-context";
 import type { SearchResponse, CachedAnswer } from "@/types/search";
 import { trackEvent } from "@/lib/pendo";
 
@@ -78,9 +78,9 @@ export function SearchHomePage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const town = useTown();
+  const { openChat } = useChatWidget();
   const searchHref = useTownHref("/search");
   const shortTownName = town.name.replace(/,\s*[A-Z]{2}$/i, "");
-  const chatRef = useRef<FloatingChatHandle>(null);
   const latestExecutedQueryRef = useRef<string | null>(null);
 
   const [query, setQuery] = useState("");
@@ -275,12 +275,12 @@ export function SearchHomePage() {
       question_length: question.length,
       town_id: town.town_id,
     });
-    chatRef.current?.openWithMessage(question);
-  }, [town.town_id]);
+    openChat(question);
+  }, [openChat, town.town_id]);
 
   const handleFollowUp = useCallback((question: string) => {
-    chatRef.current?.openWithMessage(question);
-  }, []);
+    openChat(question);
+  }, [openChat]);
 
   const showResults = isSearching || searchResults !== null;
 
@@ -491,9 +491,6 @@ export function SearchHomePage() {
       </main>
 
       <Footer />
-
-      {/* Floating Chat */}
-      <FloatingChat ref={chatRef} townId={town.town_id} />
     </>
   );
 }

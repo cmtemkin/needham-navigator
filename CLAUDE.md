@@ -43,6 +43,31 @@ Needham Navigator is an AI-powered municipal information hub built with Next.js 
 - Graceful degradation: all tracking no-ops when API key is missing
 - Zero PII: anonymous visitor IDs only, town ID as account ID
 
+## Recently Shipped
+
+- **Google-style search UX** (PR #31) — Chat page redesigned with topic cards, source links, verified badge
+- **Pendo analytics integration** — 14 track events across search, chat, feedback, and navigation
+- **Full CI/CD pipeline** — GitHub Actions auto-build, auto-merge, Vercel deploy, health checks
+- **RAG Phase 1+2: Ingestion gap fixes + chunk section headers** — Expanded crawl to include library, police, fire, health, DPW, zoning pages; added contextual chunk headers for better embedding retrieval
+- **RAG Phase 3+4: LLM query rewriting + improved fact extraction prompts** — Query expansion for better semantic search; refined prompts to focus on factual extraction
+- **Chat API health check fix** (PR #37) — Corrected SSE format parsing in health check endpoint
+- **School data ingestion** — Added Needham Public Schools (needham.k12.ma.us) content to RAG sources: enrollment, registration, nutrition, transportation, special education
+
+## In Progress
+
+- **RAG Phase 5+6: Citation accuracy filtering + answer grounding** — Filter chunks by relevance score; penalize hallucinated citations
+- **RAG Phase 7: Automated evaluation harness with 9-question golden test set** — Systematic quality tracking for RAG improvements
+- **School data embedding** — Full reingest of 800 documents including 353 school pages
+
+## RAG Quality Baseline (Feb 15, 2026)
+
+- **9-query production test:** 6 A/A-, 2 B/B-, 1 D
+- **Strong areas:** permits, taxes, DPW, zoning, recreation, snow removal
+- **Known gaps:**
+  - School enrollment (D grade before ingestion) — now addressed with needham.k12.ma.us crawl
+  - New resident guide (scattershot results) — needs targeted content curation
+  - Town meeting dates (no specific dates) — calendar integration needed
+
 ## Merge-to-Main Checklist
 
 Every time code is merged to `main`, complete these steps before pushing:
