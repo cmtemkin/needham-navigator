@@ -2,16 +2,14 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Search, FileText, Trash2, Building2, School, DollarSign, Bus } from "lucide-react";
+import { Search, Trash2, Building2, School, DollarSign, Bus, Sparkles } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SearchResultCard } from "@/components/search/SearchResultCard";
 import { AIAnswerCard } from "@/components/search/AIAnswerCard";
 import { FloatingChat, type FloatingChatHandle } from "@/components/search/FloatingChat";
 import { useTown, useTownHref } from "@/lib/town-context";
-import { parseStreamResponse } from "@/lib/stream-parser";
 import type { SearchResponse, CachedAnswer } from "@/types/search";
-import type { MockSource } from "@/lib/mock-data";
 import { trackEvent } from "@/lib/pendo";
 
 const QUICK_LINKS = [
@@ -145,56 +143,14 @@ export function SearchHomePage() {
           return;
         }
 
-        // 3. No cache → auto-generate AI answer in background
-        // Only if top result has high similarity (>= 0.7)
-        if (data.results.length > 0 && data.results[0].similarity >= 0.7) {
-          setAiAnswer({ type: "loading" });
+        // 3. No auto-generation - always show opt-in prompt
+        setAiAnswer({ type: "prompt" });
 
-          const chatRes = await fetch("/api/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              messages: [{ role: "user", content: q }],
-              town_id: town.town_id,
-            }),
+        if (data.results.length === 0) {
+          trackEvent('search_no_results', {
+            query_length: q.length,
+            town_id: town.town_id,
           });
-
-          if (!chatRes.ok) {
-            setAiAnswer({ type: "idle" });
-            return;
-          }
-
-          let fullText = "";
-          let sources: MockSource[] = [];
-
-          await parseStreamResponse(chatRes, {
-            onText: (delta) => {
-              fullText += delta;
-            },
-            onSources: (srcs) => {
-              sources = srcs;
-            },
-            onDone: () => {
-              setAiAnswer({
-                type: "loaded",
-                html: fullText,
-                sources: sources.map((s) => ({ title: s.title ?? "Source", url: s.url ?? "" })),
-              });
-            },
-            onError: (error) => {
-              console.error("AI answer stream error:", error);
-              setAiAnswer({ type: "idle" });
-            },
-          });
-        } else {
-          // Low similarity or no results → show prompt button
-          setAiAnswer({ type: "prompt" });
-          if (data.results.length === 0) {
-            trackEvent('search_no_results', {
-              query_length: q.length,
-              town_id: town.town_id,
-            });
-          }
         }
       } catch (error) {
         console.error("Search error:", error);
@@ -244,65 +200,6 @@ export function SearchHomePage() {
     void executeSearch(queryFromUrl);
   }, [executeSearch, pathname, queryFromUrl, router, searchHref]);
 
-  const handleGenerateAnswer = useCallback(async () => {
-    if (!query) return;
-
-    setAiAnswer({ type: "loading" });
-
-    trackEvent('ai_answer_requested', {
-      query_length: query.length,
-      town_id: town.town_id,
-    });
-
-    try {
-      const chatRes = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: [{ role: "user", content: query }],
-          town_id: town.town_id,
-        }),
-      });
-
-      if (!chatRes.ok) {
-        setAiAnswer({ type: "idle" });
-        return;
-      }
-
-      let fullText = "";
-      let sources: MockSource[] = [];
-
-      await parseStreamResponse(chatRes, {
-        onText: (delta) => {
-          fullText += delta;
-        },
-        onSources: (srcs) => {
-          sources = srcs;
-        },
-        onDone: () => {
-          setAiAnswer({
-            type: "loaded",
-            html: fullText,
-            sources: sources.map((s) => ({ title: s.title ?? "Source", url: s.url ?? "" })),
-          });
-          trackEvent('ai_answer_generated', {
-            query_length: query.length,
-            town_id: town.town_id,
-            response_length: fullText.length,
-            source_count: sources.length,
-          });
-        },
-        onError: (error) => {
-          console.error("AI answer stream error:", error);
-          setAiAnswer({ type: "idle" });
-        },
-      });
-    } catch (error) {
-      console.error("Generate answer error:", error);
-      setAiAnswer({ type: "idle" });
-    }
-  }, [query, town.town_id]);
-
   const handleAskAbout = useCallback((question: string) => {
     trackEvent('ask_about_clicked', {
       question_length: question.length,
@@ -322,41 +219,41 @@ export function SearchHomePage() {
       <Header />
 
       <main>
-        {/* Search Hero */}
-        <section className="bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] text-white py-16 px-4">
-          <div className="max-w-[720px] mx-auto text-center">
-            <h1 className="text-4xl font-bold mb-3 leading-tight">
-              Search{" "}
-              <span className="text-[var(--accent)]">{shortTownName}</span>
-            </h1>
-            <p className="text-lg text-white/90 mb-8">
-              Find answers from town documents, bylaws, meeting minutes, and more
-            </p>
+        {/* Search Hero - Only show when no results */}
+        {!showResults && (
+          <section className="bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] text-white py-16 px-4">
+            <div className="max-w-[720px] mx-auto text-center">
+              <h1 className="text-4xl font-bold mb-3 leading-tight">
+                Search{" "}
+                <span className="text-[var(--accent)]">{shortTownName}</span>
+              </h1>
+              <p className="text-lg text-white/90 mb-8">
+                Find answers from town documents, bylaws, meeting minutes, and more
+              </p>
 
-            {/* Search input */}
-            <div className="bg-white rounded-xl p-2 shadow-lg flex items-center gap-2">
-              <Search size={20} className="text-text-muted ml-2" />
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch(query)}
-                placeholder={`Search ${shortTownName} documents...`}
-                className="flex-1 border-none bg-transparent outline-none text-[15px] text-text-primary py-2 placeholder:text-text-muted"
-                data-pendo="search-input"
-              />
-              <button
-                onClick={() => handleSearch(query)}
-                disabled={isSearching || !query.trim()}
-                className="px-5 py-2.5 bg-[var(--primary)] text-white text-[14px] font-medium rounded-lg hover:bg-[var(--primary-dark)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                data-pendo="search-button"
-              >
-                {isSearching ? "Searching..." : "Search"}
-              </button>
-            </div>
+              {/* Search input */}
+              <div className="bg-white rounded-xl p-2 shadow-lg flex items-center gap-2">
+                <Search size={20} className="text-text-muted ml-2" />
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch(query)}
+                  placeholder={`Search ${shortTownName} documents...`}
+                  className="flex-1 border-none bg-transparent outline-none text-[15px] text-text-primary py-2 placeholder:text-text-muted"
+                  data-pendo="search-input"
+                />
+                <button
+                  onClick={() => handleSearch(query)}
+                  disabled={isSearching || !query.trim()}
+                  className="px-5 py-2.5 bg-[var(--primary)] text-white text-[14px] font-medium rounded-lg hover:bg-[var(--primary-dark)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  data-pendo="search-button"
+                >
+                  {isSearching ? "Searching..." : "Search"}
+                </button>
+              </div>
 
-            {/* Quick-link pills */}
-            {!showResults && (
+              {/* Quick-link pills */}
               <div className="flex flex-wrap justify-center gap-2 mt-6">
                 {QUICK_LINKS.map((link) => (
                   <button
@@ -376,9 +273,35 @@ export function SearchHomePage() {
                   </button>
                 ))}
               </div>
-            )}
+            </div>
+          </section>
+        )}
+
+        {/* Sticky Search Bar - Only show when results exist */}
+        {showResults && (
+          <div className="sticky top-0 z-40 bg-white border-b border-border-default h-[56px] px-4">
+            <div className="max-w-content mx-auto h-full flex items-center gap-2">
+              <Search size={18} className="text-text-muted" />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch(query)}
+                placeholder={`Search ${shortTownName} documents...`}
+                className="flex-1 border-none bg-transparent outline-none text-[14px] text-text-primary placeholder:text-text-muted"
+                data-pendo="search-input-sticky"
+              />
+              <button
+                onClick={() => handleSearch(query)}
+                disabled={isSearching || !query.trim()}
+                className="px-4 py-1.5 bg-[var(--primary)] text-white text-[13px] font-medium rounded-md hover:bg-[var(--primary-dark)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                data-pendo="search-button-sticky"
+              >
+                {isSearching ? "Searching..." : "Search"}
+              </button>
+            </div>
           </div>
-        </section>
+        )}
 
         {/* Default State (no query) */}
         {!showResults && (
@@ -442,8 +365,34 @@ export function SearchHomePage() {
 
         {/* Results State */}
         {showResults && (
-          <section className="mx-auto mt-8 max-w-content px-4 sm:px-6 pb-12">
-            {/* AI Answer */}
+          <section className="mx-auto mt-6 max-w-content px-4 sm:px-6 pb-12">
+            {/* Results count header (Google-style) */}
+            {searchResults && (
+              <div className="text-[14px] text-text-muted mb-4">
+                About {searchResults.results.length} result{searchResults.results.length !== 1 ? 's' : ''} ({(searchResults.timing_ms / 1000).toFixed(2)} seconds)
+              </div>
+            )}
+
+            {/* AI Answer Prompt Banner (compact) */}
+            {aiAnswer.type === "prompt" && (
+              <div className="bg-[#F0F9FF] border border-[#BAE6FF] rounded-lg px-4 py-3 mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles size={16} className="text-[var(--primary)]" />
+                  <span className="text-[14px] text-text-primary">
+                    Want an AI-powered answer?
+                  </span>
+                </div>
+                <button
+                  onClick={() => chatRef.current?.openWithMessage(query)}
+                  className="px-3 py-1.5 bg-[var(--primary)] text-white text-[13px] font-medium rounded-md hover:bg-[var(--primary-dark)] transition-colors"
+                  data-pendo="ask-ai-banner"
+                >
+                  Ask AI
+                </button>
+              </div>
+            )}
+
+            {/* AI Answer (if cached or loaded) */}
             {aiAnswer.type === "loading" && <AIAnswerCard state="loading" />}
             {aiAnswer.type === "cached" && (
               <AIAnswerCard
@@ -460,26 +409,10 @@ export function SearchHomePage() {
                 onFollowUp={handleFollowUp}
               />
             )}
-            {aiAnswer.type === "prompt" && (
-              <AIAnswerCard state="prompt" onGenerate={handleGenerateAnswer} data-pendo="generate-ai-answer" />
-            )}
-
-            {/* Results header */}
-            <div className="flex items-center gap-3 mb-4">
-              <FileText size={18} className="text-[var(--primary)]" />
-              <h2 className="text-xl font-bold text-text-primary">
-                Source Documents
-              </h2>
-              {searchResults && (
-                <span className="text-[13px] text-text-muted">
-                  {searchResults.results.length} results · {searchResults.timing_ms}ms
-                </span>
-              )}
-            </div>
 
             {/* Result cards */}
             {searchResults && searchResults.results.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {searchResults.results.map((result, index) => (
                   <SearchResultCard
                     key={result.id}
@@ -490,10 +423,12 @@ export function SearchHomePage() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12 text-text-secondary">
-                <p className="text-[15px]">No results found for &ldquo;{query}&rdquo;</p>
-                <p className="text-[13px] mt-2">Try a different search term</p>
-              </div>
+              !isSearching && (
+                <div className="text-center py-12 text-text-secondary">
+                  <p className="text-[15px]">No results found for &ldquo;{query}&rdquo;</p>
+                  <p className="text-[13px] mt-2">Try a different search term</p>
+                </div>
+              )
             )}
           </section>
         )}
