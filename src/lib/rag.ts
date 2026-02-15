@@ -10,7 +10,7 @@ export const DEFAULT_TOWN_ID = DEFAULT_TOWN_ID_FROM_CONFIG;
 const DEFAULT_MATCH_THRESHOLD = 0.7;
 const DEFAULT_MATCH_COUNT = 30; // Retrieve more for reranking
 const DEFAULT_FINAL_COUNT = 10; // Final chunks to pass to LLM
-const MIN_SIMILARITY_FLOOR = 0.35; // Drop chunks below this — they're noise
+const MIN_SIMILARITY_FLOOR = 0.3; // Drop chunks below this — they're noise (tuned for better recall)
 
 type ChunkMetadata = Record<string, unknown>;
 
@@ -577,6 +577,21 @@ export async function retrieveRelevantChunks(
 
   // Filter out noise — chunks below the similarity floor are irrelevant
   const chunks = allChunks.filter((c) => c.similarity >= MIN_SIMILARITY_FLOOR);
+
+  // Log filtered-out chunks in development for debugging
+  if (process.env.NODE_ENV === "development") {
+    const filteredOut = allChunks.filter((c) => c.similarity < MIN_SIMILARITY_FLOOR);
+    if (filteredOut.length > 0) {
+      console.log(
+        `[rag] Filtered ${filteredOut.length} low-relevance chunks (similarity < ${MIN_SIMILARITY_FLOOR}):`,
+        filteredOut.map((c) => ({
+          id: c.id,
+          similarity: c.similarity.toFixed(3),
+          title: c.source.documentTitle,
+        }))
+      );
+    }
+  }
 
   // Step 7: Rerank using the full expanded query for better keyword overlap scoring
   const reranked = rerankChunks(chunks, fullExpandedQuery, detectedDepartment);
