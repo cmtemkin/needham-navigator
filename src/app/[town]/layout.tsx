@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { I18nProvider } from "@/lib/i18n";
 import { TownProvider } from "@/lib/town-context";
+import { ChatProvider } from "@/lib/chat-context";
 import { getTownThemeStyle } from "@/lib/town-theme";
 import { getTownById, getTownIds, type TownConfig } from "@/lib/towns";
 import { PendoProvider } from "@/components/PendoProvider";
+import { FloatingChatWrapper } from "@/components/FloatingChatWrapper";
 
 type TownLayoutProps = Readonly<{
   children: React.ReactNode;
@@ -53,11 +55,14 @@ export default function TownLayout({ children, params }: TownLayoutProps) {
   return (
     <TownProvider town={town}>
       <I18nProvider enabled={town.feature_flags.enableMultiLanguage}>
-        <PendoProvider>
-          <div className="min-h-screen bg-surface" style={getTownThemeStyle(town)}>
-            {children}
-          </div>
-        </PendoProvider>
+        <ChatProvider>
+          <PendoProvider>
+            <div className="min-h-screen bg-surface" style={getTownThemeStyle(town)}>
+              {children}
+            </div>
+            <FloatingChatWrapper townId={town.town_id} />
+          </PendoProvider>
+        </ChatProvider>
       </I18nProvider>
     </TownProvider>
   );

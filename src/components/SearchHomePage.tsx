@@ -2,13 +2,13 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Search, Trash2, Building2, School, DollarSign, Bus, Sparkles } from "lucide-react";
+import { Search, Trash2, Building2, School, DollarSign, Bus } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SearchResultCard } from "@/components/search/SearchResultCard";
 import { AIAnswerCard } from "@/components/search/AIAnswerCard";
-import { FloatingChat, type FloatingChatHandle } from "@/components/search/FloatingChat";
 import { useTown, useTownHref } from "@/lib/town-context";
+import { useChatWidget } from "@/lib/chat-context";
 import type { SearchResponse, CachedAnswer } from "@/types/search";
 import { trackEvent } from "@/lib/pendo";
 
@@ -67,7 +67,7 @@ type AIAnswerState =
   | { type: "loading" }
   | { type: "cached"; answer: CachedAnswer }
   | { type: "loaded"; html: string; sources: { title: string; url: string }[] }
-  | { type: "prompt" };
+  | { type: "error"; message: string };
 
 function normalizeQuery(value: string | null): string {
   return (value ?? "").trim();
@@ -78,9 +78,9 @@ export function SearchHomePage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const town = useTown();
+  const { openChat } = useChatWidget();
   const searchHref = useTownHref("/search");
   const shortTownName = town.name.replace(/,\s*[A-Z]{2}$/i, "");
-  const chatRef = useRef<FloatingChatHandle>(null);
   const latestExecutedQueryRef = useRef<string | null>(null);
 
   const [query, setQuery] = useState("");
@@ -143,8 +143,78 @@ export function SearchHomePage() {
           return;
         }
 
-        // 3. No auto-generation - always show opt-in prompt
-        setAiAnswer({ type: "prompt" });
+        // 3. Always generate AI answer for uncached queries
+        if (data.results.length > 0) {
+          // Only generate if we have results
+          setAiAnswer({ type: "loading" });
+
+          try {
+            const chatRes = await fetch("/api/chat", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                messages: [{ role: "user", content: q }],
+                town_id: town.town_id,
+              }),
+            });
+
+            if (!chatRes.ok) {
+              throw new Error("Failed to generate AI answer");
+            }
+
+            // Parse the streaming response
+            const reader = chatRes.body?.getReader();
+            if (!reader) {
+              throw new Error("No response body");
+            }
+
+            let answerHtml = "";
+            let sources: { title: string; url: string }[] = [];
+            const decoder = new TextDecoder();
+
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+
+              const chunk = decoder.decode(value);
+              const lines = chunk.split("\n");
+
+              for (const line of lines) {
+                if (!line.startsWith("data: ")) continue;
+                const data = line.slice(6).trim();
+                if (!data || data === "[DONE]") continue;
+
+                try {
+                  const parsed = JSON.parse(data);
+
+                  // Handle text deltas
+                  if (parsed.type === "text-delta") {
+                    answerHtml += parsed.delta;
+                  }
+
+                  // Handle sources
+                  if (parsed.type === "data-sources") {
+                    sources = parsed.data.map((s: { document_title: string; document_url?: string }) => ({
+                      title: s.document_title,
+                      url: s.document_url ?? "",
+                    }));
+                  }
+                } catch {
+                  // Skip malformed JSON
+                }
+              }
+            }
+
+            if (answerHtml) {
+              setAiAnswer({ type: "loaded", html: answerHtml, sources });
+            } else {
+              setAiAnswer({ type: "error", message: "No answer generated" });
+            }
+          } catch (error) {
+            console.error("AI answer generation error:", error);
+            setAiAnswer({ type: "error", message: "Failed to generate AI answer" });
+          }
+        }
 
         if (data.results.length === 0) {
           trackEvent('search_no_results', {
@@ -205,12 +275,12 @@ export function SearchHomePage() {
       question_length: question.length,
       town_id: town.town_id,
     });
-    chatRef.current?.openWithMessage(question);
-  }, [town.town_id]);
+    openChat(question);
+  }, [openChat, town.town_id]);
 
   const handleFollowUp = useCallback((question: string) => {
-    chatRef.current?.openWithMessage(question);
-  }, []);
+    openChat(question);
+  }, [openChat]);
 
   const showResults = isSearching || searchResults !== null;
 
@@ -373,26 +443,7 @@ export function SearchHomePage() {
               </div>
             )}
 
-            {/* AI Answer Prompt Banner (compact) */}
-            {aiAnswer.type === "prompt" && (
-              <div className="bg-[#F0F9FF] border border-[#BAE6FF] rounded-lg px-4 py-3 mb-4 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Sparkles size={16} className="text-[var(--primary)]" />
-                  <span className="text-[14px] text-text-primary">
-                    Want an AI-powered answer?
-                  </span>
-                </div>
-                <button
-                  onClick={() => chatRef.current?.openWithMessage(query)}
-                  className="px-3 py-1.5 bg-[var(--primary)] text-white text-[13px] font-medium rounded-md hover:bg-[var(--primary-dark)] transition-colors"
-                  data-pendo="ask-ai-banner"
-                >
-                  Ask AI
-                </button>
-              </div>
-            )}
-
-            {/* AI Answer (if cached or loaded) */}
+            {/* AI Answer (loading, cached, loaded, or error) */}
             {aiAnswer.type === "loading" && <AIAnswerCard state="loading" />}
             {aiAnswer.type === "cached" && (
               <AIAnswerCard
@@ -408,6 +459,11 @@ export function SearchHomePage() {
                 sources={aiAnswer.sources}
                 onFollowUp={handleFollowUp}
               />
+            )}
+            {aiAnswer.type === "error" && (
+              <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 mb-4 text-[14px] text-red-700">
+                Failed to generate AI answer. Try asking in chat instead.
+              </div>
             )}
 
             {/* Result cards */}
@@ -435,9 +491,6 @@ export function SearchHomePage() {
       </main>
 
       <Footer />
-
-      {/* Floating Chat */}
-      <FloatingChat ref={chatRef} townId={town.town_id} />
     </>
   );
 }

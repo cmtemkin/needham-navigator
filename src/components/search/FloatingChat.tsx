@@ -214,10 +214,12 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
         });
 
         setIsOpen(true);
-        // Wait for panel to open, then send
-        setTimeout(() => {
-          sendMessage(message, { isFromSearch: true });
-        }, 100);
+        // If message is provided, wait for panel to open then send it
+        if (message.trim()) {
+          setTimeout(() => {
+            sendMessage(message, { isFromSearch: true });
+          }, 100);
+        }
       },
       [pathname, sendMessage, townId]
     );

@@ -5,12 +5,13 @@ import { Home, MessageSquare, FileCheck, Newspaper } from "lucide-react";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useI18n } from "@/lib/i18n";
 import { useTown, useTownHref } from "@/lib/town-context";
+import { useChatWidget } from "@/lib/chat-context";
 
 export function Header() {
   const town = useTown();
   const { t } = useI18n();
+  const { openChat } = useChatWidget();
   const homeHref = useTownHref();
-  const chatHref = useTownHref("/chat");
   const permitsHref = useTownHref("/permits");
   const newsHref = useTownHref("/news");
   const shortTownName = town.name.replace(/,\s*[A-Z]{2}$/i, "");
@@ -57,24 +58,24 @@ export function Header() {
             <FileCheck size={15} />
             {t("header.permits")}
           </Link>
-          <Link
-            href={chatHref}
+          <button
+            onClick={() => openChat()}
             className="flex items-center gap-[5px] rounded-lg bg-primary px-3.5 py-[7px] text-[13.5px] font-semibold text-white transition-all hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             <MessageSquare size={14} />
             {t("header.ask_question")}
-          </Link>
+          </button>
         </div>
 
         <div className="flex items-center gap-1.5 md:hidden">
           <LanguageToggle />
-          <Link
-            href={chatHref}
+          <button
+            onClick={() => openChat()}
             aria-label={t("header.ask_question")}
             className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white transition-all hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             <MessageSquare size={16} />
-          </Link>
+          </button>
         </div>
       </div>
     </header>
