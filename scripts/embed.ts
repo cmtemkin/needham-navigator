@@ -28,6 +28,57 @@ export interface EmbedOptions {
 }
 
 // ---------------------------------------------------------------------------
+// Contextual Chunk Headers
+// ---------------------------------------------------------------------------
+
+/**
+ * Build a contextual header to prepend to chunk text before embedding.
+ * This is the standard RAG technique called "contextual chunk headers."
+ * The header helps the embedding model understand WHAT document the chunk
+ * belongs to, improving retrieval for queries that reference the topic
+ * but where the chunk text itself doesn't contain those keywords.
+ *
+ * Example: A chunk from the Library page that says "Hours: Mon-Fri 9am-5pm"
+ * will now embed as "[Needham Free Public Library | Library | /library]\nHours: Mon-Fri 9am-5pm"
+ * so searching "library hours" will match much better.
+ */
+function buildChunkHeader(metadata: Record<string, unknown>): string {
+  const parts: string[] = [];
+
+  const title = metadata.document_title;
+  if (typeof title === "string" && title.trim()) {
+    parts.push(title.trim());
+  }
+
+  const department = metadata.department;
+  if (typeof department === "string" && department.trim()) {
+    parts.push(department.trim());
+  }
+
+  const sectionTitle = metadata.section_title;
+  if (typeof sectionTitle === "string" && sectionTitle.trim()
+      && sectionTitle.toLowerCase() !== "introduction") {
+    parts.push(sectionTitle.trim());
+  }
+
+  const url = metadata.document_url;
+  if (typeof url === "string" && url.trim()) {
+    // Just the path, not the full URL
+    try {
+      const path = new URL(url).pathname;
+      if (path && path !== "/") {
+        parts.push(path);
+      }
+    } catch {
+      // ignore invalid URLs
+    }
+  }
+
+  if (parts.length === 0) return "";
+  return `[${parts.join(" | ")}]`;
+}
+
+// ---------------------------------------------------------------------------
 // Main embedding + upsert function
 // ---------------------------------------------------------------------------
 
@@ -58,14 +109,20 @@ export async function embedAndStoreChunks(
 
   for (let i = 0; i < chunks.length; i += batchSize) {
     const batch = chunks.slice(i, i + batchSize);
-    const texts = batch.map((c) => c.text);
+
+    // Prepend contextual chunk headers for embedding (improves retrieval)
+    // Store original text in DB, embed with header for better semantic matching
+    const textsForEmbedding = batch.map((c) => {
+      const header = buildChunkHeader(c.metadata as unknown as Record<string, unknown>);
+      return header ? `${header}\n${c.text}` : c.text;
+    });
 
     try {
       console.log(
         `[embed] Generating embeddings for batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(chunks.length / batchSize)}`
       );
 
-      const embeddings = await generateEmbeddings(texts);
+      const embeddings = await generateEmbeddings(textsForEmbedding);
 
       // Prepare rows for upsert
       const rows = batch.map((chunk, idx) => ({

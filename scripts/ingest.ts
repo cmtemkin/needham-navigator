@@ -23,6 +23,7 @@ import { extractPdfs, PdfExtractionResult } from "./extract-pdf";
 import { chunkDocument, Chunk, detectDocumentType } from "./chunk";
 import { embedAndStoreChunks } from "./embed";
 import { IngestionLogger, StageTimer } from "./logger";
+import { getScraperConfig } from "./scraper-config";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -288,6 +289,13 @@ export async function runIngestion(options: IngestOptions = {}): Promise<IngestR
       singleStage.recordFailure(1, `Single URL re-ingest failed: ${err}`);
     }
     logger.addStageResult(singleStage.finish());
+  }
+
+  // Add direct PDF URLs from config (if any)
+  const config = getScraperConfig(townId);
+  if (config.directPdfUrls && config.directPdfUrls.length > 0) {
+    console.log(`[ingest] Adding ${config.directPdfUrls.length} direct PDF URLs from config`);
+    allPdfUrls = [...new Set([...allPdfUrls, ...config.directPdfUrls])]; // Dedupe
   }
 
   // If scrape-only mode, stop after scraping
