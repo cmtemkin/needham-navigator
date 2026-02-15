@@ -9,9 +9,7 @@ import { SearchResultCard } from "@/components/search/SearchResultCard";
 import { AIAnswerCard } from "@/components/search/AIAnswerCard";
 import { FloatingChat, type FloatingChatHandle } from "@/components/search/FloatingChat";
 import { useTown, useTownHref } from "@/lib/town-context";
-import { parseStreamResponse } from "@/lib/stream-parser";
 import type { SearchResponse, CachedAnswer } from "@/types/search";
-import type { MockSource } from "@/lib/mock-data";
 import { trackEvent } from "@/lib/pendo";
 
 const QUICK_LINKS = [
