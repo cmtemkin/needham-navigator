@@ -19,7 +19,10 @@
     "eval:new": "tsx scripts/eval/run-eval.ts",
     "eval:new:prod": "EVAL_BASE_URL=https://www.needhamnavigator.com tsx scripts/eval/run-eval.ts",
     "eval:new:local": "EVAL_BASE_URL=http://localhost:3000 tsx scripts/eval/run-eval.ts",
-    "seed-cache": "tsx scripts/seed-answer-cache.ts"
+    "seed-cache": "tsx scripts/seed-answer-cache.ts",
+    "enrich": "tsx scripts/re-enrich.ts",
+    "enrich:force": "tsx scripts/re-enrich.ts --force",
+    "enrich:migrate": "tsx scripts/apply-enrichment-migration.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.26",

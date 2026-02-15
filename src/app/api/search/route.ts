@@ -16,6 +16,11 @@ interface SearchResult {
   date: string;
   similarity: number;
   highlights: string[];
+  // AI enrichment fields (added at ingestion time)
+  ai_summary?: string;
+  ai_title?: string;
+  ai_tags?: string[];
+  content_type?: string;
 }
 
 type SearchRequestBody = {
@@ -61,15 +66,28 @@ function toSearchResult(result: HybridSearchResult): SearchResult {
   // Strip markdown from snippet before truncating
   const cleanedSnippet = stripMarkdown(result.chunk_text);
 
+  // Extract AI enrichment fields from chunk metadata
+  const aiSummary = typeof metadata.ai_summary === 'string' ? metadata.ai_summary : undefined;
+  const aiTitle = typeof metadata.ai_title === 'string' ? metadata.ai_title : undefined;
+  const aiTags = Array.isArray(metadata.ai_tags) ? metadata.ai_tags : undefined;
+  const contentType = typeof metadata.content_type === 'string' ? metadata.content_type : undefined;
+
   return {
     id: result.id,
-    title,
-    snippet: truncateSnippet(cleanedSnippet, 300),
+    // Prefer AI-cleaned title over raw title if available
+    title: aiTitle || title,
+    // Prefer AI summary over raw chunk text if available
+    snippet: aiSummary || truncateSnippet(cleanedSnippet, 300),
     source_url: sourceUrl,
     department: extractDepartment(metadata),
     date: extractDate(metadata),
     similarity: result.similarity,
     highlights: result.highlight ? [result.highlight] : [],
+    // Include enrichment fields for frontend to use
+    ai_summary: aiSummary,
+    ai_title: aiTitle,
+    ai_tags: aiTags,
+    content_type: contentType,
   };
 }
 

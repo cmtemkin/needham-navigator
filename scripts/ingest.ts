@@ -24,6 +24,7 @@ import { chunkDocument, Chunk, detectDocumentType } from "./chunk";
 import { embedAndStoreChunks } from "./embed";
 import { IngestionLogger, StageTimer } from "./logger";
 import { getScraperConfig } from "./scraper-config";
+import { enrichDocument } from "./enrich";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -85,11 +86,39 @@ async function ingestCrawledPages(
         continue;
       }
 
+      // Enrich document with AI metadata (summary, tags, title, type)
+      let enrichment = null;
+      try {
+        enrichment = await enrichDocument(page.title, page.markdown, page.url);
+        await supabase
+          .from("documents")
+          .update({
+            ai_summary: enrichment.ai_summary,
+            ai_title: enrichment.ai_title,
+            ai_tags: enrichment.ai_tags,
+            content_type: enrichment.content_type,
+            last_enriched: new Date().toISOString(),
+          })
+          .eq("id", doc.id);
+      } catch (err) {
+        console.warn(`[ingest] Enrichment failed for ${page.url}, continuing without enrichment:`, err);
+      }
+
       const chunks = chunkDocument(page.markdown, {
         documentId: doc.id,
         documentUrl: page.url,
         documentTitle: page.title,
       });
+
+      // Add enrichment fields to chunk metadata (for search results)
+      if (enrichment) {
+        for (const chunk of chunks) {
+          chunk.metadata.ai_summary = enrichment.ai_summary;
+          chunk.metadata.ai_title = enrichment.ai_title;
+          chunk.metadata.ai_tags = enrichment.ai_tags;
+          chunk.metadata.content_type = enrichment.content_type;
+        }
+      }
 
       const result = await embedAndStoreChunks(chunks, doc.id, { townId });
       totalChunks += result.chunksEmbedded;
@@ -149,12 +178,77 @@ async function ingestPdfs(
           continue;
         }
 
+        // Enrich new PDF document
+        let enrichment = null;
+        try {
+          enrichment = await enrichDocument(pdf.title, pdf.text, pdf.url);
+          await supabase
+            .from("documents")
+            .update({
+              ai_summary: enrichment.ai_summary,
+              ai_title: enrichment.ai_title,
+              ai_tags: enrichment.ai_tags,
+              content_type: enrichment.content_type,
+              last_enriched: new Date().toISOString(),
+            })
+            .eq("id", newDoc.id);
+        } catch (err) {
+          console.warn(`[ingest] Enrichment failed for ${pdf.url}, continuing without enrichment:`, err);
+        }
+
         const chunks = chunkDocument(pdf.text, { documentId: newDoc.id, documentUrl: pdf.url, documentTitle: pdf.title });
+
+        // Add enrichment fields to chunk metadata
+        if (enrichment) {
+          for (const chunk of chunks) {
+            chunk.metadata.ai_summary = enrichment.ai_summary;
+            chunk.metadata.ai_title = enrichment.ai_title;
+            chunk.metadata.ai_tags = enrichment.ai_tags;
+            chunk.metadata.content_type = enrichment.content_type;
+          }
+        }
         const result = await embedAndStoreChunks(chunks, newDoc.id, { townId });
         totalChunks += result.chunksEmbedded;
         errors += result.errors;
       } else {
+        // Enrich existing PDF if not already enriched
+        let enrichment = null;
+        try {
+          const { data: existingDoc } = await supabase
+            .from("documents")
+            .select("ai_summary")
+            .eq("id", doc.id)
+            .single();
+
+          if (!existingDoc?.ai_summary) {
+            enrichment = await enrichDocument(pdf.title, pdf.text, pdf.url);
+            await supabase
+              .from("documents")
+              .update({
+                ai_summary: enrichment.ai_summary,
+                ai_title: enrichment.ai_title,
+                ai_tags: enrichment.ai_tags,
+                content_type: enrichment.content_type,
+                last_enriched: new Date().toISOString(),
+              })
+              .eq("id", doc.id);
+          }
+        } catch (err) {
+          console.warn(`[ingest] Enrichment failed for ${pdf.url}, continuing without enrichment:`, err);
+        }
+
         const chunks = chunkDocument(pdf.text, { documentId: doc.id, documentUrl: pdf.url, documentTitle: pdf.title });
+
+        // Add enrichment fields to chunk metadata
+        if (enrichment) {
+          for (const chunk of chunks) {
+            chunk.metadata.ai_summary = enrichment.ai_summary;
+            chunk.metadata.ai_title = enrichment.ai_title;
+            chunk.metadata.ai_tags = enrichment.ai_tags;
+            chunk.metadata.content_type = enrichment.content_type;
+          }
+        }
+
         const result = await embedAndStoreChunks(chunks, doc.id, { townId });
         totalChunks += result.chunksEmbedded;
         errors += result.errors;
