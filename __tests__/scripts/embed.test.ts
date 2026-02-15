@@ -57,8 +57,9 @@ describe("embed", () => {
 
     await embedAndStoreChunks(chunks, "test-doc-id");
 
+    // Expect chunks with contextual headers prepended (Phase 2 enhancement)
     expect(mockGenerateEmbeddings).toHaveBeenCalledWith(
-      chunks.map((c) => c.text)
+      chunks.map((c) => `[Test Doc | /doc]\n${c.text}`)
     );
   });
 
