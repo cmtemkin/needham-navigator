@@ -44,7 +44,7 @@ jobs:
             # Single curl call captures both body and HTTP code
             RAW_RESPONSE=$(curl -s -w "\nHTTP_CODE:%{http_code}" --max-time 60 -X POST "https://www.needhamnavigator.com/api/chat" \
               -H "Content-Type: application/json" \
-              -d '{"message":"What are the hours for Needham Town Hall?","townId":"needham"}' 2>/dev/null || echo "HTTP_CODE:000")
+              -d '{"messages":[{"role":"user","content":"What are the hours for Needham Town Hall?"}],"townId":"needham"}' 2>/dev/null || echo "HTTP_CODE:000")
 
             API_HTTP=$(echo "$RAW_RESPONSE" | grep -o 'HTTP_CODE:[0-9]*' | tail -1 | cut -d: -f2)
             API_BODY=$(echo "$RAW_RESPONSE" | sed '/HTTP_CODE:[0-9]*/d')
