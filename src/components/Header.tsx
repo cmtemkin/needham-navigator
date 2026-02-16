@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Home, MessageSquare, FileCheck, Newspaper } from "lucide-react";
+import { Home, MessageSquare, FileCheck, Newspaper, Info } from "lucide-react";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useI18n } from "@/lib/i18n";
 import { useTown, useTownHref } from "@/lib/town-context";
@@ -12,6 +12,7 @@ export function Header() {
   const { t } = useI18n();
   const { openChat } = useChatWidget();
   const homeHref = useTownHref();
+  const aboutHref = useTownHref("/about");
   const permitsHref = useTownHref("/permits");
   const newsHref = useTownHref("/news");
   const shortTownName = town.name.replace(/,\s*[A-Z]{2}$/i, "");
@@ -49,6 +50,15 @@ export function Header() {
             >
               <Newspaper size={15} />
               News
+            </Link>
+          )}
+          {town.feature_flags.enableAbout && (
+            <Link
+              href={aboutHref}
+              className="flex items-center gap-[5px] rounded-lg px-3.5 py-[7px] text-[13.5px] font-medium text-text-secondary transition-all hover:bg-surface hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              <Info size={15} />
+              {t("header.about")}
             </Link>
           )}
           <Link
