@@ -3,9 +3,7 @@
  * These tests require a running server and are skipped in CI
  */
 
-const describeIfServer = process.env.CI ? describe.skip : describe;
-
-describeIfServer('POST /api/chat', () => {
+(process.env.CI ? describe.skip : describe)('POST /api/chat', () => {
   const API_URL = process.env.API_BASE_URL || 'http://localhost:3000';
 
   it('should return streaming response for valid message', async () => {
