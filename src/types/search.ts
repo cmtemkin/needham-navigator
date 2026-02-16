@@ -7,6 +7,9 @@ export interface SearchResult {
   date: string;
   similarity: number;
   highlights: string[];
+  ai_title?: string;
+  ai_summary?: string;
+  ai_tags?: string[];
 }
 
 export interface CachedAnswer {
