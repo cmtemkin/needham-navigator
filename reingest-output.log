@@ -1,0 +1,2547 @@
+Loaded 1500 scraped documents
+
+--- Re-ingesting from scraped data ---
+[chunk] Chunked "Needham, MA | Official Website" (public_works) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 5f458cea-9ccc-4679-ae15-6c0b0a28e7ff in 2643ms
+[chunk] Chunked "Town Buildings & Department Locations" (local_business) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 87f5d5db-9e5d-47ba-92e6-4db2e5e7ff0d in 1070ms
+[chunk] Chunked "Departments A - L, MA" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 020432f5-3d78-4b60-bcb5-23462df59314 in 1356ms
+[chunk] Chunked "Accounting, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 8d6a9cef-ba88-416a-8607-c49a2afd063d in 1123ms
+[chunk] Chunked "Assessing, MA" (local_business) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 21aab2c3-fc34-493e-8c6c-774e22427d28 in 902ms
+[chunk] Chunked "General Information, MA" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document c2d9ac6c-75ba-42e9-9454-4f39e16013c1 in 1223ms
+[chunk] Chunked "Helpful Terms, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 0c45a9f3-45f9-4d82-b4f6-d4f4289f094b in 792ms
+[chunk] Chunked "Important Dates, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 8b2fb71b-d1cd-48c5-b2d0-c059e6bb21b4 in 710ms
+[chunk] Chunked "Property Record Cards (2026), MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 0ebabd2d-56c2-4465-83fd-fa4ed9b3eea1 in 1259ms
+[chunk] Chunked "Forms & Guidelines, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document fa0ee15f-a78b-42b4-92d2-880331024244 in 613ms
+[chunk] Chunked "Real Estate & Personal Property Abatement" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document de08e219-e960-4429-b58f-913880d43ad0 in 2204ms
+[chunk] Chunked "Motor Vehicle Excise Tax, MA" (general) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document e5e800d0-05a4-40bb-bc08-62c41a99c372 in 1230ms
+[chunk] Chunked "Personal Property Tax, MA" (local_business) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 52dae3b5-48e7-4af0-a12c-07d6eaa997a5 in 961ms
+[chunk] Chunked "This Year's Bill, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 4e18d060-454a-49c9-adaf-aadbaef819f5 in 1052ms
+[chunk] Chunked "Property Taxes, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 4f9dd9bb-ec11-4b14-a305-14921f1742a1 in 908ms
+[chunk] Chunked "Property Tax Exemptions, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 6f9b0b45-067f-467a-aca6-d29d829a66c8 in 895ms
+[chunk] Chunked "Property Value Process, MA" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document f559b6d4-c686-4f5f-ae40-1d05796ec655 in 854ms
+[chunk] Chunked "Proposition 2 1 / 2" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 66c24e74-76c5-4ddf-9e7e-cf11123871ea in 736ms
+[chunk] Chunked "Tax Levy, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document c1765c27-b908-4b05-b758-5f63a6868b0a in 738ms
+[chunk] Chunked "Tax Rate, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 1d505141-ff1c-4f8c-825f-32e6d563045b in 771ms
+[chunk] Chunked "Values Compared to Last Year" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document c00a9992-9b29-4ff3-89f2-d81103f7c038 in 750ms
+[chunk] Chunked "Current Tax Rates, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 5f2fa12c-8f84-4148-90e7-a83c954985dd in 1212ms
+[chunk] Chunked "Cyclical Inspections, MA" (building_permits) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document c4e7153b-568d-494f-bc7e-d730ead7705a in 1077ms
+[chunk] Chunked "Meet Our Inspectors, MA" (building_permits) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 0140c8cc-c8b8-491e-9e63-8fbea7af5fff in 786ms
+[chunk] Chunked "Building, MA" (building_permits) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document dc0281c5-3f3d-471e-9adc-7dde3327b467 in 849ms
+  Progress: 25/1500 docs, 66 chunks
+[chunk] Chunked "Zoning By Law, MA" (zoning_bylaws) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 3cc1f592-454c-4116-ac1f-0a78b3980640 in 743ms
+[chunk] Chunked "2017 Zoning By Law Changes Articles 24 - 30" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 9fb4a746-c477-4083-9588-a98331c86bb8 in 1400ms
+[chunk] Chunked "Accessory Dwelling Unit (In-Law), MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 1b45b6e3-b7c3-4df2-aa3f-283ffcb7cbc3 in 605ms
+[chunk] Chunked "Applications, MA" (public_works) into 10 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 10/10 chunks for document c3e8d9bd-8bd6-41eb-9ec3-4b79b225fcf8 in 1121ms
+[chunk] Chunked "Building Department News, MA" (fee_schedules) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 2f14e6fe-592b-4b7d-a92c-ac4ab6e132ac in 787ms
+[chunk] Chunked "Building Permits Issued, MA" (building_permits) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document ca5d0b1b-7ab8-4c13-bb52-f18614ace3a8 in 710ms
+[chunk] Chunked "Demolition, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 07a1ff64-8fa5-435a-8d6c-2db4dbca32db in 803ms
+[chunk] Chunked "Easy Permits, MA" (building_permits) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document f83c6147-eae4-4cca-a67e-843a9a1f7a06 in 1238ms
+[chunk] Chunked "Guided Process, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document e888c40a-7f32-424d-ba47-84735db8cf60 in 593ms
+[chunk] Chunked "New Construction, MA" (zoning_bylaws) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 832f07cb-6d77-4c13-bf64-a98c1fb11a57 in 748ms
+[chunk] Chunked "Structure Demolition, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 2c8b9fa1-3dcd-470e-9f92-8915a1fb54d0 in 676ms
+[chunk] Chunked "Home Addition, MA" (zoning_bylaws) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 56336951-e8a6-4aba-a384-8a5f74e57527 in 809ms
+[chunk] Chunked "Interior Remodeling, MA" (building_permits) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 0a6be75f-7688-48f4-8313-c55c7fb597e5 in 873ms
+[chunk] Chunked "Shed, MA" (zoning_bylaws) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 585d7c64-736f-40da-97d4-a18713abf466 in 819ms
+[chunk] Chunked "Deck, MA" (zoning_bylaws) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 37fb7620-01a4-4e49-9817-40da0598cde1 in 696ms
+[chunk] Chunked "Siding / Roofing" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 19b64267-0544-44fe-8f4a-b3a23c33c335 in 628ms
+[chunk] Chunked "Swimming Pools, MA" (zoning_bylaws) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document 01933dd7-40ba-4553-a0de-24aa80e705b5 in 849ms
+[chunk] Chunked "Solar Panel, MA" (building_permits) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 37ed0bba-13f9-41ba-91ed-6187f1f55f5f in 650ms
+[chunk] Chunked "Fireplace / Woodstove" (zoning_bylaws) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document 04589174-39d6-4a9b-94b5-a3ce9a29c264 in 737ms
+[chunk] Chunked "Septic System Installation or Removal" (building_permits) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document b50f4a0b-47af-44ca-bb6d-a067c4e03012 in 872ms
+[chunk] Chunked "Approximate Timeline, MA" (building_permits) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 2e7a6179-72c5-46d6-9f06-f54023d99a4e in 657ms
+[chunk] Chunked "Fees, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document b5ae4764-e868-413f-949c-6f4a4a0e305f in 670ms
+[chunk] Chunked "Forms, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document df241a19-8651-4379-8a0a-b8ada83d963d in 644ms
+[chunk] Chunked "Inspection Schedule, MA" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 36d9160a-b51a-4784-b59b-a1b5a7a472eb in 774ms
+[chunk] Chunked "Links, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document a6af4763-e06d-456b-8c38-933a14874791 in 613ms
+  Progress: 50/1500 docs, 136 chunks
+[chunk] Chunked "On Ground Swimming Pools, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document e8fb96b1-5209-4c44-be67-ff68e2724a69 in 669ms
+[chunk] Chunked "Open Building Permits, MA" (building_permits) into 8 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 8/8 chunks for document 9318b823-444e-4225-b3c5-f199b99f8e4e in 898ms
+[chunk] Chunked "Plan Details Information, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document fb221ff1-b699-4b80-8e27-229ec801e984 in 615ms
+[chunk] Chunked "Decks, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 60bf3ee5-3d29-45bf-af8d-2c7f359d040d in 657ms
+[chunk] Chunked "Fireplaces, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 8ce2abe4-c308-45de-ae80-b051211f2b87 in 675ms
+[chunk] Chunked "General Building, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document cf409c8d-2214-4a23-b516-e8dfa99bb977 in 656ms
+[chunk] Chunked "Stairways, MA" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 30699a4d-b6e5-4280-8c69-3ec7c5b6d327 in 653ms
+[chunk] Chunked "Storm Water By- law, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document ee39a3bf-4a5c-4837-a5cc-b66a5c4d790b in 659ms
+[chunk] Chunked "Building Design & Construction, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document ae4dc3ce-2e19-4913-8dc8-fca51b3bd208 in 690ms
+[chunk] Chunked "Communications, MA" (local_business) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 17f7353b-7bf9-4cd2-89cf-6cecc2fe3008 in 708ms
+[chunk] Chunked "Social Media, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document ea9809cb-261c-4851-bcf8-1071c2cc9ab6 in 749ms
+[chunk] Chunked "Social Media Terms of Use" (local_business) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document ee28a1e3-028a-4ce2-b035-124a7a9d2cd3 in 684ms
+[chunk] Chunked "Conservation, MA" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 1f9989ee-539e-4e13-a68b-f6ce911e8cea in 770ms
+[chunk] Chunked "Agendas & Minutes, MA" (local_business) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document ab0ffc1d-01d8-45bb-bfb1-d92d9546ec9a in 745ms
+[chunk] Chunked "Submitted Applications for Upcoming and Recent Public Meetings" (building_permits) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document cd7e9249-720c-4059-afc5-fff993b489ca in 701ms
+[chunk] Chunked "Conservation Commission, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 5893a285-55fc-49fc-9730-f6c6ad407a38 in 860ms
+[chunk] Chunked "Meeting Schedule 2025, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document ee1ac994-0d77-404b-8d6a-23b6d03e4992 in 579ms
+[chunk] Chunked "Meeting Schedule 2026, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document ca0ce6c0-f2bf-40bf-8c66-994e54d4b18e in 659ms
+[chunk] Chunked "Policies, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 7fcba6da-b90b-4978-8c63-5cdcfa4fadba in 618ms
+[chunk] Chunked "Fall & Spring Yard Clean Up" (public_works) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document addc8f2d-ef81-48a0-b0ea-99d6c67cbad1 in 734ms
+[chunk] Chunked "Permitting, MA" (building_permits) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document d0f64cbd-f709-4a6f-9dea-a8122f00c688 in 846ms
+[chunk] Chunked "Wetland Consultant Information, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document dc72f444-872e-4ae1-8dfc-4cf115f36c45 in 655ms
+[chunk] Chunked "Forms, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document b90e6e4d-fe62-4068-967c-4beababff02a in 679ms
+[chunk] Chunked "Fees, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 34da8977-f8b0-4e3a-a117-950f5bcbeaf1 in 616ms
+[chunk] Chunked "Resource Areas Protected in Needham" (local_business) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 86c5da91-af6a-485f-9a97-db39b01ed630 in 815ms
+  Progress: 75/1500 docs, 189 chunks
+[chunk] Chunked "Regulated or Prohibited Activities, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document c3663312-d38d-4257-98ba-09cf95b97607 in 717ms
+[chunk] Chunked "Policies, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document acd2f1e5-70a1-458b-bb24-055d765db6c8 in 649ms
+[chunk] Chunked "Links, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 1f963b2d-2ba9-4c6f-a21b-479639e399f2 in 750ms
+[chunk] Chunked "Needham Trails, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 9cc09cb4-ebe4-4d0b-ab9a-30f5d313b6b3 in 587ms
+[chunk] Chunked "Trail Maps and Information, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 14ff775a-c79d-425b-bb3d-2bc5da29b0ce in 656ms
+[chunk] Chunked "Ridge Hill Reservation, MA" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 77d5a4eb-d567-4f3a-a53c-54d5f0855e90 in 883ms
+[chunk] Chunked "Studies of Interest, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 8cc4827b-0c57-4085-b79a-d27d2a9b97f7 in 664ms
+[chunk] Chunked "Invasive Species, MA" (general) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document d10364f9-3fab-4da5-b0ed-394214b0791a in 1172ms
+[chunk] Chunked "Events, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document f2b59e25-e932-4434-89c7-83f79ce0ecea in 1793ms
+[chunk] Chunked "Council on Aging, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 74eaa0c0-19b1-46a0-be67-b51b65b29f25 in 743ms
+[chunk] Chunked "Who We Are, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document eb7404d8-24ff-455b-a052-f348251164ed in 777ms
+[chunk] Chunked "Friends of The Center at the Heights" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 1d956da7-b829-40d1-98a9-fbf1a73d92f3 in 799ms
+[chunk] Chunked "Governance & Funding Sources, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 2cd5eb69-a284-42fe-828b-48f42034ad78 in 713ms
+[chunk] Chunked "Meet the Board, MA" (general) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document c2553d58-f8c2-45db-aa57-c19e4bfc3fdd in 797ms
+[chunk] Chunked "Meet the COA and Advisory Boards" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 7699726c-6e3c-4724-a7ab-a56d78897b03 in 864ms
+[chunk] Chunked "Meet the Staff, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 63014431-7cf8-470d-86ab-773fb2eeaf73 in 673ms
+[chunk] Chunked "Our Community Partners, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document ae48dcb5-70a9-4dc4-9363-bbc52e2d27c2 in 801ms
+[chunk] Chunked "Our History, MA" (public_works) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document c030001a-f486-4ad5-a516-0aa8a7337030 in 780ms
+[chunk] Chunked "Testimonials, MA" (general) into 8 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 8/8 chunks for document afc60b18-f29e-430d-b99c-d4a7d7703bac in 1037ms
+[chunk] Chunked "Needham Compass Newsletter, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document a725e838-af6a-4a73-abb6-f76041951be9 in 901ms
+[chunk] Chunked "Transportation Services, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 2d1664fd-d97a-4024-b538-e0eec7d1e805 in 973ms
+[chunk] Chunked "To the Senior Center, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 0cdf113f-13e6-4315-a133-dcad7797cc5d in 773ms
+[chunk] Chunked "To the Grocery Store, MA" (general) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document 4c87d073-b1a3-4031-b3a4-69af7d08bc68 in 853ms
+[chunk] Chunked "To Medical Appointments, MA" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document f04e3e11-123c-4372-a882-92c08aa3347e in 706ms
+[chunk] Chunked "To Errands and Shopping, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document f19dcb1c-393f-4ce3-bae8-41633085a6d5 in 640ms
+  Progress: 100/1500 docs, 261 chunks
+[chunk] Chunked "The MBTA RIDE, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 9bdb0d02-a11d-413a-a5ec-82a9601145fc in 651ms
+[chunk] Chunked "The Center at The Heights" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 873bd001-d0ee-40af-b681-cf7ca48b4374 in 799ms
+[chunk] Chunked "Renting the Center at the Heights" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 1ef1cec6-03e7-4cca-b3e3-54d57105ebeb in 629ms
+[chunk] Chunked "Legal Services, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document bce50ae8-e188-4d60-8dda-08eebc6a6533 in 657ms
+[chunk] Chunked "Meals, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 23db9c6b-1ce8-4c31-923c-4f254a812e48 in 656ms
+[chunk] Chunked "Senior Center Lunchtime Cafe, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 08574348-a3f0-48b3-8026-83fd635674fc in 713ms
+[chunk] Chunked "Health Insurance Counseling (SHINE), MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 39c9e579-6ffc-4b33-a76e-a16abcad6814 in 753ms
+[chunk] Chunked "Other Aging Links, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document de88676c-3d14-4576-af0a-14e329656e41 in 672ms
+[chunk] Chunked "Council on Aging Programs, MA" (local_business) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document bce3ec7e-dc92-4446-9121-dbeaa81eaa3a in 680ms
+[chunk] Chunked "Program Information, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 98b42cfa-2417-49ec-b50d-9157498e3dc2 in 1158ms
+[chunk] Chunked "Computer Center, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 7c8d5119-ff52-470c-a07b-acf5fb33194a in 710ms
+[chunk] Chunked "Trips, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 21ef9687-98bd-427d-8b3b-050952e82f02 in 712ms
+[chunk] Chunked "Senior Corps Employment Opportunities, MA" (budget) into 15 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 15/15 chunks for document dbfa6d38-35a1-495d-9395-dcdf026f6c8a in 1325ms
+[chunk] Chunked "Social Service Department, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 651c87ea-0a11-4fb9-8ce6-32e92ce3e895 in 840ms
+[chunk] Chunked "Information and Referral, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 8e1a4980-e073-4201-9046-7ac4fb5a0d64 in 611ms
+[chunk] Chunked "Counseling, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 40e61b82-0e38-4769-b34a-b6ff6dfcf869 in 684ms
+[chunk] Chunked "Support Groups, MA" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 6c1ecc1d-2f0b-431b-8664-4009adf11b5f in 726ms
+[chunk] Chunked "Grocery Shopping, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 2e940682-bb4e-4762-ae8e-92fdccf76d15 in 679ms
+[chunk] Chunked "Community Connections Program, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document e9c5c023-bad5-4a06-b5b4-ebea016fa29a in 778ms
+[chunk] Chunked "Tax Preparation, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 427ba07b-b62a-416a-8278-2146b209e633 in 649ms
+[chunk] Chunked "Volunteer Program, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document a21c8976-5396-47c6-84db-2795632ed9d7 in 888ms
+[chunk] Chunked "Wellness Clinics, MA" (board_of_health) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 4fa6d99f-d063-4d59-9636-ce0902780c3b in 674ms
+[chunk] Chunked "Economic Development, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 949a3250-2a34-48c9-bfbb-d11c7b8e2026 in 623ms
+[chunk] Chunked "Needham Small Business Recovery Grant Program" (general) into 22 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 22/22 chunks for document 31f67144-2af2-4d9c-92a6-a59489ca0a9f in 1557ms
+[chunk] Chunked "Arts and Cultural Plan, MA" (public_works) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 662960c3-c0f6-4f07-8870-da04d93eaa04 in 997ms
+  Progress: 125/1500 docs, 345 chunks
+[chunk] Chunked "Public Forum for Needham Arts and Culture Plan" (public_works) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document a524dbd7-082f-4fe2-a2eb-7eb744704503 in 767ms
+[chunk] Chunked "Snow Removal for Commercial Properties" (public_works) into 10 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 10/10 chunks for document c7a70838-2adc-4d23-b194-b575153fb5d5 in 869ms
+[chunk] Chunked "Finance Department, MA" (budget) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document de7b643f-b226-41a4-91fc-2dab6bbc38dd in 774ms
+[chunk] Chunked "Budget Documents, MA" (budget) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 3362e56f-f8b2-4222-bd29-69d0bd96185b in 581ms
+[chunk] Chunked "Contract Information, MA" (budget) into 9 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 9/9 chunks for document 8398678a-09e9-469e-b84c-0b868bee37ab in 2126ms
+[chunk] Chunked "Financial Reports, MA" (budget) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document e4966b85-3eb7-49ac-8bbf-a92c7fff94b0 in 774ms
+[chunk] Chunked "American Recovery Plan Act (ARPA) Investments" (budget) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 46b228eb-9e86-44fe-a4d6-13e9bbaf8313 in 671ms
+[chunk] Chunked "Fire Department, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 137f81c8-4a45-4114-901c-d63ef94db12e in 622ms
+[chunk] Chunked "Divisions, MA" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 0dd7ee7c-73d0-44af-ac42-01fefed21a2a in 726ms
+[chunk] Chunked "Fire Administration, MA" (local_business) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 9427581d-7166-4c01-90a1-96d1082d7fa3 in 685ms
+[chunk] Chunked "Public Safety Dispatch, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document df3aadf3-91fa-4756-a786-173270d839c6 in 704ms
+[chunk] Chunked "Emergency Medical Services, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 8fe629af-273f-450c-b261-375d9cc4849d in 664ms
+[chunk] Chunked "Emergency Management, MA" (public_works) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 826265c2-9934-4f42-a49c-638630b8a5b3 in 698ms
+[chunk] Chunked "How We Notify You in an Emergency" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 890e10ad-557f-4aea-bfaa-eb31b2110922 in 769ms
+[chunk] Chunked "How You Can Prepare, MA" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document c851771d-7518-4f6b-be95-62827b3ba888 in 862ms
+[chunk] Chunked "Severe Weather Preparedness, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 545361eb-8240-4cff-b037-4f2a46589abb in 787ms
+[chunk] Chunked "Hurricane Season, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 46c5baf8-a4f3-4b74-b091-a3040dbaf697 in 640ms
+[chunk] Chunked "Heavy Rain and Potential Flooding" (public_works) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 7031b4a1-3ffe-4c67-8db2-c74b3318a41b in 659ms
+[chunk] Chunked "Heavy Snow and Blizzard Conditions" (public_works) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document 33fcc311-32f5-4d20-b3d6-08d95dac0bcc in 788ms
+[chunk] Chunked "Extreme Heat, MA" (public_works) into 10 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 10/10 chunks for document 4c73938c-d392-4276-9014-d3faeaed6290 in 880ms
+[chunk] Chunked "Prepare for an Emergency, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 5fd72060-7032-4bb6-9040-0e42f53c6dd1 in 633ms
+[chunk] Chunked "Contacts, MA" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document b6b0c28b-e576-4369-b604-e275c8c9338a in 715ms
+[chunk] Chunked "Emergency Shelter Information, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document ab3ce21d-d13c-47ff-b1c2-5097486b16de in 710ms
+[chunk] Chunked "How We Prepare, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document ffe87a4b-8d81-4b76-968f-5a3c37a2cffa in 796ms
+[chunk] Chunked "Municipal Vulnerability Preparedness, MA" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 9ee7fa0a-ee5b-4ab7-8520-01ca001be13d in 697ms
+  Progress: 150/1500 docs, 434 chunks
+[chunk] Chunked "Local Emergency Planning Committee (LEPC)" (public_works) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 925b1f60-7e44-4ac8-a038-fb9c4a806b9c in 915ms
+[chunk] Chunked "Fire Prevention, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 06f7a11b-c6da-443a-98ea-abe16a62e3d2 in 651ms
+[chunk] Chunked "Fire Protection, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document aa2be2a8-da0f-4b3c-9e4b-a0b75916c2ac in 667ms
+[chunk] Chunked "Fleet Maintenance, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document d0023e1e-5538-4020-8398-26ab7c1e683d in 600ms
+[chunk] Chunked "Emergency Alerts and Notifications, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document fdd09849-1d1a-4258-98f1-9cb989e7b4ff in 645ms
+[chunk] Chunked "Helpful Links, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 968e06e0-1610-4a24-8681-b7cb2e9a0b67 in 572ms
+[chunk] Chunked ", MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 9d948ee6-b659-493c-873f-9def534ca7ca in 699ms
+[chunk] Chunked "The Needham Fire Department On Scene" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document a71fd2e6-c059-4666-9033-39cf9a7377c1 in 693ms
+[chunk] Chunked "Needham Fire Department In the Community" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 717653de-d8ad-4bfe-a28a-9a5c7ac1f364 in 697ms
+[chunk] Chunked "What to Know When Selling Your Home" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document ff4cf37e-be3c-4b8f-8c79-f5cdb02089b2 in 689ms
+[chunk] Chunked "Permits, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 0f6cffe1-9fc5-47b2-b437-1614d321dfa9 in 653ms
+[chunk] Chunked "Open Burning Season, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document cd18f44b-9970-4e8d-84f9-73882e4c70ad in 805ms
+[chunk] Chunked "Public Education, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document ec390c34-bc0d-4df9-8d5c-906a582034ed in 624ms
+[chunk] Chunked "Home Fire Safety, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 7dfff0ee-9dad-4721-b55b-bf31332d97d7 in 674ms
+[chunk] Chunked "When to replace your beeping detector or alarm" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 076c40d6-510f-4d00-bc65-ebab9e5c2a11 in 589ms
+[chunk] Chunked "Smoke Detectors, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document fdad9952-f7ea-4df8-a9df-639746e2b647 in 651ms
+[chunk] Chunked "Alarmas de Humo, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 558386aa-85fc-4696-9a65-b8d39e2e323c in 567ms
+[chunk] Chunked "Smoke Alarms for the Disable" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 91e7f8d7-3fc8-4264-a86e-6311c4d1ff73 in 671ms
+[chunk] Chunked "Carbon Monoxide Alarms, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 348b88fa-5eaf-40db-8554-88049a77a7ab in 723ms
+[chunk] Chunked "Alarma de monóxido de carbono" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 647bbb9e-36ed-4778-a6b0-75848dd64c21 in 619ms
+[chunk] Chunked "Home Fire Escape Planning, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 8176822c-42c2-4d91-bfcd-bb09d03a6e55 in 611ms
+[chunk] Chunked "Clothes Dryer Safety, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document d06a1e8e-ec1c-4b0c-b843-e8d0989b96ec in 633ms
+[chunk] Chunked "Cooking Safety, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 333f38db-761a-4251-a7a4-1bdd620114b9 in 642ms
+[chunk] Chunked "CFL Light Bulbs, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document fd11d4d5-e0c8-4f83-942a-10ca90d6fa31 in 694ms
+[chunk] Chunked "Electrical Safety, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 0748ffec-dfa8-417c-b96d-49993998ffca in 625ms
+  Progress: 175/1500 docs, 466 chunks
+[chunk] Chunked "Scald Prevention, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 5c415f0e-a342-44a1-b524-3363d2bb8f4f in 584ms
+[chunk] Chunked "Outdoor Electrical, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document aa7ad02e-d70b-4c7c-ab15-8827b6c0724f in 816ms
+[chunk] Chunked "Natural Gas Safety, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document c8606d9e-5b46-4a57-bcd4-936c8675843a in 651ms
+[chunk] Chunked "Summer Safety, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 756c7bf8-6804-4181-83a7-638af98e153e in 740ms
+[chunk] Chunked "Preventing Mulch Fires, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document acd2581d-f71c-40bd-9952-2b7c13d54532 in 604ms
+[chunk] Chunked "Fireworks Safety, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 5683469e-ad93-42e6-9cc8-d5dc2a1a7520 in 620ms
+[chunk] Chunked "Massachusetts Fireworks Law, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 01fb027f-e5f0-4fdf-a515-48d71167538e in 645ms
+[chunk] Chunked "Grilling Safety, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document c3c3fd61-da7b-4633-b9e3-2e0b420afb0d in 649ms
+[chunk] Chunked "Motel Safety, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document a727c383-d4ee-4ec2-83e3-7a737b04f17e in 649ms
+[chunk] Chunked "Lightning Safety, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 0dbb6c84-7990-4b28-87d0-67c3e4347f1c in 611ms
+[chunk] Chunked "Slideshows, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 7db3287b-cab6-48e9-a577-ded81b7b3b01 in 699ms
+[chunk] Chunked "NFD Apparatus Through The Years" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 9428b194-1d78-4bc8-8530-0a86da027972 in 640ms
+[chunk] Chunked "Needham Fire Department On-Scene, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 4a3bb39c-7879-41ff-8007-2775505f6eae in 669ms
+[chunk] Chunked "Human Resources, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document c5cdd24c-744b-49d0-a5cc-183d3d79a11a in 670ms
+[chunk] Chunked "Benefit Information, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document fe38710d-e493-46b9-94e9-f3146c2f5334 in 770ms
+[chunk] Chunked "Active Employees, MA" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document abf9baf2-a2c7-4941-adc9-14f0c72c952c in 822ms
+[chunk] Chunked "New Employees, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 8a204023-cbd5-4ebf-b0a4-7ede43c753fc in 843ms
+[chunk] Chunked "Other Benefits, MA" (general) into 8 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 8/8 chunks for document adc74ee7-bcfc-43ec-b447-e586a9b75045 in 932ms
+[chunk] Chunked "Aflac Supplemental Insurance, MA" (general) into 8 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 8/8 chunks for document 3b9b5171-83d2-48f1-ba86-110ab45fa3b6 in 956ms
+[chunk] Chunked "Credit Union Membership, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document a30f72e2-e51d-4182-adab-9bce2d12a8a1 in 618ms
+[chunk] Chunked "Deferred Compensation, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 88cbf64f-3d80-442c-9ecd-954d4fa36c73 in 954ms
+[chunk] Chunked "Employee Assistance Plans, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document c38d7e94-7032-45f8-944e-411f7c3b943d in 631ms
+[chunk] Chunked "Section 125 Plan, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 4aeccb5a-01a0-4e5e-9e2f-a1f7404b9a55 in 691ms
+[chunk] Chunked "Annual Open Enrollment for Benefits" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document ff7e69f3-f088-41e4-acc2-6ecee1a9bdb7 in 681ms
+[chunk] Chunked "Benefit Information, MA" (general) into 9 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 9/9 chunks for document 873c52b4-5103-456e-bba5-283684cb0bea in 1184ms
+  Progress: 200/1500 docs, 521 chunks
+[chunk] Chunked "Medicare Plan Open Enrollment, MA" (public_works) into 8 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 8/8 chunks for document 4bcdc081-4b64-4c80-80bb-a3477845806c in 826ms
+[chunk] Chunked "Classification & Compensation, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document ad093bac-add2-44ca-a107-2906867e81d9 in 639ms
+[chunk] Chunked "New Employees, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document c003a514-b991-4a6f-acd9-d405b29ea1eb in 805ms
+[chunk] Chunked "How to Apply for a Job" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 7aa643f7-43c3-4817-a0b5-f29db5306eb2 in 707ms
+[chunk] Chunked "Job Descriptions, MA" (public_works) into 32 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 32/32 chunks for document 62e16929-117d-437b-a9a5-4c0cbeadb16c in 1556ms
+[chunk] Chunked "Human Resources Policies, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 2d4301a9-d8cc-4682-ac97-3073b6fc8040 in 740ms
+[chunk] Chunked "Represented Employee Groups, MA" (public_works) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document d77d7324-7097-4f29-b067-d0bb0461f09e in 762ms
+[chunk] Chunked "Career Opportunities, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 9e1a6f56-59e2-4a20-9f9f-970d4557caa4 in 619ms
+[chunk] Chunked "Departments M - Q, MA" (public_works) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 0891a669-0b1b-4d9f-bb62-f5d574158830 in 736ms
+[chunk] Chunked "Park & Recreation, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 2958061e-88e1-47f7-b031-dae6c1a42a4a in 654ms
+[chunk] Chunked "About, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 4a11b88b-e1d6-4e4e-a9e8-94eae29376dc in 773ms
+[chunk] Chunked "Meetings, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 8374c4cf-b7dc-4f4b-981d-48b3392d9bc3 in 660ms
+[chunk] Chunked "The Department, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 05d52d73-bb3b-4c07-ae14-48b5d88793e5 in 631ms
+[chunk] Chunked "Annual Reports, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 203f3f59-9050-4f8e-8b74-bae99895c4bb in 646ms
+[chunk] Chunked "Summer Program Positions, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document a3f11ceb-f103-43d9-a319-88b08c5f1db7 in 659ms
+[chunk] Chunked "Summer Pool Positions, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document eb220a45-ac5b-4de6-a85e-d60a4916488f in 618ms
+[chunk] Chunked "Volunteer Opportunities, MA" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 4b37a07e-969d-4fc0-ab69-63df39287e3e in 933ms
+[chunk] Chunked "Open Space and Recreation Plan Update" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document b773d31f-0690-4f09-bdc1-286358d457e4 in 874ms
+[chunk] Chunked "Agendas, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 8a1d73e2-a5d5-4a55-afef-3828ce863dd9 in 646ms
+[chunk] Chunked "Minutes, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 3bbf8d8f-0ff5-4b98-8fef-84fde8197926 in 605ms
+[chunk] Chunked "AG Membership List, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 121709d1-fcd7-4e37-b2c0-3b9ddc8a026a in 650ms
+[chunk] Chunked "Public Surveys, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document e45dd19a-c74d-477a-a505-9d7987e39357 in 670ms
+[chunk] Chunked "Maps, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document eed669c6-350e-4554-8a7f-bc31b2df9d6e in 668ms
+[chunk] Chunked "ADA Surveys, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document bd630941-fae7-4bf2-a567-fe88863c2de4 in 679ms
+[chunk] Chunked "Camps, Pools & Programs, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 4f52ac1f-cbb8-4fb6-872d-a1cafd8354da in 646ms
+  Progress: 225/1500 docs, 598 chunks
+[chunk] Chunked "Brochures, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 573ef8ea-ee99-46c9-9015-29603afbbad1 in 720ms
+[chunk] Chunked "Summer Camp Guide, MA" (general) into 19 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 19/19 chunks for document 4d79b4bb-1d29-481a-bea7-3f367ed0b788 in 1429ms
+[chunk] Chunked "Fields, Parks, Trails & Playgrounds" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document cc020f32-9fef-4fdf-b06d-4fa649846b3b in 800ms
+[chunk] Chunked "Field and Special Event Permitting" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 0e2d3de8-66f4-4370-88f3-1eda1b846192 in 851ms
+[chunk] Chunked "Field Status, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 51c743bb-e89a-4807-8863-ba7687def43a in 668ms
+[chunk] Chunked "Ice Status, MA" (public_works) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document b68077f6-6c97-4ea1-8f7c-697038109aca in 836ms
+[chunk] Chunked "Trails, MA" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 023acdc7-47eb-437f-a282-1256b4d105a4 in 852ms
+[chunk] Chunked "Maps & Trails Information, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 30000925-eb46-41bb-aec2-25211f59d38e in 632ms
+[chunk] Chunked "Special Projects, MA" (public_works) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 9e1bfc06-c5fd-46d4-87b4-561f36407447 in 887ms
+[chunk] Chunked "Field, Parks and Playgrounds, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document ec72164c-b4f6-4430-b639-2a4ed5036a36 in 732ms
+[chunk] Chunked "Avery Field, MA" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document eaa78fe4-9aab-4d4a-84bb-25fd256a6a72 in 766ms
+[chunk] Chunked "Broadmeadow School, MA" (public_works) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document a219d7d4-94e4-4480-bff2-714d98f218ba in 938ms
+[chunk] Chunked "Claxton Field, MA" (public_works) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 3240c776-9f25-4845-821b-574c5388e9bc in 730ms
+[chunk] Chunked "DeFazio Park, MA" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document bcac355f-0205-47a8-9c8b-aba1b3bf9888 in 866ms
+[chunk] Chunked "Dwight Field, MA" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document df7dfb07-814f-42c2-af54-ba4be1c74196 in 766ms
+[chunk] Chunked "Eliot School, MA" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 36afdd5f-7186-489e-a757-100e4d3e341b in 827ms
+[chunk] Chunked "Greene's Field, MA" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 3c374ba6-c6f3-402b-a492-d4e3cda2552c in 913ms
+[chunk] Chunked "High Rock School, MA" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document c81db275-4ee2-4867-bd75-7833606d7daa in 791ms
+[chunk] Chunked "Memorial Park, MA" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 7bebd679-de1d-4bd9-8721-0ce4dbb91c00 in 756ms
+[chunk] Chunked "Mills Field, MA" (public_works) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document a3721a78-ca47-4548-84a8-ad795248479f in 821ms
+[chunk] Chunked "Mitchell School, MA" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document d8e4ede5-c1ac-452a-9c49-9d973f7da839 in 1038ms
+[chunk] Chunked "Needham High School, MA" (public_works) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 88bce684-a7bf-442e-bf42-21a5c46d2942 in 695ms
+[chunk] Chunked "Newman School, MA" (public_works) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document dd59df70-4e33-411c-8035-b0dd345c2840 in 907ms
+[chunk] Chunked "Perry Park, MA" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 7f42318a-b5a3-4242-be55-bbcba9e33dfb in 859ms
+[chunk] Chunked "Pollard Middle School, MA" (public_works) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document c42a06bf-73f4-46cc-a1bd-0c3e6f3c1537 in 691ms
+  Progress: 250/1500 docs, 715 chunks
+[chunk] Chunked "Riverside Park, MA" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 825907f8-e738-497c-8e70-190e02918bda in 747ms
+[chunk] Chunked "Walker-Gordon, MA" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 3d174498-a941-4881-98f3-ba867bb8a6e9 in 835ms
+[chunk] Chunked "Sunita Williams, MA" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document ed4c927f-c5ad-4bb1-9e81-d581e5e426be in 771ms
+[chunk] Chunked "Claxton Field Renovation Project, MA" (budget) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 3c6fe71b-7efe-4df7-ae33-12fc5b9331a0 in 862ms
+[chunk] Chunked "How Do I..., MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document e15f42b1-c792-497b-bb9d-997d949fe7b6 in 699ms
+[chunk] Chunked "Apply For, MA" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 671c5128-8e87-484d-be8f-9595c3f07509 in 748ms
+[chunk] Chunked "View, MA" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 07b05208-8d73-4d06-bf73-cea71f2dafd8 in 684ms
+[chunk] Chunked "Parking Clerk, MA" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 650f4c30-e95d-453d-9208-1cac9c015416 in 1089ms
+[chunk] Chunked "Planning & Community Development, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document e6a966bb-760b-4243-8516-03254826c85c in 1030ms
+[chunk] Chunked "Planning Division, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 73267a10-52ec-42ca-9b4f-50d6973c900f in 593ms
+[chunk] Chunked "Forms & Fees, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document de9f52a7-dba4-4531-b606-12bb952875d5 in 577ms
+[chunk] Chunked "By-Laws & Regulations, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 33a26646-d257-42bc-87eb-621baead8249 in 634ms
+[chunk] Chunked "Planning Maps, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document d815ea5b-dea1-4459-a285-e4c338356fc4 in 933ms
+[chunk] Chunked "557 Highland Ave. (former Muzi site)" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document acb13b99-fe8a-4e57-b302-533d3ccb0715 in 636ms
+[chunk] Chunked "Needham Housing Plan 2021, MA" (planning_board) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document cb0b47cb-87f1-431a-8740-19ef59f9f0a5 in 734ms
+[chunk] Chunked "Reports & Publications, MA" (public_works) into 12 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 12/12 chunks for document aaae8aa7-7257-4c81-b9e8-32e4cad881bc in 1011ms
+[chunk] Chunked "Downtown Study, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document bde861e3-fb67-4232-a38b-cc99dc7eec54 in 909ms
+[chunk] Chunked "Needham Center and Needham Heights Parking Study 2023" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document fba509c4-bcff-4700-bd7d-8b2072ee7f7a in 661ms
+[chunk] Chunked "Housing, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 6b11b0a4-e470-4e08-aabb-03a780d7e202 in 639ms
+[chunk] Chunked "Needham Affordable Housing Trust Fund" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document db88cae5-7f4f-432b-948c-b0a22551f900 in 796ms
+[chunk] Chunked "Affordable Housing, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document ce82cf51-8c1e-458b-adbc-631dbb823bf2 in 636ms
+[chunk] Chunked "How To Find Affordable Housing" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document fe91fc67-1ab9-4a9a-acf0-396aa316feeb in 1882ms
+[chunk] Chunked "HUD Area Median Income Limits" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document e378ee41-0ca2-4d6b-8471-8a3ee8ec7299 in 634ms
+[chunk] Chunked "Chapter 40B, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 5299825b-b2c4-4f39-8248-b852db1e2251 in 745ms
+[chunk] Chunked "Rental Subsidies, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 4ab285c2-c295-450f-b905-7fd99b1deb25 in 612ms
+  Progress: 275/1500 docs, 792 chunks
+[chunk] Chunked "MBTA Communities Law & Needham's Multi-family Zoning" (zoning_bylaws) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document 93c3cb90-f632-4896-a505-7d9852f2e8d4 in 749ms
+[chunk] Chunked "HONE Advisory Group, MA" (planning_board) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 282381f9-175c-4f61-b0ce-6eb61647d3fe in 786ms
+[chunk] Chunked "HONE - Important Documents, Meeting Agendas, Presentations & Minutes" (general) into 41 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 41/41 chunks for document b5ad99c8-267b-4207-8439-47ec9f9f4e0c in 1681ms
+[chunk] Chunked "Multi-Family Housing Community Workshops, MA" (planning_board) into 18 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 18/18 chunks for document 3fafcb95-c7e3-4582-a199-f44061a57d4a in 1039ms
+[chunk] Chunked "MBTA Communities Zoning Proposal, MA" (planning_board) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document 7beab850-d374-4fe5-887b-b48e7aa623b7 in 733ms
+[chunk] Chunked "Zoning By-Laws, MA" (zoning_bylaws) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 725def19-3f24-45e1-b3b1-3140ce29969e in 576ms
+[chunk] Chunked "Town Meeting Zoning Amendments, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document a729ab1d-2517-4c33-9091-922d291ce7ec in 605ms
+[chunk] Chunked "October 2024 Special Town Meeting MBTA Zoning Articles 1-4" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 05b5b6bc-9a6f-4f43-8e7a-56650be0d531 in 625ms
+[chunk] Chunked "May 2024 Annual Town Meeting Zoning Articles" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 2bb70582-6fbf-4cf5-acdd-c996fd333486 in 701ms
+[chunk] Chunked "Needham Housing Authority - Linden/Chambers redevlopment" (planning_board) into 17 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 17/17 chunks for document 49fdc44d-1a46-49e6-85f5-38d810bacc73 in 836ms
+[chunk] Chunked "Solar Zoning article, MA" (planning_board) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 2d620431-7969-4b1e-93a4-13490dc73269 in 635ms
+[chunk] Chunked "May 2023 Town Meeting - Accessory Dwelling Units (ADU)" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 61fee003-692d-49de-a364-5bcc567e1424 in 609ms
+[chunk] Chunked "Needham Police Department, MA" (public_works) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document 1aa17e4c-0830-4c6a-b7c6-c6130ec9f224 in 775ms
+[chunk] Chunked "Mission Statement, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 56a59a38-e518-4f5c-bd7e-15cd178da665 in 641ms
+[chunk] Chunked "Message from the Chief, MA" (public_works) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 6270de51-fe0c-429a-96ea-6b0653cd992a in 824ms
+[chunk] Chunked "Animal Control, MA" (general_bylaws) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 001c7f0c-f40f-4407-89e7-fd37786b6cd9 in 853ms
+[chunk] Chunked "Help, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 9f19d40a-1502-4916-a87a-5c2e88ec952e in 1259ms
+[chunk] Chunked "Lost & Found Animals, MA" (local_business) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 3c503036-38e8-4562-8514-cdfa76b89860 in 825ms
+[chunk] Chunked "Rabies Info, MA" (public_works) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document 3c7054c6-04dd-4a7c-96ab-4fd792a9f108 in 854ms
+[chunk] Chunked "How Can You Help Prevent Rabies?" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 16b1494d-a6f6-4230-8f85-6c8827e97eb8 in 609ms
+[chunk] Chunked "Pictures, MA" (public_works) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 3fe96e60-f00b-4ce7-8306-da47dc6b8bff in 764ms
+[chunk] Chunked "Links, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 2435bf26-0f1b-4bb0-bd4a-00e155c0124c in 686ms
+[chunk] Chunked "False Alarm By-Law, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 19d13fbd-7735-42e3-96ba-9e6bd29ee97e in 693ms
+[chunk] Chunked "Firearms Licensing, MA" (fee_schedules) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 3431edeb-b224-4769-8bfd-6ebd37eaf6cc in 719ms
+[chunk] Chunked "Hawker/Peddler/Solicitor, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 5971150f-c899-4fdf-8308-a8798559e2fc in 574ms
+  Progress: 300/1500 docs, 926 chunks
+[chunk] Chunked "Records Information, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 432030aa-cd14-450d-8a7f-e56fa0de8e86 in 694ms
+[chunk] Chunked "Arrest Log, MA" (general) into 23 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 23/23 chunks for document 81b896f9-8102-4f65-9319-66a71ed0ee4b in 1791ms
+[chunk] Chunked "State 911 Disability Information, MA" (general) into 14 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 14/14 chunks for document 91dc8856-a15d-4bb9-8fd8-10282dff64c7 in 906ms
+[chunk] Chunked "Sex Offender Information, MA" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document e792be9e-5649-415e-a942-c1026176e34e in 761ms
+[chunk] Chunked "Level 3 Sex Offenders Working, Living, or Otherwise Listed In Town" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 661b94cf-546d-43a5-9c7a-83391d6e441f in 809ms
+[chunk] Chunked "News, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 7eb7ff2c-bfa4-4122-8b59-8763224fa08e in 672ms
+[chunk] Chunked "Incident Involving Marvin Henry, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 11b7b92e-5955-4974-8390-44b89c2289f2 in 680ms
+[chunk] Chunked "Police Policies, Procedures & Info of Interest" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 149c7b13-9836-478c-8bc7-70787c4e9894 in 610ms
+[chunk] Chunked "Incident Report Involving Police Response to CVS" (public_works) into 16 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 16/16 chunks for document 81c0d726-87d1-4ada-b60a-852b3659c6fa in 879ms
+[chunk] Chunked "Annual Data Reports, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 0a44e15e-caf9-41cb-a3af-6e6704497092 in 634ms
+[chunk] Chunked "Divisions / Staff Directory" (budget) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 420efc6c-d015-440e-9b10-1ead83e1ed04 in 707ms
+[chunk] Chunked "Community Engagement, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 67bf96ed-a9f0-42b5-97e7-78635486ce6a in 594ms
+[chunk] Chunked "Resources, MA" (public_works) into 44 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 44/44 chunks for document b35fdee2-4aa8-4912-bfd8-8bfc74153208 in 1561ms
+[chunk] Chunked "Public Health, MA" (board_of_health) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document 6db8138a-7558-45d2-baea-d65a060e23b6 in 951ms
+[chunk] Chunked "Who we are/What we do" (budget) into 28 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 28/28 chunks for document 6801dd40-de3f-4b3a-bd8e-1815d11c34a7 in 1084ms
+[chunk] Chunked "Services Provided, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document a6325f84-c784-40bc-903c-9a302781d8f3 in 612ms
+[chunk] Chunked "Traveling Meals, MA" (general) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document 3de7d8a7-77a5-4bb8-9dce-4e9460e4d9d4 in 826ms
+[chunk] Chunked "Immunizations/Clinics, MA" (general) into 12 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 12/12 chunks for document 26ae1a6b-2dfd-42d7-9555-1cad0b8045a4 in 1264ms
+[chunk] Chunked "Trainings, MA" (public_works) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document 76738114-b0fa-452e-8df9-c40d0838fb48 in 783ms
+[chunk] Chunked "Assistance Programs, MA" (local_business) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 80715acb-16ba-4593-a51f-8ba8e68a395d in 723ms
+[chunk] Chunked "Domestic Violence Action Committee (DVAC)" (public_works) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document 145af023-9502-4f9b-876e-7d962409498c in 981ms
+[chunk] Chunked "Medical Reserve Corps, MA" (general) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document 5eddf38a-df00-407c-8c9c-94c9c6443987 in 846ms
+[chunk] Chunked "Referrals and Resources, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document d4cd1540-c277-48c9-81d8-0986bd76caa5 in 607ms
+[chunk] Chunked "Recovery Coach Services, MA" (general) into 11 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 11/11 chunks for document 5569a3e9-8b3a-4a36-ba7f-9842ab89c5b4 in 771ms
+[chunk] Chunked "Public Health Education, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document c7f12acd-9a1e-480e-8242-fcbb79476441 in 650ms
+  Progress: 325/1500 docs, 1129 chunks
+[chunk] Chunked "Ticks and Mosquitoes, MA" (local_business) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document 7d422b2e-808d-485f-af3c-0a9d1c2d2cc6 in 923ms
+[chunk] Chunked "Concussion, MA" (public_works) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document dfc74839-66cc-41a1-9071-d194a488f4df in 717ms
+[chunk] Chunked "Opioid settlement, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document f77074db-d6e1-4785-ad24-6e392b1d8c50 in 571ms
+[chunk] Chunked "Resources, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document a5ed54e6-9c44-4ded-a5a9-8d48772c962b in 582ms
+[chunk] Chunked "Permits, licenses, and complaints, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 5e0764c8-45a9-47e3-860f-f9be023e1352 in 654ms
+[chunk] Chunked "Licensed septic installers and waste haulers" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document d5d0d331-db94-4384-a333-4df237ec8536 in 585ms
+[chunk] Chunked "Food Establishment Resources, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 187f198d-277e-4abe-b7ec-41300dab8119 in 604ms
+[chunk] Chunked "Food Safety Trainings, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document eb8f0c76-83f4-4d96-961b-750fd7534e90 in 610ms
+[chunk] Chunked "Food Safety Risk Factor Informational Guides" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 3201d582-b560-406b-9615-53a18e938254 in 796ms
+[chunk] Chunked "2022 FDA Food Code Resources" (board_of_health) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 777040f7-99f7-4a3b-8cc0-05c54d964724 in 846ms
+[chunk] Chunked "Metro West Adolescent Health Survey" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 1042ebf7-3672-4d57-bb50-9be1dfb36a8a in 661ms
+[chunk] Chunked "Data and Reports, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 99781c28-1556-4d78-ae0e-c219f65ed51b in 634ms
+[chunk] Chunked "Narcan and Overdose Information, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 6672e059-24cf-42e1-ac7c-21cdcc72e5cf in 634ms
+[chunk] Chunked "Charles River Public Health District" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 939c257e-6561-4ed7-81ad-66d8c15952ac in 759ms
+[chunk] Chunked "Who We Are & What We Do" (board_of_health) into 19 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 19/19 chunks for document 277b4b26-cfca-46c2-884e-49fe4bd85253 in 1075ms
+[chunk] Chunked "Current Initiatives, MA" (local_business) into 13 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 13/13 chunks for document b22e154f-93d1-44d0-b54b-b4b748c2f10f in 903ms
+[chunk] Chunked "Important Links, MA" (general) into 15 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 15/15 chunks for document a40ff3cc-f310-4baa-a6e1-84d96221b0e1 in 859ms
+[chunk] Chunked "Contact Our Staff, MA" (general) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document f8db1fe9-251a-49ac-b701-291251c2882d in 691ms
+[chunk] Chunked "North Central & MetroWest Local Public Health Training Hub" (public_works) into 29 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 29/29 chunks for document 228022d4-6725-4f55-94e9-ffeb350fe1b8 in 1304ms
+[chunk] Chunked "Important Links, MA" (general) into 14 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 14/14 chunks for document 3dc95cab-f6dd-46ef-8002-9e00660d0e2c in 871ms
+[chunk] Chunked "Benefits & Initiatives, MA" (general) into 22 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 22/22 chunks for document 40d016d7-8717-4a67-b274-ad677e7373fa in 1166ms
+[chunk] Chunked "Events & Trainings, MA" (general) into 11 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 11/11 chunks for document 1d2ad519-c9b6-4f0c-b430-e46782400456 in 883ms
+[chunk] Chunked "Lending Library for Inspectional Equipment" (general) into 14 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 14/14 chunks for document 04779875-bb83-4185-9604-04a8f945f9bb in 910ms
+[chunk] Chunked "Staff & Contact Information, MA" (general) into 12 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 12/12 chunks for document 47a9c34e-382e-4bd3-ad88-41edc5c28a38 in 1104ms
+[chunk] Chunked "COVID - 19, MA" (board_of_health) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 31d6dc02-7c45-4946-a0ea-38ee48b9c8d0 in 657ms
+  Progress: 350/1500 docs, 1318 chunks
+[chunk] Chunked "Frequently Asked Questions (FAQ), MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 150ae787-9d2a-4614-a23b-5a23189297d9 in 662ms
+[chunk] Chunked "Health and Safety CommitteePublic Schools" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document e5e4894a-af80-42fa-85f8-cd7aebd2cb5f in 655ms
+[chunk] Chunked "Resources, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document c430ae08-c06f-4bd7-84cd-b03b7de36ca1 in 600ms
+[chunk] Chunked "Policies and Standard Operating Procedures" (local_business) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document f204d19f-679a-4739-b230-7a75ca682810 in 600ms
+[chunk] Chunked "Public Works, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document e774cdcc-12d4-402c-920a-fcff1919c6fc in 685ms
+[chunk] Chunked "About DPW, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document e235e637-c23f-4077-a5c5-19ed215e7f85 in 628ms
+[chunk] Chunked "DPW FAQs, MA" (public_works) into 39 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 39/39 chunks for document 2d1e3acf-d8cb-476b-816d-40b63bfc6c21 in 1552ms
+[chunk] Chunked "Needham DPW: Fill-A-Public Works Truck Food Drive" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 297e9a35-2852-422f-97b6-e566506b2b0f in 829ms
+[chunk] Chunked "Divisions, MA" (budget) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document d44cdc40-c969-42b4-9a65-d362b6c797d4 in 797ms
+[chunk] Chunked "Administration Division, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document e584442e-7e8e-404f-a590-566c28db6cdf in 787ms
+[chunk] Chunked "Bidding, MA" (public_works) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document db55c31e-a19d-45f5-a9d4-99654b133a1d in 718ms
+[chunk] Chunked "Building & Construction Permits, MA" (building_permits) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document dd9c113b-b907-48c1-ad54-7d9be0eb658e in 811ms
+[chunk] Chunked "Building Rentals, MA" (building_permits) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document a09eadcb-aa39-4407-ade8-f641022d48c5 in 719ms
+[chunk] Chunked "Damage Reports: Property and Vehicle" (public_works) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document df151ecc-e4cb-4db3-b71a-c55d738e46b2 in 749ms
+[chunk] Chunked "Rain Barrels and Soil Moisture Sensors" (public_works) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document 3552f083-fe46-47a8-a065-231181ae5e78 in 751ms
+[chunk] Chunked "Report a Public Works Issue" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 56c2837e-d82a-4e18-95a0-adb76ca30ebe in 633ms
+[chunk] Chunked "Water & Sewer Support Services" (public_works) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document dac9967b-c6d4-4f82-a955-07482d0708d6 in 962ms
+[chunk] Chunked "Billing, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 53dc3bf0-37b7-4fbf-ba76-ad40bf7a65a0 in 706ms
+[chunk] Chunked "Completing a Change of Ownership Form" (public_works) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 8dfed1dd-a2a7-46b9-830c-53ef08c23b8a in 660ms
+[chunk] Chunked "Service Termination, MA" (public_works) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document f74271f0-a1ca-4c07-8d8b-22fe65edd2a1 in 683ms
+[chunk] Chunked "Buying or Selling Property, MA" (public_works) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 4faee0dc-531a-4d67-86a4-3b76b491b618 in 724ms
+[chunk] Chunked "Delinquency Charges, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 5c328414-54b1-4ce0-b75a-f2ae35fde210 in 659ms
+[chunk] Chunked "Billing Assistance, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document be72e0f4-c5b2-42e2-bebc-5ad70ac4e873 in 655ms
+[chunk] Chunked "Disputing Your Bill, MA" (public_works) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 60839562-0efa-4323-9052-3ecb0992fcea in 697ms
+[chunk] Chunked "Right to Service, MA" (public_works) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 9a54f5ed-b567-4212-9990-3bacb89c63a0 in 652ms
+  Progress: 375/1500 docs, 1416 chunks
+[chunk] Chunked "Water/Sewer Abatement Policy for Low Income Households" (public_works) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 0b25837e-9c2a-4c7f-bf61-da0be3e93116 in 605ms
+[chunk] Chunked "Water Service Restoration, MA" (public_works) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 9fe2e214-888f-4654-b1d5-2f7aab6fcdc4 in 915ms
+[chunk] Chunked "Contact Us, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 751bcaf0-3b1f-4ab5-a25e-54c5ed35c6eb in 600ms
+[chunk] Chunked "Frequently Asked Questions (FAQ), MA" (general) into 18 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 18/18 chunks for document 8bb32181-255a-4c9b-b798-b3b72fa5635c in 1163ms
+[chunk] Chunked "Metering, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document ab636202-fdd4-4cde-a5a8-98a22fe8af41 in 651ms
+[chunk] Chunked "Meter Replacement Program, MA" (public_works) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document dd656660-bc59-40a5-8be9-dab00825f06d in 644ms
+[chunk] Chunked "Reading Your Water Meter, MA" (local_business) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document eed6e88e-6ee7-4926-a2a3-6f2f4e84f45d in 796ms
+[chunk] Chunked "Rates & Fees, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document f8aa4a47-7f98-4a1c-87c8-c5ebc189b62c in 578ms
+[chunk] Chunked "Permit Requirements, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document d65c3069-2a03-4fda-8e74-744120dffc43 in 581ms
+[chunk] Chunked "Building Maintenance Division, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document df401b19-6084-4f53-b516-f375c09e263d in 576ms
+[chunk] Chunked "Projects, MA" (public_works) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 1ceea85e-af5c-4128-84b5-b9fd2c94fa48 in 787ms
+[chunk] Chunked "Engineering Division, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 43c45f24-8829-4472-93b1-9ee617d6eeec in 652ms
+[chunk] Chunked "Maps, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 8faaef7c-e333-45c6-ab49-0ea55a4280b2 in 625ms
+[chunk] Chunked "Geographic Information Systems (GIS), MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 23e94e0d-5d42-4eac-ac59-fc1ee0ad0020 in 637ms
+[chunk] Chunked "WebGIS Help, MA" (public_works) into 9 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 9/9 chunks for document e04c1469-b65c-48bd-be9d-dad0d7a4a57e in 876ms
+[chunk] Chunked "Town Maps, MA" (general) into 9 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 9/9 chunks for document 3a76d8cd-5f3c-430c-9879-2b633cecc45c in 906ms
+[chunk] Chunked "Download GIS & CAD Mapping Data" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 07806d94-c73c-45eb-a46a-de60d6395a6e in 749ms
+[chunk] Chunked "WebGIS Deprecation & Replacement, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 197c12a5-97ee-42d7-b9e7-99a2c59c4501 in 633ms
+[chunk] Chunked "GIS FAQ, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 1583fdb7-99a4-412c-a41c-d010e3a279dd in 668ms
+[chunk] Chunked "Permits and Documents, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 7a2808a2-55b4-41dc-ae40-7fb0c43f3d08 in 783ms
+[chunk] Chunked "Street Light Inventory, MA" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document f6580f2b-a123-4007-b53d-5e809311f330 in 768ms
+[chunk] Chunked "Fleet Services Division, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document e83e63bf-bb23-48b5-98d4-cb6e7ff96a35 in 572ms
+[chunk] Chunked "Auctioning Surplus Town Vehicles, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document a8baa9e4-57a7-459b-b2c9-e958b041e161 in 684ms
+[chunk] Chunked "Highway Division, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 162e209d-96a5-41f5-9b9e-2da7ad9b500b in 808ms
+[chunk] Chunked "Snow & Ice Program, MA" (public_works) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document dcaedf4f-72b5-47da-bcba-c025d56b7c68 in 882ms
+  Progress: 400/1500 docs, 1498 chunks
+[chunk] Chunked "Sidewalk Plowing, MA" (public_works) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 8ca08d04-c454-4718-afd1-a667cb80f8fc in 643ms
+[chunk] Chunked "Frequently Asked Questions, MA" (general) into 9 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 9/9 chunks for document f6f82b77-a4d1-4b5e-b281-6a09d31e38d6 in 827ms
+[chunk] Chunked "On-Call Snow Plowing Program, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 43fa5a94-03dd-44ad-acd1-ea7307c14587 in 590ms
+[chunk] Chunked "Parks & Forestry Division, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document ac8d6a08-0462-40b9-bda8-8b4b7d50c577 in 617ms
+[chunk] Chunked "Integrated Pest Management, MA" (local_business) into 11 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 11/11 chunks for document 9492b8ad-cf74-484e-975c-73114177a36f in 875ms
+[chunk] Chunked "Pest Fact Sheets, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 72496b21-ad21-4d0d-9e1b-3cc55ba3d931 in 632ms
+[chunk] Chunked "Sidewalk Clearance, MA" (general_bylaws) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 390d430d-20e0-4552-8c72-743606a6cf27 in 750ms
+[chunk] Chunked "Tree Planting, MA" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 9c5e034f-e2ef-4cec-98ef-1a0a7e50255c in 769ms
+[chunk] Chunked "Parks & Forestry FAQ, MA" (public_works) into 18 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 18/18 chunks for document 0dbbc643-7910-481d-92ad-40aefbf9efda in 913ms
+[chunk] Chunked "Recycling & Solid Waste Division" (public_works) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document a5b5ce19-6dda-459e-a97f-0f4984a15dd1 in 754ms
+[chunk] Chunked "Bags, Stickers, Bins & Fees" (public_works) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 8663cc1b-9b1f-42a2-81db-209bf787542a in 801ms
+[chunk] Chunked "As-You-Throw Bags, MA" (public_works) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document e7172134-f3f6-4edc-a596-2f73c46cbc39 in 914ms
+[chunk] Chunked "What We Take, MA" (public_works) into 40 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 40/40 chunks for document abdc3482-bfff-4d3e-adeb-1136ec933b40 in 1685ms
+[chunk] Chunked "Yard Waste, MA" (public_works) into 14 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 14/14 chunks for document 7b5a990a-c1d8-47e3-8e21-f31338230603 in 932ms
+[chunk] Chunked "Contractor & Landscaper Information, MA" (public_works) into 9 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 9/9 chunks for document 81832d48-fad6-473b-a37b-193351aece83 in 906ms
+[chunk] Chunked "Re-Use-It Swap Shop, MA" (public_works) into 10 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 10/10 chunks for document 75e5a4fa-4699-42fa-a249-c26818cf6ad7 in 803ms
+[chunk] Chunked "Frequently Asked Questions, MA" (public_works) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 4c58da6d-2137-4ca8-a78a-26f777fe8c6d in 703ms
+[chunk] Chunked "Hazardous Waste, MA" (public_works) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 2b1d2314-94c9-4cc2-9c3b-780d7b104573 in 777ms
+[chunk] Chunked "Paint Collection Days, MA" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 6f62be5d-9016-431d-8bbf-62458b329fff in 678ms
+[chunk] Chunked "Home Medical Waste, MA" (public_works) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 7ec89b2e-febe-4338-9ff6-94eba2026e1b in 723ms
+[chunk] Chunked "Holiday Hours & Tips, MA" (public_works) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 0fa322d6-b1a6-4179-a3eb-c517592c2e00 in 785ms
+[chunk] Chunked "Holiday Tips, MA" (general) into 9 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 9/9 chunks for document ec8c81b5-7e98-4649-a8c1-de206908e14e in 895ms
+[chunk] Chunked "Publications & Resources, MA" (fee_schedules) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 94cc2c2f-7895-4584-8c61-def6ff5766ec in 697ms
+[chunk] Chunked "Waste Ban Items, MA" (public_works) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 2e1fe040-3f2a-4c33-b744-f1468283429f in 799ms
+[chunk] Chunked "RTS Electronic Sign Information, MA" (public_works) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 0165a2b1-f97f-4a4b-986b-10252e36fa76 in 789ms
+  Progress: 425/1500 docs, 1679 chunks
+[chunk] Chunked "Water, Sewer & Drain Division" (public_works) into 8 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 8/8 chunks for document 02a567f1-199a-486f-a97f-65974e1f1b90 in 935ms
+[chunk] Chunked "Emergency Information, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 40819b1b-ee73-43fa-90ca-5d8f31fc2cb4 in 656ms
+[chunk] Chunked "Water Restrictions, MA" (public_works) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 41f99461-5c52-45f6-9e8d-df1e9af35b30 in 716ms
+[chunk] Chunked "Water Division, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 136a806d-479f-4c26-99a8-92b845b9715c in 725ms
+[chunk] Chunked "Aquifer Protection, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document fa6b82df-18c8-4cd6-9886-62e106eb89be in 651ms
+[chunk] Chunked "Needham Public Water System, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 379e301a-9102-418b-b460-523b5638d0c6 in 673ms
+[chunk] Chunked "Water Conservation, MA" (local_business) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 1d11c4a5-fa58-421e-b610-29cad4bde688 in 729ms
+[chunk] Chunked "Water Conservation Tips, MA" (general) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document 98a07098-224e-475e-ae27-b434b9dd69c8 in 882ms
+[chunk] Chunked "Watering Efficiently, MA" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 71914d32-9e47-4069-b8aa-c50b9864929c in 780ms
+[chunk] Chunked "Rain Gardens, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document ef88fcfd-9500-4943-b3ef-7110e9531225 in 707ms
+[chunk] Chunked "Xeriscape, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 9c230bd4-e069-472f-81bc-6675aa4db1f9 in 691ms
+[chunk] Chunked "Needham Water Conservation Program, MA" (local_business) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document d4206dd2-0a89-42aa-b5bb-9ed22ecc04b5 in 726ms
+[chunk] Chunked "Rain Barrels and Soil Moisture Sensors" (general) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document 1a6607dd-8e0e-4e6e-918b-bfdc9061a882 in 715ms
+[chunk] Chunked "PFAS, MA" (public_works) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 3ccae920-e4ff-4180-a462-6318579ab365 in 740ms
+[chunk] Chunked "Cross Connection (Backflow) Control Program" (public_works) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 56d00fb8-177f-4a98-b653-802634f93cd8 in 818ms
+[chunk] Chunked "Drinking Water Quality, MA" (public_works) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document e496f016-110a-41f9-a838-320f8999a711 in 748ms
+[chunk] Chunked "Aesthetic Concerns, MA" (public_works) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document a4e757f6-603b-42e8-8b1c-9abb6fab25d2 in 727ms
+[chunk] Chunked "Standards Program, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document b221743a-4471-491a-a888-e1aeb1377a49 in 687ms
+[chunk] Chunked "Lead in Drinking Water, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document a67f7ac9-6a37-41be-8720-a9955d90413f in 694ms
+[chunk] Chunked "At the Tap Sampling Program" (public_works) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 795ceeb6-b95e-4806-b013-b943c23628a9 in 639ms
+[chunk] Chunked "Needham Lead Sampling Results, MA" (public_works) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 832fa4b2-3d61-4252-ae42-52c29a290ca3 in 723ms
+[chunk] Chunked "Private Testing, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 10c2897a-c6e4-4929-a2db-7a271979e75f in 635ms
+[chunk] Chunked "Water Characteristics, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 5570feff-1d97-49e7-a6c3-208f80476968 in 588ms
+[chunk] Chunked "Fire Hydrants, MA" (public_works) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document ae25205f-6d2c-4611-be4b-2f5122e4855c in 656ms
+[chunk] Chunked "Precipitation, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document b48bd105-e0ee-485b-ad13-11d1e14f1207 in 763ms
+  Progress: 450/1500 docs, 1751 chunks
+[chunk] Chunked "Water Treatment, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 19ce33e9-ccb2-4ddd-9f7d-5219758bbe9f in 632ms
+[chunk] Chunked "Water Sources, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 56ad9481-096e-4640-b18c-2f44b8f9e0f2 in 770ms
+[chunk] Chunked "Sourcewater Protection, MA" (zoning_bylaws) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document ad6689f6-0ca4-4fb5-9e3e-54c6fde5e370 in 751ms
+[chunk] Chunked "SWAP, MA" (local_business) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document c6409736-a7cb-44dc-8006-2cfae596292c in 656ms
+[chunk] Chunked "Water Usage, MA" (public_works) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document e8ea31d3-af40-44fc-be40-0bddf0c4674e in 900ms
+[chunk] Chunked "Treatment Process, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 1791eb1c-6924-49b0-9917-18f12109800d in 704ms
+[chunk] Chunked "Operations & Maintenance, MA" (public_works) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document b5b84b69-9521-4f74-9083-dea42baf778e in 727ms
+[chunk] Chunked "Water Distribution System, MA" (local_business) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 208a67c7-0937-4306-b694-1073ed2f1431 in 671ms
+[chunk] Chunked "Water Main Flushing Program, MA" (public_works) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document e0556d17-aed4-41b1-b03d-63de67faf0b2 in 831ms
+[chunk] Chunked "Sewer Collection System, MA" (local_business) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 13e26e6e-9b61-47ee-bb22-89cffa024f4c in 671ms
+[chunk] Chunked "SSO Notifications - Recent Event Notice" (board_of_health) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 29107fc6-92c8-4cd2-915c-3e5e2d1409b0 in 2009ms
+[chunk] Chunked "Operation & Maintenance, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document b863f8ec-4d58-49e1-a808-978194357a7f in 647ms
+[chunk] Chunked "Infiltration & Inflow, MA" (board_of_health) into 20 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 20/20 chunks for document 7b4924c2-0e8c-4a84-9b69-2c13fb0ed6f9 in 1122ms
+[chunk] Chunked "I & I Projects, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document bb16138b-0116-4a0e-a96a-35c8a0a4aee1 in 696ms
+[chunk] Chunked "Preventing Grease in the Sewer System" (board_of_health) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document cab287a7-4ddc-4965-a838-f1ed5a30b5ee in 606ms
+[chunk] Chunked "What Not to Throw Down the Drain" (public_works) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 400c12c9-adc3-433d-a296-2d3172a3a73f in 615ms
+[chunk] Chunked "Storm Drain System, MA" (public_works) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document bf421b6b-5a9f-4e5c-840c-f4c97d6f8419 in 736ms
+[chunk] Chunked "Stormwater Facts, MA" (general) into 10 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 10/10 chunks for document 90d00d60-df4b-4405-85b4-d7611049f01a in 972ms
+[chunk] Chunked "Stormwater Management, MA" (public_works) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 130e5ca1-bf02-49bf-b918-e013efa580d9 in 794ms
+[chunk] Chunked "Educational Outreach Materials, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document c039b137-ef49-479c-ac5c-3d41dc26462a in 642ms
+[chunk] Chunked "Projects, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 95d4f402-977c-4c13-ae3e-2f44f95b618f in 736ms
+[chunk] Chunked "Construction Alerts, MA" (public_works) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 4643ea59-6da1-4990-8931-c81750e27992 in 707ms
+[chunk] Chunked "Envision Needham Center, MA" (general) into 9 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 9/9 chunks for document ebcde146-1e4b-421c-a50e-d66cc5e3b845 in 759ms
+[chunk] Chunked "ENC Working Group Meetings and Presentations" (general) into 24 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 24/24 chunks for document 37cc139e-2da2-44a5-a921-b7e169e7e04c in 1077ms
+[chunk] Chunked "Community Engagement, MA" (meeting_minutes) into 12 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 12/12 chunks for document edd082d8-50d9-4f51-839b-72e541c8eceb in 937ms
+  Progress: 475/1500 docs, 1888 chunks
+[chunk] Chunked "Highland Avenue Roadway Improvements Project" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document eab14adf-07e0-4bc6-a7eb-2f8bff6cec73 in 576ms
+[chunk] Chunked "Marked Tree Rd - Road Construction Upgrades" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 1d1e26f3-f187-45f4-a346-1fd66ac199d7 in 761ms
+[chunk] Chunked "Needham Street Design Guide, MA" (public_works) into 11 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 11/11 chunks for document 812efedb-36ae-4531-b89d-070677b060e3 in 930ms
+[chunk] Chunked "Needham High School Tennis Court and Site Improvement Project" (budget) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 64d850cc-1ada-41e6-8448-babf74b24cfb in 851ms
+[chunk] Chunked "South Street Water Main, MA" (public_works) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document 5ef950e8-2bee-4385-ac1f-f6fe42e93500 in 856ms
+[chunk] Chunked "Needham Reservoir Remediation and Stormwater Improvements" (public_works) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document b8d02839-f5e9-4573-a78b-58a13e068033 in 946ms
+[chunk] Chunked "NPDES - Storm Water Management Plan" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document f05d4378-b438-415a-8337-cec348c855d5 in 593ms
+[chunk] Chunked "Municipal Separate Storm Sewer System (MS4) Compliance Documents" (building_permits) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 6c38af59-a254-4308-a084-5ba388a585f0 in 830ms
+[chunk] Chunked "Walker Pond Improvements Project, MA" (local_business) into 9 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 9/9 chunks for document 17650a38-04d0-4b27-ac08-ed9bc4815e8a in 1056ms
+[chunk] Chunked "Needham/Newton Community Way, MA" (general) into 14 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 14/14 chunks for document a95819d0-0e79-4999-8d58-c1a4410d54dc in 1212ms
+[chunk] Chunked "Complete Streets, MA" (local_business) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document f0246c8a-f852-4fee-b131-863e770e3f4d in 666ms
+[chunk] Chunked "Stormwater Dashboard, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 7009c372-5ea2-4c5c-aa2f-453353ca6375 in 675ms
+[chunk] Chunked "How to Harden Your Home" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 65415158-8c5b-4f58-b0ba-8808d7da2b3f in 684ms
+[chunk] Chunked "Town Stormwater Projects, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document d7b4498a-00da-4d3c-9dba-a655ff64d96d in 1012ms
+[chunk] Chunked "Stormwater Capacity Upgrades, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document fd3473c7-1fad-43e6-bb09-03705b2119e0 in 836ms
+[chunk] Chunked "Past Projects, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document f661f989-bc07-4a20-aeff-9c318c8e6883 in 632ms
+[chunk] Chunked "McLeod Field Renovations, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document a4aaf559-e746-4d40-9f8a-6be477effee7 in 618ms
+[chunk] Chunked "Town Common Renovation Project, MA" (public_works) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document b453dc9b-9514-47ad-a4ca-c2a6f864efab in 897ms
+[chunk] Chunked "Safety Improvements - Intersection of Dedham Avenue, Harris Avenue, and Warren Street" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 5c984542-b3f3-43ae-83b8-7d6ee62f793d in 850ms
+[chunk] Chunked "Downtown Improvement Project, MA" (public_works) into 81 chunks
+[embed] Generating embeddings for batch 1/2
+[embed] Generating embeddings for batch 2/2
+[embed] Embedded 81/81 chunks for document 9909bea6-4be4-4b14-a33a-b5e16ab62e87 in 2926ms
+[chunk] Chunked "16" Water Main Replacement - Rosemary Street" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 0e5340c1-73b0-49b4-9792-b2716cff176b in 745ms
+[chunk] Chunked "LED Streetlight Conversion, MA" (public_works) into 10 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 10/10 chunks for document 55a8bc81-baea-4c86-9a2c-cac4f95f5a09 in 1160ms
+[chunk] Chunked "About LED Lights in Needham" (public_works) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document c95db67a-2ecc-4b61-8fa2-ba9e2fc4c108 in 720ms
+[chunk] Chunked "Frequently Asked Questions, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 42576531-f7cc-4d3a-a550-be0f17633165 in 671ms
+[chunk] Chunked "Streetlight Outages - Current & Future" (public_works) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 00590c88-9389-4ef3-92c2-6b5aa82df033 in 983ms
+  Progress: 500/1500 docs, 2061 chunks
+[chunk] Chunked "16" Water Main Replacement Central Avenue" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document aa5d56bf-5d16-4f9b-8299-8c3e897659d7 in 699ms
+[chunk] Chunked "George Aggot Road Culvert Replacement and Alder Brook Wall Restoration" (local_business) into 11 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 11/11 chunks for document 3d5d2345-2b49-4bc2-8db1-ec38eea89a3d in 1256ms
+[chunk] Chunked "Report a Non-Emergency DPW Issue" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document d5e6ab16-da56-488d-842c-7f0e33399fe8 in 654ms
+[chunk] Chunked "How Do I..., MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 7d227838-2160-4a20-8f26-7f72a8f852fe in 632ms
+[chunk] Chunked "Purchasing, MA" (news) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document e3bc8cc0-8ef0-4cb8-a937-67db597ff2c4 in 671ms
+[chunk] Chunked "Doing Business with the Town" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 592571fb-59a7-44bf-8935-5f05228e253e in 707ms
+[chunk] Chunked "Departments R - Z, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 488ba462-c461-4e56-b5cb-a3006f729383 in 675ms
+[chunk] Chunked "Sustainability, MA" (general) into 17 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 17/17 chunks for document 003c2c14-daa1-40fa-b229-f7f76d9ae98b in 1293ms
+[chunk] Chunked "Green Communities, MA" (zoning_bylaws) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document c9c934d9-fa31-4804-9d24-cb3800256481 in 782ms
+[chunk] Chunked "Energy Efficiency at Home, MA" (general) into 14 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 14/14 chunks for document 35b87a4b-e588-4623-a8bc-a5b874738682 in 948ms
+[chunk] Chunked "Commercial and Industrial Properties, MA" (general) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document be0df8c0-3c77-437b-952d-4de6b6cbf3c4 in 926ms
+[chunk] Chunked "Mobility, MA" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 9b0861bf-6b24-44cb-bc75-70daeadae1b9 in 806ms
+[chunk] Chunked "Energy Savings, Rebates, and Incentives" (general) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document b916d540-926f-4d15-8532-0bb3ad7c60eb in 761ms
+[chunk] Chunked "Energy Coaching, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document fb4ff47e-ee6c-4b7b-a54c-fc5a3c3ec729 in 781ms
+[chunk] Chunked "Opt-In Specialized Stretch Energy Code" (building_permits) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document d9741ff3-0af0-4742-9137-969985c4604d in 882ms
+[chunk] Chunked "Municipal Projects Spotlight, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document b0bf9e04-edf2-46a9-9699-1db57d1e0fb6 in 642ms
+[chunk] Chunked "Eversource Heat Pump Rate, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 06894501-5313-4736-85b1-2013d3e28d05 in 891ms
+[chunk] Chunked "Town Solar Production, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 6f199225-b1aa-49d5-9869-eb61aa81b4b5 in 624ms
+[chunk] Chunked "Town Clerk, MA" (board_of_health) into 30 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 30/30 chunks for document 1bec86d6-618f-40f0-8361-99e57f5428e3 in 1230ms
+[chunk] Chunked "Annual Town Census, MA" (general) into 16 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 16/16 chunks for document 920ccf64-db10-4653-80fe-5ec39135b692 in 1040ms
+[chunk] Chunked "2025 Town Census Form, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 1cc24008-ca74-4c3f-b545-662c2842fb84 in 616ms
+[chunk] Chunked "Elections, MA" (general) into 17 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 17/17 chunks for document ff710c61-3ed8-4d5e-b131-0ad6419d65ba in 1062ms
+[chunk] Chunked "2026 Elections, MA" (board_of_health) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document bbe3c4db-dbab-4ea4-827e-68d22d5aa1ce in 696ms
+[chunk] Chunked "2026 Annual Town Election Candidates" (board_of_health) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 871d1ffa-09b4-4340-a902-350f3452735e in 683ms
+[chunk] Chunked "2025 Elections, MA" (general) into 15 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 15/15 chunks for document 537bff52-b5c9-4173-9d83-362c165d0f35 in 1277ms
+  Progress: 525/1500 docs, 2228 chunks
+[chunk] Chunked "2025 Annual Town Election Candidates" (board_of_health) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document 5e6c8ca8-7f82-47e3-8ca1-7f9b1de37d73 in 877ms
+[chunk] Chunked "Testing of Tabulators, Advance Ballot Processing, and Central Tabulation Facility" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 8790e7f1-9f17-41be-b719-7b2ef71f4ae0 in 780ms
+[chunk] Chunked "2024 Elections, MA" (general) into 9 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 9/9 chunks for document a2dc395a-16bf-4316-970c-a919538f257d in 927ms
+[chunk] Chunked "September 3, 2024 State Primary Election" (public_works) into 18 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 18/18 chunks for document cb04075a-a292-49e8-96ae-b71439f682d4 in 1030ms
+[chunk] Chunked "2024 Annual Town Election/Town Meeting/Calendar" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 069b401b-7e5a-46c1-9cc5-a4049c821111 in 772ms
+[chunk] Chunked "2024 Town Election/Town Meeting Calendar" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document b8b1f8ce-57d0-4d35-ae57-a18404d085bb in 639ms
+[chunk] Chunked "How Do You Want To Vote in the 2023 Annual Town Election?" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 1fc73d7f-c48c-43fd-9504-11b7ff282b11 in 698ms
+[chunk] Chunked "Specimen Ballots for the April 11, 2023 Annual Town Election" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 0ff30c8b-e08b-4cf0-a5fd-cd7d7babedf2 in 593ms
+[chunk] Chunked "Preliminary Tally Sheet for the Tuesday, April 11, 2023 Annual Town Election" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 74958487-136f-4362-aa9e-537042db4686 in 595ms
+[chunk] Chunked "2023 Annual Town Meeting Article Index and Action Taken" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document de4609c7-795e-417a-a15c-703334ce82e8 in 601ms
+[chunk] Chunked "November 5, 2024 Presidential and State Election" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 97326293-68b4-4ee2-a625-cbe8f42d5443 in 728ms
+[chunk] Chunked "Campaign Finance Reports, MA" (public_works) into 14 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 14/14 chunks for document 1a357932-8589-4911-9f65-1102b916ff7f in 1011ms
+[chunk] Chunked "Office of Campaign and Political Finance Guidance" (general) into 12 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 12/12 chunks for document bd4de572-7018-4541-8c2c-2e3b63a9aa2c in 974ms
+[chunk] Chunked "Town Elected Officers, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 8a14d2ed-60f9-478c-8343-fc5bc44817ff in 656ms
+[chunk] Chunked "Board & Committee Calendars and Handbook" (news) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 02d2fcc7-551d-436c-b4ba-0e44a8afa23d in 697ms
+[chunk] Chunked "Town of Needham Committee Handbook" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document f6f0636e-30f7-476b-b7b8-5e74b2070a3f in 649ms
+[chunk] Chunked "Commissioners to Qualify Oath of Office" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 8b766f8e-a8b8-4f80-8129-999487a6339f in 662ms
+[chunk] Chunked "Justice of the Peace, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document a2520d3f-b2a8-450a-9c3f-3a116575f7b9 in 735ms
+[chunk] Chunked "Notary Public Services, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 25b23839-89c7-4c16-969d-de111e22f0af in 639ms
+[chunk] Chunked "Conflict of Interest, MA" (public_works) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document 262191ae-48c3-4f10-adcf-fafe81206306 in 747ms
+[chunk] Chunked "Summary of the Conflict of Interest Law" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document e73d52eb-12d4-40db-8623-6afe897f1da0 in 746ms
+[chunk] Chunked "Special Municipal Employees, MA" (general) into 11 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 11/11 chunks for document b24fc3e4-cdb1-4e70-bb49-31db1505e1ce in 956ms
+[chunk] Chunked "Section 17, MA" (planning_board) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 4006894b-c36d-452d-b125-936ab9548c6a in 663ms
+[chunk] Chunked "Section 20, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document db326a44-7eff-4001-9d40-da497f3dbf84 in 671ms
+[chunk] Chunked "Open Meeting Law Guide, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document abd4ae41-c9b4-4da2-a43b-b55418eb76a2 in 662ms
+  Progress: 550/1500 docs, 2330 chunks
+[chunk] Chunked "What meetings are covered by the Open Meeting Law?" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document f70f15b8-9894-47c1-9164-117a8b947052 in 760ms
+[chunk] Chunked "What are the requirements for posting notice of meetings?" (news) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document ac775250-15df-425c-b726-1c2bea9f1052 in 803ms
+[chunk] Chunked "When can a public body meet in Executive Session?" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 5f786363-5e46-4b47-a102-6a8bafb3405f in 902ms
+[chunk] Chunked "Ten Reasons for Executive Session" (general) into 10 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 10/10 chunks for document 39603cbe-112a-4a51-a1b3-012bab1123f0 in 952ms
+[chunk] Chunked "May a member of a public body participate remotely?" (general) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document e198170d-eb4e-434f-8926-7e9347042dcf in 816ms
+[chunk] Chunked "What public participation in meetings must be allowed?" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 8500e0c0-e989-4b33-ad9f-083769696d76 in 680ms
+[chunk] Chunked "What records of public meetings must be kept?" (meeting_minutes) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document fc862888-e3f1-4684-9130-506633180ff2 in 805ms
+[chunk] Chunked "What is the Attorney General’s role in enforcing the Open Meeting Law?" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 417304a4-06d8-4564-804c-383c5f62b82c in 771ms
+[chunk] Chunked "What is the Open Meeting Law complaint procedure?" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document eb7f77d4-0a81-4f60-a826-7c983c49b188 in 730ms
+[chunk] Chunked "When is a violation of the law considered "intentional"?" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document a015c968-a641-44aa-a7ce-de1827db2403 in 651ms
+[chunk] Chunked "Will the Attorney General’s Office provide training on the Open Meeting Law?" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document ad0eede9-0b0e-4c6b-83c2-54710334b21c in 690ms
+[chunk] Chunked "Contacting the Attorney General, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 5f6d91cd-448d-4a57-a2e5-e1671d17fc38 in 848ms
+[chunk] Chunked "Licenses, Business Certificates, Passports, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 231d0d47-8098-4e00-bbd9-550f48197fe9 in 649ms
+[chunk] Chunked "Business Certificates, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document bfc72f58-b5d8-4800-90ef-a778a0c6b613 in 798ms
+[chunk] Chunked "Dog Licenses, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 1fe7965b-be75-4ef2-ae95-aa9cc6093c3f in 797ms
+[chunk] Chunked "Marriage Licenses, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 39bc38f6-864a-4b79-ace8-a45fd0c9cfca in 712ms
+[chunk] Chunked "Passports, MA" (public_works) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 8483de6f-c1ee-4eb3-a91a-a8ac53b84dd7 in 793ms
+[chunk] Chunked "Storage of Flammables License, MA" (general_bylaws) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document da6a416b-81ee-4cd4-a40d-61f091562efb in 587ms
+[chunk] Chunked "Raffle Permits, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 3cf57529-cc33-4fde-9403-d078eb589667 in 643ms
+[chunk] Chunked "UCC Filings, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document e89d8c5d-3857-42de-9905-d98eb7f18140 in 745ms
+[chunk] Chunked "Needham Demographics, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 243a26bb-9b88-4497-80e0-3085b9f442df in 744ms
+[chunk] Chunked "Town Meetings & Member Information" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 41c36ba5-4728-4aff-81f1-f850c2d7a0f3 in 671ms
+[chunk] Chunked "Town Meeting Information, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 321740e0-8a5e-4c4d-a3f7-c9bcf004de0d in 601ms
+[chunk] Chunked "May 5, 2014 Annual Town Meeting Index" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document bb7d6fb2-9270-4d3c-a87e-e4174893a785 in 680ms
+[chunk] Chunked "2017 Town Clerk's Records, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document e4e4c189-e225-49ff-9fd1-15d196406e33 in 647ms
+  Progress: 575/1500 docs, 2399 chunks
+[chunk] Chunked "2018 Town Clerk's Records, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 5dd64305-0852-4426-90fb-354706d53f78 in 651ms
+[chunk] Chunked "2019 Town Clerk's Records, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 933e998b-57e4-4aea-9bc5-587a18803651 in 672ms
+[chunk] Chunked "2020 & 2021 Town Clerk's Records" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document ebcca416-b004-4a3f-9e19-46c724e20c45 in 595ms
+[chunk] Chunked "2021 Attorney General Approval STM Article 47 May 1, 2021" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 25258530-0a16-4d01-a660-e899bfd4b728 in 633ms
+[chunk] Chunked "2021 Attorney General Approval ATM Articles 5 and 6 May 3, 2021" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 5a41fdca-28c3-4091-aab7-eb2c787e98eb in 602ms
+[chunk] Chunked "2022 Town Clerk's Records, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 55acfc31-4bf6-4bdd-9167-439c5f1e3a5e in 634ms
+[chunk] Chunked "2023 Town Clerk's Records, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 8f744751-2524-4f1f-afa1-00e16b5cbcc5 in 704ms
+[chunk] Chunked "Vital Records, MA" (general) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document fd5f0c6b-9271-436d-af47-9170f6710a2a in 874ms
+[chunk] Chunked "Electronic Death Records, MA" (board_of_health) into 10 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 10/10 chunks for document f09e4c3d-bc26-473e-ae7c-c0e1ab0a3b00 in 834ms
+[chunk] Chunked "Voter Registration & Information, MA" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document c5cad280-2c6d-4b83-a1e8-348cd5134d55 in 766ms
+[chunk] Chunked "Online Voter Registration Now Available in Massachusetts!" (general) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document 558a93ee-4e26-4027-bc2c-e807036fc23d in 812ms
+[chunk] Chunked "Town Manager, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 1d48d020-ca83-4cd4-8507-d047d451e1d9 in 608ms
+[chunk] Chunked "Town Manager Responsibilities, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 9b5a9345-ba48-4443-b98a-4dbadbc91170 in 662ms
+[chunk] Chunked "Office of the Town Manager/Select Board Services" (public_works) into 9 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 9/9 chunks for document b5461168-23c5-4cc6-ae53-141ca8fcd85a in 914ms
+[chunk] Chunked "Information to apply for a Passport" (public_works) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 86ed82f2-8240-4cff-b8a5-a3d168918bc4 in 731ms
+[chunk] Chunked "Treasurer/Collector, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 93e25e65-11de-4a5c-8a89-0bdd74025396 in 706ms
+[chunk] Chunked "Billing & Payment Information, MA" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 5cdae9fc-4521-4087-8dad-f6648543ea2f in 834ms
+[chunk] Chunked "Ambulance, MA" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document e606d794-0165-4664-8d40-276307e507be in 1001ms
+[chunk] Chunked "Custodial Details, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 3eeaf2ad-4c0b-4e5a-ab2c-ea1fa526e47f in 588ms
+[chunk] Chunked "Motor Vehicle Excise Tax, MA" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document e0d08d19-431c-43b7-9220-f78290c5e36e in 803ms
+[chunk] Chunked "Police & Fire Details, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 4bb1bf90-fed3-497b-8d4f-d445032d5456 in 650ms
+[chunk] Chunked "Real Estate & Personal Property Taxes" (general) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document 532662eb-3c6d-47a0-8085-9136c434cfbd in 1109ms
+[chunk] Chunked "Property Tax Relief, MA" (local_business) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 27fbc04e-a337-46e0-a236-713d55475459 in 741ms
+[chunk] Chunked "Property Tax Relief Application for the Elderly and Disabled" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document afd7c82a-fb17-47f6-8884-64b418404736 in 692ms
+[chunk] Chunked "Property Tax Relief Fund Donation" (local_business) into 9 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 9/9 chunks for document 483c82f8-4af9-4499-8ea4-61df6ab51772 in 1042ms
+  Progress: 600/1500 docs, 2485 chunks
+[chunk] Chunked "Water & Sewer, MA" (public_works) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document 38c5712d-6a5d-408c-a911-70536ab399cd in 823ms
+[chunk] Chunked "Financial Assistance, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document fd614f13-520c-4f54-af1a-6407ab6e6964 in 600ms
+[chunk] Chunked "Late Charges, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 7280155f-029c-416a-8b30-a346cfe2ffe4 in 689ms
+[chunk] Chunked "Liability, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 85db04ad-825d-4abd-bef7-25deb28a3893 in 635ms
+[chunk] Chunked "Stormwater Utility Fee, MA" (general) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document fca2da01-368d-4d10-9102-49dc792cdde8 in 771ms
+[chunk] Chunked "Dissolving Betterments, MA" (fee_schedules) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document c11570c8-960b-4312-910f-536f5495227e in 645ms
+[chunk] Chunked "Donations, MA" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 96dac3c4-aba9-4245-b0b1-801077d5be61 in 719ms
+[chunk] Chunked "Municipal Lien Certificates, MA" (fee_schedules) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document abb0217a-c010-411e-ac9e-347ff8d7678e in 786ms
+[chunk] Chunked "Veterans Services, MA" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 94d62153-97de-4e97-a59b-92c223fdf1ae in 797ms
+[chunk] Chunked "Veterans Day, MA" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document f79b6292-bbdb-4244-a9ac-562e30f6700e in 929ms
+[chunk] Chunked "Memorial Day, MA" (general) into 8 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 8/8 chunks for document 8d547df9-14a0-4fc6-b92f-f846b1ce98db in 876ms
+[chunk] Chunked "Monuments & Plaques, MA" (general) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document 81af194e-1b98-483d-b31a-277b21efbff7 in 930ms
+[chunk] Chunked "Proper Half Staff Display of American Flag" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document a0f7ffd2-053c-4ab3-97f5-51a3d25360fc in 633ms
+[chunk] Chunked "Purple Heart Community, MA" (general) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document cdc2632f-1112-41d9-9657-243eecad01e7 in 1189ms
+[chunk] Chunked "Needham Youth & Family Services" (general) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document f6d96f95-f367-4b55-8acc-d58f8e3e3ded in 1095ms
+[chunk] Chunked "Join Our Email Listserv, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document a7289d73-d54d-47bd-b140-63a6593f4402 in 681ms
+[chunk] Chunked "Counseling Services, MA" (general) into 8 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 8/8 chunks for document c5b7f445-3e87-4e34-9523-2af549919087 in 969ms
+[chunk] Chunked "Substance Abuse Awareness Program, MA" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 9133bf88-696e-4d03-8fb4-08f08249e4c8 in 757ms
+[chunk] Chunked "Behavioral Intervention Program, MA" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document a8785211-bc8d-4805-ac4a-a5917a9fe1c2 in 1011ms
+[chunk] Chunked "Programs for Youth, MA" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 4dc6e334-90d3-48c1-b719-afbf932e608f in 866ms
+[chunk] Chunked "Programs, MA" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 3ae5c7c3-192c-4cbd-9905-30019bee0d16 in 704ms
+[chunk] Chunked "Volunteers Around Needham, MA" (local_business) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document f22551d7-ff03-4da2-b760-62b5cf33b6ec in 944ms
+[chunk] Chunked "Peer Tutor Program, MA" (local_business) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document 1fce0f02-fb0c-49a6-b7a0-243e8744393d in 995ms
+[chunk] Chunked "VIP Program (Valuable Interactions Among Peers)" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 6a8db228-a732-47f3-8aa1-65ee19cd6998 in 696ms
+[chunk] Chunked "RAY of Hope (Recognize A Youth)" (local_business) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 0a2ccd80-8e13-4fd1-93e2-214906c361db in 736ms
+  Progress: 625/1500 docs, 2596 chunks
+[chunk] Chunked "Junior Police Academy, MA" (general) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document 426894e9-073f-48b4-9c2d-2ae0502a95e0 in 727ms
+[chunk] Chunked "Needham Unplugged, MA" (public_works) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 3c38ae12-d866-46b4-984d-8783f3e663f4 in 755ms
+[chunk] Chunked "Family Night, MA" (public_works) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 3172309d-2efa-4fe7-9db8-f51674390abd in 722ms
+[chunk] Chunked "Social Skills Groups, MA" (general) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document 8e5a08b5-076d-4814-a289-66276c19adcd in 838ms
+[chunk] Chunked "Expressive Art Therapy Workshops, MA" (public_works) into 9 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 9/9 chunks for document 5b9ad813-0eab-4894-85d6-88ed866c2a05 in 751ms
+[chunk] Chunked "School Partnership Programs, MA" (public_works) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document c60caab2-eed1-4d6f-9c92-526f6be4c378 in 744ms
+[chunk] Chunked "Make a Statement Day, MA" (public_works) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 2018c444-ddd8-4de2-9c59-37bfbc8bf02f in 741ms
+[chunk] Chunked "Teen Dating Violence Seminars, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document e8f66b62-4dfe-4758-8df7-593712d72504 in 630ms
+[chunk] Chunked "Safe Surf: Internet Safety and Cyber-Friendship Program" (news) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 82ec8937-ec2b-4a75-8a00-59e96a364ef9 in 794ms
+[chunk] Chunked "Picture Perfect, MA" (local_business) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document a6be279f-af2d-413a-ad4f-1fb1e9c2216b in 958ms
+[chunk] Chunked "Socialization Groups, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 66e241bd-6dd1-4948-8cf4-396b70263aa2 in 689ms
+[chunk] Chunked "Crisis Support Donation Fund, MA" (public_works) into 11 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 11/11 chunks for document 5ec2a427-1b51-4c33-9461-91a1bd3d58cd in 1420ms
+[chunk] Chunked "Patrick and Patricia Forde Good Person Memorial Award" (public_works) into 10 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 10/10 chunks for document fdbd6c55-a60e-4144-8004-b72e5210b1ee in 1551ms
+[chunk] Chunked "Learn More About Needham Youth Services" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document dd5d59ca-978e-4768-800f-9d0d9f699d69 in 744ms
+[chunk] Chunked "Mission Statement, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 0cb378e3-c289-4aa8-ac71-9a8e42995c20 in 923ms
+[chunk] Chunked "Fee Structure, MA" (local_business) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 142aee56-663d-4bc1-b127-743267b3c30a in 764ms
+[chunk] Chunked "Internship Opportunities, MA" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document a69f3f23-a37e-45d9-a5d3-86de3bb18259 in 845ms
+[chunk] Chunked "General Information, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document e8e93adb-165a-424c-83fb-e52bafeac1e5 in 623ms
+[chunk] Chunked "Graduate Clinical Internship, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document f22e8e27-84c7-479a-b4f6-d2d3ef02e85b in 738ms
+[chunk] Chunked "Directions to Needham Youth Services" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 5482f4e9-f2c1-4d3e-8f66-fd9f55e4581b in 766ms
+[chunk] Chunked "Community Partnerships & Collaborations, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 945da6c7-2411-480a-b438-bf3c12a3a92c in 673ms
+[chunk] Chunked "Youth Seeking Employment: Residential Setting" (general) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document 5c51fbaf-22ee-43cf-9deb-e0e1f97b949f in 1097ms
+[chunk] Chunked "Youth Commission Board, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document a10c7d8f-e94c-4f5d-b4ee-82a1a297637b in 1040ms
+[chunk] Chunked "Holiday Schedule for 2026, MA" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 53d7ee74-a0ca-4194-9d48-fd579704f12c in 1062ms
+[chunk] Chunked "Your Government, MA" (public_works) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document aecad746-073e-462a-b98d-fb8f0077a15b in 928ms
+  Progress: 650/1500 docs, 2700 chunks
+[chunk] Chunked "Boards, Commissions & Committees, MA" (general_bylaws) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 72d1d6a0-727b-47d1-8c42-a07c53629c9e in 1480ms
+[chunk] Chunked "All Committees, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document a772fbfe-359f-47e4-8e33-bb75e808c33b in 657ms
+[chunk] Chunked "Volunteer Opportunities, MA" (public_works) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document e4970b27-6e2e-45ec-8615-a0453ce23e8e in 1154ms
+[chunk] Chunked "Transportation Safety Committee, MA" (general) into 9 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 9/9 chunks for document ffae89f6-a2be-4679-ac68-d56588dd701a in 1413ms
+[chunk] Chunked "Climate Action Plan Committee (CAPC)" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 9b16369e-61d9-46b8-80f7-e163afbd5636 in 771ms
+[chunk] Chunked "Working Groups, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document f0f9f918-667c-4ab9-a802-16b0ce3d30e3 in 612ms
+[chunk] Chunked "Sustainable Needham: Climate Action Roadmap" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document c5e08fb1-fe67-451c-8d3a-9c222f46d474 in 954ms
+[chunk] Chunked "Transportation Planning and Review Committee" (public_works) into 12 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 12/12 chunks for document 230a517e-20cc-437f-a881-90a8363ee2aa in 1058ms
+[chunk] Chunked "Water and Sewer Rate Structure Committee" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document d4fb46e6-124a-4302-9b71-dae4f6723a8b in 818ms
+[chunk] Chunked "Mobility Planning & Coordination Committee" (general) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document 30939a87-c44c-4ce9-8b97-f4ce44ff4b9d in 1074ms
+[chunk] Chunked "Biosafety Committee, MA" (board_of_health) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 88d86d16-1938-4da0-ac16-1f66767e8ac2 in 740ms
+[chunk] Chunked "Climate Action Committee, MA" (budget) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document fc0d55d4-f57d-4a62-97f3-3604afae353b in 763ms
+[chunk] Chunked "Envision Needham Center Working Group" (public_works) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 07040d22-bc96-4b37-8161-5a48c7f769ce in 782ms
+[chunk] Chunked "Town Manager Screening Committee, MA" (planning_board) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 1ffcc4a0-e557-4639-8682-8dcadf14e281 in 776ms
+[chunk] Chunked "Legal Notices and Public Hearings" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 4e7b2672-685f-484f-8c77-bc3ec39a4c82 in 692ms
+[chunk] Chunked "Local Elected Officials, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 378002c2-38ee-41a2-a659-0689a92296a6 in 565ms
+[chunk] Chunked "About Public Records Request, MA" (local_business) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 91921ca7-9dc8-4e87-8342-9b5bb264cf88 in 990ms
+[chunk] Chunked "Publications, Reports and Studies, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 48ee8923-561e-4710-91cd-0bd100c46703 in 715ms
+[chunk] Chunked "Department of Public Works Feasibility Studies" (public_works) into 24 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 24/24 chunks for document dff9e934-a9a9-4e18-9a12-bf6eeb23bdcf in 1358ms
+[chunk] Chunked "Annual Town Reports, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document d6e89c4d-9edb-480e-8d96-4f60d17e4a46 in 732ms
+[chunk] Chunked "Budget Documents, MA" (budget) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 30e551fa-b18c-4ee4-8546-080d43e9fd76 in 685ms
+[chunk] Chunked "FY 2027 Budget Documents, MA" (budget) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 199b0b27-346e-46e4-b141-17d38cabbdab in 644ms
+[chunk] Chunked "FY2027 Proposed Budget, MA" (budget) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 65272b25-6a47-4b52-a504-f5cfd2304469 in 937ms
+[chunk] Chunked "FY2026 Budget Documents, MA" (budget) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 5cde834d-03c6-4329-a64d-1dad36de5734 in 812ms
+[chunk] Chunked "FY2026-2030 Capital Improvement Plan, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document e8b38f22-6d04-4719-9da6-bf76f6267d74 in 642ms
+  Progress: 675/1500 docs, 2789 chunks
+[chunk] Chunked "FY2026 Proposed Budget, MA" (budget) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document a6299e0e-6bec-4e03-8703-de6922087b26 in 627ms
+[chunk] Chunked "Previous Budget Information, MA" (budget) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 03310e24-c62e-4119-8140-fc8e3d0ece79 in 610ms
+[chunk] Chunked "FY2025 Budget Documents, MA" (budget) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 8bf2c1da-e1f8-4b02-8ee7-0087cc238165 in 736ms
+[chunk] Chunked "FY2025-2029 Capital Improvement Plan, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 53c72782-6ad9-46d6-b4bc-a4434d7b315b in 718ms
+[chunk] Chunked "FY2025 Proposed Budget, MA" (budget) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 257bdbb4-1158-434b-b0c7-83761c588a18 in 721ms
+[chunk] Chunked "FY2024 Budget Documents, MA" (budget) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document e08779f7-4c32-4281-a497-25de126f0446 in 720ms
+[chunk] Chunked "FY2024 - FY2028 Capital Improvement Plan" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document c4cff516-4d65-4972-8e4d-abea7af382f1 in 635ms
+[chunk] Chunked "FY2024 Proposed Budget, MA" (budget) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document afc08c8a-1baf-4b0b-8d21-fd59ce118968 in 713ms
+[chunk] Chunked "FY2023 Budget Documents, MA" (budget) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 11b5f218-ed48-47b5-b88a-f5cc3f7235b6 in 587ms
+[chunk] Chunked "FY2023 - FY2027 Capital Improvement Plan" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document f8a4a28e-8e29-4bd5-84df-95b082ea927f in 619ms
+[chunk] Chunked "FY2023 Proposed Budget, MA" (budget) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document bdff7c2b-6caa-4313-b64c-40125e2fc6a9 in 696ms
+[chunk] Chunked "FY2022 Budget Documents, MA" (budget) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 9d2686ca-2d7a-4ee6-88de-4bb38097c661 in 584ms
+[chunk] Chunked "FY2022 - FY2026 Capital Improvement Plan" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 1b2f76c3-225b-47e2-b2bc-ba171a94ccd1 in 658ms
+[chunk] Chunked "FY2022 Proposed Annual Budget, MA" (budget) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 1adac3a0-1679-4372-bb7d-b02e65c8ecaf in 656ms
+[chunk] Chunked "FY2021 Proposed Annual Budget, MA" (budget) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 57a1844e-1aae-4877-957b-231de62b733b in 643ms
+[chunk] Chunked "FY2021 Proposed Annual Budget, MA" (budget) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 377b2f43-2b71-4b9d-8621-0b2369baf467 in 598ms
+[chunk] Chunked "FY2021-FY2025 Capital Improvement Plan, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document c7548ee5-f1cd-44bd-9910-0a9cb9138e3b in 575ms
+[chunk] Chunked "FY2020 Proposed Annual Budget, MA" (budget) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 3df61496-e34c-49fb-aa55-7714fbf42383 in 650ms
+[chunk] Chunked "FY2020-FY2024 Capital Improvement Plan, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document b3c6948f-f1ae-4f17-aa2c-f7ef0490493a in 653ms
+[chunk] Chunked "FY2020 Proposed Annual Budget, MA" (budget) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document a1e8afe0-952e-4e1f-a15f-01f5f42d7086 in 869ms
+[chunk] Chunked "FY2019 Budget Documents, MA" (budget) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document c11f4fbb-f77d-45a5-ba5a-67bad855ad2b in 646ms
+[chunk] Chunked "FY2019 - FY2023 Capital Improvement Plan" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 82751489-2031-4a48-aec9-c7cb7c684d9e in 575ms
+[chunk] Chunked "FY2019 Proposed Annual Budget, MA" (budget) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document ffc44915-c097-403b-b6c5-ba5631d5c363 in 611ms
+[chunk] Chunked "National Community Survey, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document be9bef45-e1f1-4454-b818-edf830542f01 in 657ms
+[chunk] Chunked "Energy Audit Reports, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 0e657085-9889-498f-9a7d-fb117f75b98b in 574ms
+  Progress: 700/1500 docs, 2814 chunks
+[chunk] Chunked "Facilities Master Plan, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 816b0f2e-b072-469e-8b7a-793cd39225ca in 649ms
+[chunk] Chunked "Town Hall Historical Preservation Documents" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 4b7bd191-2ada-4927-bb07-30da5296f2cd in 909ms
+[chunk] Chunked "Public Service Administration Building, MA" (general) into 11 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 11/11 chunks for document 9c217ce3-eb35-44b5-a10a-0aca9a3e2fc8 in 991ms
+[chunk] Chunked "Needham Parking Study, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 2b4bba4b-d948-4715-858e-bc0745876dc5 in 599ms
+[chunk] Chunked "Local Transportation Study, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 839bb189-2c6e-4576-9a02-c49afbe7b339 in 623ms
+[chunk] Chunked "Needham Arts & Culture Action Plan" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 1bbc6e0c-bfc0-4855-8f73-b7fc24b6f2d1 in 753ms
+[chunk] Chunked "Recycling and Transfer Station Study 2025" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document c70aa7db-d372-4aa7-9503-923b030a0ab7 in 713ms
+[chunk] Chunked "Town Meeting, MA" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document 8a4a73b8-3bd4-480f-974f-55fe58b957b7 in 718ms
+[chunk] Chunked "October 2025 Special Town Meeting" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 617c87a1-4597-4029-8793-5e94e024a5d4 in 619ms
+[chunk] Chunked "Previous Town Meeting Information, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 00764b27-ad35-4f08-bce1-5c92091131cf in 815ms
+[chunk] Chunked "During Fiscal Year 2026, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document c36fbea1-29f8-4afa-a22c-5517052fb320 in 664ms
+[chunk] Chunked "During Fiscal Year 2025, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 5f8a3b4e-81e0-4fad-8600-86e9c01555e7 in 638ms
+[chunk] Chunked "October 2024 Special Town Meeting" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document f05abc6b-faf6-4561-9473-4e0cebc2c882 in 638ms
+[chunk] Chunked "May 2025 Special Town Meeting" (zoning_bylaws) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document 4595a625-9d56-4f31-947a-ef94f569aaab in 873ms
+[chunk] Chunked "May 2025 Annual Town Meeting" (public_works) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document 330d7b99-65e1-468f-9e8d-ccbd515c5ab0 in 1455ms
+[chunk] Chunked "During Fiscal Year 2024, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document d0d40e39-a9d8-4862-aa1a-c50e767d2aaa in 613ms
+[chunk] Chunked "October 2023 Special Town Meeting" (budget) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document ce47a46e-ecb2-4157-a92b-8631d0f84782 in 988ms
+[chunk] Chunked "May 2024 Special Town Meeting" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 6eca63bc-9c34-4f7d-ac25-8d615af840c6 in 694ms
+[chunk] Chunked "May 2024 Annual Town Meeting" (public_works) into 7 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 7/7 chunks for document 8e4d5f1d-f49b-47c9-bfb3-b5e3c4418101 in 981ms
+[chunk] Chunked "May 2024 ATM & STM Questions and Answers" (general) into 55 chunks
+[embed] Generating embeddings for batch 1/2
+[embed] Generating embeddings for batch 2/2
+[embed] Embedded 55/55 chunks for document 4f276625-6c53-4f5b-90cc-aec5b3ced68d in 2671ms
+[chunk] Chunked "During Fiscal Year 2023, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document ec9797b1-3cfb-4e1a-8750-bc7ddaf2fc70 in 614ms
+[chunk] Chunked "October 2022 Fall Town Meeting" (budget) into 8 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 8/8 chunks for document 9064f154-2bf0-44b4-a7d9-6941d7163125 in 889ms
+[chunk] Chunked "May 2023 ATM & STM Questions and Answers" (zoning_bylaws) into 17 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 17/17 chunks for document e6904933-7dbe-4859-8398-821ae6cbb6cb in 1049ms
+[chunk] Chunked "May 2023 Annual Town Meeting" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document f8bb6528-79c8-47b7-a7fb-4860c3e23473 in 641ms
+[chunk] Chunked "May 2023 Special Town Meeting" (general_bylaws) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document b554df10-b5f1-4ea6-92ac-e53a01859dfd in 821ms
+  Progress: 725/1500 docs, 2954 chunks
+[chunk] Chunked "During Fiscal year 2022, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 6d8e741e-ae17-4730-b576-1907ea9fbe3d in 627ms
+[chunk] Chunked "May 2022 ATM & STM Questions and Answers" (budget) into 64 chunks
+[embed] Generating embeddings for batch 1/2
+[embed] Generating embeddings for batch 2/2
+[embed] Embedded 64/64 chunks for document c471e489-d754-4834-9cf9-9db4f1dd5512 in 2163ms
+[chunk] Chunked "October 2021 Special Town Meeting" (zoning_bylaws) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document ad7829aa-ed19-40c9-bb6f-b7097100c219 in 737ms
+[chunk] Chunked "May 2022 Annual Town Meeting" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document aaf99d6f-e15d-4649-8353-ebc47ba727ab in 783ms
+[chunk] Chunked "May 2022 Special Town Meeting" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 8f2f43a9-44f8-4a96-bf31-0fddd070da17 in 643ms
+[chunk] Chunked "During Fiscal Year 2021, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document b119ccbc-31d2-40c3-bd19-d25145a22d64 in 576ms
+[chunk] Chunked "2020 October Fall Special Town Meeting" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 163c07dd-9bae-4a1e-9716-35932961ce08 in 718ms
+[chunk] Chunked "2020 OCT Fall STM Warrant Article Information" (zoning_bylaws) into 48 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 48/48 chunks for document 08b77489-d8f7-4882-9cb6-ab65e88e514f in 1371ms
+[chunk] Chunked "2021 Spring Town Meetings, MA" (general) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document 09c6b724-d85d-4919-b81b-37d0fbd02175 in 973ms
+[chunk] Chunked "2021 STM Warrant Articles 1 - 23" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 2cbc3bc3-795b-4c8c-8133-a3c42b3d0a91 in 767ms
+[chunk] Chunked "2021 STM Warrant Articles 24 - 50" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document e8a4d274-3b97-439a-85b6-e90998fc61b6 in 912ms
+[chunk] Chunked "2021 May Annual Town Meeting Warrant Articles" (zoning_bylaws) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document bc897d55-4068-42e7-ba63-20f3a3812985 in 742ms
+[chunk] Chunked "During Fiscal Year 2020, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 3ab57c6e-5c5a-4508-90ab-9ab629811651 in 609ms
+[chunk] Chunked "October 2019 Special Town Meeting" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 82e91e01-5e64-48eb-adf5-b887636fecc9 in 664ms
+[chunk] Chunked "2020 Special Town Meeting, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 98a54470-64b3-4c84-9a70-87781da3657e in 607ms
+[chunk] Chunked "2020 Annual Town Meeting, MA" (general) into 14 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 14/14 chunks for document 55a2a1fb-0ef3-4bb6-bec7-f5c6c904a9db in 1039ms
+[chunk] Chunked "2020 Annual Warrant Articles, MA" (public_works) into 46 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 46/46 chunks for document 8d754250-395a-4efa-b789-a49b4c81663b in 1627ms
+[chunk] Chunked "During Fiscal Year 2019, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document d2c36b5b-91fb-461c-bde5-ac2bf754bf28 in 755ms
+[chunk] Chunked "October 2018 Special Town Meeting" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document f2fdf49e-7d64-4fbf-9b1f-10edd8c97cb1 in 686ms
+[chunk] Chunked "2019 May Special Town Meeting" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 200a03e1-4f39-4b10-aed6-b0d51d748258 in 651ms
+[chunk] Chunked "2019 May Annual Town Meeting" (general_bylaws) into 9 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 9/9 chunks for document 1c8c348c-506e-4e05-9826-d39b9ad602b3 in 920ms
+[chunk] Chunked "2019 January Special Town Meeting" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document d5867bfc-6dfe-415f-b86a-d6c32a15d53d in 715ms
+[chunk] Chunked "During Fiscal Year 2018, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 8ee3a87a-d92d-4bb9-8890-a95b440cb999 in 669ms
+[chunk] Chunked "During Fiscal Year 2017, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document f8b91b73-0bf7-424c-b428-3ca8bf15cac1 in 654ms
+[chunk] Chunked "During Fiscal Year 2016, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 3e838525-d2d8-42aa-a571-5d0243ff5cda in 727ms
+  Progress: 750/1500 docs, 3170 chunks
+[chunk] Chunked "During Fiscal Year 2015, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 2510986c-c9fa-4915-9ebf-a9cb20301244 in 602ms
+[chunk] Chunked "May 2015 Annual Town Meeting" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document c2ca5615-b8e6-4d84-8f6a-f587c4d58820 in 645ms
+[chunk] Chunked "May 2015 Special Town Meeting" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 95eb6a08-c772-4f1b-8d11-6c188d2664e1 in 774ms
+[chunk] Chunked "October 2014 Special Town Meeting" (zoning_bylaws) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document c135d159-f875-4089-97ba-f16320f228fc in 715ms
+[chunk] Chunked "During Fiscal Year 2014, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 50096aed-6f0c-4fc0-90e1-2893894c027e in 650ms
+[chunk] Chunked "May 2014 Annual Town Meeting" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 981f0b74-2617-4a85-88e6-02ada4cd0dc9 in 604ms
+[chunk] Chunked "May 2014 Special Town Meeting" (general) into 4 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 4/4 chunks for document a919b9eb-4fd5-4c50-805b-269c97460814 in 750ms
+[chunk] Chunked "November 4, 2013 Special Town Meeting" (zoning_bylaws) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 6b128ac1-d200-4500-b3e5-a0f5f24e2876 in 758ms
+[chunk] Chunked "FY 2014, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document f5b8ac63-ffd1-4f70-b677-f28828e006ce in 819ms
+[chunk] Chunked "May 2013 Annual Town Meeting" (zoning_bylaws) into 16 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 16/16 chunks for document 7d0953ee-e8e5-4a3c-b01c-cd3d2a53d029 in 1193ms
+[chunk] Chunked "May 2013 Special Town Meeting" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document d35e5399-e489-4703-82fc-4fbcd08f90f1 in 611ms
+[chunk] Chunked "December 3, 2012 Special Town Meeting" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document e0e5d2ae-daef-4843-8754-0ac93873f199 in 666ms
+[chunk] Chunked "October 29, 2012 Special Town Meeting" (zoning_bylaws) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 0f4eaa07-4883-4b64-93df-1d86d97ab26a in 870ms
+[chunk] Chunked "During Fiscal Year 2012, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 4ae60b9d-f9d5-47b1-b6f3-ecd6f88145a3 in 654ms
+[chunk] Chunked "May 2012 Special Town Meeting" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 29ebaf55-2294-4243-952b-4ada060ef813 in 869ms
+[chunk] Chunked "May 2012 Annual Town Meeting" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 129ceb83-9b49-4a03-9a86-0bf6300bfca6 in 584ms
+[chunk] Chunked "Nov 2011 Special Town Meeting" (zoning_bylaws) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 5d4f96ca-0177-4f55-bc06-7d53925e7287 in 750ms
+[chunk] Chunked "During Fiscal Year 2011, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 51bb66e2-fb6b-4f0d-b4c2-5a2dda3e3bb3 in 658ms
+[chunk] Chunked "May 2011 Annual Town Meeting" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 30f3dc23-586c-4d35-be8c-1d3b6b7fc319 in 748ms
+[chunk] Chunked "May 2011 Special Town Meeting" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document fccea0ea-1f4e-4af5-a59b-0d70b86b6e3e in 754ms
+[chunk] Chunked "March 2011 Special Town Meeting" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document df83c281-c0ef-49ff-bd63-d9603d563760 in 589ms
+[chunk] Chunked "November 2010 Special Town Meeting" (general) into 22 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 22/22 chunks for document 672952b3-6fea-4a9a-a270-75fb4f146fdc in 1127ms
+[chunk] Chunked "During Fiscal Year 2010, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 3c6a8942-7fd3-4ea5-ae26-77bf80621936 in 599ms
+[chunk] Chunked "May 2010 Special Town Meeting" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document ae352762-154f-43cf-a7dc-6e833a120b24 in 584ms
+[chunk] Chunked "May 2010 Annual Town Meeting" (zoning_bylaws) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document d54f75ab-bd4b-48de-98e3-f57eb5d1027f in 720ms
+  Progress: 775/1500 docs, 3245 chunks
+[chunk] Chunked "November 2009 Special Town Meeting" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 35a6a050-32c8-43b9-9087-656eea87ef62 in 638ms
+[chunk] Chunked "During Fiscal Year 2009, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document ce37806b-de09-4b4b-9a32-d754fbe0756b in 690ms
+[chunk] Chunked "May 2009 Annual Town Meeting" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document a04ffaa0-cb35-46d1-b452-f50f79d8037c in 648ms
+[chunk] Chunked "May 2009 Special Town Meeting" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 729dba8e-8eed-4d5e-b13a-e68b1c72e7cd in 643ms
+[chunk] Chunked "October 2008 Special Town Meeting" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 39304cf6-ed53-4864-b7c8-0f469709fc90 in 576ms
+[chunk] Chunked "Our Regional, State & Federal Government" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 275af328-ff36-4417-926b-03f239e2941b in 634ms
+[chunk] Chunked "August 2023 Weather Event, MA" (public_works) into 11 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 11/11 chunks for document d05f958f-b2ff-46c9-b465-bb8bb3dfc165 in 1032ms
+[chunk] Chunked "Town Services, MA" (general) into 12 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 12/12 chunks for document 8d1453a7-d789-4731-b75b-43cb83d81108 in 1084ms
+[chunk] Chunked "Off Leash Dog Recreational Area" (general) into 8 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 8/8 chunks for document a97ebd53-df2f-4090-b3af-98beeaeb0d1a in 1038ms
+[chunk] Chunked "Our Needham Community, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 2fb528df-6b32-4a68-a60e-626cb23b19f0 in 633ms
+[chunk] Chunked "Getting To Needham, MA" (general) into 3 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 3/3 chunks for document 18ba05fe-f26a-409d-b4fe-4e02458ea881 in 939ms
+[chunk] Chunked "History, MA" (general) into 9 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 9/9 chunks for document c880d483-523d-48a9-9abf-8a097bf999e6 in 916ms
+[chunk] Chunked "Public Notices, MA" (local_business) into 14 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 14/14 chunks for document 97439733-cc77-4fb1-a0c7-45caf3beeda5 in 1001ms
+[chunk] Chunked "Needham In the News, MA" (public_works) into 15 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 15/15 chunks for document 9b44d9c5-fe56-46e8-b9b5-14f9c16457ce in 1189ms
+[chunk] Chunked "Community Standards for Municipal Workplaces" (local_business) into 11 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 11/11 chunks for document 1f3e9152-ad4f-4684-a107-ef1392999403 in 1009ms
+[chunk] Chunked "Community Information Sessions, MA" (planning_board) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 54182ee9-c261-4b2b-af74-ca9c26c9fa9a in 793ms
+[chunk] Chunked "Needham Crossing, MA" (local_business) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 3a23e8d4-b56e-4b4d-a184-cb979cd5d41b in 624ms
+[chunk] Chunked "Trip Advisor, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 5eb6701c-0535-4a0d-a515-930b0273d31c in 615ms
+[chunk] Chunked "Town-Sponsored Community Events, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 96fff4dc-5b6f-4d15-9b1a-b79016f90913 in 713ms
+[chunk] Chunked "How Do I..., MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document c3e339ff-c3e5-4701-ae19-228c26a586c6 in 628ms
+[chunk] Chunked "Apply / Register For" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 9ad0359a-d51b-4290-861e-c5f5c729cfce in 772ms
+[chunk] Chunked "Use of the Memorial Park Sign Boards" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document d615d809-0df7-43b2-95ba-f2abe430d081 in 776ms
+[chunk] Chunked "Find More About, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 3c161547-1cd3-40dd-95aa-24dadb185ab5 in 917ms
+[chunk] Chunked "SMS Mobile Number and Email Privacy" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 5abae679-29ee-4bc1-8794-549101e864c8 in 828ms
+[chunk] Chunked "Pay For, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 87163416-aaf7-4240-a167-0dffd50960f4 in 971ms
+  Progress: 800/1500 docs, 3347 chunks
+[chunk] Chunked "Rent A, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 5b0d6d5e-81ff-4440-9bf0-683ef512fbdc in 784ms
+[chunk] Chunked "Report / Submit A" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document dcbb524d-c7a7-44ed-8df3-a7de4cac8122 in 692ms
+[chunk] Chunked "View, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 4b7a01c1-146f-478e-b4a3-fa7bb4e7faa4 in 758ms
+[chunk] Chunked "Volunteer For, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document ed478719-282b-4a53-9141-5a9f9d0f349a in 721ms
+[chunk] Chunked "Water Restriction Use Status, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document ca79f283-f015-4b20-a4a0-4c08e425dcc6 in 788ms
+[chunk] Chunked "Youth Center Reports, MA" (public_works) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 9b1c1c9a-be58-4730-b12b-682c23f1653a in 619ms
+[chunk] Chunked "E-Services, MA" (public_works) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document d6535b12-fcb0-44c5-a108-db59b0b1eca6 in 983ms
+[chunk] Chunked "MBTA Quiet Zone, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 5174f887-232c-4c23-9073-5957fff47ac4 in 621ms
+[chunk] Chunked "Stephen Palmer Studies, MA" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 1ae2c3e6-e03c-40ad-a907-b0277a591ad4 in 709ms
+[chunk] Chunked "Form Center" (public_works) into 10 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 10/10 chunks for document f8fe53a2-332f-4481-8285-f196a066d605 in 2051ms
+[chunk] Chunked "Document Center" (general) into 1 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 1/1 chunks for document 681ad890-7422-4573-bb3d-dead709f9215 in 624ms
+[chunk] Chunked "News Flash" (general) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document e4d80eed-e9a1-45c8-9c72-28fba1923a46 in 1017ms
+[chunk] Chunked "Alert Center" (public_works) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document 2704822c-502e-4af9-bff6-d5f22f1c9095 in 1169ms
+[chunk] Chunked "Staff Directory" (general) into 6 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 6/6 chunks for document 3c886235-7ba2-4007-abcb-595b655d02fc in 1147ms
+[chunk] Chunked "Public Health Inspection Reports" (public_works) into 5 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 5/5 chunks for document d36dab59-d287-4352-87f2-d4cdadae243e in 841ms
+[chunk] Chunked "Archive Center" (board_of_health) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document faee82a3-2816-4175-ae05-212c199b0a0b in 785ms
+[chunk] Chunked "Frequently Asked Questions - CivicPlus.CMS.FAQ" (local_business) into 16 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 16/16 chunks for document 7ca25134-2425-479e-9c02-048ba1b5a00c in 1191ms
+[chunk] Chunked "Frequently Asked Questions - CivicPlus.CMS.FAQ" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document ca3d2777-0798-4242-a175-d90f4b85609e in 651ms
+[chunk] Chunked "Frequently Asked Questions - CivicPlus.CMS.FAQ" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 2e5604f3-915e-4c61-803c-e48d066a6453 in 786ms
+[chunk] Chunked "Frequently Asked Questions - CivicPlus.CMS.FAQ" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 1bbd3eeb-ba31-413e-85e2-c830fabe97be in 870ms
+[chunk] Chunked "Frequently Asked Questions - CivicPlus.CMS.FAQ" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document c965dc4d-3bf0-4d5f-a0ce-26f930f29ebd in 712ms
+[chunk] Chunked "Frequently Asked Questions - CivicPlus.CMS.FAQ" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document b08ed588-dae7-46e7-a4db-92f410a623aa in 1083ms
+[chunk] Chunked "Frequently Asked Questions - CivicPlus.CMS.FAQ" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 89933e56-ef25-41fc-95fa-0b9f7f34b50f in 715ms
+[chunk] Chunked "Frequently Asked Questions - CivicPlus.CMS.FAQ" (budget) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 3912fcba-bd50-47a0-9bf0-5e8a0a00f98e in 817ms
+[chunk] Chunked "Frequently Asked Questions - CivicPlus.CMS.FAQ" (budget) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 782f718e-860a-4a4b-8705-bf24ef668431 in 724ms
+  Progress: 825/1500 docs, 3427 chunks
+[chunk] Chunked "Frequently Asked Questions - CivicPlus.CMS.FAQ" (budget) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document b9995808-00f3-417c-aca0-78f2e6974abc in 755ms
+[chunk] Chunked "Frequently Asked Questions - CivicPlus.CMS.FAQ" (budget) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document de31dfd9-0f6e-46bd-b3b1-13aae5348f56 in 1019ms
+[chunk] Chunked "Frequently Asked Questions - CivicPlus.CMS.FAQ" (budget) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 240eaf86-b262-4547-b97a-2ed6ae375d28 in 789ms
+[chunk] Chunked "Frequently Asked Questions - CivicPlus.CMS.FAQ" (budget) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 3aa7b1eb-cc5d-4916-bcb4-b0034618d0b1 in 1058ms
+[chunk] Chunked "Frequently Asked Questions - CivicPlus.CMS.FAQ" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 7ae3300d-22b4-4a16-bf19-cf950a97e410 in 700ms
+[chunk] Chunked "Frequently Asked Questions - CivicPlus.CMS.FAQ" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 579f6994-271f-4ff3-86bd-08023e582330 in 874ms
+[chunk] Chunked "Frequently Asked Questions - CivicPlus.CMS.FAQ" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document a7984fb1-9814-4d68-8f5e-ae3cb48e04ae in 629ms
+[chunk] Chunked "Frequently Asked Questions - CivicPlus.CMS.FAQ" (general) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document d0816152-fffd-4e83-ba96-a409ecdb265d in 785ms
+[chunk] Chunked "Frequently Asked Questions - CivicPlus.CMS.FAQ" (local_business) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document dc4fb86c-8119-4055-a063-dffe79d97096 in 803ms
+[chunk] Chunked "Frequently Asked Questions - CivicPlus.CMS.FAQ" (local_business) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document fb29b60c-9587-46f2-a449-cbc586f300d4 in 1159ms
+[chunk] Chunked "Frequently Asked Questions - CivicPlus.CMS.FAQ" (local_business) into 2 chunks
+[embed] Generating embeddings for batch 1/1
+[embed] Embedded 2/2 chunks for document 2b5348c3-ca73-4933-91aa-e23b4ca9ac0a in 915ms
