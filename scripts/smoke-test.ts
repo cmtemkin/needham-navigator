@@ -59,7 +59,7 @@ async function main() {
 
     // Display results
     const topScore = matches[0].similarity;
-    const avgScore = matches.reduce((s: number, m: any) => s + m.similarity, 0) / matches.length;
+    const avgScore = matches.reduce((s: number, m: { similarity: number }) => s + m.similarity, 0) / matches.length;
 
     let confidence: string;
     if (topScore >= 0.85) confidence = "HIGH";

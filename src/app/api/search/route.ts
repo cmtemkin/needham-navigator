@@ -145,7 +145,6 @@ function deduplicateByUrl(results: SearchResult[]): SearchResult[] {
 
   // Log deduplication in development to help debug
   if (process.env.NODE_ENV === 'development' && results.length !== deduplicated.length) {
-    // eslint-disable-next-line no-console
     console.log(`[search] Deduplicated ${results.length} results → ${deduplicated.length} unique URLs`);
   }
 

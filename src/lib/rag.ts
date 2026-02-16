@@ -697,7 +697,6 @@ export async function retrieveRelevantChunks(
   if (process.env.NODE_ENV === "development") {
     const filteredOut = allChunks.filter((c) => c.similarity < MIN_SIMILARITY_FLOOR);
     if (filteredOut.length > 0) {
-      // eslint-disable-next-line no-console
       console.log(
         `[rag] Filtered ${filteredOut.length} low-relevance chunks (similarity < ${MIN_SIMILARITY_FLOOR}):`,
         filteredOut.map((c) => ({

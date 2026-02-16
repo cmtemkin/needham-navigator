@@ -48,8 +48,8 @@ async function main() {
       }
 
       console.log(" ✓");
-    } catch (err: any) {
-      const msg = err?.message || String(err);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
 
       // If column already exists, that's fine
       if (msg.includes("already exists") || msg.includes("42701") || msg.includes("42P07")) {
