@@ -30,6 +30,7 @@ export type TownFeatureFlags = {
   enableMultiLanguage: boolean;
   enableDashboard: boolean;
   enableNews: boolean;
+  enableAbout: boolean;
   enableEvents: boolean;
   enableDining: boolean;
   enableSafety: boolean;
@@ -127,6 +128,7 @@ export const TOWNS: TownConfig[] = [
       enableMultiLanguage: true,
       enableDashboard: true,
       enableNews: true,
+      enableAbout: false,
       enableEvents: true,
       enableDining: true,
       enableSafety: true,
@@ -183,6 +185,7 @@ export const TOWNS: TownConfig[] = [
       enableMultiLanguage: true,
       enableDashboard: false,
       enableNews: false,
+      enableAbout: false,
       enableEvents: false,
       enableDining: false,
       enableSafety: false,
