@@ -4,6 +4,8 @@ import { DEFAULT_TOWN_ID as DEFAULT_TOWN_ID_FROM_CONFIG } from "@/lib/towns";
 import { expandQuery } from "@/lib/synonyms";
 import { rewriteQuery } from "@/lib/query-rewriter";
 import { trackEvent } from "@/lib/pendo";
+import { CohereClient } from "cohere-ai";
+import type { RetrievalConfig } from "@/lib/query-router";
 
 export const DEFAULT_TOWN_ID = DEFAULT_TOWN_ID_FROM_CONFIG;
 
@@ -11,6 +13,12 @@ const DEFAULT_MATCH_THRESHOLD = 0.7;
 const DEFAULT_MATCH_COUNT = 30; // Retrieve more for reranking
 const DEFAULT_FINAL_COUNT = 10; // Final chunks to pass to LLM
 const MIN_SIMILARITY_FLOOR = 0.3; // Drop chunks below this — they're noise (tuned for better recall)
+
+// Cohere client for cross-encoder reranking (optional upgrade over formula-based reranking)
+const cohereClient =
+  process.env.COHERE_API_KEY && process.env.USE_CROSS_ENCODER_RERANK === "true"
+    ? new CohereClient({ token: process.env.COHERE_API_KEY })
+    : null;
 
 type ChunkMetadata = Record<string, unknown>;
 
@@ -43,6 +51,8 @@ export type RetrievedChunk = {
   similarity: number;
   metadata: ChunkMetadata;
   source: SourceReference;
+  cohereScore?: number;  // Added by Cohere reranker if used
+  relevanceScore?: number;  // Added by formula reranking
 };
 
 export type HybridSearchResult = {
@@ -333,17 +343,94 @@ function detectDepartment(query: string): string | null {
   return null;
 }
 
+// ---------------------------------------------------------------------------
+// Cohere cross-encoder reranking (optional upgrade)
+// ---------------------------------------------------------------------------
+
+interface RerankResult {
+  chunks: RetrievedChunk[];
+  usedReranker: boolean;
+  rerankerLatencyMs: number | null;
+}
+
+async function cohereRerank(
+  query: string,
+  chunks: RetrievedChunk[]
+): Promise<RerankResult> {
+  // If Cohere client not configured or no chunks, skip reranking
+  if (!cohereClient || chunks.length === 0) {
+    return { chunks, usedReranker: false, rerankerLatencyMs: null };
+  }
+
+  const startTime = performance.now();
+
+  try {
+    // Cohere rerank API expects documents as strings
+    const documents = chunks.map((chunk) => chunk.chunkText);
+
+    // Call Cohere Rerank v3.5 with 3-second timeout
+    const abortController = new AbortController();
+    const timeoutId = setTimeout(() => abortController.abort(), 3000);
+
+    const response = await cohereClient.v2.rerank({
+      model: "rerank-v3.5",
+      query,
+      documents,
+      topN: chunks.length, // Return all documents with scores
+    });
+
+    clearTimeout(timeoutId);
+
+    const latencyMs = Math.round(performance.now() - startTime);
+
+    // Map Cohere results back to chunks with updated scores
+    const rankedChunks = response.results.map((result) => {
+      const chunk = chunks[result.index];
+      return {
+        ...chunk,
+        cohereScore: result.relevanceScore,
+      };
+    });
+
+    return {
+      chunks: rankedChunks,
+      usedReranker: true,
+      rerankerLatencyMs: latencyMs,
+    };
+  } catch (error) {
+    // Graceful fallback: if Cohere fails or times out, use original chunks
+    console.warn("[rag] Cohere reranking failed, using formula reranking:", error);
+    return {
+      chunks,
+      usedReranker: false,
+      rerankerLatencyMs: null,
+    };
+  }
+}
+
 // Reranking: score chunks by multiple factors
+// If config is provided, uses adjusted weights. Otherwise uses defaults.
+// If chunks have cohereScore, blends it with the formula score.
 function rerankChunks(
   chunks: RetrievedChunk[],
   query: string,
-  detectedDepartment: string | null
+  detectedDepartment: string | null,
+  config?: RetrievalConfig
 ): RetrievedChunk[] {
   const queryTerms = query.toLowerCase().split(/\s+/).filter(t => t.length >= 3);
+
+  // Use config weights if provided, otherwise use defaults
+  const recencyWeight = config?.recencyWeight ?? 0.1;
+  const authorityWeight = config?.authorityWeight ?? 0.1;
+  const sourceBoost = config?.sourceBoost ?? {};
 
   const scored = chunks.map(chunk => {
     const chunkLower = chunk.chunkText.toLowerCase();
     const metadata = chunk.metadata;
+
+    // Check if this chunk has a Cohere score (from reranking)
+    const hasCohereScore = chunk.cohereScore !== undefined;
+    const cohereScore = chunk.cohereScore ?? 0;
 
     // Semantic similarity (0.6 weight)
     const semanticScore = chunk.similarity * 0.6;
@@ -352,33 +439,44 @@ function rerankChunks(
     const matchedTerms = queryTerms.filter(term => chunkLower.includes(term)).length;
     const keywordScore = (matchedTerms / Math.max(queryTerms.length, 1)) * 0.2;
 
-    // Document recency (0.1 weight)
+    // Document recency (configurable weight)
     let recencyScore = 0;
     const docDate = readString(metadata, ["document_date", "effective_date", "last_amended"]);
     if (docDate) {
       const year = parseInt(docDate.match(/\d{4}/)?.[0] ?? "0");
-      if (year >= 2024) recencyScore = 0.1;
-      else if (year >= 2020) recencyScore = 0.07;
-      else if (year >= 2015) recencyScore = 0.04;
+      if (year >= 2024) recencyScore = recencyWeight;
+      else if (year >= 2020) recencyScore = recencyWeight * 0.7;
+      else if (year >= 2015) recencyScore = recencyWeight * 0.4;
     }
 
-    // Document authority (0.1 weight)
+    // Document authority (configurable weight)
     let authorityScore = 0;
     const docType = readString(metadata, ["document_type", "chunk_type"]);
-    if (docType === "regulation" || docType === "bylaw") authorityScore = 0.1;
-    else if (docType === "procedure" || docType === "meeting") authorityScore = 0.07;
-    else authorityScore = 0.05;
+    if (docType === "regulation" || docType === "bylaw") authorityScore = authorityWeight;
+    else if (docType === "procedure" || docType === "meeting") authorityScore = authorityWeight * 0.7;
+    else authorityScore = authorityWeight * 0.5;
 
-    // Department boost
-    let deptBoost = 0;
-    if (detectedDepartment) {
+    // Source boost (from config, replaces department boost)
+    let sourceBoostScore = 0;
+    const contentType = readString(metadata, ["content_type"]);
+    if (contentType && sourceBoost[contentType as keyof typeof sourceBoost]) {
+      sourceBoostScore = sourceBoost[contentType as keyof typeof sourceBoost] ?? 0;
+    }
+    // Fallback to department boost if no source boost
+    if (sourceBoostScore === 0 && detectedDepartment) {
       const chunkDept = readString(metadata, ["department"]);
       if (chunkDept && chunkDept.toLowerCase().includes(detectedDepartment.toLowerCase())) {
-        deptBoost = 0.05;
+        sourceBoostScore = 0.05;
       }
     }
 
-    const relevanceScore = semanticScore + keywordScore + recencyScore + authorityScore + deptBoost;
+    // Formula score (existing 5-factor formula with adjusted weights)
+    const formulaScore = semanticScore + keywordScore + recencyScore + authorityScore + sourceBoostScore;
+
+    // Blend Cohere score if available: 60% Cohere, 30% formula, 10% source boost
+    const relevanceScore = hasCohereScore
+      ? cohereScore * 0.6 + formulaScore * 0.3 + sourceBoostScore * 0.1
+      : formulaScore;
 
     return {
       ...chunk,
@@ -400,7 +498,20 @@ function rerankChunks(
 //            stay together. Falls back to next-best-ranked if no siblings.
 const MAX_CHUNKS_PER_DOC = 3;
 
-function selectTopChunks(chunks: RetrievedChunk[], maxCount: number): RetrievedChunk[] {
+function selectTopChunks(
+  chunks: RetrievedChunk[],
+  maxCount: number,
+  config?: RetrievalConfig
+): RetrievedChunk[] {
+  // Check if sibling expansion is enabled (default: true for backward compatibility)
+  const expandSiblings = config?.expandSiblings ?? true;
+
+  if (!expandSiblings) {
+    // Simple selection: just take top N chunks by score
+    return chunks.slice(0, maxCount);
+  }
+
+  // Otherwise, use the two-pass sibling expansion strategy
   const primaryCount = Math.ceil(maxCount * 0.8); // e.g. 8 of 10
 
   // --- Pass 1: primary selection with per-doc cap ---
@@ -495,12 +606,16 @@ export async function retrieveRelevantChunks(
     matchThreshold?: number;
     matchCount?: number;
     finalCount?: number;
+    config?: RetrievalConfig; // Optional retrieval config from query router
   }
 ): Promise<RetrievedChunk[]> {
   const townId = options?.townId ?? DEFAULT_TOWN_ID;
-  const matchThreshold = options?.matchThreshold ?? DEFAULT_MATCH_THRESHOLD;
+  const config = options?.config;
+
+  // Use config values if provided, otherwise fall back to options or defaults
+  const matchThreshold = config?.similarityThreshold ?? options?.matchThreshold ?? DEFAULT_MATCH_THRESHOLD;
   const matchCount = options?.matchCount ?? DEFAULT_MATCH_COUNT;
-  const finalCount = options?.finalCount ?? DEFAULT_FINAL_COUNT;
+  const finalCount = config?.resultCount ?? options?.finalCount ?? DEFAULT_FINAL_COUNT;
 
   const trimmedQuery = query.trim();
   if (!trimmedQuery) {
@@ -594,11 +709,29 @@ export async function retrieveRelevantChunks(
     }
   }
 
-  // Step 7: Rerank using the full expanded query for better keyword overlap scoring
-  const reranked = rerankChunks(chunks, fullExpandedQuery, detectedDepartment);
+  // Step 7: Cohere cross-encoder reranking (optional upgrade)
+  const { chunks: cohereRanked, usedReranker, rerankerLatencyMs } = await cohereRerank(
+    fullExpandedQuery,
+    chunks
+  );
 
-  // Step 8: Select top chunks by reranked score
-  const diverse = selectTopChunks(reranked, finalCount);
+  // Log reranker usage for telemetry
+  if (usedReranker) {
+    try {
+      trackEvent("reranker_used", {
+        latency_ms: rerankerLatencyMs,
+        chunk_count: chunks.length,
+      });
+    } catch {
+      // Non-critical — don't let tracking failures affect search
+    }
+  }
+
+  // Step 8: Formula-based reranking (blends with Cohere if available)
+  const reranked = rerankChunks(cohereRanked, fullExpandedQuery, detectedDepartment, config);
+
+  // Step 9: Select top chunks by reranked score (with optional sibling expansion)
+  const diverse = selectTopChunks(reranked, finalCount, config);
 
   return diverse;
 }

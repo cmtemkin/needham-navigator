@@ -3,6 +3,7 @@ import { hybridSearch, type HybridSearchResult, cleanDocumentTitle } from '@/lib
 import { getCachedAnswer } from '@/lib/answer-cache';
 import { DEFAULT_TOWN_ID } from '@/lib/towns';
 import { stripMarkdown } from '@/lib/utils';
+import { logSearchTelemetry } from '@/lib/telemetry';
 
 // Search-specific threshold (higher than chat since results are user-facing)
 // Chat uses 0.3, but search results need stricter filtering to avoid irrelevant matches
@@ -211,6 +212,26 @@ export async function POST(request: Request): Promise<Response> {
     results = results.slice(0, limit);
 
     const timingMs = Math.round(performance.now() - start);
+
+    // Log telemetry asynchronously (non-blocking, fire-and-forget)
+    const topSimilarity = results.length > 0 ? results[0].similarity : undefined;
+    const avgSimilarity =
+      results.length > 0
+        ? results.reduce((sum, r) => sum + r.similarity, 0) / results.length
+        : undefined;
+
+    logSearchTelemetry({
+      query,
+      resultCount: results.length,
+      topSimilarity,
+      avgSimilarity,
+      totalLatencyMs: timingMs,
+      hadAiAnswer: !!cachedAnswer,
+      town: townId,
+    }).catch((error) => {
+      // Non-critical — log but don't fail the request
+      console.warn('[api/search] Telemetry logging failed:', error);
+    });
 
     return NextResponse.json({
       results,
