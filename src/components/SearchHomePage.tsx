@@ -2,19 +2,14 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Search, Trash2, Building2, School, DollarSign, Bus, ChevronRight } from "lucide-react";
-import Link from "next/link";
+import { Search, Trash2, Building2, School, DollarSign, Bus } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SearchResultCard } from "@/components/search/SearchResultCard";
 import { AIAnswerCard } from "@/components/search/AIAnswerCard";
-import { DailyBriefBanner } from "@/components/DailyBriefBanner";
-import { ArticleCard } from "@/components/ArticleCard";
-import { ArticleSkeleton } from "@/components/ArticleSkeleton";
 import { useTown, useTownHref } from "@/lib/town-context";
 import { useChatWidget } from "@/lib/chat-context";
 import type { SearchResponse, CachedAnswer } from "@/types/search";
-import type { Article, ArticleListResponse } from "@/types/article";
 import { trackEvent } from "@/lib/pendo";
 
 const QUICK_LINKS = [
@@ -96,7 +91,10 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
   const [searchResults, setSearchResults] = useState<SearchResponse | null>(null);
   const [aiAnswer, setAiAnswer] = useState<AIAnswerState>({ type: "idle" });
   const [isSearching, setIsSearching] = useState(false);
+  const [featuredArticles, setFeaturedArticles] = useState<Article[]>([]);
+  const [articlesLoading, setArticlesLoading] = useState(true);
   const queryFromUrl = normalizeQuery(searchParams.get("q"));
+  const articlesHref = useTownHref("/articles");
 
   const executeSearch = useCallback(
     async (rawQuery: string) => {
@@ -279,6 +277,25 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
     void executeSearch(queryFromUrl);
   }, [executeSearch, pathname, queryFromUrl, router, searchHref]);
 
+  // Fetch featured articles
+  useEffect(() => {
+    async function fetchArticles() {
+      try {
+        const res = await fetch(`/api/articles?town=${town.town_id}&limit=6`);
+        if (res.ok) {
+          const data: ArticleListResponse = await res.json();
+          setFeaturedArticles(data.articles);
+        }
+      } catch (error) {
+        console.error("Failed to fetch articles:", error);
+      } finally {
+        setArticlesLoading(false);
+      }
+    }
+
+    void fetchArticles();
+  }, [town.town_id]);
+
   const handleAskAbout = useCallback((question: string) => {
     trackEvent('ask_about_clicked', {
       question_length: question.length,
@@ -385,6 +402,41 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
         {/* Default State (no query) */}
         {!showResults && (
           <>
+            {/* Daily Brief & Articles */}
+            <section className="mx-auto mt-8 max-w-content px-4 sm:px-6">
+              <DailyBriefBanner />
+
+              {/* Featured Articles */}
+              <div className="mb-12">
+                <div className="flex items-center justify-between mb-5">
+                  <h2 className="text-2xl font-bold text-text-primary">
+                    Latest Articles
+                  </h2>
+                  <Link
+                    href={articlesHref}
+                    className="flex items-center gap-1 text-[var(--primary)] hover:text-[var(--primary-dark)] font-medium text-sm transition-colors group"
+                  >
+                    View all articles
+                    <ChevronRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+                </div>
+
+                {articlesLoading ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[...Array(6)].map((_, i) => (
+                      <ArticleSkeleton key={i} variant="grid" />
+                    ))}
+                  </div>
+                ) : featuredArticles.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {featuredArticles.map((article) => (
+                      <ArticleCard key={article.id} article={article} variant="grid" />
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            </section>
+
             {/* Browse by Topic */}
             <section className="mx-auto mt-12 max-w-content px-4 sm:px-6">
               <h2 className="text-2xl font-bold text-text-primary mb-5">
