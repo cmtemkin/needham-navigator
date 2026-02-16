@@ -192,7 +192,7 @@ export const NEEDHAM_CONFIG: ScraperConfig = {
   ],
 
   maxDepth: 5,
-  maxPages: 1500,  // Expanded for mega-expansion (was 800)
+  maxPages: 50000,  // Mega-batch overnight run (was 1500)
   crawlDelayMs: 1500, // 1.5 seconds between requests — extra polite with more sources
   maxRetries: 3,
 

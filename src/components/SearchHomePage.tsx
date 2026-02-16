@@ -2,14 +2,19 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Search, Trash2, Building2, School, DollarSign, Bus } from "lucide-react";
+import { Search, Trash2, Building2, School, DollarSign, Bus, ChevronRight } from "lucide-react";
+import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SearchResultCard } from "@/components/search/SearchResultCard";
 import { AIAnswerCard } from "@/components/search/AIAnswerCard";
+import { DailyBriefBanner } from "@/components/DailyBriefBanner";
+import { ArticleCard } from "@/components/ArticleCard";
+import { ArticleSkeleton } from "@/components/ArticleSkeleton";
 import { useTown, useTownHref } from "@/lib/town-context";
 import { useChatWidget } from "@/lib/chat-context";
 import type { SearchResponse, CachedAnswer } from "@/types/search";
+import type { Article, ArticleListResponse } from "@/types/article";
 import { trackEvent } from "@/lib/pendo";
 
 const QUICK_LINKS = [
@@ -73,7 +78,11 @@ function normalizeQuery(value: string | null): string {
   return (value ?? "").trim();
 }
 
-export function SearchHomePage() {
+interface SearchHomePageProps {
+  initialQuery?: string;
+}
+
+export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -83,7 +92,7 @@ export function SearchHomePage() {
   const shortTownName = town.name.replace(/,\s*[A-Z]{2}$/i, "");
   const latestExecutedQueryRef = useRef<string | null>(null);
 
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialQuery);
   const [searchResults, setSearchResults] = useState<SearchResponse | null>(null);
   const [aiAnswer, setAiAnswer] = useState<AIAnswerState>({ type: "idle" });
   const [isSearching, setIsSearching] = useState(false);

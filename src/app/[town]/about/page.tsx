@@ -24,15 +24,15 @@ const FAQ_ITEMS = [
   },
   {
     question: "Is my data being collected?",
-    answer: "We don&apos;t require accounts or collect personal information. Search queries are logged anonymously to improve results and understand what information residents are looking for. We use Pendo for anonymous usage analytics (no personal data).",
+    answer: "We don't require accounts or collect personal information. Search queries are logged anonymously to improve results and understand what information residents are looking for. We use Pendo for anonymous usage analytics (no personal data).",
   },
   {
     question: "Can the AI be wrong?",
-    answer: "Yes. AI can make mistakes or misinterpret information. That&apos;s why we always link to original sources so you can verify. For important decisions like permits, taxes, or legal matters, check official town resources or contact the relevant department.",
+    answer: "Yes. AI can make mistakes or misinterpret information. That's why we always link to original sources so you can verify. For important decisions like permits, taxes, or legal matters, check official town resources or contact the relevant department.",
   },
   {
     question: "How can I help?",
-    answer: "Send us feedback, suggest new sources, or report errors at info@needhamnavigator.com. This is a community project and we&apos;d love your input. If you&apos;re technical, contributions are welcome on GitHub!",
+    answer: "Send us feedback, suggest new sources, or report errors at info@needhamnavigator.com. This is a community project and we'd love your input. If you're technical, contributions are welcome on GitHub!",
   },
   {
     question: "Who built this?",
@@ -71,7 +71,7 @@ export default function AboutPage() {
           <h2 className="text-3xl font-bold text-text-primary mb-6">Our Mission</h2>
           <div className="bg-white border border-border-default rounded-xl p-6 space-y-4">
             <p className="text-[15px] text-text-primary leading-relaxed">
-              Make Needham&apos;s public information accessible, searchable, and understandable for everyone.
+              Make Needham's public information accessible, searchable, and understandable for everyone.
             </p>
             <ul className="space-y-3 text-[15px] text-text-secondary">
               <li className="flex items-start gap-3">
@@ -99,7 +99,7 @@ export default function AboutPage() {
           <h2 className="text-3xl font-bold text-text-primary mb-6">How It Works</h2>
           <div className="bg-white border border-border-default rounded-xl p-6 space-y-4">
             <p className="text-[15px] text-text-primary leading-relaxed">
-              Needham Navigator is transparent about using AI. Here&apos;s what happens when you search:
+              Needham Navigator is transparent about using AI. Here's what happens when you search:
             </p>
             <ol className="space-y-4 text-[15px] text-text-secondary">
               <li className="flex items-start gap-3">
@@ -156,7 +156,7 @@ export default function AboutPage() {
 
         {/* What's Coming Next */}
         <section className="mx-auto max-w-content px-4 sm:px-6 mt-12">
-          <h2 className="text-3xl font-bold text-text-primary mb-6">What&apos;s Coming Next</h2>
+          <h2 className="text-3xl font-bold text-text-primary mb-6">What's Coming Next</h2>
           <div className="bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-200 rounded-xl p-6">
             <ul className="space-y-3 text-[15px] text-text-primary">
               <li className="flex items-start gap-3">
@@ -165,7 +165,7 @@ export default function AboutPage() {
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-blue-600 mt-1">→</span>
-                <span>AI Daily Brief — a morning summary of what&apos;s happening in Needham</span>
+                <span>AI Daily Brief — a morning summary of what's happening in Needham</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-blue-600 mt-1">→</span>
@@ -190,7 +190,7 @@ export default function AboutPage() {
               Want This For Your Town?
             </h2>
             <p className="text-[15px] text-text-secondary mb-6 max-w-[600px] mx-auto leading-relaxed">
-              Needham Navigator is open source and free for any community to use. If you&apos;re a town official, resident, or developer who wants to bring AI-powered municipal information to your community, you can fork this project and customize it for your town.
+              Needham Navigator is open source and free for any community to use. If you're a town official, resident, or developer who wants to bring AI-powered municipal information to your community, you can fork this project and customize it for your town.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
               <a
@@ -241,7 +241,7 @@ export default function AboutPage() {
           <h2 className="text-3xl font-bold text-text-primary mb-6">Get in Touch</h2>
           <div className="bg-white border border-border-default rounded-xl p-6">
             <p className="text-[15px] text-text-primary mb-6">
-              Have feedback, found an error, or want to suggest a source? We&apos;d love to hear from you.
+              Have feedback, found an error, or want to suggest a source? We'd love to hear from you.
             </p>
             <div className="space-y-4">
               <a
@@ -264,7 +264,7 @@ export default function AboutPage() {
               </a>
             </div>
             <p className="text-[13px] text-text-muted mt-6">
-              Needham Navigator is open source — contributions welcome! If you&apos;re a developer, designer, or data enthusiast who wants to help improve this tool for the community, check out our GitHub repository.
+              Needham Navigator is open source — contributions welcome! If you're a developer, designer, or data enthusiast who wants to help improve this tool for the community, check out our GitHub repository.
             </p>
           </div>
         </section>
