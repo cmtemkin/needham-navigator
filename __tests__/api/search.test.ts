@@ -84,7 +84,7 @@ describe('POST /api/search', () => {
     const data = await response.json();
     // cached_answer is optional
     if (data.cached_answer) {
-      expect(data.cached_answer).toHaveProperty('answer');
+      expect(data.cached_answer).toHaveProperty('answer_html');
       expect(data.cached_answer).toHaveProperty('sources');
       expect(Array.isArray(data.cached_answer.sources)).toBe(true);
     }

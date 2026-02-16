@@ -31,7 +31,7 @@ describe('POST /api/chat', () => {
 
       reader.releaseLock();
     }
-  });
+  }, 30000); // 30 second timeout for integration test with real API calls
 
   it('should return 400 for empty messages array', async () => {
     const response = await fetch(`${API_URL}/api/chat`, {
