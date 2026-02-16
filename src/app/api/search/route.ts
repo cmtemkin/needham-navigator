@@ -4,8 +4,9 @@ import { getCachedAnswer } from '@/lib/answer-cache';
 import { DEFAULT_TOWN_ID } from '@/lib/towns';
 import { stripMarkdown } from '@/lib/utils';
 
-// Import the same threshold used in the chat RAG pipeline
-const MIN_SIMILARITY_THRESHOLD = 0.3;
+// Search-specific threshold (higher than chat since results are user-facing)
+// Chat uses 0.3, but search results need stricter filtering to avoid irrelevant matches
+const MIN_SIMILARITY_THRESHOLD = 0.35;
 
 interface SearchResult {
   id: string;
@@ -92,6 +93,31 @@ function toSearchResult(result: HybridSearchResult): SearchResult {
 }
 
 /**
+ * Normalize a URL for deduplication by removing variations that represent the same page.
+ */
+function normalizeUrl(url: string): string {
+  let normalized = url.trim();
+
+  // Remove protocol (http:// or https://)
+  normalized = normalized.replace(/^https?:\/\//i, '');
+
+  // For FAQ pages with query parameters (e.g., Faq.aspx?QID=123, FAQ.asp?TID=45),
+  // strip the query params to group all FAQ entries from the same page together.
+  // This prevents showing "Frequently Asked Questions" 3+ times with different QIDs.
+  if (/\/faq\.(aspx?|php)/i.test(normalized)) {
+    normalized = normalized.split('?')[0];
+  }
+
+  // Remove trailing slashes
+  normalized = normalized.replace(/\/+$/, '');
+
+  // Convert to lowercase for case-insensitive comparison
+  normalized = normalized.toLowerCase();
+
+  return normalized;
+}
+
+/**
  * Deduplicate search results by source URL.
  * For each unique URL, keeps only the result with the highest similarity score.
  */
@@ -104,14 +130,25 @@ function deduplicateByUrl(results: SearchResult[]): SearchResult[] {
       continue;
     }
 
-    const existing = bestByUrl.get(result.source_url);
+    // Normalize URL to handle variations (trailing slashes, case, protocol)
+    const normalizedUrl = normalizeUrl(result.source_url);
+
+    const existing = bestByUrl.get(normalizedUrl);
     if (!existing || result.similarity > existing.similarity) {
-      bestByUrl.set(result.source_url, result);
+      bestByUrl.set(normalizedUrl, result);
     }
   }
 
   // Return deduplicated results sorted by similarity (highest first)
-  return Array.from(bestByUrl.values()).sort((a, b) => b.similarity - a.similarity);
+  const deduplicated = Array.from(bestByUrl.values()).sort((a, b) => b.similarity - a.similarity);
+
+  // Log deduplication in development to help debug
+  if (process.env.NODE_ENV === 'development' && results.length !== deduplicated.length) {
+    // eslint-disable-next-line no-console
+    console.log(`[search] Deduplicated ${results.length} results → ${deduplicated.length} unique URLs`);
+  }
+
+  return deduplicated;
 }
 
 export async function POST(request: Request): Promise<Response> {
