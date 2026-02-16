@@ -171,6 +171,47 @@ async function fetchWithRetry(
 }
 
 // ---------------------------------------------------------------------------
+// Sitemap.xml parsing
+// ---------------------------------------------------------------------------
+
+async function fetchSitemap(sitemapUrl: string, config: ScraperConfig): Promise<string[]> {
+  try {
+    console.log(`[scraper] Fetching sitemap: ${sitemapUrl}`);
+    const response = await fetch(sitemapUrl, {
+      headers: { "User-Agent": config.userAgent },
+      signal: AbortSignal.timeout(30000),
+    });
+
+    if (!response.ok) {
+      console.warn(`[scraper] Sitemap fetch failed (${response.status}): ${sitemapUrl}`);
+      return [];
+    }
+
+    const xml = await response.text();
+    const urls: string[] = [];
+
+    // Parse XML for <loc> tags (both sitemap index and urlset)
+    const locMatches = xml.matchAll(/<loc>([^<]+)<\/loc>/gi);
+    for (const match of locMatches) {
+      const url = match[1].trim();
+      // If this is a sitemap index (linking to other sitemaps), recursively fetch
+      if (url.endsWith(".xml") || url.includes("sitemap")) {
+        const nestedUrls = await fetchSitemap(url, config);
+        urls.push(...nestedUrls);
+      } else {
+        urls.push(url);
+      }
+    }
+
+    console.log(`[scraper] Sitemap parsed: ${urls.length} URLs from ${sitemapUrl}`);
+    return urls;
+  } catch (err) {
+    console.error(`[scraper] Sitemap parsing failed for ${sitemapUrl}:`, err);
+    return [];
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Robots.txt
 // ---------------------------------------------------------------------------
 
@@ -416,6 +457,39 @@ export async function scrape(options: ScrapeOptions = {}): Promise<ScrapeResult>
   console.log(`  Max depth: ${config.maxDepth}, Max pages: ${config.maxPages}`);
   console.log(`  Crawl delay: ${config.crawlDelayMs}ms`);
   console.log("=".repeat(60));
+
+  // Check for sitemap.xml in seed URLs and expand queue
+  const expandedSeeds: string[] = [];
+  for (const seed of config.seedUrls) {
+    if (seed.endsWith(".xml") || seed.includes("sitemap")) {
+      // This is a sitemap URL - fetch and expand
+      const sitemapUrls = await fetchSitemap(seed, config);
+      expandedSeeds.push(...sitemapUrls);
+      console.log(`[scraper] Expanded sitemap ${seed} to ${sitemapUrls.length} URLs`);
+    } else {
+      // Try to find sitemap.xml at the root
+      try {
+        const rootUrl = new URL(seed);
+        const sitemapUrl = `${rootUrl.protocol}//${rootUrl.host}/sitemap.xml`;
+        const sitemapUrls = await fetchSitemap(sitemapUrl, config);
+        if (sitemapUrls.length > 0) {
+          expandedSeeds.push(...sitemapUrls);
+          console.log(`[scraper] Found sitemap.xml at ${sitemapUrl} (${sitemapUrls.length} URLs)`);
+        } else {
+          // No sitemap found, use regular seed
+          expandedSeeds.push(seed);
+        }
+      } catch {
+        expandedSeeds.push(seed);
+      }
+    }
+  }
+
+  // Update config with expanded seeds
+  if (expandedSeeds.length > config.seedUrls.length) {
+    console.log(`[scraper] Expanded ${config.seedUrls.length} seeds to ${expandedSeeds.length} URLs via sitemaps`);
+    config.seedUrls = expandedSeeds.slice(0, config.maxPages); // Limit to maxPages
+  }
 
   // Initialize or resume progress
   let progress: CrawlProgress;

@@ -77,16 +77,123 @@ export const NEEDHAM_CONFIG: ScraperConfig = {
   ],
 
   allowedDomains: [
+    // Needham Town Gov
     "www.needhamma.gov",
     "needhamma.gov",
     // Needham Public Schools
     "www.needham.k12.ma.us",
     "needham.k12.ma.us",
+    // Local News
+    "patch.com",
+    "www.patch.com",
+    "wickedlocal.com",
+    "www.wickedlocal.com",
+    "needhamchannel.org",
+    "www.needhamchannel.org",
+    // Community Orgs
+    "needhamhistory.org",
+    "www.needhamhistory.org",
+    "needhamcommunityfarm.org",
+    "www.needhamcommunityfarm.org",
+    "needhamba.com",
+    "www.needhamba.com",
+    "ymcaboston.org",
+    "needhamgardenclub.com",
+    "www.needhamgardenclub.com",
+    "needhamwomensclub.org",
+    "www.needhamwomensclub.org",
+    "needhamsportsmansclub.com",
+    "www.needhamsportsmansclub.com",
+    // Libraries & Recreation
+    "needhamlibrary.org",
+    "www.needhamlibrary.org",
+    "needhamyouthsoccer.com",
+    "www.needhamyouthsoccer.com",
+    "needhamyouthlacrosse.org",
+    "www.needhamyouthlacrosse.org",
+    "needhamhockey.com",
+    "www.needhamhockey.com",
+    "needhamcommunitytheatre.org",
+    "www.needhamcommunitytheatre.org",
+    // Health Services
+    "bidneedham.org",
+    "www.bidneedham.org",
+    // Regional/Transit
+    "mbta.com",
+    "www.mbta.com",
+    "norfolkcountyma.gov",
+    "www.norfolkcountyma.gov",
+    "mass.gov",
+    "www.mass.gov",
+    // Surrounding Towns (limited crawl)
+    "wellesleyma.gov",
+    "www.wellesleyma.gov",
+    "newtonma.gov",
+    "www.newtonma.gov",
+    "dedham-ma.gov",
+    "www.dedham-ma.gov",
+    "doverma.gov",
+    "www.doverma.gov",
+    "townhall.westwood.ma.us",
+    "www.townhall.westwood.ma.us",
+    // Utilities
+    "eversource.com",
+    "www.eversource.com",
+    "verizon.com",
+    "www.verizon.com",
+    "xfinity.com",
+    "www.xfinity.com",
+    // Faith Communities
+    "fbcneedham.org",
+    "www.fbcneedham.org",
+    "firstcongregationalneedham.org",
+    "www.firstcongregationalneedham.org",
+    "stjosephsneedham.com",
+    "www.stjosephsneedham.com",
+    "templealiyah.org",
+    "www.templealiyah.org",
+    "tbshalom.org",
+    "www.tbshalom.org",
+    "christchurchneedham.org",
+    "www.christchurchneedham.org",
+    "firstparishneedham.org",
+    "www.firstparishneedham.org",
+    "channingchurch.org",
+    "www.channingchurch.org",
+    "newmancenteratbabson.org",
+    "www.newmancenteratbabson.org",
+    "shaareitorah.org",
+    "www.shaareitorah.org",
+    "communityfellowship.church",
+    "www.communityfellowship.church",
+    "christianscience.com",
+    // Business Reviews (most will be blocked, but include for completeness)
+    "yelp.com",
+    "www.yelp.com",
+    "angi.com",
+    "www.angi.com",
+    "homeadvisor.com",
+    "www.homeadvisor.com",
+    "thumbtack.com",
+    "www.thumbtack.com",
+    "bbb.org",
+    "www.bbb.org",
+    "tripadvisor.com",
+    "www.tripadvisor.com",
+    "yellowpages.com",
+    "www.yellowpages.com",
+    "google.com",
+    "www.google.com",
+    // Housing
+    "needhamhousing.org",
+    "www.needhamhousing.org",
+    // Community Resources
+    "needhamcouncil.org",
   ],
 
   maxDepth: 5,
-  maxPages: 800,  // was 500 — schools site adds ~200 pages
-  crawlDelayMs: 1000, // 1 second between requests — polite to town servers
+  maxPages: 1500,  // Expanded for mega-expansion (was 800)
+  crawlDelayMs: 1500, // 1.5 seconds between requests — extra polite with more sources
   maxRetries: 3,
 
   userAgent:
@@ -141,6 +248,33 @@ export const NEEDHAM_CONFIG: ScraperConfig = {
     /\/calendar-events/i,
     /\/lunch-menu/i,
     /\/employment/i,
+
+    // Social media & review sites (anti-scraping, login walls)
+    /\/login|\/signin|\/signup|\/register/i,
+    /\/user\/|\/profile\//i,
+    /\/checkout|\/cart|\/payment/i,
+    /\/advertise|\/business\/claim/i,
+
+    // News site paywalls & subscriptions
+    /\/subscribe|\/subscription|\/paywall/i,
+    /\/newsletter-signup/i,
+
+    // Review site dynamic content (infinite scroll, AJAX)
+    /\/biz_photos|\/biz_user_photos/i, // Yelp photo galleries
+    /\/search\?|\/filter\?/i, // Dynamic search results
+
+    // MBTA/transit dynamic schedules (get static pages only)
+    /\/schedules\/.*\/line/i,
+    /\/schedules\/.*\/predictions/i,
+
+    // Utility company account management
+    /\/myaccount|\/pay-bill|\/start-service/i,
+
+    // Social media feeds (requires login)
+    /facebook\.com.*\/posts\//i,
+    /facebook\.com.*\/photos\//i,
+    /twitter\.com.*\/status\//i,
+    /instagram\.com\/p\//i,
   ],
 
   departmentPatterns: [

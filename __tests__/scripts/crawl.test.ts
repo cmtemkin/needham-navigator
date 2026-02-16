@@ -45,8 +45,8 @@ describe("scraper-config", () => {
     });
 
     it("rejects other domains", () => {
-      expect(isAllowedDomain("https://www.google.com")).toBe(false);
-      expect(isAllowedDomain("https://www.mbta.com/schedules")).toBe(false);
+      expect(isAllowedDomain("https://www.example.com")).toBe(false);
+      expect(isAllowedDomain("https://www.someotherrandomsite.org")).toBe(false);
     });
 
     it("handles invalid URLs gracefully", () => {

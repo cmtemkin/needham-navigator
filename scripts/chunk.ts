@@ -97,6 +97,8 @@ export type DocumentType =
   | "public_works"
   | "meeting_minutes"
   | "planning_board"
+  | "local_business" // business reviews and recommendations
+  | "news" // local news articles
   | "general"; // fallback
 
 export type ChunkType =
@@ -128,6 +130,21 @@ export interface ChunkMetadata {
   chunk_index?: number;
   total_chunks?: number;
   content_hash?: string;
+  // Business-specific fields (for local_business document type)
+  business_name?: string;
+  business_category?: string;
+  business_subcategory?: string;
+  business_rating?: number;
+  business_review_count?: number;
+  business_address?: string;
+  business_phone?: string;
+  business_website?: string;
+  source_platform?: string; // e.g., "yelp", "angi", "bbb"
+  // Enrichment fields (from AI enrichment)
+  ai_summary?: string;
+  ai_title?: string;
+  ai_tags?: string[];
+  content_type?: string;
 }
 
 export interface Chunk {
@@ -191,6 +208,16 @@ const CHUNKING_CONFIGS: Record<DocumentType, ChunkingConfig> = {
     overlapTokens: 224,
     breakStrategy: "item_project_separation",
   },
+  local_business: {
+    maxTokens: 512,
+    overlapTokens: 128,
+    breakStrategy: "business_profile", // Each business review/profile is atomic
+  },
+  news: {
+    maxTokens: 768,
+    overlapTokens: 192,
+    breakStrategy: "article_paragraphs",
+  },
   general: {
     maxTokens: 768,
     overlapTokens: 192,
@@ -238,6 +265,28 @@ const DOCUMENT_TYPE_PATTERNS: Array<{ type: DocumentType; patterns: RegExp[] }> 
   {
     type: "planning_board",
     patterns: [/planning\s*board/i, /planning\s*department/i, /site\s*plan\s*review/i],
+  },
+  {
+    type: "local_business",
+    patterns: [
+      /\b\d+\s*star[s]?\b/i, // "4.5 stars"
+      /\b\d+\s*review[s]?\b/i, // "23 reviews"
+      /rating|rated|score/i,
+      /yelp|angi|homeadvisor|thumbtack|bbb|tripadvisor/i,
+      /business\s*directory|local\s*business/i,
+      /hours:\s*\d|open\s*\d/i, // "Hours: 9am" or "Open 9"
+      /\(\d{3}\)\s*\d{3}-\d{4}/,  // Phone number pattern
+    ],
+  },
+  {
+    type: "news",
+    patterns: [
+      /patch\.com|wickedlocal|needham\s*channel/i,
+      /by\s+\w+\s+\w+\s*\|\s*\w+\s+\d+,\s+\d{4}/i, // "By John Doe | January 15, 2024"
+      /posted\s+on|published\s+on|updated\s+on/i,
+      /share\s*article|print\s*article/i,
+      /\barticle\b.*\bauthor\b/i,
+    ],
   },
 ];
 
