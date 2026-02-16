@@ -59,6 +59,33 @@ jobs:
         with:
           script: |
             const prNumber = context.payload.pull_request.number;
+            const prTitle = context.payload.pull_request.title;
+
+            // Close any stale ci-failure issues for this PR
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'ci-failure',
+              state: 'open'
+            });
+
+            for (const issue of issues.data) {
+              // Check if this issue is for this PR (title contains PR number or title)
+              if (issue.title.includes(`CI Failure: ${prTitle}`) || issue.body.includes(`#${prNumber}`)) {
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  state: 'closed'
+                });
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  body: `✅ CI eventually passed and PR #${prNumber} was merged. Closing this stale failure issue.`
+                });
+              }
+            }
 
             // Add a success comment
             await github.rest.issues.createComment({
