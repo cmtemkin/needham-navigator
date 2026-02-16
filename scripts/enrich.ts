@@ -43,7 +43,7 @@ export async function enrichDocument(
   try {
     const response = await openai.chat.completions.create({
       model: ENRICHMENT_MODEL,
-      temperature: 0.1, // Factual, consistent summaries
+      // Note: gpt-5-nano does not support custom temperature - uses default (1.0)
       response_format: { type: "json_object" },
       messages: [
         {

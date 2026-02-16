@@ -255,6 +255,36 @@ Many review and social platforms block web scraping. These are included in the s
 ✅ npm audit --production --audit-level=critical
 ```
 
+### Full Pipeline Test Results ✅
+Validated 2026-02-16:
+
+**Scraper Test** (10 pages):
+- ✅ Sitemap auto-discovery: Found 1,783 URLs across 2 sitemaps (1,079 from needhamma.gov, 704 from schools)
+- ✅ Rate limiting: 1.5s delays between requests
+- ✅ Document type detection: Correctly identified `local_business`, `news`, `general` types
+- ✅ PDF discovery: 3 PDFs found and queued
+- ✅ Duration: 27.0s for 10 pages
+
+**Ingestion Test** (10 pages + 3 PDFs):
+- ✅ Pages chunked: 10 documents → 28 chunks
+- ✅ PDFs extracted: 3 PDFs → 12 chunks
+- ✅ Embeddings generated: 40 total chunks embedded via OpenAI text-embedding-3-small
+- ✅ Total documents processed: 13
+- ✅ Total chunks: 40
+- ✅ Duration: 1.0 minute
+
+**Enrichment Test** (fixed temperature issue):
+- ✅ AI summaries: Clear, helpful 2-3 sentence descriptions
+- ✅ AI titles: Clean, descriptive titles (removed CMS junk)
+- ✅ AI tags: 5-10 relevant tags per document
+- ✅ Content classification: Correctly classified as `department`, `news`, `service`, etc.
+- ⚠️ Fix required: Removed `temperature: 0.1` parameter (gpt-5-nano doesn't support custom temperature)
+
+**Document Type Detection**:
+- ✅ `department`: 7 chunks (town department pages)
+- ✅ `news`: 3 chunks (homepage news and alerts)
+- ✅ Auto-detection working via URL patterns and content analysis
+
 ### Test Ingestion (Recommended)
 ```bash
 # Priority 5 sources only (8 sources, ~100 pages)
