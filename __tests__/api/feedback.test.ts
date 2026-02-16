@@ -1,8 +1,11 @@
 /**
  * Integration tests for /api/feedback endpoint
+ * These tests require a running server and are skipped in CI
  */
 
-describe('POST /api/feedback', () => {
+const describeIfServer = process.env.CI ? describe.skip : describe;
+
+describeIfServer('POST /api/feedback', () => {
   const API_URL = process.env.API_BASE_URL || 'http://localhost:3000';
 
   it('should accept valid feedback', async () => {

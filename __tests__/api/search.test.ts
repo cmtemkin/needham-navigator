@@ -1,8 +1,11 @@
 /**
  * Integration tests for /api/search endpoint
+ * These tests require a running server and are skipped in CI
  */
 
-describe('POST /api/search', () => {
+const describeIfServer = process.env.CI ? describe.skip : describe;
+
+describeIfServer('POST /api/search', () => {
   const API_URL = process.env.API_BASE_URL || 'http://localhost:3000';
 
   it('should return search results for valid query', async () => {
