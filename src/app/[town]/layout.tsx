@@ -7,12 +7,13 @@ import { getTownThemeStyle } from "@/lib/town-theme";
 import { getTownById, getTownIds, type TownConfig } from "@/lib/towns";
 import { PendoProvider } from "@/components/PendoProvider";
 import { FloatingChatWrapper } from "@/components/FloatingChatWrapper";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 type TownLayoutProps = Readonly<{
   children: React.ReactNode;
-  params: {
+  params: Promise<{
     town: string;
-  };
+  }>;
 }>;
 
 function normalizeTownId(townId: string): string {
@@ -35,7 +36,8 @@ export function generateStaticParams(): Array<{ town: string }> {
 export async function generateMetadata({
   params,
 }: Pick<TownLayoutProps, "params">): Promise<Metadata> {
-  const town = getTownById(normalizeTownId(params.town));
+  const resolvedParams = await params;
+  const town = getTownById(normalizeTownId(resolvedParams.town));
   if (!town) {
     return {
       title: "Town Not Found | Needham Navigator",
@@ -49,18 +51,21 @@ export async function generateMetadata({
   };
 }
 
-export default function TownLayout({ children, params }: TownLayoutProps) {
-  const town = getTownOr404(params.town);
+export default async function TownLayout({ children, params }: TownLayoutProps) {
+  const resolvedParams = await params;
+  const town = getTownOr404(resolvedParams.town);
 
   return (
     <TownProvider town={town}>
       <I18nProvider enabled={town.feature_flags.enableMultiLanguage}>
         <ChatProvider>
           <PendoProvider>
-            <div className="min-h-screen bg-surface" style={getTownThemeStyle(town)}>
-              {children}
-            </div>
-            <FloatingChatWrapper townId={town.town_id} />
+            <ErrorBoundary>
+              <div className="min-h-screen bg-surface" style={getTownThemeStyle(town)}>
+                {children}
+              </div>
+              <FloatingChatWrapper townId={town.town_id} />
+            </ErrorBoundary>
           </PendoProvider>
         </ChatProvider>
       </I18nProvider>
