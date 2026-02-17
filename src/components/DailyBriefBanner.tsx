@@ -38,11 +38,17 @@ export function DailyBriefBanner() {
     return null;
   }
 
-  // Extract bullet points from summary (simple version - just split by periods/dashes)
-  const bulletPoints = brief.summary
-    ?.split(/[.•-]\s+/)
-    .filter((s) => s.trim().length > 10)
-    .slice(0, 4) || [];
+  // Extract topic headlines from body lines like "**Heading**: detail ([source](url))"
+  // Fall back to splitting summary if no bold headings found
+  const bodyHeadings = brief.body
+    ? [...brief.body.matchAll(/^\*\*([^*]+)\*\*:/gm)].map((m) => m[1].trim())
+    : [];
+  const bulletPoints = bodyHeadings.length > 0
+    ? bodyHeadings.slice(0, 4)
+    : (brief.summary
+        ?.split(/[.•-]\s+/)
+        .filter((s) => s.trim().length > 10)
+        .slice(0, 4) || []);
 
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
