@@ -14,7 +14,7 @@ export function Header() {
   const homeHref = useTownHref();
   const aboutHref = useTownHref("/about");
   const permitsHref = useTownHref("/permits");
-  const newsHref = useTownHref("/news");
+  const articlesHref = useTownHref("/articles");
   const shortTownName = town.name.replace(/,\s*[A-Z]{2}$/i, "");
 
   return (
@@ -45,11 +45,11 @@ export function Header() {
           </Link>
           {town.feature_flags.enableNews && (
             <Link
-              href={newsHref}
+              href={articlesHref}
               className="flex items-center gap-[5px] rounded-lg px-3.5 py-[7px] text-[13.5px] font-medium text-text-secondary transition-all hover:bg-surface hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <Newspaper size={15} />
-              News
+              Articles
             </Link>
           )}
           {town.feature_flags.enableAbout && (
