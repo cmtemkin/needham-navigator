@@ -110,15 +110,37 @@ export default function DailyBriefPage() {
                   <h2 className="text-3xl font-bold text-text-primary mb-6">{todayBrief.title}</h2>
 
                   <div className="prose prose-slate max-w-none"><ReactMarkdown>{todayBrief.body}</ReactMarkdown></div>
+
+                  {todayBrief.source_urls && todayBrief.source_urls.length > 0 && (
+                    <div className="mt-8 pt-6 border-t border-border-light">
+                      <h3 className="text-sm font-semibold text-text-muted uppercase tracking-wide mb-3">
+                        Sources
+                      </h3>
+                      <ul className="space-y-1">
+                        {todayBrief.source_urls.map((url, i) => (
+                          <li key={i}>
+                            <a
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-[var(--primary)] hover:underline break-all"
+                            >
+                              {todayBrief.source_names?.[i] || url}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="bg-white rounded-lg p-12 shadow-sm border border-border-default mb-8 text-center">
                   <div className="text-6xl mb-4">📰</div>
                   <h2 className="text-2xl font-bold text-text-primary mb-2">
-                    No brief available today
+                    {"Today's brief hasn't been generated yet"}
                   </h2>
                   <p className="text-text-secondary">
-                    Check back tomorrow for your daily digest of {shortTownName} news.
+                    Check back after 5 AM for your daily digest of {shortTownName} news.
                   </p>
                 </div>
               )}
