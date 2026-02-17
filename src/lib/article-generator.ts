@@ -139,6 +139,53 @@ function categorizeDocument(url: string): { category: ArticleCategory; sourceTyp
   return null; // Unknown category — skip
 }
 
+// ─── Source URL utilities ─────────────────────────────────────────────────────
+
+/**
+ * Normalize a source URL: upgrade http:// to https://.
+ * Scraper sometimes stores HTTP URLs that redirect to HTTPS; store the canonical form.
+ */
+function normalizeSourceUrl(url: string): string {
+  return url.replace(/^http:\/\//i, 'https://');
+}
+
+/**
+ * Check whether a source URL is publicly accessible.
+ * Uses a browser User-Agent to avoid bot-blocking (e.g. k12.ma.us returns 403 to bare requests).
+ * Returns true if the server responds with a non-4xx status.
+ * Treats network errors and timeouts as inaccessible.
+ */
+async function isUrlAccessible(url: string): Promise<boolean> {
+  try {
+    const res = await fetch(url, {
+      method: 'HEAD',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; NeedhamNavigator/1.0; +https://needhamnavigator.com)',
+      },
+      signal: AbortSignal.timeout(8000),
+      redirect: 'follow',
+    });
+    // Treat anything under 400 as accessible
+    if (res.status < 400) return true;
+    // Some servers reject HEAD — retry with GET (truncated)
+    if (res.status === 405) {
+      const getRes = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; NeedhamNavigator/1.0; +https://needhamnavigator.com)',
+          Range: 'bytes=0-0', // Request only 1 byte to minimise bandwidth
+        },
+        signal: AbortSignal.timeout(8000),
+        redirect: 'follow',
+      });
+      return getRes.status < 400 || getRes.status === 416; // 416 = Range Not Satisfiable (still reachable)
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
 // ─── Source helpers ───────────────────────────────────────────────────────────
 
 /**
@@ -185,7 +232,7 @@ async function getRecentDocuments(options: {
 
     result.push({
       document_id: doc.id,
-      url: doc.url,
+      url: normalizeSourceUrl(doc.url),
       title: doc.title,
       content,
       ingested_at: doc.last_ingested_at ?? doc.created_at,
@@ -225,6 +272,13 @@ async function generateArticleFromDocument(doc: SourceDocument): Promise<Article
 
   // Skip if we already generated an article from this exact source
   if (await articleExistsForSource(doc.url)) {
+    return null;
+  }
+
+  // Skip if the source URL is not publicly accessible — no point citing a broken link
+  const accessible = await isUrlAccessible(doc.url);
+  if (!accessible) {
+    console.warn(`[article-generator] Source URL inaccessible (skipping): ${doc.url}`);
     return null;
   }
 
