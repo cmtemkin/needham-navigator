@@ -2,6 +2,29 @@
 
 ---
 
+## v0.9.0 — 2026-02-17
+
+**AI Articles Hub Frontend**
+
+### New Features
+- **Articles list page** (`/<town>/articles`) — Browse all AI-generated articles and summaries with category and content-type filters, 12-per-page load-more, and an empty state
+- **Article detail page** (`/<town>/articles/[id]`) — Full article view with proper markdown rendering (react-markdown), AI disclaimer banner, collapsible sources, thumbs up/down feedback, "Ask about this" button that pre-populates chat, and related articles sidebar
+- **Daily Brief page** (`/<town>/daily-brief`) — Today's digest rendered as formatted markdown, with 7-day accordion history of previous briefs
+- **Homepage articles section** — Below the search hero, the home page now shows a Daily Brief Banner (when a brief exists for today) and a "Latest Articles" grid of 6 featured articles, with a "View all articles" link
+- **Header nav** — Added "Articles" link (gated behind `enableNews` feature flag) pointing to `/articles`
+
+### Components Added
+- `ArticleCard` — Card component with content-type badge, category tag, title, summary, source, and relative timestamp; supports `grid` and `list` variants
+- `DailyBriefBanner` — Gradient banner for the homepage showing today's brief summary with bullet points and a link to the full brief
+- `ArticleFilters` — Category dropdown + content-type pill filters for the articles list page
+- `ArticleSkeleton` / `DailyBriefSkeleton` — Animated loading placeholders
+
+### Technical
+- Installed `react-markdown` and `@tailwindcss/typography` for proper markdown rendering with prose styles
+- `scripts/seed-articles.ts` — Dev seed script for 8 realistic sample articles (run with `npx tsx --env-file=.env.local scripts/seed-articles.ts`)
+
+---
+
 ## v0.8.9 — 2026-02-14
 
 **Search-First UI Skin with Floating Chat**

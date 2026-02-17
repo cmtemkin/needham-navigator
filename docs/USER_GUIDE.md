@@ -81,24 +81,34 @@ Click the language toggle (globe icon) in the header to switch between:
 
 All navigation, labels, and system text are translated. AI chat responses are currently in English.
 
-### Local News Feed
+### AI Articles Hub
 
-Navigate to **News** from the header or visit `/<town>/news`.
+Navigate to **Articles** from the header or visit `/<town>/articles`.
 
-A real-time aggregated feed of local news from multiple sources:
+AI-generated and AI-summarized articles covering town news, government decisions, schools, public safety, and more.
 
-| Source | Description |
-|--------|-------------|
-| **Needham Patch** | Hyperlocal news and community stories |
-| **Needham Observer** | In-depth local reporting |
-| **Needham Local** | Community-focused coverage and video |
-| **Town of Needham** | Official town government RSS updates |
+**Article types:**
+| Badge | Meaning |
+|-------|---------|
+| **AI Generated** | Full article written by AI from public records and meeting minutes |
+| **AI Summary** | AI-condensed summary of an external article or document |
+| **External** | Link to an article from an external source |
 
 **Features:**
-- Filter by source using filter chips at the top
-- Each article shows source badge, publish time (relative), summary, and link to full article
-- "Load more" pagination for browsing older articles
-- Content is automatically refreshed via the ingestion pipeline
+- Filter by category (Town Government, Schools, Public Safety, Community, Permits & Development, Business)
+- Filter by content type (AI Generated, AI Summary, External)
+- "Load more" to browse additional articles
+- Each article page shows: formatted content with headers and bullets, source links, AI disclaimer, thumbs up/down feedback, and an "Ask about this" button that opens chat pre-loaded with the article title
+
+### Daily Brief
+
+Navigate to **Daily Brief** from the home page banner or visit `/<town>/daily-brief`.
+
+A daily AI-generated digest of the most important Needham news and updates. When a brief is available for today it appears as a banner on the home page.
+
+**Features:**
+- Today's brief rendered with full markdown formatting
+- Collapsible accordion of up to 7 previous briefs
 
 ### Department Directory
 
