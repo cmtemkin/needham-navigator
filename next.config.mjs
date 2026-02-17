@@ -16,8 +16,13 @@ const nextConfig = {
           has: [{ type: "host", value: NEEDHAM_HOSTS }],
         },
         {
-          source: "/:path(chat|permits|news|search)",
+          source: "/:path(chat|permits|news|search|articles|daily-brief|about)",
           destination: "/needham/:path",
+          has: [{ type: "host", value: NEEDHAM_HOSTS }],
+        },
+        {
+          source: "/:path(articles|chat)/:subpath*",
+          destination: "/needham/:path/:subpath*",
           has: [{ type: "host", value: NEEDHAM_HOSTS }],
         },
       ],

@@ -93,8 +93,21 @@ function categorizeDocument(url: string): { category: ArticleCategory; sourceTyp
     return { category: 'schools', sourceType: 'public_record' };
   }
 
-  // DPW / public works
-  if (u.includes('dpw') || u.includes('public-works') || u.includes('highway')) {
+  // DPW / public works / infrastructure
+  if (
+    u.includes('dpw') ||
+    u.includes('public-works') ||
+    u.includes('highway') ||
+    u.includes('snow') ||
+    u.includes('recycl') ||
+    u.includes('trash') ||
+    u.includes('solid-waste') ||
+    u.includes('transfer-station') ||
+    u.includes('water') ||
+    u.includes('sewer') ||
+    u.includes('street') ||
+    u.includes('sidewalk')
+  ) {
     return { category: 'government', sourceType: 'dpw_notice' };
   }
 
@@ -104,23 +117,37 @@ function categorizeDocument(url: string): { category: ArticleCategory; sourceTyp
     u.includes('permit') ||
     u.includes('inspection') ||
     u.includes('development') ||
-    u.includes('zoning')
+    u.includes('zoning') ||
+    u.includes('housing') ||
+    u.includes('affordable')
   ) {
     return { category: 'development', sourceType: 'permit_log' };
   }
 
   // Public safety
-  if (u.includes('police') || u.includes('fire') || u.includes('emergency')) {
+  if (
+    u.includes('police') ||
+    u.includes('fire') ||
+    u.includes('emergency') ||
+    u.includes('weather') ||
+    u.includes('preparedness') ||
+    u.includes('safety')
+  ) {
     return { category: 'public_safety', sourceType: 'public_record' };
   }
 
   // Board of health
-  if (u.includes('health')) {
+  if (u.includes('health') || u.includes('biosafety')) {
     return { category: 'public_safety', sourceType: 'public_record' };
   }
 
-  // Conservation
-  if (u.includes('conservation') || u.includes('environment')) {
+  // Conservation / environment / sustainability
+  if (
+    u.includes('conservation') ||
+    u.includes('environment') ||
+    u.includes('climate') ||
+    u.includes('sustainable')
+  ) {
     return { category: 'community', sourceType: 'public_record' };
   }
 
@@ -129,11 +156,45 @@ function categorizeDocument(url: string): { category: ArticleCategory; sourceTyp
     u.includes('library') ||
     u.includes('recreation') ||
     u.includes('parks') ||
+    u.includes('park-') ||
     u.includes('community') ||
     u.includes('senior') ||
-    u.includes('youth')
+    u.includes('youth') ||
+    u.includes('sport')
   ) {
     return { category: 'community', sourceType: 'public_record' };
+  }
+
+  // Government / town boards / committees / commissions / licensing
+  if (
+    u.includes('board-of') ||
+    u.includes('commission') ||
+    u.includes('committee') ||
+    u.includes('licensing') ||
+    u.includes('town-meeting') ||
+    u.includes('town_meeting') ||
+    u.includes('town-clerk') ||
+    u.includes('assessor') ||
+    u.includes('treasurer') ||
+    u.includes('retirement') ||
+    u.includes('trust-fund') ||
+    u.includes('trust_fund') ||
+    u.includes('parking') ||
+    u.includes('faq') ||
+    u.includes('holiday') ||
+    u.includes('registrar') ||
+    u.includes('needhamma.gov')
+  ) {
+    return { category: 'government', sourceType: 'public_record' };
+  }
+
+  // Business
+  if (
+    u.includes('business') ||
+    u.includes('commerce') ||
+    u.includes('needhamchannel')
+  ) {
+    return { category: 'business', sourceType: 'public_record' };
   }
 
   return null; // Unknown category — skip
@@ -213,7 +274,7 @@ async function getRecentDocuments(options: {
     .eq('town_id', TOWN_ID)
     .gte('last_ingested_at', since)
     .order('last_ingested_at', { ascending: false })
-    .limit(100);
+    .limit(500);
 
   if (error) {
     console.error('[article-generator] Error fetching documents:', error);
@@ -424,8 +485,8 @@ ${truncatedContent}`;
 /**
  * Generate articles from recent meeting minutes (planning board, select board, etc.)
  */
-export async function generateFromMeetingMinutes(): Promise<Article[]> {
-  const docs = await getRecentDocuments({ daysBack: DEFAULT_DAYS_BACK });
+export async function generateFromMeetingMinutes(options?: { daysBack?: number }): Promise<Article[]> {
+  const docs = await getRecentDocuments({ daysBack: options?.daysBack ?? DEFAULT_DAYS_BACK });
 
   const minutesDocs = docs.filter((doc) => {
     const u = doc.url.toLowerCase();
@@ -454,8 +515,8 @@ export async function generateFromMeetingMinutes(): Promise<Article[]> {
 /**
  * Generate articles from recent public records (permits, DPW notices, health, conservation).
  */
-export async function generateFromPublicRecord(): Promise<Article[]> {
-  const docs = await getRecentDocuments({ daysBack: DEFAULT_DAYS_BACK });
+export async function generateFromPublicRecord(options?: { daysBack?: number }): Promise<Article[]> {
+  const docs = await getRecentDocuments({ daysBack: options?.daysBack ?? DEFAULT_DAYS_BACK });
 
   const recordDocs = docs.filter((doc) => {
     const u = doc.url.toLowerCase();
@@ -476,6 +537,26 @@ export async function generateFromPublicRecord(): Promise<Article[]> {
 
   const articles: Article[] = [];
   for (const doc of recordDocs) {
+    const article = await generateArticleFromDocument(doc);
+    if (article) articles.push(article);
+  }
+  return articles;
+}
+
+/**
+ * Generate articles from ALL categorizable documents (bulk backfill).
+ * Unlike the specific functions above, this doesn't apply an additional URL filter —
+ * any document that passes categorizeDocument() is eligible.
+ */
+export async function generateFromAllDocuments(options?: { daysBack?: number }): Promise<Article[]> {
+  const docs = await getRecentDocuments({ daysBack: options?.daysBack ?? DEFAULT_DAYS_BACK });
+
+  // Only keep documents that categorizeDocument() can classify
+  const categorizable = docs.filter((doc) => categorizeDocument(doc.url) !== null);
+  console.log(`[article-generator] ${docs.length} docs fetched, ${categorizable.length} categorizable`);
+
+  const articles: Article[] = [];
+  for (const doc of categorizable) {
     const article = await generateArticleFromDocument(doc);
     if (article) articles.push(article);
   }
