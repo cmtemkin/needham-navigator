@@ -161,12 +161,11 @@ export default function ArticlesPage() {
             <div className="text-center py-16">
               <div className="text-6xl mb-4">📰</div>
               <h2 className="text-2xl font-bold text-text-primary mb-2">
-                Articles are coming soon!
+                No articles yet
               </h2>
               <p className="text-text-secondary max-w-md mx-auto">
-                {"We're working on generating AI summaries of "}
-                {shortTownName}
-                {"'s public records and local news. In the meantime, try searching for what you need."}
+                Articles are generated daily from {shortTownName}&apos;s public records, meeting
+                minutes, and local news. Check back soon!
               </p>
             </div>
           )}

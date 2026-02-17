@@ -2,6 +2,30 @@
 
 ---
 
+## v0.9.1 — 2026-02-17
+
+**Real Article Generation — Nuke Fake Seed Data**
+
+### Bug Fixes
+- **Deleted all fake seed articles** from production — fabricated articles about events that never happened, people that don't exist, and 404 source URLs are gone
+- **Removed `scripts/seed-articles.ts`** — the script that created fake data is deleted from the repo
+- **Fixed feedback API bug** — article detail page was sending `POST` with `{ feedback }` but API expects `PATCH` with `{ type }`; frontend now correctly sends `PATCH { type }`
+
+### New Features
+- **Real article generation** (`src/lib/article-generator.ts` rewritten) — generates articles exclusively from ingested documents in the Supabase `documents` table; every article has a real source URL; low-confidence results are discarded
+- **Nightly GitHub Action** (`.github/workflows/generate-articles.yml`) — runs `generate-articles.ts` at 5 AM ET every day; can also be triggered manually from GitHub Actions UI
+- **Admin API** (`POST /api/articles/generate`) — admin-authenticated endpoint to trigger article generation on demand; accepts `{ type: 'meeting_minutes' | 'public_record' | 'external' | 'daily_brief' | 'all' }`
+- **CLI generation script** (`scripts/generate-articles.ts`) — standalone script for manual runs or CI; exits 0 on success, 1 on any errors
+- **Delete-seed script** (`scripts/delete-seed-articles.ts`) — permanently removes all articles from the database; used once to purge fake data
+
+### UI Improvements
+- **Daily brief page** — empty state now says "Today's brief hasn't been generated yet. Check back after 5 AM." and a Sources section with clickable links is shown below each brief when sources exist
+- **Homepage articles section** — entire "Latest Articles" section (header + grid) is now hidden when no articles exist, instead of showing a floating orphan header
+- **Articles page** — empty state updated to: "Articles are generated daily from Needham's public records, meeting minutes, and local news. Check back soon!"
+- **Article detail page** — source_type badge displayed alongside the "Sources (N)" count header; source links now have `break-all` for long URLs
+
+---
+
 ## v0.9.0 — 2026-02-17
 
 **AI Articles Hub Frontend**

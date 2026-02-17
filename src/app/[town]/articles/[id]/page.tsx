@@ -78,9 +78,9 @@ export default function ArticleDetailPage() {
 
     try {
       await fetch(`/api/articles/${id}/feedback`, {
-        method: "POST",
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ feedback: type }),
+        body: JSON.stringify({ type }),
       });
 
       trackEvent("article_feedback", {
@@ -206,9 +206,16 @@ export default function ArticleDetailPage() {
                     onClick={() => setSourcesExpanded(!sourcesExpanded)}
                     className="flex items-center justify-between w-full text-left mb-2"
                   >
-                    <h2 className="text-lg font-bold text-text-primary">
-                      Sources ({article.source_urls.length})
-                    </h2>
+                    <div className="flex items-center gap-3">
+                      <h2 className="text-lg font-bold text-text-primary">
+                        Sources ({article.source_urls.length})
+                      </h2>
+                      {article.source_type && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 capitalize">
+                          {article.source_type.replace(/_/g, " ")}
+                        </span>
+                      )}
+                    </div>
                     {sourcesExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                   </button>
 
@@ -220,9 +227,9 @@ export default function ArticleDetailPage() {
                           href={url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-sm text-[var(--primary)] hover:underline"
+                          className="flex items-center gap-2 text-sm text-[var(--primary)] hover:underline break-all"
                         >
-                          <ExternalLink size={14} />
+                          <ExternalLink size={14} className="flex-shrink-0" />
                           {article.source_names?.[index] || url}
                         </a>
                       ))}

@@ -1,0 +1,33 @@
+name: Generate Daily Articles
+
+on:
+  schedule:
+    - cron: '0 10 * * *'  # 5 AM ET (10:00 UTC) every day
+  workflow_dispatch: {}     # Allow manual trigger from GitHub Actions UI
+
+jobs:
+  generate:
+    name: Generate articles from ingested documents
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate articles
+        run: npx tsx scripts/generate-articles.ts
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}

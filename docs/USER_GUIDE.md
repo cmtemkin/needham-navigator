@@ -85,7 +85,7 @@ All navigation, labels, and system text are translated. AI chat responses are cu
 
 Navigate to **Articles** from the header or visit `/<town>/articles`.
 
-AI-generated and AI-summarized articles covering town news, government decisions, schools, public safety, and more.
+AI-generated articles covering town news, government decisions, schools, public safety, and more. Every article is grounded in real documents ingested from official town sources — no fabricated events, names, or votes. Each article links back to its official source.
 
 **Article types:**
 | Badge | Meaning |
@@ -98,17 +98,20 @@ AI-generated and AI-summarized articles covering town news, government decisions
 - Filter by category (Town Government, Schools, Public Safety, Community, Permits & Development, Business)
 - Filter by content type (AI Generated, AI Summary, External)
 - "Load more" to browse additional articles
-- Each article page shows: formatted content with headers and bullets, source links, AI disclaimer, thumbs up/down feedback, and an "Ask about this" button that opens chat pre-loaded with the article title
+- Each article page shows: formatted content with headers and bullets, source type badge, clickable source links to official documents, AI disclaimer, thumbs up/down feedback, and an "Ask about this" button that opens chat pre-loaded with the article title
+- Articles are generated automatically each morning at 5 AM from newly ingested town documents
 
 ### Daily Brief
 
 Navigate to **Daily Brief** from the home page banner or visit `/<town>/daily-brief`.
 
-A daily AI-generated digest of the most important Needham news and updates. When a brief is available for today it appears as a banner on the home page.
+A daily AI-generated digest of the most important Needham news and updates, with inline citations linking each item to its official source. When a brief is available for today it appears as a banner on the home page.
 
 **Features:**
-- Today's brief rendered with full markdown formatting
+- Today's brief rendered with full markdown formatting and inline source citations
+- Sources section at the bottom listing all official documents referenced
 - Collapsible accordion of up to 7 previous briefs
+- Brief is generated daily at 5 AM ET; "Check back after 5 AM" shown when not yet available
 
 ### Department Directory
 
