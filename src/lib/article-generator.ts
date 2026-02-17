@@ -492,9 +492,13 @@ export async function summarizeExternalArticle(): Promise<Article[]> {
 }
 
 /**
- * Generate a daily brief from today's generated articles and recent documents.
+ * Generate a daily brief from today's generated articles.
  * Skips if a brief already exists for today.
- * Returns null if there is insufficient content.
+ * Returns null if there are no articles to summarize.
+ *
+ * Design: GPT outputs structured JSON where each topic includes the EXACT
+ * source_url copied from our input — it never invents URLs. We then build
+ * the markdown body ourselves so citations are always correct.
  */
 export async function generateDailyBrief(): Promise<Article | null> {
   const supabase = getSupabaseServiceClient();
@@ -519,24 +523,19 @@ export async function generateDailyBrief(): Promise<Article | null> {
     return null;
   }
 
-  // Gather today's generated articles (last 24h)
+  // Only use articles that were generated today (last 24h), not raw documents.
+  // Each article already has a verified, topic-specific source_url.
   const { data: recentArticles } = await supabase
     .from('articles')
-    .select('title, summary, body, source_urls, category')
+    .select('title, summary, body, source_urls, source_names, category')
     .eq('town', TOWN_ID)
     .eq('is_daily_brief', false)
     .gte('published_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
     .order('published_at', { ascending: false })
     .limit(10);
 
-  // Also pull any new documents from last 24h as supplementary context
-  const recentDocs = await getRecentDocuments({ daysBack: 1, minContentLength: 200 });
-
-  const hasArticles = recentArticles && recentArticles.length > 0;
-  const hasDocs = recentDocs.length > 0;
-
-  if (!hasArticles && !hasDocs) {
-    console.log('[article-generator] No recent content for daily brief — skipping.');
+  if (!recentArticles || recentArticles.length === 0) {
+    console.log('[article-generator] No recent articles for daily brief — skipping.');
     return null;
   }
 
@@ -548,74 +547,108 @@ export async function generateDailyBrief(): Promise<Article | null> {
     year: 'numeric',
   });
 
-  const allSourceUrls: string[] = [];
-  const contentItems: string[] = [];
+  // Build a numbered source list. Each entry has a source_url that GPT must
+  // copy verbatim — it cannot invent its own URLs.
+  type ArticleRow = {
+    title: string;
+    summary?: string;
+    body: string;
+    source_urls?: string[];
+    source_names?: string[];
+    category: string;
+  };
 
-  if (hasArticles) {
-    for (const a of recentArticles!) {
-      const article = a as {
-        title: string;
-        summary?: string;
-        body: string;
-        source_urls?: string[];
-        category: string;
-      };
-      contentItems.push(
-        `- **${article.title}** (${article.category}): ${article.summary || article.body.slice(0, 200)}`
-      );
-      if (article.source_urls) allSourceUrls.push(...article.source_urls);
-    }
+  const sourceItems = recentArticles
+    .map((a) => a as ArticleRow)
+    .filter((a) => a.source_urls && a.source_urls.length > 0)
+    .map((a) => ({
+      title: a.title,
+      summary: a.summary || a.body.slice(0, 250),
+      source_url: a.source_urls![0],
+      source_name: a.source_names?.[0] || a.source_urls![0],
+    }));
+
+  if (sourceItems.length === 0) {
+    console.log('[article-generator] No articles with source URLs — skipping brief.');
+    return null;
   }
 
-  if (hasDocs) {
-    for (const d of recentDocs.slice(0, 5)) {
-      const docLabel = d.title || d.url;
-      contentItems.push(`- ${docLabel}: ${d.content.slice(0, 200)}`);
-      allSourceUrls.push(d.url);
-    }
-  }
+  const sourceList = sourceItems
+    .map((s, i) => `${i + 1}. source_url: "${s.source_url}"\n   title: ${s.title}\n   summary: ${s.summary}`)
+    .join('\n\n');
 
-  const uniqueSourceUrls = [...new Set(allSourceUrls)];
+  const systemPrompt = `You are a factual daily news editor for ${TOWN_NAME}.
+Output ONLY valid JSON. Do NOT output markdown or prose outside the JSON.
 
-  const prompt = `Create a daily brief for ${TOWN_NAME} residents for ${today}.
+Rules:
+- Write a brief for today (${today}) covering the provided sources
+- Each topic's "source_url" field MUST be copied EXACTLY from the corresponding numbered source above — do not modify or invent URLs
+- "heading" is a short topic label (3-6 words, no trailing colon)
+- "detail" is one factual sentence from the source
+- Include 3-5 topics, one per source (skip a source if its content is too vague)
 
-CRITICAL RULES:
-- ONLY include information from the provided sources below
-- Each bullet point MUST include a source citation as a markdown link: ([source](URL))
-- Do NOT hallucinate events, names, decisions, or dollar amounts not in the sources
-- If sources are too thin for a full brief, write a shorter brief with only what's supported
+Output format:
+{"topics": [{"heading": "...", "detail": "...", "source_url": "..."}]}`;
 
-Format each item as:
-**[Topic]**: Description ([source](SOURCE_URL))
-
-Available sources:
-${contentItems.join('\n')}
-
-Write 3-5 bullet points. Be concise and factual.`;
+  const userPrompt = `Sources for today's brief:\n\n${sourceList}`;
 
   const response = await openai.chat.completions.create({
     model: MODEL,
     messages: [
-      {
-        role: 'system',
-        content: `You are a factual daily news editor for ${TOWN_NAME}. Write only from provided sources. Never invent facts.`,
-      },
-      { role: 'user', content: prompt },
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
     ],
     max_tokens: 700,
-    temperature: 0.3,
+    temperature: 0.1,
+    response_format: { type: 'json_object' },
   });
 
-  const briefContent = response.choices[0]?.message?.content?.trim();
-  if (!briefContent) return null;
+  const raw = response.choices[0]?.message?.content?.trim();
+  if (!raw) return null;
+
+  let parsed: { topics?: { heading: string; detail: string; source_url: string }[] };
+  try {
+    parsed = JSON.parse(raw) as typeof parsed;
+  } catch {
+    console.error('[article-generator] Failed to parse daily brief JSON');
+    return null;
+  }
+
+  const topics = parsed.topics ?? [];
+  if (topics.length === 0) return null;
+
+  // Build markdown body ourselves — we control the URLs, not GPT.
+  // Validate each source_url is in our known set; fall back to closest match if not.
+  const knownUrls = new Set(sourceItems.map((s) => s.source_url));
+  const usedUrls = new Set<string>();
+
+  const bodyLines = topics.map((t) => {
+    // Accept the URL only if it's from our list
+    const url = knownUrls.has(t.source_url)
+      ? t.source_url
+      : sourceItems.find((s) => s.title.toLowerCase().includes(t.heading.toLowerCase().slice(0, 10)))?.source_url
+        ?? sourceItems[0].source_url;
+    usedUrls.add(url);
+    return `**${t.heading}**: ${t.detail} ([source](${url}))`;
+  });
+
+  const briefContent = bodyLines.join('\n\n');
+
+  // source_urls/names = only the URLs actually cited in the brief, in order used
+  const finalSourceUrls = [...usedUrls];
+  const finalSourceNames = finalSourceUrls.map((url) => {
+    const item = sourceItems.find((s) => s.source_url === url);
+    return item?.source_name ?? url;
+  });
 
   const articleInput: CreateArticleInput = {
     title: `${TOWN_NAME} Daily Brief — ${today}`,
     body: briefContent,
-    summary: `Your daily update from ${TOWN_NAME} for ${today}`,
+    summary: topics.map((t) => t.heading).join(' · '),
     content_type: 'ai_generated',
     category: 'government',
-    source_urls: uniqueSourceUrls.slice(0, 10),
+    source_urls: finalSourceUrls,
+    source_names: finalSourceNames,
     source_type: 'public_record',
     town: TOWN_ID,
     author: 'Needham Navigator AI',

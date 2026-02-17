@@ -10,6 +10,7 @@ import { useTown } from "@/lib/town-context";
 import type { Article, ArticleListResponse } from "@/types/article";
 
 const ARTICLES_PER_PAGE = 12;
+const FETCH_TIMEOUT_MS = 10000;
 
 export default function ArticlesPage() {
   const town = useTown();
@@ -17,13 +18,19 @@ export default function ArticlesPage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedContentType, setSelectedContentType] = useState("all");
   const [offset, setOffset] = useState(0);
 
   useEffect(() => {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
     async function fetchArticles() {
       setLoading(true);
+      setError(false);
       setOffset(0);
 
       try {
@@ -41,7 +48,7 @@ export default function ArticlesPage() {
           params.set("content_type", selectedContentType);
         }
 
-        const res = await fetch(`/api/articles?${params}`);
+        const res = await fetch(`/api/articles?${params}`, { signal: controller.signal });
         if (!res.ok) {
           throw new Error("Failed to fetch articles");
         }
@@ -49,15 +56,20 @@ export default function ArticlesPage() {
         const data: ArticleListResponse = await res.json();
         setArticles(data.articles);
         setTotal(data.total);
-      } catch (error) {
-        console.error("Error fetching articles:", error);
+      } catch (err) {
+        if ((err as Error).name !== "AbortError") {
+          console.error("Error fetching articles:", err);
+          setError(true);
+        }
       } finally {
+        clearTimeout(timeout);
         setLoading(false);
       }
     }
 
     void fetchArticles();
-  }, [town.town_id, selectedCategory, selectedContentType]);
+    return () => { controller.abort(); clearTimeout(timeout); };
+  }, [town.town_id, selectedCategory, selectedContentType, retryCount]);
 
   const handleLoadMore = () => {
     const newOffset = offset + ARTICLES_PER_PAGE;
@@ -123,7 +135,7 @@ export default function ArticlesPage() {
             }}
           />
 
-          {!loading && (
+          {!loading && !error && (
             <div className="text-sm text-text-muted mb-4">
               {total} article{total !== 1 ? "s" : ""} found
             </div>
@@ -157,7 +169,25 @@ export default function ArticlesPage() {
             </div>
           )}
 
-          {!loading && articles.length === 0 && (
+          {!loading && error && (
+            <div className="text-center py-16">
+              <div className="text-6xl mb-4">⚠️</div>
+              <h2 className="text-2xl font-bold text-text-primary mb-2">
+                Unable to load articles
+              </h2>
+              <p className="text-text-secondary mb-6">
+                Something went wrong. Please try again.
+              </p>
+              <button
+                onClick={() => setRetryCount((c) => c + 1)}
+                className="px-6 py-3 bg-[var(--primary)] text-white font-medium rounded-lg hover:bg-[var(--primary-dark)] transition-colors"
+              >
+                Try Again
+              </button>
+            </div>
+          )}
+
+          {!loading && !error && articles.length === 0 && (
             <div className="text-center py-16">
               <div className="text-6xl mb-4">📰</div>
               <h2 className="text-2xl font-bold text-text-primary mb-2">
