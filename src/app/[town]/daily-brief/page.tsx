@@ -6,48 +6,7 @@ import { Footer } from "@/components/Footer";
 import { ChevronDown, ChevronRight, Calendar } from "lucide-react";
 import { useTown } from "@/lib/town-context";
 import type { Article, ArticleListResponse } from "@/types/article";
-
-function renderMarkdown(text: string) {
-  return text.split("\n").map((line, i) => {
-    if (line.startsWith("## ")) {
-      return (
-        <h2 key={i} className="text-2xl font-bold text-text-primary mt-6 mb-3">
-          {line.slice(3)}
-        </h2>
-      );
-    }
-    if (line.startsWith("### ")) {
-      return (
-        <h3 key={i} className="text-xl font-bold text-text-primary mt-4 mb-2">
-          {line.slice(4)}
-        </h3>
-      );
-    }
-    if (line.startsWith("- ")) {
-      return (
-        <li key={i} className="ml-6 mb-2 text-text-primary">
-          {line.slice(2)}
-        </li>
-      );
-    }
-    if (line.includes("**")) {
-      const parts = line.split("**");
-      return (
-        <p key={i} className="mb-3 text-text-primary leading-relaxed">
-          {parts.map((part, j) => (j % 2 === 1 ? <strong key={j}>{part}</strong> : part))}
-        </p>
-      );
-    }
-    if (line.trim() === "") {
-      return <div key={i} className="h-2" />;
-    }
-    return (
-      <p key={i} className="mb-3 text-text-primary leading-relaxed">
-        {line}
-      </p>
-    );
-  });
-}
+import ReactMarkdown from "react-markdown";
 
 export default function DailyBriefPage() {
   const town = useTown();
@@ -150,7 +109,7 @@ export default function DailyBriefPage() {
 
                   <h2 className="text-3xl font-bold text-text-primary mb-6">{todayBrief.title}</h2>
 
-                  <div className="prose max-w-none">{renderMarkdown(todayBrief.body)}</div>
+                  <div className="prose prose-slate max-w-none"><ReactMarkdown>{todayBrief.body}</ReactMarkdown></div>
                 </div>
               ) : (
                 <div className="bg-white rounded-lg p-12 shadow-sm border border-border-default mb-8 text-center">
@@ -202,7 +161,7 @@ export default function DailyBriefPage() {
 
                           {isExpanded && (
                             <div className="px-5 pb-5 border-t border-border-light pt-5">
-                              <div className="prose max-w-none">{renderMarkdown(brief.body)}</div>
+                              <div className="prose prose-slate max-w-none"><ReactMarkdown>{brief.body}</ReactMarkdown></div>
                             </div>
                           )}
                         </div>

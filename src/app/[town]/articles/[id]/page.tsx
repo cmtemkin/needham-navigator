@@ -10,6 +10,7 @@ import { useTown } from "@/lib/town-context";
 import { useChatWidget } from "@/lib/chat-context";
 import type { Article, ArticleListResponse } from "@/types/article";
 import { trackEvent } from "@/lib/pendo";
+import ReactMarkdown from "react-markdown";
 
 const CONTENT_TYPE_LABELS = {
   ai_generated: "AI Generated",
@@ -25,48 +26,6 @@ const CATEGORY_LABELS: Record<string, string> = {
   development: "Permits & Development",
   business: "Business",
 };
-
-function renderMarkdown(text: string) {
-  return text.split("\n").map((line, i) => {
-    if (line.startsWith("## ")) {
-      return (
-        <h2 key={i} className="text-2xl font-bold text-text-primary mt-8 mb-4">
-          {line.slice(3)}
-        </h2>
-      );
-    }
-    if (line.startsWith("### ")) {
-      return (
-        <h3 key={i} className="text-xl font-bold text-text-primary mt-6 mb-3">
-          {line.slice(4)}
-        </h3>
-      );
-    }
-    if (line.startsWith("- ")) {
-      return (
-        <li key={i} className="ml-6 mb-2 text-text-primary">
-          {line.slice(2)}
-        </li>
-      );
-    }
-    if (line.includes("**")) {
-      const parts = line.split("**");
-      return (
-        <p key={i} className="mb-3 text-text-primary leading-relaxed">
-          {parts.map((part, j) => (j % 2 === 1 ? <strong key={j}>{part}</strong> : part))}
-        </p>
-      );
-    }
-    if (line.trim() === "") {
-      return <div key={i} className="h-2" />;
-    }
-    return (
-      <p key={i} className="mb-3 text-text-primary leading-relaxed">
-        {line}
-      </p>
-    );
-  });
-}
 
 function estimateReadingTime(text: string): number {
   const wordsPerMinute = 200;
@@ -237,7 +196,7 @@ export default function ArticleDetailPage() {
                   </div>
                 )}
 
-                <div className="prose max-w-none">{renderMarkdown(article.body)}</div>
+                <div className="prose prose-slate max-w-none"><ReactMarkdown>{article.body}</ReactMarkdown></div>
               </div>
 
               {/* Sources */}

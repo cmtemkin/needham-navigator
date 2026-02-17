@@ -94,13 +94,13 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
 
   const articlesHref = useTownHref("/articles");
 
-  const [query, setQuery] = useState(initialQuery);
+  const queryFromUrl = normalizeQuery(searchParams.get("q"));
+  const [query, setQuery] = useState(initialQuery || queryFromUrl);
   const [searchResults, setSearchResults] = useState<SearchResponse | null>(null);
   const [aiAnswer, setAiAnswer] = useState<AIAnswerState>({ type: "idle" });
   const [isSearching, setIsSearching] = useState(false);
   const [featuredArticles, setFeaturedArticles] = useState<Article[]>([]);
   const [articlesLoading, setArticlesLoading] = useState(true);
-  const queryFromUrl = normalizeQuery(searchParams.get("q"));
 
   const executeSearch = useCallback(
     async (rawQuery: string) => {
