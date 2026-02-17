@@ -128,7 +128,7 @@ export const TOWNS: TownConfig[] = [
       enableMultiLanguage: true,
       enableDashboard: true,
       enableNews: true,
-      enableAbout: false,
+      enableAbout: true,
       enableEvents: true,
       enableDining: true,
       enableSafety: true,

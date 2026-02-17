@@ -53,6 +53,9 @@ export async function generateMetadata(props: SearchPageProps): Promise<Metadata
   };
 }
 
-export default function TownSearchPage() {
-  return <SearchHomePage />;
+export default async function TownSearchPage(props: SearchPageProps) {
+  const searchParams = await props.searchParams;
+  const initialQuery = searchParams.q || "";
+
+  return <SearchHomePage initialQuery={initialQuery} />;
 }
