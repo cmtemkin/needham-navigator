@@ -839,16 +839,46 @@ Output format:
   if (topics.length === 0) return null;
 
   // Build markdown body ourselves — we control the URLs, not GPT.
-  // Validate each source_url is in our known set; fall back to closest match if not.
+  // Validate each source_url is in our known set; fall back to fuzzy match by title.
   const knownUrls = new Set(sourceItems.map((s) => s.source_url));
   const usedUrls = new Set<string>();
 
   const bodyLines = topics.map((t) => {
-    // Accept the URL only if it's from our list
-    const url = knownUrls.has(t.source_url)
-      ? t.source_url
-      : sourceItems.find((s) => s.title.toLowerCase().includes(t.heading.toLowerCase().slice(0, 10)))?.source_url
-        ?? sourceItems[0].source_url;
+    let url: string | undefined;
+
+    // 1. Exact match — GPT copied the URL verbatim
+    if (knownUrls.has(t.source_url)) {
+      url = t.source_url;
+    }
+
+    // 2. Fuzzy match by title overlap (bidirectional)
+    if (!url) {
+      const headingLower = t.heading.toLowerCase();
+      const match = sourceItems.find((s) => {
+        const titleLower = s.title.toLowerCase();
+        return titleLower.includes(headingLower) || headingLower.includes(titleLower.slice(0, 20));
+      });
+      url = match?.source_url;
+    }
+
+    // 3. Fuzzy match by detail content overlap
+    if (!url) {
+      const detailLower = t.detail.toLowerCase();
+      const match = sourceItems.find((s) => {
+        const summaryLower = s.summary.toLowerCase();
+        // Check if any significant words overlap
+        const detailWords = detailLower.split(/\s+/).filter((w) => w.length > 4);
+        const matchCount = detailWords.filter((w) => summaryLower.includes(w)).length;
+        return matchCount >= 2;
+      });
+      url = match?.source_url;
+    }
+
+    // 4. Skip this topic if no matching source found (don't cite a wrong source)
+    if (!url) {
+      return `**${t.heading}**: ${t.detail}`;
+    }
+
     usedUrls.add(url);
     return `**${t.heading}**: ${t.detail} ([source](${url}))`;
   });

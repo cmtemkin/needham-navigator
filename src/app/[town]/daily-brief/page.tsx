@@ -117,18 +117,26 @@ export default function DailyBriefPage() {
                         Sources
                       </h3>
                       <ul className="space-y-1">
-                        {todayBrief.source_urls.map((url, i) => (
-                          <li key={i}>
-                            <a
-                              href={url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-sm text-[var(--primary)] hover:underline break-all"
-                            >
-                              {todayBrief.source_names?.[i] || url}
-                            </a>
-                          </li>
-                        ))}
+                        {todayBrief.source_urls.map((url, i) => {
+                          let hostname: string;
+                          try {
+                            hostname = new URL(url).hostname.replace(/^www\./, "");
+                          } catch {
+                            hostname = url;
+                          }
+                          return (
+                            <li key={i}>
+                              <a
+                                href={url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm text-[var(--primary)] hover:underline"
+                              >
+                                {todayBrief.source_names?.[i] || hostname}
+                              </a>
+                            </li>
+                          );
+                        })}
                       </ul>
                     </div>
                   )}

@@ -54,10 +54,13 @@ export default function ArticlesPage() {
         }
 
         const data: ArticleListResponse = await res.json();
-        setArticles(data.articles);
-        setTotal(data.total);
+        setArticles(data.articles ?? []);
+        setTotal(data.total ?? 0);
       } catch (err) {
-        if ((err as Error).name !== "AbortError") {
+        if ((err as Error).name === "AbortError") {
+          // Timeout — show error state instead of leaving skeleton forever
+          setError(true);
+        } else {
           console.error("Error fetching articles:", err);
           setError(true);
         }
