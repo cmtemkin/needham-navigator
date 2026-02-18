@@ -2,6 +2,31 @@
 
 ---
 
+## v0.11.0 — 2026-02-18
+
+**Community Feature Pages — Events, Weather, Safety, Transit, Dining, Zoning**
+
+### New Features
+- **Events page** (`/<town>/events`) — Community events, meetings, and activities fetched from the content API with date/time/location display, pagination, and "Ask About Events" fallback
+- **Weather page** (`/<town>/weather`) — Live weather conditions and 7-day extended forecast from the National Weather Service API using the town's lat/lng coordinates; shows current temp, wind, humidity, and NWS icons
+- **Safety page** (`/<town>/safety`) — Emergency 911 banner, auto-detected Police & Fire quick-dial cards from town config departments, and safety updates from the content feed
+- **Transit page** (`/<town>/transit`) — Live MBTA API integration using `transit_route` from town config; shows service alerts and upcoming departure schedule with stop names and directions
+- **Dining page** (`/<town>/dining`) — Local restaurant/eatery listings from the content API in a 2-column grid with address, hours, and ratings metadata
+- **Zoning page** (`/<town>/zoning-map`) — Zoning district info with Google Maps embed (when API key configured), 4 interactive topic cards that open chat with pre-filled zoning questions
+- **Header "More" dropdown** — New dropdown menu in the navigation bar with icons for all 6 new feature pages, gated by existing feature flags (`enableEvents`, `enableWeather`, `enableSafety`, `enableTransit`, `enableDining`, `enableZoningMap`)
+- **i18n support** — All 6 new navigation labels translated in English, Spanish, and Chinese
+
+### Technical
+- All pages follow established patterns: gradient hero, content API integration, loading skeletons, error/retry states, empty states with chat fallback
+- Header refactored with shared `NAV_LINK_CLASS` constant and click-outside-to-close dropdown
+- Weather uses free NWS API (api.weather.gov) — no API key required
+- Transit uses free MBTA V3 API (api-v3.mbta.com) — no API key required
+- All 6 pages statically generated for both `needham` and `mock-town`
+
+### Pages (34 total, +6 new)
+
+---
+
 ## v0.10.0 — 2026-02-18
 
 **RSS/External News Integration — Unified Community Platform**

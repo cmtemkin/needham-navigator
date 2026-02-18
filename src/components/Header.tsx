@@ -1,11 +1,18 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { Home, MessageSquare, FileCheck, Newspaper, Info } from "lucide-react";
+import {
+  Home, MessageSquare, FileCheck, Newspaper, Info,
+  ChevronDown, Calendar, Cloud, UtensilsCrossed, Shield, Train, Map,
+} from "lucide-react";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useI18n } from "@/lib/i18n";
 import { useTown, useTownHref } from "@/lib/town-context";
 import { useChatWidget } from "@/lib/chat-context";
+
+const NAV_LINK_CLASS =
+  "flex items-center gap-[5px] rounded-lg px-3.5 py-[7px] text-[13.5px] font-medium text-text-secondary transition-all hover:bg-surface hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary";
 
 export function Header() {
   const town = useTown();
@@ -15,7 +22,37 @@ export function Header() {
   const aboutHref = useTownHref("/about");
   const permitsHref = useTownHref("/permits");
   const articlesHref = useTownHref("/articles");
+  const eventsHref = useTownHref("/events");
+  const weatherHref = useTownHref("/weather");
+  const safetyHref = useTownHref("/safety");
+  const transitHref = useTownHref("/transit");
+  const diningHref = useTownHref("/dining");
+  const zoningHref = useTownHref("/zoning-map");
   const shortTownName = town.name.replace(/,\s*[A-Z]{2}$/i, "");
+
+  // "More" dropdown state
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
+        setMoreOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Collect feature links for the "More" dropdown
+  type MoreLink = { href: string; icon: typeof Calendar; label: string };
+  const moreLinks: MoreLink[] = [];
+  if (town.feature_flags.enableEvents) moreLinks.push({ href: eventsHref, icon: Calendar, label: t("header.events") });
+  if (town.feature_flags.enableWeather) moreLinks.push({ href: weatherHref, icon: Cloud, label: t("header.weather") });
+  if (town.feature_flags.enableSafety) moreLinks.push({ href: safetyHref, icon: Shield, label: t("header.safety") });
+  if (town.feature_flags.enableTransit) moreLinks.push({ href: transitHref, icon: Train, label: t("header.transit") });
+  if (town.feature_flags.enableDining) moreLinks.push({ href: diningHref, icon: UtensilsCrossed, label: t("header.dining") });
+  if (town.feature_flags.enableZoningMap) moreLinks.push({ href: zoningHref, icon: Map, label: t("header.zoning") });
 
   return (
     <header className="sticky top-0 z-50 border-b border-border-light bg-white shadow-xs">
@@ -36,38 +73,56 @@ export function Header() {
 
         <div className="hidden items-center gap-2 md:flex">
           <LanguageToggle />
-          <Link
-            href={homeHref}
-            className="flex items-center gap-[5px] rounded-lg px-3.5 py-[7px] text-[13.5px] font-medium text-text-secondary transition-all hover:bg-surface hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-          >
+          <Link href={homeHref} className={NAV_LINK_CLASS}>
             <Home size={15} />
             {t("header.home")}
           </Link>
           {town.feature_flags.enableNews && (
-            <Link
-              href={articlesHref}
-              className="flex items-center gap-[5px] rounded-lg px-3.5 py-[7px] text-[13.5px] font-medium text-text-secondary transition-all hover:bg-surface hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            >
+            <Link href={articlesHref} className={NAV_LINK_CLASS}>
               <Newspaper size={15} />
               Articles
             </Link>
           )}
-          <Link
-            href={permitsHref}
-            className="flex items-center gap-[5px] rounded-lg px-3.5 py-[7px] text-[13.5px] font-medium text-text-secondary transition-all hover:bg-surface hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-          >
+          <Link href={permitsHref} className={NAV_LINK_CLASS}>
             <FileCheck size={15} />
             {t("header.permits")}
           </Link>
           {town.feature_flags.enableAbout && (
-            <Link
-              href={aboutHref}
-              className="flex items-center gap-[5px] rounded-lg px-3.5 py-[7px] text-[13.5px] font-medium text-text-secondary transition-all hover:bg-surface hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            >
+            <Link href={aboutHref} className={NAV_LINK_CLASS}>
               <Info size={15} />
               {t("header.about")}
             </Link>
           )}
+
+          {moreLinks.length > 0 && (
+            <div className="relative" ref={moreRef}>
+              <button
+                onClick={() => setMoreOpen((v) => !v)}
+                className={`${NAV_LINK_CLASS} ${moreOpen ? "bg-surface text-text-primary" : ""}`}
+                aria-expanded={moreOpen}
+                aria-haspopup="true"
+              >
+                More
+                <ChevronDown size={14} className={`transition-transform ${moreOpen ? "rotate-180" : ""}`} />
+              </button>
+              {moreOpen && (
+                <div className="absolute right-0 top-full mt-1 w-48 rounded-lg border border-border-light bg-white py-1 shadow-lg z-50">
+                  {moreLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setMoreOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-[13.5px] font-medium text-text-secondary hover:bg-surface hover:text-text-primary transition-colors"
+                    >
+                      <link.icon size={15} />
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           <button
             onClick={() => openChat()}
             className="flex items-center gap-[5px] rounded-lg bg-primary px-3.5 py-[7px] text-[13.5px] font-semibold text-white transition-all hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"

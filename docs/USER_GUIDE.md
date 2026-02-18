@@ -115,6 +115,51 @@ A daily AI-generated digest of the most important Needham news and updates, with
 - Collapsible accordion of up to 7 previous briefs
 - Brief is generated daily at 5 AM ET; "Check back after 5 AM" shown when not yet available
 
+### Events
+
+Navigate to **More → Events** or visit `/<town>/events`.
+
+Community events, town meetings, and activities pulled from calendar feeds. Each event shows the date, time, location, and a link to details. When no events are available yet, you can ask Navigator about upcoming events.
+
+### Weather
+
+Navigate to **More → Weather** or visit `/<town>/weather`.
+
+Live weather conditions and 7-day forecast from the National Weather Service (weather.gov). Shows current temperature, wind speed, humidity, and detailed forecast periods with official NWS icons. Data updates automatically from the NWS API using the town's geographic coordinates.
+
+### Safety
+
+Navigate to **More → Safety** or visit `/<town>/safety`.
+
+Emergency contacts and public safety resources:
+- **911 emergency banner** prominently displayed
+- **Quick-dial cards** for Police and Fire departments (auto-detected from town config)
+- **Safety updates** from the content feed as they're added
+
+### Transit
+
+Navigate to **More → Transit** or visit `/<town>/transit`.
+
+Live MBTA schedules and alerts for the town's commuter rail line (configured via `transit_route` in town settings):
+- **Service alerts** with descriptions
+- **Upcoming departures** with stop names, direction, and times
+- Link to full schedule on MBTA.com
+
+### Dining
+
+Navigate to **More → Dining** or visit `/<town>/dining`.
+
+Local restaurant and eatery listings as they're added to the content feed. Each listing shows the name, address, hours, and a link to the restaurant. Ask Navigator for recommendations in the meantime.
+
+### Zoning
+
+Navigate to **More → Zoning** or visit `/<town>/zoning-map`.
+
+Zoning district information and land use resources:
+- **Interactive map** (when Google Maps API key is configured)
+- **Quick-lookup cards** for common zoning topics — click any card to ask Navigator about setbacks, permitted uses, dimensional requirements, or zoning by-laws
+- Link to the town's official zoning map
+
 ### Department Directory
 
 The home page lists key town departments with phone numbers. Click any department to ask the AI about their services.
@@ -220,6 +265,12 @@ Daily change detection with content-hash comparison:
 | Chat | `/<town>/chat` | AI-powered Q&A |
 | News | `/<town>/news` | Aggregated local news feed |
 | Permits | `/<town>/permits` | Permit wizard |
+| Events | `/<town>/events` | Community events calendar |
+| Weather | `/<town>/weather` | Live NWS weather & forecast |
+| Safety | `/<town>/safety` | Emergency contacts & updates |
+| Transit | `/<town>/transit` | MBTA schedules & alerts |
+| Dining | `/<town>/dining` | Local restaurant listings |
+| Zoning | `/<town>/zoning-map` | Zoning info & map |
 | Admin | `/admin` | Dashboard (not town-scoped) |
 
 Legacy URLs like `/chat` automatically redirect to the default town.
