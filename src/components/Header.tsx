@@ -52,6 +52,13 @@ export function Header() {
               Articles
             </Link>
           )}
+          <Link
+            href={permitsHref}
+            className="flex items-center gap-[5px] rounded-lg px-3.5 py-[7px] text-[13.5px] font-medium text-text-secondary transition-all hover:bg-surface hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            <FileCheck size={15} />
+            {t("header.permits")}
+          </Link>
           {town.feature_flags.enableAbout && (
             <Link
               href={aboutHref}
@@ -61,13 +68,6 @@ export function Header() {
               {t("header.about")}
             </Link>
           )}
-          <Link
-            href={permitsHref}
-            className="flex items-center gap-[5px] rounded-lg px-3.5 py-[7px] text-[13.5px] font-medium text-text-secondary transition-all hover:bg-surface hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-          >
-            <FileCheck size={15} />
-            {t("header.permits")}
-          </Link>
           <button
             onClick={() => openChat()}
             className="flex items-center gap-[5px] rounded-lg bg-primary px-3.5 py-[7px] text-[13.5px] font-semibold text-white transition-all hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
