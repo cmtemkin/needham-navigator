@@ -2,6 +2,24 @@
 
 ---
 
+## v0.10.0 — 2026-02-18
+
+**RSS/External News Integration — Unified Community Platform**
+
+### New Features
+- **External news ingestion** — Needham Patch, Needham Observer, and Needham Local are scraped every 4 hours via the connector framework; content stored in `content_items` with vector embeddings
+- **AI article summaries** — `summarizeExternalArticle()` generates reader-friendly AI summaries from external news; inserted as `ai_summary` articles with source attribution
+- **Automated article generation cron** (`/api/cron/generate`) — daily cron at 10 AM UTC generates articles from new documents + summarizes external news + creates daily brief
+- **Content items in RAG search** — `vectorSearchContentItems()` searches `content_items` in parallel with `document_chunks`; external news surfaces in both search and chat with a 0.95x ranking penalty so official content ranks higher
+- **Ingest cron** — `/api/cron/ingest` runs every 4 hours on Vercel to keep external sources fresh
+- **Patch RSS source config** — added `needham:patch-rss` (disabled — feed returns 404; scrape connector handles Patch)
+
+### Data
+- 40 external content items ingested (15 Patch, 15 Observer, 10 Needham Local)
+- 20 AI Summary articles generated from external news
+
+---
+
 ## v0.9.1 — 2026-02-17
 
 **Real Article Generation — Nuke Fake Seed Data**

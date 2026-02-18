@@ -574,6 +574,61 @@ function selectTopChunks(
 }
 
 /**
+ * Run a vector search against content_items (external news, RSS, etc.)
+ * and transform results to MatchDocumentRow shape for merging.
+ */
+async function vectorSearchContentItems(
+  queryText: string,
+  townId: string,
+  matchThreshold: number,
+  matchCount: number,
+): Promise<MatchDocumentRow[]> {
+  const embedding = await generateEmbedding(queryText);
+  const supabase = getSupabaseClient({ townId });
+
+  const { data, error } = await supabase.rpc("match_content_items", {
+    query_embedding: embedding,
+    match_threshold: matchThreshold,
+    match_count: matchCount,
+    filter_town_id: townId,
+  });
+
+  if (error) {
+    // Non-fatal — content_items search is supplementary
+    console.warn(`[rag] content_items search failed: ${error.message}`);
+    return [];
+  }
+
+  // Transform content_items results to MatchDocumentRow shape
+  return ((data ?? []) as Array<{
+    id: string;
+    title: string;
+    content: string;
+    summary: string | null;
+    url: string | null;
+    source_id: string;
+    category: string;
+    published_at: string;
+    metadata: ChunkMetadata | null;
+    similarity: number;
+  }>).map((row) => ({
+    id: row.id,
+    chunk_text: row.summary || row.content?.slice(0, 1500) || row.title,
+    metadata: {
+      ...(row.metadata ?? {}),
+      document_title: row.title,
+      document_url: row.url,
+      content_type: "external_news",
+      source_id: row.source_id,
+      category: row.category,
+      published_at: row.published_at,
+    },
+    // Apply 0.95x penalty so official municipal content ranks above news at similar scores
+    similarity: row.similarity * 0.95,
+  }));
+}
+
+/**
  * Run a single vector search against Supabase match_documents RPC.
  */
 async function vectorSearch(
@@ -644,6 +699,8 @@ export async function retrieveRelevantChunks(
 
   const searchPromises: Promise<MatchDocumentRow[]>[] = [
     vectorSearch(trimmedQuery, townId, matchThreshold, matchCount),
+    // Search external content (RSS, news) in parallel
+    vectorSearchContentItems(trimmedQuery, townId, matchThreshold, Math.ceil(matchCount / 2)),
   ];
 
   if (hasExpansions) {
