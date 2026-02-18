@@ -17,7 +17,7 @@ import { trackEvent } from "@/lib/pendo";
 const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true";
 
 function generateSessionId(): string {
-  return `sess-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+  return `sess-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
 }
 
 function ChatLoadingFallback() {
@@ -148,7 +148,7 @@ function ChatContent() {
       setIsTyping(true);
       scrollToBottom();
 
-      const delay = 900 + Math.random() * 700;
+      const delay = 900 + (crypto.getRandomValues(new Uint8Array(1))[0] / 255) * 700;
       setTimeout(() => {
         try {
           const response = findMockResponse(question);
