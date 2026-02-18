@@ -564,12 +564,152 @@ export async function generateFromAllDocuments(options?: { daysBack?: number }):
 }
 
 /**
- * Summarize external news articles.
- * Currently a no-op — external news is not yet ingested into the documents table.
- * Will be implemented when an external news connector is added.
+ * Summarize external news articles from the content_items table.
+ * Queries recent news items ingested by RSS/scrape connectors, generates
+ * AI summaries, and inserts them as `ai_summary` articles.
  */
-export async function summarizeExternalArticle(): Promise<Article[]> {
-  return [];
+export async function summarizeExternalArticle(options?: {
+  daysBack?: number;
+  limit?: number;
+}): Promise<Article[]> {
+  const daysBack = options?.daysBack ?? 2;
+  const limit = options?.limit ?? 20;
+  const supabase = getSupabaseServiceClient();
+
+  const since = new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000).toISOString();
+
+  // Fetch recent news content_items
+  const { data: items, error: fetchError } = await supabase
+    .from('content_items')
+    .select('id, source_id, title, content, summary, url, published_at, category, metadata')
+    .eq('town_id', TOWN_ID)
+    .eq('category', 'news')
+    .gte('published_at', since)
+    .order('published_at', { ascending: false })
+    .limit(limit);
+
+  if (fetchError || !items || items.length === 0) {
+    if (fetchError) console.error('[article-generator] Error fetching content_items:', fetchError);
+    return [];
+  }
+
+  console.log(`[article-generator] Found ${items.length} external news items to process`);
+
+  const articles: Article[] = [];
+
+  for (const item of items) {
+    // Skip items without a URL — can't cite them
+    if (!item.url) continue;
+
+    const normalizedUrl = normalizeSourceUrl(item.url);
+
+    // Skip if article already exists for this source
+    if (await articleExistsForSource(normalizedUrl)) continue;
+
+    // Skip items with too little content
+    const content = item.content ?? '';
+    if (content.length < 100 && (!item.summary || item.summary.length < 50)) {
+      continue;
+    }
+
+    const openai = getOpenAI();
+    const textToSummarize = content.slice(0, 4000);
+
+    try {
+      const response = await openai.chat.completions.create({
+        model: MODEL,
+        messages: [
+          {
+            role: 'system',
+            content: `You are a local news editor for ${TOWN_NAME}. Summarize this external news article for residents.
+
+RULES:
+- Write a clear, factual summary — no speculation
+- If the content is too short or vague, respond with {"skip": true}
+- Include key facts, names, and dates from the article
+
+Output valid JSON:
+{
+  "title": "Clear headline (not clickbait)",
+  "summary": "2-3 sentence summary",
+  "body": "Full markdown summary with key details. Use ## headers if appropriate.",
+  "confidence_score": 0.0
+}`,
+          },
+          {
+            role: 'user',
+            content: `Title: ${item.title}\nSource: ${(item.metadata as Record<string, unknown>)?.sourceName || item.source_id}\nURL: ${item.url}\n\nContent:\n${textToSummarize}`,
+          },
+        ],
+        max_tokens: 1000,
+        temperature: 0.2,
+        response_format: { type: 'json_object' },
+      });
+
+      const raw = response.choices[0]?.message?.content?.trim();
+      if (!raw) continue;
+
+      let parsed: {
+        skip?: boolean;
+        title?: string;
+        summary?: string;
+        body?: string;
+        confidence_score?: number;
+      };
+      try {
+        parsed = JSON.parse(raw) as typeof parsed;
+      } catch {
+        continue;
+      }
+
+      if (parsed.skip || !parsed.title || !parsed.body) continue;
+
+      const confidence = parsed.confidence_score ?? 0;
+      if (confidence < MIN_CONFIDENCE) continue;
+
+      // Map content category to article category
+      const articleCategory: ArticleCategory = 'community';
+
+      const sourceName =
+        ((item.metadata as Record<string, unknown>)?.sourceName as string) ||
+        item.source_id;
+
+      const articleInput: CreateArticleInput = {
+        title: parsed.title,
+        body: parsed.body,
+        summary: parsed.summary,
+        content_type: 'ai_summary',
+        category: articleCategory,
+        source_urls: [normalizedUrl],
+        source_type: 'news_article',
+        source_names: [sourceName],
+        town: TOWN_ID,
+        author: 'Needham Navigator AI',
+        model_used: MODEL,
+        confidence_score: confidence,
+        status: 'published',
+      };
+
+      const { data, error } = await supabase
+        .from('articles')
+        .insert(articleInput)
+        .select()
+        .single();
+
+      if (error || !data) {
+        console.error('[article-generator] Error inserting ai_summary article:', error);
+        continue;
+      }
+
+      console.log(`[article-generator] AI Summary: "${parsed.title}" from ${sourceName}`);
+      articles.push(data as Article);
+    } catch (err) {
+      console.error('[article-generator] Error summarizing external article:', err);
+      continue;
+    }
+  }
+
+  return articles;
 }
 
 /**

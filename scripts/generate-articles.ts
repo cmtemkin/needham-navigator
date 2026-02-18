@@ -47,14 +47,14 @@ async function main() {
     errors.push(`Public records: ${msg}`);
   }
 
-  // Step 3: External articles (no-op until connector is built)
+  // Step 3: External articles (RSS/scrape → AI summary)
   console.log('\n📰 Summarizing external articles...');
   try {
     const articles = await summarizeExternalArticle();
     console.log(
       articles.length > 0
         ? `   ✅ ${articles.length} summaries generated`
-        : '   ℹ️  No external articles to process (connector not yet configured)'
+        : '   ℹ️  No new external articles to process'
     );
     totalGenerated += articles.length;
   } catch (error) {

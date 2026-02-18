@@ -100,6 +100,8 @@ AI-generated articles covering town news, government decisions, schools, public 
 - "Load more" to browse additional articles
 - Each article page shows: formatted content with headers and bullets, source type badge, clickable source links to official documents, AI disclaimer, thumbs up/down feedback, and an "Ask about this" button that opens chat pre-loaded with the article title
 - Articles are generated automatically each morning at 5 AM from newly ingested town documents
+- **External news integration** — AI summaries of articles from Needham Patch, Needham Observer, and Needham Local are generated alongside official town content. External sources are scraped every 4 hours and summarized daily.
+- External news appears in RAG-powered search and chat alongside official municipal content (official sources rank slightly higher)
 
 ### Daily Brief
 

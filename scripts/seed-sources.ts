@@ -48,7 +48,22 @@ const NEEDHAM_SOURCES: SourceSeed[] = [
     should_embed: true,
   },
 
-  // Local News - Needham Patch
+  // Local News - Needham Patch (RSS — disabled, feed returns 404)
+  {
+    id: "needham:patch-rss",
+    town_id: "needham",
+    connector_type: "rss",
+    category: "news",
+    schedule: "hourly",
+    config: {
+      feedUrl: "https://patch.com/massachusetts/needham/feed",
+      sourceName: "Needham Patch",
+    },
+    enabled: false,
+    should_embed: true,
+  },
+
+  // Local News - Needham Patch (scrape fallback)
   {
     id: "needham:patch-news",
     town_id: "needham",
