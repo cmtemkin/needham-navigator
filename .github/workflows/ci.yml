@@ -9,6 +9,7 @@ permissions:
   contents: write
   pull-requests: write
   issues: write
+  security-events: write
 
 jobs:
   build-and-test:
@@ -46,11 +47,28 @@ jobs:
       - name: Run tests
         run: npm test
 
-      - name: Security audit
+      - name: Security audit (critical)
         run: npm audit --production --audit-level=critical
 
+      - name: Security audit (high — warning only)
+        run: npm audit --production --audit-level=high || echo "::warning::High-severity vulnerabilities found — review npm audit output"
+
+  codeql:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
   auto-merge:
-    needs: build-and-test
+    needs: [build-and-test, codeql]
     runs-on: ubuntu-latest
     if: success()
     steps:
@@ -110,7 +128,7 @@ jobs:
         run: gh api -X DELETE "repos/${{ github.repository }}/git/refs/heads/${{ github.event.pull_request.head.ref }}" || true
 
   on-failure:
-    needs: build-and-test
+    needs: [build-and-test, codeql]
     runs-on: ubuntu-latest
     if: failure()
     steps:

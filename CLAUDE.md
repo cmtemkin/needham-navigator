@@ -144,10 +144,11 @@ gh pr create --title "type: description" --body "Summary of changes"
 Every agent session MUST start with these steps before writing any new code:
 
 1. Check for open issues: `gh issue list --label ci-failure --label prod-down --state open`
-2. Verify build health: `git checkout main && git pull origin main && npm ci && npm run build`
-3. Check in-flight work: `gh pr list --state open`
-4. If anything is broken, fix it FIRST - create a `fix/` branch, push, and create a PR
-5. Only after everything is green should you start new feature work
+2. Check for open security alerts: `gh api repos/{owner}/{repo}/code-scanning/alerts --jq '[.[] | select(.state=="open")] | length'`
+3. Verify build health: `git checkout main && git pull origin main && npm ci && npm run build`
+4. Check in-flight work: `gh pr list --state open`
+5. If anything is broken (issues, security alerts, build failures), fix it FIRST - create a `fix/` branch, push, and create a PR
+6. Only after everything is green should you start new feature work
 
 Branch naming: `feature/<name>`, `fix/<name>`, `setup/<name>`, `data/<name>`
 
@@ -162,8 +163,40 @@ Branch naming: `feature/<name>`, `fix/<name>`, `setup/<name>`, `data/<name>`
 - **Connector Ingest** (`/api/cron/ingest`): Runs connectors on schedule
 - **Sync** (`/api/cron/sync`): Legacy sync endpoint (predecessor to monitor)
 
+## Security Scanning Pipeline
+
+The CI pipeline includes multiple layers of security scanning:
+
+1. **ESLint Security Plugin** (`eslint-plugin-security`) — catches common JS/Node security anti-patterns (eval, non-literal regex, etc.) during local lint and CI
+2. **CodeQL** — GitHub's semantic code analysis runs as a parallel CI job and weekly schedule. Blocks auto-merge if findings are detected.
+3. **Semgrep SAST** — Runs on PRs and weekly (`semgrep.yml`). Results uploaded to GitHub Security tab as SARIF.
+4. **npm audit** — Two-tier check in CI:
+   - `--audit-level=critical` — fails the build
+   - `--audit-level=high` — emits a warning annotation
+
+### CI Failure Auto-Remediation
+
+When a security scan fails in CI:
+
+1. **ESLint security rule violation**: Fix the flagged pattern locally. Common fixes:
+   - `security/detect-object-injection` → use `Map` or validate the key
+   - `security/detect-non-literal-regexp` → use a string literal or escape input
+   - `security/detect-eval-with-expression` → refactor to avoid `eval()`
+2. **CodeQL finding**: Check the GitHub Security tab → Code Scanning Alerts for details. Fix the flagged code pattern and push.
+3. **Semgrep finding**: Check the PR's SARIF results or GitHub Security tab. Fix and push.
+4. **npm audit critical**: Run `npm audit` locally, then `npm audit fix` or update the vulnerable package. If unfixable, document an exception.
+
+### Agent Security Preflight
+
+Before starting new work, also check for security alerts:
+```bash
+gh api repos/{owner}/{repo}/code-scanning/alerts --jq '[.[] | select(.state=="open")] | length'
+```
+If there are open alerts, triage and fix them before writing new features.
+
 ## CI/CD Pipeline Status
-- **Last validated:** 2026-02-12
+- **Last validated:** 2026-02-18
 - **Pipeline:** GitHub Actions (ci.yml) > auto-merge > Vercel deploy
+- **Security scanning:** CodeQL (inline + weekly), Semgrep (PR + weekly), ESLint security plugin, npm audit
 - **Branch protection:** Enforced on `main` (require PR + status checks)
 - **Repo visibility:** Public (MIT License)
