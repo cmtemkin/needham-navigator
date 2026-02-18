@@ -25,7 +25,13 @@ const QUICK_LINKS = [
   { label: "Transportation", icon: Bus },
 ];
 
-const TOPIC_CARDS = [
+const TOPIC_CARDS: {
+  icon: string;
+  title: string;
+  description: string;
+  /** If set, clicking navigates to this path (relative to town root) instead of searching */
+  townPath?: string;
+}[] = [
   {
     icon: "🗑️",
     title: "Trash & Recycling",
@@ -35,6 +41,7 @@ const TOPIC_CARDS = [
     icon: "🏗️",
     title: "Permits & Zoning",
     description: "Building permits, zoning districts, applications",
+    townPath: "/permits",
   },
   {
     icon: "💰",
@@ -50,6 +57,7 @@ const TOPIC_CARDS = [
     icon: "🚌",
     title: "Transportation",
     description: "Commuter rail, parking, roads",
+    townPath: "/transit",
   },
   {
     icon: "🏞️",
@@ -447,28 +455,48 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
                 Browse by Topic
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {TOPIC_CARDS.map((topic) => (
-                  <button
-                    key={topic.title}
-                    onClick={() => {
-                      trackEvent('topic_card_clicked', {
-                        topic: topic.title,
-                        town_id: town.town_id,
-                      });
-                      handleSearch(topic.title);
-                    }}
-                    className="text-left bg-white border border-border-default rounded-xl p-5 hover:border-[var(--primary)] hover:shadow-md transition-all group"
-                    data-pendo={`topic-${topic.title.toLowerCase().replace(/\s+/g, '-')}`}
-                  >
-                    <div className="text-3xl mb-3">{topic.icon}</div>
-                    <h3 className="text-[16px] font-bold text-text-primary mb-2 group-hover:text-[var(--primary)] transition-colors">
-                      {topic.title}
-                    </h3>
-                    <p className="text-[14px] text-text-secondary leading-relaxed">
-                      {topic.description}
-                    </p>
-                  </button>
-                ))}
+                {TOPIC_CARDS.map((topic) => {
+                  const cardClass = "text-left bg-white border border-border-default rounded-xl p-5 hover:border-[var(--primary)] hover:shadow-md transition-all group";
+                  const cardContent = (
+                    <>
+                      <div className="text-3xl mb-3">{topic.icon}</div>
+                      <h3 className="text-[16px] font-bold text-text-primary mb-2 group-hover:text-[var(--primary)] transition-colors">
+                        {topic.title}
+                      </h3>
+                      <p className="text-[14px] text-text-secondary leading-relaxed">
+                        {topic.description}
+                      </p>
+                    </>
+                  );
+
+                  if (topic.townPath) {
+                    return (
+                      <Link
+                        key={topic.title}
+                        href={`/${town.town_id}${topic.townPath}`}
+                        className={cardClass}
+                        data-pendo={`topic-${topic.title.toLowerCase().replace(/\s+/g, '-')}`}
+                        onClick={() => trackEvent('topic_card_clicked', { topic: topic.title, town_id: town.town_id })}
+                      >
+                        {cardContent}
+                      </Link>
+                    );
+                  }
+
+                  return (
+                    <button
+                      key={topic.title}
+                      onClick={() => {
+                        trackEvent('topic_card_clicked', { topic: topic.title, town_id: town.town_id });
+                        handleSearch(topic.title);
+                      }}
+                      className={cardClass}
+                      data-pendo={`topic-${topic.title.toLowerCase().replace(/\s+/g, '-')}`}
+                    >
+                      {cardContent}
+                    </button>
+                  );
+                })}
               </div>
             </section>
 

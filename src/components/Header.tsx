@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import {
   Home, MessageSquare, FileCheck, Newspaper, Info,
-  ChevronDown, Calendar, Cloud, UtensilsCrossed, Shield, Train, Map,
+  ChevronDown, Cloud, Train, Users,
 } from "lucide-react";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useI18n } from "@/lib/i18n";
@@ -22,12 +22,9 @@ export function Header() {
   const aboutHref = useTownHref("/about");
   const permitsHref = useTownHref("/permits");
   const articlesHref = useTownHref("/articles");
-  const eventsHref = useTownHref("/events");
   const weatherHref = useTownHref("/weather");
-  const safetyHref = useTownHref("/safety");
   const transitHref = useTownHref("/transit");
-  const diningHref = useTownHref("/dining");
-  const zoningHref = useTownHref("/zoning-map");
+  const communityHref = useTownHref("/community");
   const shortTownName = town.name.replace(/,\s*[A-Z]{2}$/i, "");
 
   // "More" dropdown state
@@ -45,14 +42,12 @@ export function Header() {
   }, []);
 
   // Collect feature links for the "More" dropdown
-  type MoreLink = { href: string; icon: typeof Calendar; label: string };
+  type MoreLink = { href: string; icon: typeof Cloud; label: string };
   const moreLinks: MoreLink[] = [];
-  if (town.feature_flags.enableEvents) moreLinks.push({ href: eventsHref, icon: Calendar, label: t("header.events") });
   if (town.feature_flags.enableWeather) moreLinks.push({ href: weatherHref, icon: Cloud, label: t("header.weather") });
-  if (town.feature_flags.enableSafety) moreLinks.push({ href: safetyHref, icon: Shield, label: t("header.safety") });
   if (town.feature_flags.enableTransit) moreLinks.push({ href: transitHref, icon: Train, label: t("header.transit") });
-  if (town.feature_flags.enableDining) moreLinks.push({ href: diningHref, icon: UtensilsCrossed, label: t("header.dining") });
-  if (town.feature_flags.enableZoningMap) moreLinks.push({ href: zoningHref, icon: Map, label: t("header.zoning") });
+  const hasCommunity = town.feature_flags.enableEvents || town.feature_flags.enableSafety || town.feature_flags.enableDining;
+  if (hasCommunity) moreLinks.push({ href: communityHref, icon: Users, label: t("header.community") });
 
   return (
     <header className="sticky top-0 z-50 border-b border-border-light bg-white shadow-xs">

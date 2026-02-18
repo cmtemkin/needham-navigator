@@ -31,6 +31,7 @@ const DICTIONARIES: Record<LanguageCode, Record<string, string>> = {
     "header.transit": "Transit",
     "header.dining": "Dining",
     "header.zoning": "Zoning",
+    "header.community": "Community",
     "hero.badge": "AI-Powered · Always Up to Date",
     "hero.title_prefix": "Your guide to everything",
     "hero.subtitle":
@@ -91,6 +92,7 @@ const DICTIONARIES: Record<LanguageCode, Record<string, string>> = {
     "header.transit": "Transporte",
     "header.dining": "Restaurantes",
     "header.zoning": "Zonificacion",
+    "header.community": "Comunidad",
     "hero.badge": "Impulsado por IA · Siempre actualizado",
     "hero.title_prefix": "Tu guia para todo en",
     "hero.subtitle":
@@ -151,6 +153,7 @@ const DICTIONARIES: Record<LanguageCode, Record<string, string>> = {
     "header.transit": "交通",
     "header.dining": "餐饮",
     "header.zoning": "分区",
+    "header.community": "社区",
     "hero.badge": "AI 驱动 · 实时更新",
     "hero.title_prefix": "您的城镇指南",
     "hero.subtitle":
