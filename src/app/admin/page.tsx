@@ -26,13 +26,21 @@ import {
   Save,
   Cpu,
   DollarSign,
+  Globe,
+  Plus,
+  Download,
+  Upload,
+  Trash2,
+  Edit3,
+  ExternalLink,
+  X,
 } from "lucide-react";
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-type Tab = "documents" | "analytics" | "costs" | "logs" | "settings";
+type Tab = "documents" | "analytics" | "costs" | "logs" | "settings" | "sources";
 
 interface AdminDocument {
   id: string;
@@ -848,6 +856,625 @@ function SettingsTab({ password }: { password: string }) {
 }
 
 // ---------------------------------------------------------------------------
+// Source type
+// ---------------------------------------------------------------------------
+
+interface AdminSource {
+  id: string;
+  town_id: string;
+  url: string;
+  name: string;
+  category: string;
+  priority: number;
+  update_frequency: string;
+  document_type: string;
+  max_depth: number;
+  max_pages: number;
+  is_active: boolean;
+  last_scraped_at: string | null;
+  last_status: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+const SOURCE_CATEGORIES = [
+  "general", "government", "zoning", "permits", "public_works", "schools",
+  "recreation", "public_safety", "health", "transportation", "property",
+  "community", "news", "utilities", "regional", "social_media", "business_reviews",
+];
+
+// ---------------------------------------------------------------------------
+// Sources Tab
+// ---------------------------------------------------------------------------
+
+function SourcesTab({ password }: { password: string }) {
+  const [sources, setSources] = useState<AdminSource[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [editingSource, setEditingSource] = useState<AdminSource | null>(null);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [testResult, setTestResult] = useState<{ accessible: boolean; status: number } | null>(null);
+  const [testingUrl, setTestingUrl] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [showImport, setShowImport] = useState(false);
+  const [csvText, setCsvText] = useState("");
+  const [importResult, setImportResult] = useState<string | null>(null);
+
+  // Form state
+  const [formUrl, setFormUrl] = useState("");
+  const [formName, setFormName] = useState("");
+  const [formCategory, setFormCategory] = useState("general");
+  const [formPriority, setFormPriority] = useState(3);
+  const [formFrequency, setFormFrequency] = useState("weekly");
+  const [formDocType, setFormDocType] = useState("html");
+  const [formMaxDepth, setFormMaxDepth] = useState(2);
+  const [formMaxPages, setFormMaxPages] = useState(10);
+  const [formActive, setFormActive] = useState(true);
+
+  const fetchSources = useCallback(async () => {
+    setLoading(true);
+    const params = new URLSearchParams();
+    if (search) params.set("search", search);
+    if (categoryFilter) params.set("category", categoryFilter);
+    const res = await adminFetch(`/api/admin/sources?${params}`, password);
+    if (res.ok) {
+      const data = await res.json();
+      setSources(data.sources || []);
+    }
+    setLoading(false);
+  }, [password, search, categoryFilter]);
+
+  useEffect(() => {
+    fetchSources();
+  }, [fetchSources]);
+
+  const resetForm = () => {
+    setFormUrl("");
+    setFormName("");
+    setFormCategory("general");
+    setFormPriority(3);
+    setFormFrequency("weekly");
+    setFormDocType("html");
+    setFormMaxDepth(2);
+    setFormMaxPages(10);
+    setFormActive(true);
+    setTestResult(null);
+  };
+
+  const populateForm = (source: AdminSource) => {
+    setFormUrl(source.url);
+    setFormName(source.name);
+    setFormCategory(source.category);
+    setFormPriority(source.priority);
+    setFormFrequency(source.update_frequency);
+    setFormDocType(source.document_type);
+    setFormMaxDepth(source.max_depth);
+    setFormMaxPages(source.max_pages);
+    setFormActive(source.is_active);
+    setTestResult(null);
+  };
+
+  const handleTestUrl = async () => {
+    if (!formUrl) return;
+    setTestingUrl(true);
+    setTestResult(null);
+    const res = await adminFetch("/api/admin/sources/test-url", password, {
+      method: "POST",
+      body: JSON.stringify({ url: formUrl }),
+    });
+    if (res.ok) {
+      setTestResult(await res.json());
+    }
+    setTestingUrl(false);
+  };
+
+  const handleSave = async () => {
+    if (!formUrl || !formName) return;
+    const body = {
+      url: formUrl,
+      name: formName,
+      category: formCategory,
+      priority: formPriority,
+      update_frequency: formFrequency,
+      document_type: formDocType,
+      max_depth: formMaxDepth,
+      max_pages: formMaxPages,
+      is_active: formActive,
+    };
+
+    if (editingSource) {
+      await adminFetch(`/api/admin/sources/${editingSource.id}`, password, {
+        method: "PUT",
+        body: JSON.stringify(body),
+      });
+    } else {
+      await adminFetch("/api/admin/sources", password, {
+        method: "POST",
+        body: JSON.stringify(body),
+      });
+    }
+
+    setEditingSource(null);
+    setShowAddForm(false);
+    resetForm();
+    fetchSources();
+  };
+
+  const handleDelete = async (id: string) => {
+    await adminFetch(`/api/admin/sources/${id}`, password, { method: "DELETE" });
+    fetchSources();
+  };
+
+  const handleBulkToggle = async (active: boolean) => {
+    for (const id of selectedIds) {
+      await adminFetch(`/api/admin/sources/${id}`, password, {
+        method: "PUT",
+        body: JSON.stringify({ is_active: active }),
+      });
+    }
+    setSelectedIds(new Set());
+    fetchSources();
+  };
+
+  const handleBulkDelete = async () => {
+    for (const id of selectedIds) {
+      await adminFetch(`/api/admin/sources/${id}`, password, { method: "DELETE" });
+    }
+    setSelectedIds(new Set());
+    fetchSources();
+  };
+
+  const handleExport = async () => {
+    const res = await adminFetch("/api/admin/sources/export", password);
+    if (res.ok) {
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "sources.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  };
+
+  const handleImport = async () => {
+    if (!csvText.trim()) return;
+    setImportResult(null);
+    const res = await adminFetch("/api/admin/sources/import", password, {
+      method: "POST",
+      body: JSON.stringify({ csv: csvText }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setImportResult(`Imported ${data.imported} sources`);
+      setCsvText("");
+      setShowImport(false);
+      fetchSources();
+    } else {
+      setImportResult(`Error: ${data.error}`);
+    }
+  };
+
+  const toggleSelection = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <RefreshCw size={24} className="animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // Render add/edit form
+  if (showAddForm || editingSource) {
+    return (
+      <div>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-bold text-text-primary">
+            {editingSource ? "Edit Source" : "Add Source"}
+          </h2>
+          <button
+            onClick={() => { setShowAddForm(false); setEditingSource(null); resetForm(); }}
+            className="text-text-secondary hover:text-text-primary"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="bg-white rounded-lg border border-border-default p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-text-primary mb-1">URL *</label>
+            <div className="flex gap-2">
+              <input
+                type="url"
+                value={formUrl}
+                onChange={(e) => setFormUrl(e.target.value)}
+                placeholder="https://www.needhamma.gov/..."
+                className="flex-1 px-3 py-2 rounded-lg border border-border-default text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+              <button
+                onClick={handleTestUrl}
+                disabled={!formUrl || testingUrl}
+                className="px-3 py-2 bg-gray-100 border border-border-default rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors disabled:opacity-50"
+              >
+                {testingUrl ? <RefreshCw size={14} className="animate-spin" /> : "Test URL"}
+              </button>
+            </div>
+            {testResult && (
+              <div className={`mt-2 text-sm flex items-center gap-1 ${testResult.accessible ? "text-green-600" : "text-red-600"}`}>
+                {testResult.accessible ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
+                {testResult.accessible ? `Accessible (${testResult.status})` : `Not accessible (${testResult.status})`}
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-text-primary mb-1">Name *</label>
+            <input
+              type="text"
+              value={formName}
+              onChange={(e) => setFormName(e.target.value)}
+              placeholder="Town Homepage"
+              className="w-full px-3 py-2 rounded-lg border border-border-default text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-1">Category</label>
+              <select
+                value={formCategory}
+                onChange={(e) => setFormCategory(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg border border-border-default text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+              >
+                {SOURCE_CATEGORIES.map((c) => (
+                  <option key={c} value={c}>{c.replace(/_/g, " ")}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-1">Priority (1-5)</label>
+              <select
+                value={formPriority}
+                onChange={(e) => setFormPriority(Number(e.target.value))}
+                className="w-full px-3 py-2 rounded-lg border border-border-default text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+              >
+                {[1, 2, 3, 4, 5].map((p) => (
+                  <option key={p} value={p}>{p} {"★".repeat(p)}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-1">Update Frequency</label>
+              <select
+                value={formFrequency}
+                onChange={(e) => setFormFrequency(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg border border-border-default text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+              >
+                {["hourly", "daily", "weekly", "monthly"].map((f) => (
+                  <option key={f} value={f}>{f}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-1">Document Type</label>
+              <select
+                value={formDocType}
+                onChange={(e) => setFormDocType(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg border border-border-default text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+              >
+                {["html", "pdf", "rss"].map((t) => (
+                  <option key={t} value={t}>{t.toUpperCase()}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-1">Max Depth</label>
+              <input
+                type="number"
+                value={formMaxDepth}
+                onChange={(e) => setFormMaxDepth(Number(e.target.value))}
+                min={0}
+                max={10}
+                className="w-full px-3 py-2 rounded-lg border border-border-default text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-1">Max Pages</label>
+              <input
+                type="number"
+                value={formMaxPages}
+                onChange={(e) => setFormMaxPages(Number(e.target.value))}
+                min={1}
+                max={100}
+                className="w-full px-3 py-2 rounded-lg border border-border-default text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="source-active"
+              checked={formActive}
+              onChange={(e) => setFormActive(e.target.checked)}
+              className="rounded"
+            />
+            <label htmlFor="source-active" className="text-sm font-medium text-text-primary">Active</label>
+          </div>
+
+          <div className="flex gap-3 pt-4 border-t border-border-light">
+            <button
+              onClick={handleSave}
+              disabled={!formUrl || !formName}
+              className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
+            >
+              {editingSource ? "Update Source" : "Add Source"}
+            </button>
+            <button
+              onClick={() => { setShowAddForm(false); setEditingSource(null); resetForm(); }}
+              className="px-4 py-2 bg-white border border-border-default rounded-lg text-sm font-medium text-text-secondary hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Render import form
+  if (showImport) {
+    return (
+      <div>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-bold text-text-primary">Import Sources (CSV)</h2>
+          <button onClick={() => { setShowImport(false); setCsvText(""); setImportResult(null); }} className="text-text-secondary hover:text-text-primary">
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="bg-white rounded-lg border border-border-default p-6 space-y-4">
+          <p className="text-sm text-text-secondary">
+            Paste CSV with columns: url, name, category, priority, update_frequency, document_type, max_depth, max_pages
+          </p>
+          <textarea
+            value={csvText}
+            onChange={(e) => setCsvText(e.target.value)}
+            rows={10}
+            className="w-full px-3 py-2 rounded-lg border border-border-default text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary/30"
+            placeholder="url,name,category,priority,update_frequency,document_type,max_depth,max_pages&#10;https://example.com,Example,general,3,weekly,html,2,10"
+          />
+          {importResult && (
+            <p className={`text-sm ${importResult.startsWith("Error") ? "text-red-600" : "text-green-600"}`}>
+              {importResult}
+            </p>
+          )}
+          <div className="flex gap-3">
+            <button
+              onClick={handleImport}
+              disabled={!csvText.trim()}
+              className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
+            >
+              Import
+            </button>
+            <button
+              onClick={() => { setShowImport(false); setCsvText(""); setImportResult(null); }}
+              className="px-4 py-2 bg-white border border-border-default rounded-lg text-sm font-medium text-text-secondary hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Categories present in the data
+  const categories = [...new Set(sources.map((s) => s.category))].sort();
+
+  return (
+    <div>
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        <div className="flex-1 min-w-[200px]">
+          <div className="relative">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search sources..."
+              className="w-full pl-8 pr-3 py-2 rounded-lg border border-border-default text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+            />
+          </div>
+        </div>
+
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          className="px-3 py-2 rounded-lg border border-border-default text-sm"
+        >
+          <option value="">All Categories</option>
+          {categories.map((c) => (
+            <option key={c} value={c}>{c.replace(/_/g, " ")}</option>
+          ))}
+        </select>
+
+        <button
+          onClick={() => { resetForm(); setShowAddForm(true); }}
+          className="flex items-center gap-1.5 px-3 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors"
+        >
+          <Plus size={14} /> Add Source
+        </button>
+
+        <button
+          onClick={() => setShowImport(true)}
+          className="flex items-center gap-1.5 px-3 py-2 bg-white border border-border-default rounded-lg text-sm font-medium text-text-secondary hover:bg-gray-50 transition-colors"
+        >
+          <Upload size={14} /> Import CSV
+        </button>
+
+        <button
+          onClick={handleExport}
+          className="flex items-center gap-1.5 px-3 py-2 bg-white border border-border-default rounded-lg text-sm font-medium text-text-secondary hover:bg-gray-50 transition-colors"
+        >
+          <Download size={14} /> Export CSV
+        </button>
+      </div>
+
+      {/* Bulk actions */}
+      {selectedIds.size > 0 && (
+        <div className="flex items-center gap-2 mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <span className="text-sm font-medium text-blue-800">{selectedIds.size} selected</span>
+          <button onClick={() => handleBulkToggle(true)} className="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded hover:bg-green-200">
+            Activate
+          </button>
+          <button onClick={() => handleBulkToggle(false)} className="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200">
+            Deactivate
+          </button>
+          <button onClick={handleBulkDelete} className="px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded hover:bg-red-200">
+            Delete
+          </button>
+          <button onClick={() => setSelectedIds(new Set())} className="ml-auto text-xs text-blue-600 hover:text-blue-800">
+            Clear selection
+          </button>
+        </div>
+      )}
+
+      {/* Source count */}
+      <div className="text-sm text-text-muted mb-3">
+        {sources.length} source{sources.length !== 1 ? "s" : ""}
+        {categoryFilter ? ` in ${categoryFilter.replace(/_/g, " ")}` : ""}
+      </div>
+
+      {/* Source table */}
+      <div className="bg-white rounded-lg border border-border-default overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-50 border-b border-border-default">
+            <tr>
+              <th className="w-8 px-3 py-3">
+                <input
+                  type="checkbox"
+                  checked={selectedIds.size === sources.length && sources.length > 0}
+                  onChange={(e) => {
+                    if (e.target.checked) setSelectedIds(new Set(sources.map((s) => s.id)));
+                    else setSelectedIds(new Set());
+                  }}
+                  className="rounded"
+                />
+              </th>
+              <th className="text-left px-3 py-3 font-medium text-text-secondary">Name</th>
+              <th className="text-left px-3 py-3 font-medium text-text-secondary">Category</th>
+              <th className="text-center px-3 py-3 font-medium text-text-secondary">Priority</th>
+              <th className="text-left px-3 py-3 font-medium text-text-secondary">Frequency</th>
+              <th className="text-center px-3 py-3 font-medium text-text-secondary">Status</th>
+              <th className="text-right px-3 py-3 font-medium text-text-secondary">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border-light">
+            {sources.map((source) => {
+              let hostname: string;
+              try {
+                hostname = new URL(source.url).hostname.replace(/^www\./, "");
+              } catch {
+                hostname = source.url;
+              }
+
+              return (
+                <tr key={source.id} className="hover:bg-gray-50">
+                  <td className="px-3 py-3">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(source.id)}
+                      onChange={() => toggleSelection(source.id)}
+                      className="rounded"
+                    />
+                  </td>
+                  <td className="px-3 py-3">
+                    <div className="font-medium text-text-primary">{source.name}</div>
+                    <a
+                      href={source.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-text-muted hover:text-primary flex items-center gap-1"
+                    >
+                      {hostname}
+                      <ExternalLink size={10} />
+                    </a>
+                  </td>
+                  <td className="px-3 py-3">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700">
+                      {source.category.replace(/_/g, " ")}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3 text-center">
+                    <span className="text-yellow-500 text-xs">
+                      {"★".repeat(source.priority)}{"☆".repeat(5 - source.priority)}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3 text-text-secondary">{source.update_frequency}</td>
+                  <td className="px-3 py-3 text-center">
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                      source.is_active
+                        ? "bg-green-50 text-green-700 border border-green-200"
+                        : "bg-gray-50 text-gray-500 border border-gray-200"
+                    }`}>
+                      {source.is_active ? "Active" : "Inactive"}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3 text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <button
+                        onClick={() => { populateForm(source); setEditingSource(source); }}
+                        className="p-1.5 rounded hover:bg-gray-100 text-text-muted hover:text-primary transition-colors"
+                        title="Edit"
+                      >
+                        <Edit3 size={14} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(source.id)}
+                        className="p-1.5 rounded hover:bg-red-50 text-text-muted hover:text-red-600 transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+
+        {sources.length === 0 && (
+          <div className="text-center py-12 text-text-secondary">
+            <Globe size={32} className="mx-auto mb-3 text-text-muted" />
+            <p>No sources found. Add your first source above.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Main Admin Dashboard
 // ---------------------------------------------------------------------------
 
@@ -867,6 +1494,7 @@ export default function AdminPage() {
     { id: "costs", label: "Costs", icon: DollarSign },
     { id: "logs", label: "Ingestion Logs", icon: Activity },
     { id: "settings", label: "Settings", icon: Settings },
+    { id: "sources", label: "Sources", icon: Globe },
   ];
 
   return (
@@ -918,6 +1546,7 @@ export default function AdminPage() {
         {activeTab === "costs" && <CostsTab password={password} />}
         {activeTab === "logs" && <LogsTab password={password} />}
         {activeTab === "settings" && <SettingsTab password={password} />}
+        {activeTab === "sources" && <SourcesTab password={password} />}
       </main>
     </div>
   );
