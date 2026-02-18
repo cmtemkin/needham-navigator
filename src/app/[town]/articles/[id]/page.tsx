@@ -41,7 +41,7 @@ export default function ArticleDetailPage() {
   const [article, setArticle] = useState<Article | null>(null);
   const [relatedArticles, setRelatedArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sourcesExpanded, setSourcesExpanded] = useState(true);
+  const [sourcesExpanded, setSourcesExpanded] = useState(false);
   const [feedback, setFeedback] = useState<"helpful" | "not_helpful" | null>(null);
 
   useEffect(() => {
@@ -200,43 +200,57 @@ export default function ArticleDetailPage() {
               </div>
 
               {/* Sources */}
-              {article.source_urls && article.source_urls.length > 0 && (
-                <div className="bg-white rounded-lg p-6 mb-6 shadow-sm border border-border-default">
-                  <button
-                    onClick={() => setSourcesExpanded(!sourcesExpanded)}
-                    className="flex items-center justify-between w-full text-left mb-2"
-                  >
-                    <div className="flex items-center gap-3">
-                      <h2 className="text-lg font-bold text-text-primary">
-                        Sources ({article.source_urls.length})
-                      </h2>
-                      {article.source_type && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 capitalize">
-                          {article.source_type.replace(/_/g, " ")}
-                        </span>
-                      )}
-                    </div>
-                    {sourcesExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                  </button>
+              {article.source_urls && article.source_urls.length > 0 && (() => {
+                const displayUrls = article.source_urls.slice(0, 3);
+                const displayNames = article.source_names?.slice(0, 3);
+                const totalCount = article.source_urls.length;
 
-                  {sourcesExpanded && (
-                    <div className="space-y-2 mt-4">
-                      {article.source_urls.map((url, index) => (
-                        <a
-                          key={index}
-                          href={url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-sm text-[var(--primary)] hover:underline break-all"
-                        >
-                          <ExternalLink size={14} className="flex-shrink-0" />
-                          {article.source_names?.[index] || url}
-                        </a>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
+                return (
+                  <div className="bg-white rounded-lg p-6 mb-6 shadow-sm border border-border-default">
+                    <button
+                      onClick={() => setSourcesExpanded(!sourcesExpanded)}
+                      className="flex items-center justify-between w-full text-left"
+                    >
+                      <div className="flex items-center gap-3">
+                        <h2 className="text-lg font-bold text-text-primary">
+                          Sources ({totalCount > 3 ? `3 of ${totalCount}` : totalCount})
+                        </h2>
+                        {article.source_type && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 capitalize">
+                            {article.source_type.replace(/_/g, " ")}
+                          </span>
+                        )}
+                      </div>
+                      {sourcesExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                    </button>
+
+                    {sourcesExpanded && (
+                      <div className="space-y-2 mt-4">
+                        {displayUrls.map((url, index) => {
+                          let hostname: string;
+                          try {
+                            hostname = new URL(url).hostname.replace(/^www\./, "");
+                          } catch {
+                            hostname = url;
+                          }
+                          return (
+                            <a
+                              key={index}
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-2 text-sm text-[var(--primary)] hover:underline"
+                            >
+                              <ExternalLink size={14} className="flex-shrink-0" />
+                              {displayNames?.[index] || hostname}
+                            </a>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
 
               {/* Engagement */}
               <div className="bg-white rounded-lg p-6 shadow-sm border border-border-default">
