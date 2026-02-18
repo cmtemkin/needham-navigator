@@ -5,11 +5,7 @@
       "schedule": "0 6 * * *"
     },
     {
-      "path": "/api/cron/ingest?town=needham",
-      "schedule": "0 */4 * * *"
-    },
-    {
-      "path": "/api/cron/generate",
+      "path": "/api/cron/ingest?town=needham&generate=true",
       "schedule": "0 10 * * *"
     }
   ]
