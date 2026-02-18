@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Cloud, Thermometer, Droplets, Wind, Eye, Sunrise, Sunset, RefreshCw } from "lucide-react";
+import { Thermometer, Droplets, Wind, RefreshCw } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useTown } from "@/lib/town-context";

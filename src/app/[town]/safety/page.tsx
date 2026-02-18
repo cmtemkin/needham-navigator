@@ -34,7 +34,7 @@ export default function SafetyPage() {
   const town = useTown();
   const { openChat } = useChatWidget();
   const [items, setItems] = useState<ContentItem[]>([]);
-  const [total, setTotal] = useState(0);
+  const [, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [retryCount, setRetryCount] = useState(0);

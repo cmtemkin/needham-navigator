@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Train, Bus, Clock, ExternalLink, AlertCircle, RefreshCw } from "lucide-react";
+import { Train, Clock, ExternalLink, AlertCircle, RefreshCw } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useTown } from "@/lib/town-context";
