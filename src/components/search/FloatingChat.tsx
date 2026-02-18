@@ -31,7 +31,7 @@ const SUGGESTION_CHIPS = [
 ];
 
 function generateSessionId(): string {
-  return `sess-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+  return `sess-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
 }
 
 export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(

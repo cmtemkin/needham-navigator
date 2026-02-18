@@ -123,12 +123,15 @@ async function discoverLinks(
 
       try {
         const resolved = new URL(href, baseUrl).href;
-        // Skip anchors, same-page, non-http
+        // Only allow http/https URLs
         if (
-          resolved.startsWith("javascript:") ||
-          resolved.startsWith("mailto:") ||
-          resolved.includes("#")
+          !resolved.startsWith("http://") &&
+          !resolved.startsWith("https://")
         ) {
+          return;
+        }
+        // Skip fragment-only links
+        if (resolved.includes("#")) {
           return;
         }
 
