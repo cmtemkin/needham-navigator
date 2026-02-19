@@ -7,18 +7,31 @@ export interface CachedAnswer {
   is_cached: true;
 }
 
+const STOPWORDS = new Set([
+  'what', 'where', 'when', 'how', 'who', 'which',
+  'is', 'are', 'was', 'were', 'be', 'been',
+  'the', 'a', 'an',
+  'do', 'does', 'did',
+  'i', 'my', 'me',
+  'can', 'could', 'would', 'should',
+  'to', 'for', 'of', 'in', 'on', 'at', 'about', 'with',
+]);
+
 /**
  * Normalize a query for cache matching.
- * Lowercase, trim, strip punctuation, collapse whitespace.
- * This means "What are transfer station hours?" matches
- * "transfer station hours" matches "Transfer Station Hours".
+ * Lowercase, trim, strip punctuation, collapse whitespace, remove stopwords.
+ * This means "what are the transfer station hours?" and
+ * "transfer station hours" now hit the same cache entry.
  */
 export function normalizeQuery(query: string): string {
   return query
     .toLowerCase()
     .replace(/[^\w\s]/g, '')
     .replace(/\s+/g, ' ')
-    .trim();
+    .trim()
+    .split(' ')
+    .filter(w => !STOPWORDS.has(w))
+    .join(' ');
 }
 
 /**
@@ -54,14 +67,14 @@ export async function getCachedAnswer(
 
 /**
  * Store an answer in the cache.
- * Default TTL: 7 days.
+ * Default TTL: 30 days.
  */
 export async function setCachedAnswer(
   query: string,
   townId: string,
   answerHtml: string,
   sources: { title: string; url: string }[],
-  ttlDays: number = 7
+  ttlDays: number = 30
 ): Promise<void> {
   const normalized = normalizeQuery(query);
   const expiresAt = new Date();
@@ -80,4 +93,23 @@ export async function setCachedAnswer(
     },
     { onConflict: 'town_id,normalized_query' }
   );
+}
+
+/**
+ * Delete expired cache entries to reclaim disk space.
+ * Called daily from the monitor cron.
+ */
+export async function cleanupExpiredCache(): Promise<number> {
+  const supabase = getSupabaseServiceClient();
+  const { data, error } = await supabase
+    .from('cached_answers')
+    .delete()
+    .lt('expires_at', new Date().toISOString())
+    .select('id');
+
+  if (error) {
+    console.warn('[answer-cache] Cleanup failed:', error.message);
+    return 0;
+  }
+  return data?.length ?? 0;
 }
