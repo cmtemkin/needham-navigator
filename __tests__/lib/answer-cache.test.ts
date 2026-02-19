@@ -10,9 +10,9 @@ describe("answer-cache", () => {
       expect(normalizeQuery("Transfer Station Hours")).toBe("transfer station hours");
     });
 
-    it("strips punctuation", () => {
+    it("strips punctuation and stopwords", () => {
       expect(normalizeQuery("What are the transfer station hours?")).toBe(
-        "what are the transfer station hours"
+        "transfer station hours"
       );
     });
 

@@ -87,7 +87,7 @@ export async function embedAndStoreChunks(
   documentId: string,
   options: EmbedOptions = {}
 ): Promise<EmbedResult> {
-  const { townId = "needham", batchSize = 50 } = options;
+  const { townId = "needham", batchSize = 200 } = options;
   const startTime = Date.now();
   const supabase = getSupabaseServiceClient();
   let errors = 0;

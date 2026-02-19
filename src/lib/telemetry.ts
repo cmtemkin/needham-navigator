@@ -30,6 +30,9 @@ export interface SearchTelemetry {
  */
 export async function logSearchTelemetry(data: SearchTelemetry): Promise<void> {
   try {
+    // Sample at 20% to reduce write IO on Supabase free tier
+    if (Math.random() > 0.2) return;
+
     const supabase = getSupabaseServiceClient();
 
     // Compute confidence level from similarity scores
