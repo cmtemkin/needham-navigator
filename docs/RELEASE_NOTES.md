@@ -2,6 +2,27 @@
 
 ---
 
+## v0.11.1 — 2026-02-18
+
+**Post-Deploy Polish — Source Display, Nav Cleanup, Homepage Live Widgets**
+
+### Bug Fixes
+- **Article source links** now display human-readable names (e.g. "Needham Observer") instead of raw source type tags like `needham:observer-news`
+- **Article sources dropdown** shows all source URLs instead of limiting to 3; count no longer says "3 of 5"
+- **Source type labels** in article headers now show "News Sources", "Meeting Minutes", etc. instead of raw database values
+- **Article generator** skips non-article URLs (author pages, tag pages, category pages) to prevent broken source citations
+- **Admin Sources tab** — new `POST /api/admin/sources/seed` endpoint populates the empty `sources` table from the 140+ hardcoded crawl config entries
+
+### UI Improvements
+- **Language selector** moved from header navigation to footer (standard placement, less nav clutter)
+- **"Permits" nav label** renamed to **"Permits & Zoning"** with i18n translations (en/es/zh)
+- **"Right Now in Needham" live widgets** — new homepage section between articles and Browse by Topic showing compact cards for Weather (NWS API), Transit (MBTA API), and Community safety status; each links to its full page; includes loading skeletons and graceful API failure fallbacks
+- **Browse by Topic cards** reordered by likely user frequency: Schools, Taxes, Permits, Trash, Transportation, Recreation
+- **"Ask a Question" CTA** button made more prominent with larger size and subtle shadow
+- **Transportation topic card** now shows "Live commuter rail, parking, roads" description
+
+---
+
 ## v0.11.0 — 2026-02-18
 
 **Community Feature Pages — Events, Weather, Safety, Transit, Dining, Zoning**

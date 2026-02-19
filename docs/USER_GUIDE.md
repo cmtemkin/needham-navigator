@@ -27,6 +27,7 @@ Needham Navigator supports two interface styles (configured via `uiMode` in town
 - Floating chat button in bottom-right corner for follow-up questions
 - "Ask about this" buttons on search results open the chat with context
 - Browse by topic cards and popular questions for discovery
+- **"Right Now in Needham" live widgets** — compact cards showing current weather (NWS), next commuter rail departure (MBTA), and community safety status, each linking to their full page
 
 Both modes access the same underlying data and provide the same quality answers — choose based on your preferred interaction style.
 
@@ -74,7 +75,7 @@ A guided step-by-step tool that tells you exactly which permits, fees, and docum
 
 ### Multi-Language Support
 
-Click the language toggle (globe icon) in the header to switch between:
+Click the language toggle (globe icon) in the footer to switch between:
 - English
 - Spanish (Espanol)
 - Chinese (中文)
@@ -264,7 +265,7 @@ Daily change detection with content-hash comparison:
 | Home | `/<town>` | Landing page with quick links |
 | Chat | `/<town>/chat` | AI-powered Q&A |
 | News | `/<town>/news` | Aggregated local news feed |
-| Permits | `/<town>/permits` | Permit wizard |
+| Permits & Zoning | `/<town>/permits` | Permit wizard + zoning info |
 | Events | `/<town>/events` | Community events calendar |
 | Weather | `/<town>/weather` | Live NWS weather & forecast |
 | Safety | `/<town>/safety` | Emergency contacts & updates |
