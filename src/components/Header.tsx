@@ -6,7 +6,6 @@ import {
   Home, MessageSquare, FileCheck, Newspaper, Info,
   ChevronDown, Cloud, Train, Users,
 } from "lucide-react";
-import { LanguageToggle } from "@/components/LanguageToggle";
 import { useI18n } from "@/lib/i18n";
 import { useTown, useTownHref } from "@/lib/town-context";
 import { useChatWidget } from "@/lib/chat-context";
@@ -67,7 +66,6 @@ export function Header() {
         </Link>
 
         <div className="hidden items-center gap-2 md:flex">
-          <LanguageToggle />
           <Link href={homeHref} className={NAV_LINK_CLASS}>
             <Home size={15} />
             {t("header.home")}
@@ -120,7 +118,7 @@ export function Header() {
 
           <button
             onClick={() => openChat()}
-            className="flex items-center gap-[5px] rounded-lg bg-primary px-3.5 py-[7px] text-[13.5px] font-semibold text-white transition-all hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="flex items-center gap-[5px] rounded-lg bg-primary px-4 py-2 text-[14px] font-semibold text-white shadow-sm transition-all hover:bg-primary-light hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             <MessageSquare size={14} />
             {t("header.ask_question")}
@@ -128,7 +126,6 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-1.5 md:hidden">
-          <LanguageToggle />
           <button
             onClick={() => openChat()}
             aria-label={t("header.ask_question")}

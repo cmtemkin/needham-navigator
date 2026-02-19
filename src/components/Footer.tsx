@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import { useTown, useTownHref } from "@/lib/town-context";
 
 const FOOTER_VERSION_LABEL = "v0.1.0";
@@ -41,6 +42,9 @@ export function Footer() {
         {afterWebsite}
         <span className="text-text-muted"> {t("footer.terms_privacy")}</span>
       </p>
+      <div className="mt-3 flex items-center justify-center gap-4">
+        <LanguageToggle />
+      </div>
       <div className="mt-2">
         <Link
           href={releasesHref}
