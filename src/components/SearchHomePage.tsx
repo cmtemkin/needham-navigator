@@ -9,6 +9,7 @@ import { Footer } from "@/components/Footer";
 import { SearchResultCard } from "@/components/search/SearchResultCard";
 import { AIAnswerCard } from "@/components/search/AIAnswerCard";
 import { DailyBriefBanner } from "@/components/DailyBriefBanner";
+import { LiveWidgets } from "@/components/LiveWidgets";
 import { ArticleCard } from "@/components/ArticleCard";
 import { ArticleSkeleton } from "@/components/ArticleSkeleton";
 import { useTown, useTownHref } from "@/lib/town-context";
@@ -33,9 +34,14 @@ const TOPIC_CARDS: {
   townPath?: string;
 }[] = [
   {
-    icon: "🗑️",
-    title: "Trash & Recycling",
-    description: "Transfer station hours, recycling rules, stickers",
+    icon: "🎓",
+    title: "Schools",
+    description: "Enrollment, calendar, bus routes",
+  },
+  {
+    icon: "💰",
+    title: "Taxes & Assessments",
+    description: "Property tax info, payments, exemptions",
   },
   {
     icon: "🏗️",
@@ -44,19 +50,14 @@ const TOPIC_CARDS: {
     townPath: "/permits",
   },
   {
-    icon: "💰",
-    title: "Taxes & Assessments",
-    description: "Property tax info, payments, exemptions",
-  },
-  {
-    icon: "🎓",
-    title: "Schools",
-    description: "Enrollment, calendar, bus routes",
+    icon: "🗑️",
+    title: "Trash & Recycling",
+    description: "Transfer station hours, recycling rules, stickers",
   },
   {
     icon: "🚌",
     title: "Transportation",
-    description: "Commuter rail, parking, roads",
+    description: "Live commuter rail, parking, roads",
     townPath: "/transit",
   },
   {
@@ -447,6 +448,11 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
                   )}
                 </div>
               )}
+            </section>
+
+            {/* Live Widgets */}
+            <section className="mx-auto max-w-content px-4 sm:px-6">
+              <LiveWidgets />
             </section>
 
             {/* Browse by Topic */}

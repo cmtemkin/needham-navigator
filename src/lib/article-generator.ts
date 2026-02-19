@@ -211,6 +211,32 @@ function normalizeSourceUrl(url: string): string {
 }
 
 /**
+ * Check if a URL points to an actual article rather than a structural page
+ * (author page, tag page, category page, etc.) that wouldn't be a valid source.
+ */
+function isArticleUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    const path = parsed.pathname.toLowerCase();
+    const nonArticlePaths = ['/author/', '/authors/', '/tag/', '/tags/', '/category/', '/categories/', '/page/', '/wp-admin/'];
+    return !nonArticlePaths.some((p) => path.includes(p));
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Map common source IDs to human-readable display names.
+ */
+const SOURCE_DISPLAY_NAMES: Record<string, string> = {
+  'needham:observer-news': 'Needham Observer',
+  'needham:patch-news': 'Needham Patch',
+  'needham:needham-local': 'Needham Local',
+  'needham:town-rss': 'Town of Needham',
+  'needham:wickedlocal': 'Wicked Local Needham',
+};
+
+/**
  * Check whether a source URL is publicly accessible.
  * Uses a browser User-Agent to avoid bot-blocking (e.g. k12.ma.us returns 403 to bare requests).
  * Returns true if the server responds with a non-4xx status.
@@ -603,6 +629,12 @@ export async function summarizeExternalArticle(options?: {
 
     const normalizedUrl = normalizeSourceUrl(item.url);
 
+    // Skip non-article URLs (author pages, tag pages, etc.)
+    if (!isArticleUrl(normalizedUrl)) {
+      console.warn(`[article-generator] Skipping non-article URL: ${normalizedUrl}`);
+      continue;
+    }
+
     // Skip if article already exists for this source
     if (await articleExistsForSource(normalizedUrl)) continue;
 
@@ -672,6 +704,7 @@ Output valid JSON:
 
       const sourceName =
         ((item.metadata as Record<string, unknown>)?.sourceName as string) ||
+        SOURCE_DISPLAY_NAMES[item.source_id] ||
         item.source_id;
 
       const articleInput: CreateArticleInput = {

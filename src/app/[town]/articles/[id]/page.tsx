@@ -27,6 +27,14 @@ const CATEGORY_LABELS: Record<string, string> = {
   business: "Business",
 };
 
+const SOURCE_TYPE_LABELS: Record<string, string> = {
+  meeting_minutes: "Meeting Minutes",
+  permit_log: "Permit Records",
+  news_article: "News Sources",
+  public_record: "Public Records",
+  dpw_notice: "DPW Notices",
+};
+
 function estimateReadingTime(text: string): number {
   const wordsPerMinute = 200;
   const wordCount = text.split(/\s+/).length;
@@ -178,7 +186,7 @@ export default function ArticleDetailPage() {
                   <span>
                     {article.content_type === "ai_generated" && "AI Generated from "}
                     {article.content_type === "ai_summary" && "Summarized from "}
-                    {article.source_type?.replace(/_/g, " ")}
+                    {article.source_type ? (SOURCE_TYPE_LABELS[article.source_type] ?? article.source_type.replace(/_/g, " ")) : "Multiple Sources"}
                   </span>
                   <span>•</span>
                   <span>{publishedDate}</span>
@@ -201,8 +209,6 @@ export default function ArticleDetailPage() {
 
               {/* Sources */}
               {article.source_urls && article.source_urls.length > 0 && (() => {
-                const displayUrls = article.source_urls.slice(0, 3);
-                const displayNames = article.source_names?.slice(0, 3);
                 const totalCount = article.source_urls.length;
 
                 return (
@@ -213,11 +219,11 @@ export default function ArticleDetailPage() {
                     >
                       <div className="flex items-center gap-3">
                         <h2 className="text-lg font-bold text-text-primary">
-                          Sources ({totalCount > 3 ? `3 of ${totalCount}` : totalCount})
+                          Sources ({totalCount})
                         </h2>
                         {article.source_type && (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 capitalize">
-                            {article.source_type.replace(/_/g, " ")}
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">
+                            {SOURCE_TYPE_LABELS[article.source_type] ?? article.source_type.replace(/_/g, " ")}
                           </span>
                         )}
                       </div>
@@ -226,13 +232,14 @@ export default function ArticleDetailPage() {
 
                     {sourcesExpanded && (
                       <div className="space-y-2 mt-4">
-                        {displayUrls.map((url, index) => {
+                        {article.source_urls.map((url, index) => {
                           let hostname: string;
                           try {
                             hostname = new URL(url).hostname.replace(/^www\./, "");
                           } catch {
                             hostname = url;
                           }
+                          const displayName = article.source_names?.[index];
                           return (
                             <a
                               key={`source-${url}`}
@@ -242,7 +249,7 @@ export default function ArticleDetailPage() {
                               className="flex items-center gap-2 text-sm text-[var(--primary)] hover:underline"
                             >
                               <ExternalLink size={14} className="flex-shrink-0" />
-                              {displayNames?.[index] || hostname}
+                              {displayName || hostname}
                             </a>
                           );
                         })}
