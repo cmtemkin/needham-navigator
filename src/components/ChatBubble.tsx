@@ -75,8 +75,8 @@ export function ChatBubble({ message, onFollowupClick, sessionId }: ChatBubblePr
           {/* Source chips */}
           {message.sources && message.sources.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-3 sm:flex-wrap overflow-x-auto scrollbar-hide">
-              {message.sources.map((source, i) => (
-                <SourceChip key={i} source={source} />
+              {message.sources.map((source) => (
+                <SourceChip key={source.url ?? source.title} source={source} />
               ))}
             </div>
           )}

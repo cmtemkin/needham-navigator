@@ -30,7 +30,7 @@ export function DailyBriefBanner() {
       }
     }
 
-    void fetchDailyBrief();
+    fetchDailyBrief().catch(() => {});
   }, [town.town_id]);
 
   // Don't render anything if loading or no brief exists
@@ -71,8 +71,8 @@ export function DailyBriefBanner() {
 
           {bulletPoints.length > 0 && (
             <ul className="space-y-2 mb-4">
-              {bulletPoints.map((point, index) => (
-                <li key={index} className="flex items-start gap-2 text-[15px] text-white/95">
+              {bulletPoints.map((point) => (
+                <li key={point} className="flex items-start gap-2 text-[15px] text-white/95">
                   <span className="text-[var(--accent)] mt-1">•</span>
                   <span className="flex-1">{point.trim()}</span>
                 </li>

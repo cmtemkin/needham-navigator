@@ -48,7 +48,7 @@ export default function DailyBriefPage() {
       }
     }
 
-    void fetchBriefs();
+    fetchBriefs().catch(() => {});
   }, [town.town_id]);
 
   const toggleBrief = (id: string) => {
@@ -125,7 +125,7 @@ export default function DailyBriefPage() {
                             hostname = url;
                           }
                           return (
-                            <li key={i}>
+                            <li key={`source-${url}`}>
                               <a
                                 href={url}
                                 target="_blank"

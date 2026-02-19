@@ -39,7 +39,7 @@ interface TrackedDocument {
 
 function hashContent(content: string | Buffer): string {
   return createHash("sha256")
-    .update(typeof content === "string" ? content : content)
+    .update(content)
     .digest("hex");
 }
 

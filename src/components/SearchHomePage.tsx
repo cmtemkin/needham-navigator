@@ -260,7 +260,7 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
 
       const currentQuery = normalizeQuery(searchParams.get("q"));
       if (pathname === searchHref && currentQuery === trimmed) {
-        void executeSearch(trimmed);
+        executeSearch(trimmed).catch(() => {});
         return;
       }
 
@@ -288,7 +288,7 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
       return;
     }
 
-    void executeSearch(queryFromUrl);
+    executeSearch(queryFromUrl).catch(() => {});
   }, [executeSearch, pathname, queryFromUrl, router, searchHref]);
 
   // Fetch featured articles for homepage
@@ -306,7 +306,7 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
         setArticlesLoading(false);
       }
     }
-    void fetchArticles();
+    fetchArticles().catch(() => {});
   }, [town.town_id]);
 
   const handleAskAbout = useCallback((question: string) => {
@@ -435,7 +435,7 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
                   {articlesLoading ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {[...Array(6)].map((_, i) => (
-                        <ArticleSkeleton key={i} variant="grid" />
+                        <ArticleSkeleton key={`skeleton-${i}`} variant="grid" />
                       ))}
                     </div>
                   ) : (

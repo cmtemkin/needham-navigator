@@ -101,7 +101,7 @@ export default function CommunityPage() {
       }
     }
 
-    void fetchSafety();
+    fetchSafety().catch(() => {});
     return () => { controller.abort(); clearTimeout(timeout); };
   }, [town.town_id]);
 
@@ -133,7 +133,7 @@ export default function CommunityPage() {
       }
     }
 
-    void fetchEvents();
+    fetchEvents().catch(() => {});
     return () => { controller.abort(); clearTimeout(timeout); };
   }, [town.town_id]);
 
@@ -165,7 +165,7 @@ export default function CommunityPage() {
       }
     }
 
-    void fetchDining();
+    fetchDining().catch(() => {});
     return () => { controller.abort(); clearTimeout(timeout); };
   }, [town.town_id]);
 
@@ -258,7 +258,7 @@ export default function CommunityPage() {
             {safetyLoading && (
               <div className="space-y-3">
                 {[...Array(3)].map((_, i) => (
-                  <div key={i} className="bg-white border border-border-light rounded-xl p-5 animate-pulse">
+                  <div key={`safety-skeleton-${i}`} className="bg-white border border-border-light rounded-xl p-5 animate-pulse">
                     <div className="h-4 bg-gray-200 rounded w-2/3 mb-2" />
                     <div className="h-3 bg-gray-100 rounded w-full" />
                   </div>
@@ -324,7 +324,7 @@ export default function CommunityPage() {
             {eventsLoading && (
               <div className="space-y-3">
                 {[...Array(3)].map((_, i) => (
-                  <div key={i} className="bg-white border border-border-light rounded-xl p-5 animate-pulse">
+                  <div key={`events-skeleton-${i}`} className="bg-white border border-border-light rounded-xl p-5 animate-pulse">
                     <div className="h-4 bg-gray-200 rounded w-2/3 mb-2" />
                     <div className="h-3 bg-gray-100 rounded w-1/3" />
                   </div>
@@ -406,7 +406,7 @@ export default function CommunityPage() {
             {diningLoading && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {[...Array(4)].map((_, i) => (
-                  <div key={i} className="bg-white border border-border-light rounded-xl p-5 animate-pulse">
+                  <div key={`dining-skeleton-${i}`} className="bg-white border border-border-light rounded-xl p-5 animate-pulse">
                     <div className="h-4 bg-gray-200 rounded w-2/3 mb-2" />
                     <div className="h-3 bg-gray-100 rounded w-1/2" />
                   </div>

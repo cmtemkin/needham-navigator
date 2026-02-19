@@ -767,7 +767,7 @@ export function PermitWizard() {
           <div className="flex gap-1">
             {questions.map((_, i) => (
               <div
-                key={i}
+                key={`step-${i}`}
                 className={`h-1.5 rounded-full transition-all ${
                   i <= currentStep
                     ? "w-6 bg-primary"
