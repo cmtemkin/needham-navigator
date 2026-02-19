@@ -24,6 +24,7 @@ declare global {
   interface Window {
     pendo?: Pendo;
   }
+  var pendo: Pendo | undefined;
 }
 
 export {};

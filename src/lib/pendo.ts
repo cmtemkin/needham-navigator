@@ -18,12 +18,12 @@ type PageType =
 
 /** Generate or retrieve a persistent anonymous visitor ID */
 export function getVisitorId(): string {
-  if (typeof window === 'undefined') return 'server';
+  if (typeof globalThis.window === 'undefined') return 'server';
 
   const STORAGE_KEY = 'nn_visitor_id';
   let id = localStorage.getItem(STORAGE_KEY);
   if (!id) {
-    id = `anon-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    id = `anon-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
     localStorage.setItem(STORAGE_KEY, id);
   }
   return id;
@@ -31,7 +31,7 @@ export function getVisitorId(): string {
 
 /** Generate or retrieve the first-seen timestamp for this visitor */
 function getFirstSeen(): string {
-  if (typeof window === 'undefined') return new Date().toISOString();
+  if (typeof globalThis.window === 'undefined') return new Date().toISOString();
 
   const STORAGE_KEY = 'nn_first_seen';
   let firstSeen = localStorage.getItem(STORAGE_KEY);
@@ -44,9 +44,9 @@ function getFirstSeen(): string {
 
 /** Initialize Pendo with visitor and account data */
 export function initializePendo(townId: string, townName: string): void {
-  if (!PENDO_API_KEY || typeof window === 'undefined') return;
+  if (!PENDO_API_KEY || typeof globalThis.window === 'undefined') return;
 
-  const pendo = window.pendo;
+  const pendo = globalThis.pendo;
   if (!pendo) return;
 
   pendo.initialize({
@@ -84,10 +84,10 @@ export function resolvePageType(pathname: string, query?: string): PageType {
 
 /** Track a page view from the current browser URL */
 export function trackCurrentPageView(townId: string): void {
-  if (typeof window === "undefined") return;
+  if (typeof globalThis.window === "undefined") return;
 
-  const path = window.location.pathname;
-  const query = new URLSearchParams(window.location.search).get("q")?.trim() ?? "";
+  const path = globalThis.location.pathname;
+  const query = new URLSearchParams(globalThis.location.search).get("q")?.trim() ?? "";
 
   trackEvent("page_view", {
     town_id: townId,
@@ -99,8 +99,8 @@ export function trackCurrentPageView(townId: string): void {
 
 /** Track a custom event in Pendo */
 export function trackEvent(eventName: string, metadata?: Record<string, unknown>): void {
-  if (typeof window === 'undefined') return;
-  const pendo = window.pendo;
+  if (typeof globalThis.window === 'undefined') return;
+  const pendo = globalThis.pendo;
   if (!pendo?.track) return;
 
   pendo.track(eventName, {
