@@ -195,9 +195,16 @@ gh api repos/{owner}/{repo}/code-scanning/alerts --jq '[.[] | select(.state=="op
 ```
 If there are open alerts, triage and fix them before writing new features.
 
+## Branch Cleanup Automation
+- **On PR merge** (`branch-cleanup.yml` + `ci.yml`): Head branch is automatically deleted immediately after merge
+- **Weekly sweep** (`branch-cleanup.yml`, Mondays 5:00 AM UTC): Scans all branches, deletes any that were merged via PR but not yet cleaned up. Skips branches with open PRs and protected branches (main, master, develop).
+- **GitHub repo setting** (REQUIRED): Enable "Automatically delete head branches" in Settings > General. This is the most reliable method and catches merges done via the GitHub UI.
+- **Manual trigger**: The branch-cleanup workflow can also be triggered manually via `workflow_dispatch`
+
 ## CI/CD Pipeline Status
-- **Last validated:** 2026-02-18
+- **Last validated:** 2026-02-19
 - **Pipeline:** GitHub Actions (ci.yml) > auto-merge > Vercel deploy
 - **Security scanning:** CodeQL (inline + weekly), Semgrep (PR + weekly), SonarCloud (automatic analysis), ESLint security plugin, npm audit
+- **Branch cleanup:** Automatic on merge + weekly sweep (branch-cleanup.yml)
 - **Branch protection:** Enforced on `main` (require PR + status checks)
 - **Repo visibility:** Public (MIT License)
