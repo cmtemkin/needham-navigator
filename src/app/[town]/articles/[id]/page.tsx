@@ -186,7 +186,7 @@ export default function ArticleDetailPage() {
                   <span>
                     {article.content_type === "ai_generated" && "AI Generated from "}
                     {article.content_type === "ai_summary" && "Summarized from "}
-                    {article.source_type ? (SOURCE_TYPE_LABELS[article.source_type] ?? article.source_type.replace(/_/g, " ")) : "Multiple Sources"}
+                    {article.source_type ? (SOURCE_TYPE_LABELS[article.source_type] ?? article.source_type.replaceAll("_", " ")) : "Multiple Sources"}
                   </span>
                   <span>•</span>
                   <span>{publishedDate}</span>
@@ -223,7 +223,7 @@ export default function ArticleDetailPage() {
                         </h2>
                         {article.source_type && (
                           <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">
-                            {SOURCE_TYPE_LABELS[article.source_type] ?? article.source_type.replace(/_/g, " ")}
+                            {SOURCE_TYPE_LABELS[article.source_type] ?? article.source_type.replaceAll("_", " ")}
                           </span>
                         )}
                       </div>

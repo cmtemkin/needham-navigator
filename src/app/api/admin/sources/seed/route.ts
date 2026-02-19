@@ -19,7 +19,7 @@ export async function POST(request: Request): Promise<Response> {
     const rows = CRAWL_SOURCES.map((src) => ({
       town_id: DEFAULT_TOWN_ID,
       url: src.url,
-      name: src.id.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+      name: src.id.replaceAll("-", " ").replace(/\b\w/g, (c) => c.toUpperCase()),
       category: src.category,
       priority: src.priority,
       update_frequency: src.updateFrequency,

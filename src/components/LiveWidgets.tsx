@@ -220,7 +220,7 @@ function TransitWidget() {
         </div>
         {data.alertCount > 0 ? (
           <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-700 uppercase tracking-wider">
-            {data.alertCount} Alert{data.alertCount !== 1 ? "s" : ""}
+            {data.alertCount} Alert{data.alertCount === 1 ? "" : "s"}
           </span>
         ) : (
           <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-green-50 text-green-700 uppercase tracking-wider">On Time</span>
@@ -297,7 +297,7 @@ function WidgetSkeleton() {
   );
 }
 
-function WidgetFallback({ href, icon, title, message }: { href: string; icon: React.ReactNode; title: string; message: string }) {
+function WidgetFallback({ href, icon, title, message }: Readonly<{ href: string; icon: React.ReactNode; title: string; message: string }>) {
   return (
     <Link href={href} className="group block bg-white border border-border-default rounded-xl p-5 hover:border-[var(--primary)] hover:shadow-md transition-all">
       <div className="flex items-center gap-2 mb-3">
