@@ -1,0 +1,103 @@
+name: Branch Cleanup — Delete Stale Merged Branches
+
+on:
+  # Run after any PR is closed (merged or not)
+  pull_request:
+    types: [closed]
+  # Also run weekly to catch any branches that slipped through
+  schedule:
+    - cron: '0 5 * * 1'  # Every Monday at 5:00 AM UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  # Delete the head branch immediately after a PR is merged
+  delete-on-merge:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
+    steps:
+      - name: Delete merged branch
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const branch = context.payload.pull_request.head.ref;
+            if (branch === 'main') {
+              console.log('Skipping deletion of main branch');
+              return;
+            }
+            try {
+              await github.rest.git.deleteRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `heads/${branch}`
+              });
+              console.log(`Deleted branch: ${branch}`);
+            } catch (e) {
+              console.log(`Branch deletion skipped (may already be deleted): ${e.message}`);
+            }
+
+  # Weekly sweep: find and delete branches that were merged but never cleaned up
+  sweep-stale:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Delete stale merged branches
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: branches } = await github.rest.repos.listBranches({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100
+            });
+
+            const protectedBranches = ['main', 'master', 'develop'];
+
+            for (const branch of branches) {
+              if (protectedBranches.includes(branch.name)) continue;
+
+              // Check if this branch has any open PRs
+              const { data: prs } = await github.rest.pulls.list({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                head: `${context.repo.owner}:${branch.name}`,
+                state: 'open'
+              });
+
+              if (prs.length > 0) {
+                console.log(`Skipping ${branch.name} — has open PR(s)`);
+                continue;
+              }
+
+              // Check if this branch has been merged via a closed PR
+              const { data: closedPrs } = await github.rest.pulls.list({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                head: `${context.repo.owner}:${branch.name}`,
+                state: 'closed'
+              });
+
+              const wasMerged = closedPrs.some(pr => pr.merged_at !== null);
+
+              if (wasMerged) {
+                try {
+                  await github.rest.git.deleteRef({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    ref: `heads/${branch.name}`
+                  });
+                  console.log(`Deleted stale merged branch: ${branch.name}`);
+                } catch (e) {
+                  console.log(`Failed to delete ${branch.name}: ${e.message}`);
+                }
+              } else {
+                console.log(`Skipping ${branch.name} — not merged`);
+              }
+            }
