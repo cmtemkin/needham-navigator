@@ -151,6 +151,8 @@ function deduplicateByUrl(results: SearchResult[]): SearchResult[] {
   return deduplicated;
 }
 
+export const maxDuration = 60;
+
 export async function POST(request: Request): Promise<Response> {
   const start = performance.now();
 

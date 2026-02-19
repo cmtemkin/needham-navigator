@@ -63,14 +63,27 @@ function ChatContent() {
       scrollToBottom();
 
       try {
-        const response = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            messages: [{ role: "user", content: question }],
-            town_id: town.town_id,
-          }),
+        const chatBody = JSON.stringify({
+          messages: [{ role: "user", content: question }],
+          town_id: town.town_id,
         });
+        const chatHeaders = { "Content-Type": "application/json" };
+        let response = await fetch("/api/chat", {
+          method: "POST",
+          headers: chatHeaders,
+          body: chatBody,
+        });
+
+        if (!response.ok) {
+          // Retry once for cold-start timeouts
+          console.warn(`/api/chat returned ${response.status}, retrying in 2s...`);
+          await new Promise((r) => setTimeout(r, 2000));
+          response = await fetch("/api/chat", {
+            method: "POST",
+            headers: chatHeaders,
+            body: chatBody,
+          });
+        }
 
         if (!response.ok) {
           throw new Error("API request failed");

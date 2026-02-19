@@ -2,6 +2,30 @@
 
 ---
 
+## v0.11.2 — 2026-02-19
+
+**Fix: Search & Chat Resilience — Cold Start Timeouts, Retry Logic, Non-Fatal Text Search**
+
+### Bug Fixes
+- **Search results now load reliably on cold starts** — previously, Vercel serverless cold starts caused `/api/search` to return HTTP 500 (heavy dependency loading took ~38s, exceeding the default 10s timeout). Extended `maxDuration` to 60s on both search and chat API routes.
+- **Text search failure no longer kills entire search** — when Supabase full-text search hit a statement timeout, `Promise.all` rejected and discarded working semantic (vector) search results. Text search is now non-fatal — if it fails, semantic results still come through.
+- **Client-side retry on failed API calls** — both search and chat UI now retry once after a 2-second delay when the API returns a non-200 response, transparently handling cold-start transients instead of silently showing empty results.
+
+### Performance
+- **Lazy Cohere SDK loading** — CohereClient is now loaded on first use via `require()` instead of at module import time, reducing cold start payload
+- **Health endpoint + keep-alive cron** — new `/api/health` endpoint warms the Supabase connection; hourly Vercel cron keeps functions warm to prevent cold starts
+
+### Technical
+- `src/app/api/search/route.ts` — added `maxDuration = 60`
+- `src/app/api/chat/route.ts` — added `maxDuration = 60`
+- `src/components/SearchHomePage.tsx` — retry-once logic for `/api/search` and `/api/chat` fetches
+- `src/components/TownChatPage.tsx` — retry-once logic for `/api/chat` fetch
+- `src/lib/rag.ts` — lazy `getCohereClient()`, non-fatal `textSearchChunks` in `hybridSearch()`
+- `src/app/api/health/route.ts` — new lightweight health check endpoint
+- `vercel.json` — added hourly `/api/health` cron
+
+---
+
 ## v0.11.1 — 2026-02-18
 
 **Post-Deploy Polish — Source Display, Nav Cleanup, Homepage Live Widgets**

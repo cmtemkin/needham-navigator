@@ -144,16 +144,28 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
       setAiAnswer({ type: "idle" });
 
       try {
-        // 1. INSTANT: fetch search results
-        const res = await fetch("/api/search", {
+        // 1. INSTANT: fetch search results (with one retry for cold-start timeouts)
+        const searchBody = JSON.stringify({ query: q, town_id: town.town_id });
+        const searchHeaders = { "Content-Type": "application/json" };
+        let res = await fetch("/api/search", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ query: q, town_id: town.town_id }),
+          headers: searchHeaders,
+          body: searchBody,
         });
 
         if (!res.ok) {
-          // Fallback: if /api/search doesn't exist yet, just show empty results
-          console.warn("/api/search not available yet, showing empty results");
+          // Retry once after a short delay — Vercel cold starts can cause 500s
+          console.warn(`/api/search returned ${res.status}, retrying in 2s...`);
+          await new Promise((r) => setTimeout(r, 2000));
+          res = await fetch("/api/search", {
+            method: "POST",
+            headers: searchHeaders,
+            body: searchBody,
+          });
+        }
+
+        if (!res.ok) {
+          console.error(`/api/search failed after retry: ${res.status}`);
           setSearchResults({ results: [], cached_answer: null, timing_ms: 0 });
           setIsSearching(false);
           return;
@@ -185,14 +197,26 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
           setAiAnswer({ type: "loading" });
 
           try {
-            const chatRes = await fetch("/api/chat", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                messages: [{ role: "user", content: q }],
-                town_id: town.town_id,
-              }),
+            const chatBody = JSON.stringify({
+              messages: [{ role: "user", content: q }],
+              town_id: town.town_id,
             });
+            const chatHeaders = { "Content-Type": "application/json" };
+            let chatRes = await fetch("/api/chat", {
+              method: "POST",
+              headers: chatHeaders,
+              body: chatBody,
+            });
+
+            if (!chatRes.ok) {
+              // Retry once for cold-start timeouts
+              await new Promise((r) => setTimeout(r, 2000));
+              chatRes = await fetch("/api/chat", {
+                method: "POST",
+                headers: chatHeaders,
+                body: chatBody,
+              });
+            }
 
             if (!chatRes.ok) {
               throw new Error("Failed to generate AI answer");
