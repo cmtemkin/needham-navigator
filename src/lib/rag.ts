@@ -4,7 +4,6 @@ import { DEFAULT_TOWN_ID as DEFAULT_TOWN_ID_FROM_CONFIG } from "@/lib/towns";
 import { expandQuery } from "@/lib/synonyms";
 import { rewriteQuery } from "@/lib/query-rewriter";
 import { trackEvent } from "@/lib/pendo";
-import { CohereClient } from "cohere-ai";
 import type { RetrievalConfig } from "@/lib/query-router";
 
 export const DEFAULT_TOWN_ID = DEFAULT_TOWN_ID_FROM_CONFIG;
@@ -14,11 +13,20 @@ const DEFAULT_MATCH_COUNT = 20; // Retrieve more for reranking (reduced from 30 
 const DEFAULT_FINAL_COUNT = 10; // Final chunks to pass to LLM
 const MIN_SIMILARITY_FLOOR = 0.3; // Drop chunks below this — they're noise (tuned for better recall)
 
-// Cohere client for cross-encoder reranking (optional upgrade over formula-based reranking)
-const cohereClient =
-  process.env.COHERE_API_KEY && process.env.USE_CROSS_ENCODER_RERANK === "true"
-    ? new CohereClient({ token: process.env.COHERE_API_KEY })
-    : null;
+// Lazy-loaded Cohere client — avoids importing the heavy cohere-ai package on cold start
+// unless cross-encoder reranking is actually enabled
+let _cohereClient: import("cohere-ai").CohereClient | null | undefined;
+
+function getCohereClient(): import("cohere-ai").CohereClient | null {
+  if (_cohereClient !== undefined) return _cohereClient;
+  if (process.env.COHERE_API_KEY && process.env.USE_CROSS_ENCODER_RERANK === "true") {
+    const { CohereClient } = require("cohere-ai") as typeof import("cohere-ai");
+    _cohereClient = new CohereClient({ token: process.env.COHERE_API_KEY });
+  } else {
+    _cohereClient = null;
+  }
+  return _cohereClient;
+}
 
 type ChunkMetadata = Record<string, unknown>;
 
@@ -358,6 +366,7 @@ async function cohereRerank(
   chunks: RetrievedChunk[]
 ): Promise<RerankResult> {
   // If Cohere client not configured or no chunks, skip reranking
+  const cohereClient = getCohereClient();
   if (!cohereClient || chunks.length === 0) {
     return { chunks, usedReranker: false, rerankerLatencyMs: null };
   }
@@ -908,13 +917,22 @@ export async function hybridSearch(
   const townId = options?.townId ?? DEFAULT_TOWN_ID;
   const limit = options?.limit ?? 15;
 
+  // Run semantic + text search in parallel. Text search is non-critical —
+  // if it fails (e.g. Supabase statement timeout), we still return semantic results.
+  const semanticPromise = retrieveRelevantChunks(query, {
+    townId,
+    matchThreshold: 0.45,
+    matchCount: Math.max(limit * 2, 12),
+  });
+  const textPromise = textSearchChunks(query, { townId, limit: Math.max(limit * 2, 12) })
+    .catch((err) => {
+      console.warn("[hybridSearch] Text search failed, using semantic only:", err?.message ?? err);
+      return [] as TextSearchRow[];
+    });
+
   const [semanticMatches, textMatches] = await Promise.all([
-    retrieveRelevantChunks(query, {
-      townId,
-      matchThreshold: 0.45,
-      matchCount: Math.max(limit * 2, 12),
-    }),
-    textSearchChunks(query, { townId, limit: Math.max(limit * 2, 12) }),
+    semanticPromise,
+    textPromise,
   ]);
 
   const merged = new Map<
