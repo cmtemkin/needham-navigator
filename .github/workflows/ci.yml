@@ -62,9 +62,53 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: javascript-typescript
+          queries: security-extended
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
+
+      - name: Gate on new CodeQL alerts
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const prRef = context.payload.pull_request.head.ref;
+
+            // Get alerts on this PR branch
+            const branchAlerts = await github.rest.codeScanning.listAlertsForRepo({
+              owner,
+              repo,
+              ref: prRef,
+              state: 'open',
+              per_page: 100,
+            });
+
+            // Get alerts already on main (baseline)
+            let mainAlertNumbers = new Set();
+            try {
+              const mainAlerts = await github.rest.codeScanning.listAlertsForRepo({
+                owner,
+                repo,
+                ref: 'main',
+                state: 'open',
+                per_page: 100,
+              });
+              mainAlertNumbers = new Set(mainAlerts.data.map(a => a.number));
+            } catch {
+              // No alerts on main yet — treat as empty baseline
+            }
+
+            // New alerts = on branch but NOT on main
+            const newAlerts = branchAlerts.data.filter(a => !mainAlertNumbers.has(a.number));
+
+            if (newAlerts.length > 0) {
+              const summary = newAlerts.map(a =>
+                `  - #${a.number}: ${a.rule.description} (${a.rule.id}) at ${a.most_recent_instance.location.path}:${a.most_recent_instance.location.start_line}`
+              ).join('\n');
+              core.setFailed(`❌ This PR introduces ${newAlerts.length} new CodeQL alert(s):\n${summary}\n\nFix these issues before merging.`);
+            } else {
+              core.info(`✅ No new CodeQL alerts introduced by this PR (${branchAlerts.data.length} existing alerts on branch, ${mainAlertNumbers.size} on main).`);
+            }
 
   auto-merge:
     needs: [build-and-test, codeql]

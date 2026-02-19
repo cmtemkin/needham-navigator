@@ -118,10 +118,12 @@ export function cleanDocumentTitle(title: string): string {
   // Remove CivicPlus module suffixes like "- CivicPlus.CMS.FAQ", "- CivicPlus.CMS.Document"
   cleaned = cleaned.replace(/\s*[-–]\s*CivicPlus\.[A-Za-z.]+$/i, "");
   // Remove CivicEngage suffixes like "• Needham • CivicEngage"
+  // eslint-disable-next-line security/detect-unsafe-regex -- anchored regex on short title strings, no backtracking risk
   cleaned = cleaned.replace(/\s*[•·]\s*(?:Needham\s*[•·]\s*)?CivicEngage$/i, "");
   // Remove trailing " • Needham" standalone
   cleaned = cleaned.replace(/\s*[•·]\s*Needham$/i, "");
   // Remove trailing " - Needham, MA" or " | Town of Needham"
+  // eslint-disable-next-line security/detect-unsafe-regex -- anchored regex on short title strings, no backtracking risk
   cleaned = cleaned.replace(/\s*[-–|]\s*(?:Town of\s+)?Needham(?:,?\s*MA)?$/i, "");
   // Remove leading/trailing whitespace
   cleaned = cleaned.trim();

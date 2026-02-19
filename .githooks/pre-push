@@ -1,0 +1,21 @@
+#!/bin/sh
+# Pre-push hook: runs lint + type check before pushing.
+# Catches common issues locally before wasting CI time.
+# Bypass with: git push --no-verify
+
+echo "Running pre-push checks..."
+
+npm run lint
+LINT_EXIT=$?
+
+npx tsc --noEmit
+TSC_EXIT=$?
+
+if [ $LINT_EXIT -ne 0 ] || [ $TSC_EXIT -ne 0 ]; then
+  echo ""
+  echo "Pre-push checks failed. Fix the errors above before pushing."
+  echo "To skip: git push --no-verify"
+  exit 1
+fi
+
+echo "Pre-push checks passed."

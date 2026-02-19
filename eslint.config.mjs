@@ -1,10 +1,10 @@
-// Minimal ESLint flat config for Next.js 16
-// Temporarily simplified due to eslint-config-next@16 compatibility issues with ESLint 9
-// TODO: Re-enable full linting once eslint-config-next is fully compatible with ESLint 9
+// ESLint flat config for Next.js 16 + security scanning
+// Uses eslint-plugin-security for OWASP pattern detection
 
 import js from "@eslint/js";
 import tseslint from "@typescript-eslint/eslint-plugin";
 import tsparser from "@typescript-eslint/parser";
+import security from "eslint-plugin-security";
 
 export default [
   {
@@ -44,7 +44,7 @@ export default [
       "@typescript-eslint/no-explicit-any": "off",
     },
   },
-  // TypeScript files - src (stricter)
+  // TypeScript files - src (stricter + security rules)
   {
     files: ["src/**/*.{ts,tsx}"],
     languageOptions: {
@@ -59,6 +59,7 @@ export default [
     },
     plugins: {
       "@typescript-eslint": tseslint,
+      security,
     },
     rules: {
       "no-unused-vars": "off",
@@ -72,6 +73,22 @@ export default [
         },
       ],
       "@typescript-eslint/no-explicit-any": "warn",
+      // Security plugin rules (restored from legacy .eslintrc.json)
+      ...security.configs.recommended.rules,
+      // Disable noisy rules that produce excessive false positives
+      "security/detect-object-injection": "off", // flags every obj[var] — too noisy
+      "security/detect-non-literal-regexp": "off", // flags RSS/scraper XML parsing — safe
+      "security/detect-non-literal-fs-filename": "off", // flags known-safe fs.readFile calls
+      // Ban Date.now() for ID generation — use crypto.randomUUID() instead
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "TemplateLiteral CallExpression[callee.object.name='Date'][callee.property.name='now']",
+          message:
+            "Do not use Date.now() in template literals for IDs. Use crypto.randomUUID() instead.",
+        },
+      ],
     },
   },
   // Config files at root
