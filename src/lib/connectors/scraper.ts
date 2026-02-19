@@ -124,7 +124,8 @@ async function discoverLinks(
       try {
         const parsedUrl = new URL(href, baseUrl);
         // Only allow http/https URLs (blocks javascript:, data:, vbscript:, etc.)
-        if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+        const allowedProtocols = new Set(["http:", "https:"]);
+        if (!allowedProtocols.has(parsedUrl.protocol)) {
           return;
         }
         const resolved = parsedUrl.href;

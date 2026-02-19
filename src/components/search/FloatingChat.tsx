@@ -34,7 +34,7 @@ const SUGGESTION_CHIPS = [
 ];
 
 function generateSessionId(): string {
-  return `sess-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
+  return `sess-${crypto.randomUUID()}`;
 }
 
 export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
@@ -65,7 +65,7 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
 
     const sendMessage = useCallback(
       async (text: string, options?: { isFromSearch?: boolean }) => {
-        const startTime = Date.now();
+        const startTime = performance.now();
         const isFromSearch = options?.isFromSearch ?? false;
 
         trackEvent("chat_message_sent", {
@@ -78,7 +78,7 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
         });
 
         const userMessage: ChatMessage = {
-          id: `user-${Date.now()}`,
+          id: `user-${crypto.randomUUID().slice(0, 8)}`,
           role: "user",
           text,
         };
@@ -126,7 +126,7 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
               sources = srcs;
             },
             onDone: () => {
-              const aiMessageId = `ai-${Date.now()}`;
+              const aiMessageId = `ai-${crypto.randomUUID().slice(0, 8)}`;
               const aiMessage: ChatMessage = {
                 id: aiMessageId,
                 role: "ai",
@@ -144,7 +144,7 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
                 response_length: fullText.length,
                 source_count: sources.length,
                 confidence,
-                response_time_ms: Date.now() - startTime,
+                response_time_ms: Math.round(performance.now() - startTime),
                 town_id: townId,
                 session_id: sessionIdRef.current,
                 interaction_surface: "floating_chat",
@@ -153,7 +153,7 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
             },
             onError: (error) => {
               console.error("Chat stream error:", error);
-              const errorMessageId = `ai-${Date.now()}`;
+              const errorMessageId = `ai-${crypto.randomUUID().slice(0, 8)}`;
               const errorMessage: ChatMessage = {
                 id: errorMessageId,
                 role: "ai",
@@ -175,7 +175,7 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
           });
         } catch (error) {
           console.error("Chat API error:", error);
-          const errorMessageId = `ai-${Date.now()}`;
+          const errorMessageId = `ai-${crypto.randomUUID().slice(0, 8)}`;
           const errorMessage: ChatMessage = {
             id: errorMessageId,
             role: "ai",
@@ -242,9 +242,9 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
 
         // Pre-populate messages with search context
         const contextMessages: ChatMessage[] = [
-          { id: `ctx-user-${Date.now()}`, role: "user", text: options.context.searchQuery },
+          { id: `ctx-user-${crypto.randomUUID().slice(0, 8)}`, role: "user", text: options.context.searchQuery },
           {
-            id: `ctx-ai-${Date.now()}`,
+            id: `ctx-ai-${crypto.randomUUID().slice(0, 8)}`,
             role: "ai",
             text: options.context.aiAnswer,
             sources: options.context.sources.map((s) => ({
