@@ -10,6 +10,7 @@
  *   ?schedule=daily      — run only connectors with this schedule
  *   ?force=true          — run even if not due
  *   ?generate=true       — also run article generation after ingestion
+ *   ?mode=incremental    — lightweight run: connectors only, no article generation
  *
  * Security: Protected by CRON_SECRET header check.
  */
@@ -45,18 +46,25 @@ export async function GET(request: NextRequest) {
   const schedule = searchParams.get("schedule") as ConnectorSchedule | undefined;
   const force = searchParams.get("force") === "true";
   const shouldGenerate = searchParams.get("generate") === "true";
+  const mode = searchParams.get("mode") ?? "full";
 
   try {
     const results = await runConnectors({ townId, schedule, force });
 
     const summary: Record<string, unknown> = {
       timestamp: new Date().toISOString(),
+      mode,
       connectorsRun: results.length,
       totalItemsUpserted: results.reduce((s, r) => s + r.itemsUpserted, 0),
       totalItemsSkipped: results.reduce((s, r) => s + r.itemsSkipped, 0),
       totalErrors: results.reduce((s, r) => s + r.errors.length, 0),
       results,
     };
+
+    // Incremental mode: connectors only, skip article generation
+    if (mode === "incremental") {
+      return NextResponse.json(summary);
+    }
 
     // Optionally run article generation after ingestion
     if (shouldGenerate) {

@@ -46,14 +46,9 @@ function timeAgo(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString();
 }
 
-function getSourceLabel(sourceId: string): string {
-  const labels: Record<string, string> = {
-    "needham:patch-news": "Needham Patch",
-    "needham:observer-news": "Needham Observer",
-    "needham:needham-local": "Needham Local",
-    "needham:town-rss": "Town of Needham",
-  };
-  return labels[sourceId] ?? sourceId.split(":").pop() ?? sourceId;
+function getSourceLabel(sourceId: string, townNewsSources?: Record<string, string>): string {
+  if (townNewsSources?.[sourceId]) return townNewsSources[sourceId];
+  return sourceId.split(":").pop() ?? sourceId;
 }
 
 function getSourceColor(sourceId: string): string {
@@ -70,7 +65,7 @@ function getSourceColor(sourceId: string): string {
 // News Card Component
 // ---------------------------------------------------------------------------
 
-function NewsCard({ item }: { item: ContentItem }) {
+function NewsCard({ item, newsSources }: { item: ContentItem; newsSources?: Record<string, string> }) {
   const displayText = item.summary || item.content?.slice(0, 200) || "";
 
   return (
@@ -91,7 +86,7 @@ function NewsCard({ item }: { item: ContentItem }) {
             <span
               className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${getSourceColor(item.source_id)}`}
             >
-              {getSourceLabel(item.source_id)}
+              {getSourceLabel(item.source_id, newsSources)}
             </span>
             <span className="text-[12px] text-text-muted">
               {timeAgo(item.published_at)}
@@ -274,7 +269,7 @@ export function NewsFeed({ maxItems, compact = false }: NewsFeedProps) {
       {/* News cards */}
       <div className="space-y-3">
         {items.map((item) => (
-          <NewsCard key={item.id} item={item} />
+          <NewsCard key={item.id} item={item} newsSources={town.news_sources} />
         ))}
       </div>
 

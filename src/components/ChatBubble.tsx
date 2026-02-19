@@ -32,8 +32,9 @@ export function ChatBubble({ message, onFollowupClick, sessionId }: ChatBubblePr
         <div className="w-[30px] h-[30px] rounded-full bg-gradient-to-br from-primary to-primary-light flex items-center justify-center text-white text-xs font-extrabold shrink-0 mt-0.5">
           N
         </div>
-        <div className="bg-white border border-border-light rounded-2xl rounded-bl-md px-[18px] py-3.5 shadow-xs">
+        <div className="bg-white border border-border-light rounded-2xl rounded-bl-md px-[18px] py-3.5 shadow-xs flex items-center gap-2">
           <TypingDots />
+          <span className="text-[13px] text-text-secondary">Thinking...</span>
         </div>
       </div>
     );

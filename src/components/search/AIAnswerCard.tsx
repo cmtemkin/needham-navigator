@@ -1,6 +1,7 @@
 "use client";
 
-import { Bot, Check, MessageCircle, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { Bot, Check, MessageCircle, Send, Sparkles } from "lucide-react";
 import { SourceChip } from "@/components/SourceChip";
 import type { CachedAnswer } from "@/types/search";
 
@@ -30,6 +31,39 @@ function LoadingDots() {
       <span className="w-1.5 h-1.5 bg-[var(--primary)] rounded-full animate-blink" />
       <span className="w-1.5 h-1.5 bg-[var(--primary)] rounded-full animate-blink [animation-delay:0.2s]" />
       <span className="w-1.5 h-1.5 bg-[var(--primary)] rounded-full animate-blink [animation-delay:0.4s]" />
+    </div>
+  );
+}
+
+function FollowUpInput({ onSubmit }: { onSubmit: (question: string) => void }) {
+  const [value, setValue] = useState("");
+
+  const handleSubmit = () => {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    onSubmit(trimmed);
+    setValue("");
+  };
+
+  return (
+    <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[#BAE6FF]/50">
+      <MessageCircle size={14} className="text-[var(--primary)] shrink-0" />
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+        placeholder="Ask a follow-up question..."
+        className="flex-1 border-none bg-transparent text-[13px] text-text-primary outline-none placeholder:text-text-muted"
+      />
+      <button
+        onClick={handleSubmit}
+        disabled={!value.trim()}
+        className="w-7 h-7 rounded-md bg-[var(--primary)] text-white flex items-center justify-center hover:bg-[var(--primary-dark)] transition-colors shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
+        aria-label="Send follow-up"
+      >
+        <Send size={12} />
+      </button>
     </div>
   );
 }
@@ -117,14 +151,8 @@ export function AIAnswerCard(props: AIAnswerCardProps) {
           </div>
         )}
 
-        {/* Ask follow-up button */}
-        <button
-          onClick={() => props.onFollowUp("Can you tell me more about this?")}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#BAE6FF] text-[var(--primary)] text-[12px] font-medium rounded-md hover:bg-[#F0F9FF] transition-colors"
-        >
-          <MessageCircle size={12} />
-          Ask follow-up
-        </button>
+        {/* Inline follow-up input */}
+        <FollowUpInput onSubmit={props.onFollowUp} />
       </div>
     );
   }
@@ -154,14 +182,8 @@ export function AIAnswerCard(props: AIAnswerCardProps) {
         </div>
       )}
 
-      {/* Ask follow-up button */}
-      <button
-        onClick={() => props.onFollowUp("Can you tell me more about this?")}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#BAE6FF] text-[var(--primary)] text-[12px] font-medium rounded-md hover:bg-[#F0F9FF] transition-colors"
-      >
-        <MessageCircle size={12} />
-        Ask follow-up
-      </button>
+      {/* Inline follow-up input */}
+      <FollowUpInput onSubmit={props.onFollowUp} />
     </div>
   );
 }

@@ -7,13 +7,14 @@ import { useChatWidget } from "@/lib/chat-context";
 
 interface FloatingChatWrapperProps {
   townId: string;
+  assistantName?: string;
 }
 
 /**
  * Wrapper component that mounts the FloatingChat and registers it with ChatContext.
  * Automatically hides on the /chat page to avoid conflicts with the old chat UI.
  */
-export function FloatingChatWrapper({ townId }: FloatingChatWrapperProps) {
+export function FloatingChatWrapper({ townId, assistantName }: FloatingChatWrapperProps) {
   const pathname = usePathname();
   const { registerChatWidget } = useChatWidget();
   const chatRef = useRef<FloatingChatHandle>(null);
@@ -28,5 +29,5 @@ export function FloatingChatWrapper({ townId }: FloatingChatWrapperProps) {
     return null;
   }
 
-  return <FloatingChat ref={chatRef} townId={townId} />;
+  return <FloatingChat ref={chatRef} townId={townId} assistantName={assistantName} />;
 }

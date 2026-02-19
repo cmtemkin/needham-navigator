@@ -110,6 +110,20 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
   const [isSearching, setIsSearching] = useState(false);
   const [featuredArticles, setFeaturedArticles] = useState<Article[]>([]);
   const [articlesLoading, setArticlesLoading] = useState(true);
+  const [lastVisitTimestamp, setLastVisitTimestamp] = useState<number | undefined>(undefined);
+
+  // Track last visit for "NEW" badges on articles
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("nn_last_visit");
+      if (stored) {
+        setLastVisitTimestamp(parseInt(stored, 10));
+      }
+      localStorage.setItem("nn_last_visit", String(Date.now()));
+    } catch {
+      // localStorage unavailable (SSR / private browsing)
+    }
+  }, []);
 
   const executeSearch = useCallback(
     async (rawQuery: string) => {
@@ -319,8 +333,19 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
   }, [openChat, town.town_id]);
 
   const handleFollowUp = useCallback((question: string) => {
-    openChat(question);
-  }, [openChat]);
+    const answerText = aiAnswer.type === "loaded" ? aiAnswer.html :
+                       aiAnswer.type === "cached" ? aiAnswer.answer.answer_html : "";
+    const sources = aiAnswer.type === "loaded" ? aiAnswer.sources :
+                    aiAnswer.type === "cached" ? aiAnswer.answer.sources : [];
+    openChat({
+      message: question,
+      context: {
+        searchQuery: query,
+        aiAnswer: answerText,
+        sources: sources.map((s) => ({ title: s.title, url: s.url ?? "" })),
+      },
+    });
+  }, [openChat, query, aiAnswer]);
 
   const showResults = isSearching || searchResults !== null;
 
@@ -331,40 +356,18 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
       <main>
         {/* Search Hero - Only show when no results */}
         {!showResults && (
-          <section className="bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] text-white py-16 px-4">
+          <section className="bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] text-white py-8 px-4">
             <div className="max-w-[720px] mx-auto text-center">
-              <h1 className="text-4xl font-bold mb-3 leading-tight">
+              <h1 className="text-3xl font-bold mb-2 leading-tight">
                 Search{" "}
                 <span className="text-[var(--accent)]">{shortTownName}</span>
               </h1>
-              <p className="text-lg text-white/90 mb-8">
-                Find answers from town documents, bylaws, meeting minutes, and more
+              <p className="text-base text-white/90 mb-5">
+                Find answers from official documents, bylaws, meeting minutes, and more
               </p>
 
-              {/* Search input */}
-              <div className="bg-white rounded-xl p-2 shadow-lg flex items-center gap-2">
-                <Search size={20} className="text-text-muted ml-2" />
-                <input
-                  type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSearch(query)}
-                  placeholder={`Search ${shortTownName} documents...`}
-                  className="flex-1 border-none bg-transparent outline-none text-[15px] text-text-primary py-2 placeholder:text-text-muted"
-                  data-pendo="search-input"
-                />
-                <button
-                  onClick={() => handleSearch(query)}
-                  disabled={isSearching || !query.trim()}
-                  className="px-5 py-2.5 bg-[var(--primary)] text-white text-[14px] font-medium rounded-lg hover:bg-[var(--primary-dark)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  data-pendo="search-button"
-                >
-                  {isSearching ? "Searching..." : "Search"}
-                </button>
-              </div>
-
               {/* Quick-link pills */}
-              <div className="flex flex-wrap justify-center gap-2 mt-6">
+              <div className="flex flex-wrap justify-center gap-2">
                 {QUICK_LINKS.map((link) => (
                   <button
                     key={link.label}
@@ -415,121 +418,132 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
 
         {/* Default State (no query) */}
         {!showResults && (
-          <>
-            {/* Daily Brief & Featured Articles */}
-            <section className="mx-auto mt-8 max-w-content px-4 sm:px-6">
-              <DailyBriefBanner />
+          <div className="mx-auto mt-8 max-w-content px-4 sm:px-6 pb-12">
+            {/* Daily Brief — full width above the grid */}
+            <DailyBriefBanner />
 
-              {(articlesLoading || featuredArticles.length > 0) && (
-                <div className="mb-12">
-                  <div className="flex items-center justify-between mb-5">
-                    <h2 className="text-2xl font-bold text-text-primary">Latest Articles</h2>
-                    <Link
-                      href={articlesHref}
-                      className="flex items-center gap-1 text-[var(--primary)] hover:text-[var(--primary-dark)] font-medium text-sm transition-colors group"
-                    >
-                      View all articles
-                      <ChevronRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
-                    </Link>
-                  </div>
-
-                  {articlesLoading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {[...Array(6)].map((_, i) => (
-                        <ArticleSkeleton key={`skeleton-${i}`} variant="grid" />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {featuredArticles.map((article) => (
-                        <ArticleCard key={article.id} article={article} variant="grid" />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </section>
-
-            {/* Live Widgets */}
-            <section className="mx-auto max-w-content px-4 sm:px-6">
-              <LiveWidgets />
-            </section>
-
-            {/* Browse by Topic */}
-            <section className="mx-auto mt-12 max-w-content px-4 sm:px-6">
-              <h2 className="text-2xl font-bold text-text-primary mb-5">
-                Browse by Topic
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {TOPIC_CARDS.map((topic) => {
-                  const cardClass = "text-left bg-white border border-border-default rounded-xl p-5 hover:border-[var(--primary)] hover:shadow-md transition-all group";
-                  const cardContent = (
-                    <>
-                      <div className="text-3xl mb-3">{topic.icon}</div>
-                      <h3 className="text-[16px] font-bold text-text-primary mb-2 group-hover:text-[var(--primary)] transition-colors">
-                        {topic.title}
-                      </h3>
-                      <p className="text-[14px] text-text-secondary leading-relaxed">
-                        {topic.description}
-                      </p>
-                    </>
-                  );
-
-                  if (topic.townPath) {
-                    return (
+            {/* Two-column layout: content left, widgets right */}
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
+              {/* Left column: articles, topics, questions */}
+              <div>
+                {(articlesLoading || featuredArticles.length > 0) && (
+                  <div className="mb-10">
+                    <div className="flex items-center justify-between mb-5">
+                      <h2 className="text-2xl font-bold text-text-primary">Latest Articles</h2>
                       <Link
-                        key={topic.title}
-                        href={`/${town.town_id}${topic.townPath}`}
-                        className={cardClass}
-                        data-pendo={`topic-${topic.title.toLowerCase().replace(/\s+/g, '-')}`}
-                        onClick={() => trackEvent('topic_card_clicked', { topic: topic.title, town_id: town.town_id })}
+                        href={articlesHref}
+                        className="flex items-center gap-1 text-[var(--primary)] hover:text-[var(--primary-dark)] font-medium text-sm transition-colors group"
                       >
-                        {cardContent}
+                        View all articles
+                        <ChevronRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
                       </Link>
-                    );
-                  }
+                    </div>
 
-                  return (
-                    <button
-                      key={topic.title}
-                      onClick={() => {
-                        trackEvent('topic_card_clicked', { topic: topic.title, town_id: town.town_id });
-                        handleSearch(topic.title);
-                      }}
-                      className={cardClass}
-                      data-pendo={`topic-${topic.title.toLowerCase().replace(/\s+/g, '-')}`}
-                    >
-                      {cardContent}
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
+                    {articlesLoading ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {[...Array(4)].map((_, i) => (
+                          <ArticleSkeleton key={`skeleton-${i}`} variant="grid" />
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {featuredArticles.map((article) => (
+                          <ArticleCard key={article.id} article={article} variant="grid" lastVisitTimestamp={lastVisitTimestamp} />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
 
-            {/* Popular Questions */}
-            <section className="mx-auto mt-10 max-w-content px-4 sm:px-6 pb-12">
-              <h2 className="text-2xl font-bold text-text-primary mb-5">
-                Popular Questions
-              </h2>
-              <div className="flex flex-wrap gap-2">
-                {POPULAR_QUESTIONS.map((q) => (
-                  <button
-                    key={q}
-                    onClick={() => {
-                      trackEvent('popular_question_clicked', {
-                        question: q,
-                        town_id: town.town_id,
-                      });
-                      handleSearch(q);
-                    }}
-                    className="px-4 py-2 bg-white border border-border-default rounded-full text-[13px] text-text-secondary hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[#F5F8FC] transition-all"
-                  >
-                    {q}
-                  </button>
-                ))}
+                {/* Browse by Topic */}
+                <div className="mb-10">
+                  <h2 className="text-2xl font-bold text-text-primary mb-5">
+                    Browse by Topic
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {TOPIC_CARDS.map((topic) => {
+                      const cardClass = "text-left bg-white border border-border-default rounded-xl p-5 hover:border-[var(--primary)] hover:shadow-md transition-all group";
+                      const cardContent = (
+                        <>
+                          <div className="text-3xl mb-3">{topic.icon}</div>
+                          <h3 className="text-[16px] font-bold text-text-primary mb-2 group-hover:text-[var(--primary)] transition-colors">
+                            {topic.title}
+                          </h3>
+                          <p className="text-[14px] text-text-secondary leading-relaxed">
+                            {topic.description}
+                          </p>
+                        </>
+                      );
+
+                      if (topic.townPath) {
+                        return (
+                          <Link
+                            key={topic.title}
+                            href={`/${town.town_id}${topic.townPath}`}
+                            className={cardClass}
+                            data-pendo={`topic-${topic.title.toLowerCase().replace(/\s+/g, '-')}`}
+                            onClick={() => trackEvent('topic_card_clicked', { topic: topic.title, town_id: town.town_id })}
+                          >
+                            {cardContent}
+                          </Link>
+                        );
+                      }
+
+                      return (
+                        <button
+                          key={topic.title}
+                          onClick={() => {
+                            trackEvent('topic_card_clicked', { topic: topic.title, town_id: town.town_id });
+                            handleSearch(topic.title);
+                          }}
+                          className={cardClass}
+                          data-pendo={`topic-${topic.title.toLowerCase().replace(/\s+/g, '-')}`}
+                        >
+                          {cardContent}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Popular Questions */}
+                <div>
+                  <h2 className="text-2xl font-bold text-text-primary mb-5">
+                    Popular Questions
+                  </h2>
+                  <div className="flex flex-wrap gap-2">
+                    {POPULAR_QUESTIONS.map((q) => (
+                      <button
+                        key={q}
+                        onClick={() => {
+                          trackEvent('popular_question_clicked', {
+                            question: q,
+                            town_id: town.town_id,
+                          });
+                          handleSearch(q);
+                        }}
+                        className="px-4 py-2 bg-white border border-border-default rounded-full text-[13px] text-text-secondary hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[#F5F8FC] transition-all"
+                      >
+                        {q}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </section>
-          </>
+
+              {/* Right column: sticky sidebar with live widgets */}
+              <aside className="hidden lg:block">
+                <div className="sticky top-[76px] self-start">
+                  <LiveWidgets variant="sidebar" />
+                </div>
+              </aside>
+            </div>
+
+            {/* LiveWidgets shown inline on mobile/tablet (below content) */}
+            <div className="lg:hidden mt-8">
+              <LiveWidgets />
+            </div>
+          </div>
         )}
 
         {/* Results State */}

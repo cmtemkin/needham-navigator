@@ -124,12 +124,12 @@ export default function TransitPage() {
       <Header />
 
       <main className="min-h-screen bg-surface">
-        <div className="bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] text-white py-12 px-4">
+        <div className="bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] text-white py-8 px-4">
           <div className="max-w-content mx-auto">
-            <h1 className="text-4xl font-bold mb-3">
+            <h1 className="text-3xl font-bold mb-2">
               {shortTownName} <span className="text-[var(--accent)]">Transit</span>
             </h1>
-            <p className="text-lg text-white/90">
+            <p className="text-base text-white/90">
               {routeId
                 ? `MBTA schedules, alerts, and service updates`
                 : `Public transportation information`}
@@ -181,76 +181,81 @@ export default function TransitPage() {
 
           {routeId && !loading && !error && data && (
             <>
-              {/* Active Alerts */}
-              {data.alerts.length > 0 && (
-                <div className="mb-8">
-                  <h2 className="text-xl font-bold text-text-primary mb-4 flex items-center gap-2">
-                    <AlertCircle size={20} className="text-[var(--warning)]" />
-                    Service Alerts
-                  </h2>
-                  <div className="space-y-3">
-                    {data.alerts.slice(0, 5).map((alert) => (
-                      <div
-                        key={alert.id}
-                        className="bg-yellow-50 border border-yellow-200 rounded-xl p-4"
-                      >
-                        <h3 className="text-[15px] font-semibold text-yellow-900 mb-1">
-                          {alert.attributes.header}
-                        </h3>
-                        {alert.attributes.description && (
-                          <p className="text-[13px] text-yellow-800 line-clamp-3">
-                            {alert.attributes.description}
-                          </p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Schedule */}
-              <h2 className="text-xl font-bold text-text-primary mb-4 flex items-center gap-2">
-                <Clock size={20} className="text-[var(--primary)]" />
-                Upcoming Departures
-              </h2>
-
-              {data.schedules.length > 0 ? (
-                <div className="bg-white border border-border-light rounded-xl overflow-hidden">
-                  <div className="divide-y divide-border-light">
-                    {data.schedules.slice(0, 15).map((schedule) => {
-                      const stopName = getStopName(schedule);
-                      const time = schedule.attributes.departure_time || schedule.attributes.arrival_time;
-                      const direction = schedule.attributes.direction_id === 0 ? "Outbound" : "Inbound";
-
-                      return (
+              {/* Two-column layout when alerts exist: alerts left, schedule right */}
+              <div className={data.alerts.length > 0 ? "grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-6" : ""}>
+                {/* Active Alerts */}
+                {data.alerts.length > 0 && (
+                  <div>
+                    <h2 className="text-xl font-bold text-text-primary mb-4 flex items-center gap-2">
+                      <AlertCircle size={20} className="text-[var(--warning)]" />
+                      Service Alerts
+                    </h2>
+                    <div className="space-y-3">
+                      {data.alerts.slice(0, 5).map((alert) => (
                         <div
-                          key={schedule.id}
-                          className="flex items-center justify-between px-5 py-3"
+                          key={alert.id}
+                          className="bg-yellow-50 border border-yellow-200 rounded-xl p-4"
                         >
-                          <div className="flex items-center gap-3">
-                            <Train size={16} className="text-[var(--primary)] flex-shrink-0" />
-                            <div>
-                              <div className="text-[14px] font-medium text-text-primary">
-                                {stopName || "Station"}
+                          <h3 className="text-[15px] font-semibold text-yellow-900 mb-1">
+                            {alert.attributes.header}
+                          </h3>
+                          {alert.attributes.description && (
+                            <p className="text-[13px] text-yellow-800 line-clamp-3">
+                              {alert.attributes.description}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Schedule */}
+                <div>
+                  <h2 className="text-xl font-bold text-text-primary mb-4 flex items-center gap-2">
+                    <Clock size={20} className="text-[var(--primary)]" />
+                    Upcoming Departures
+                  </h2>
+
+                  {data.schedules.length > 0 ? (
+                    <div className="bg-white border border-border-light rounded-xl overflow-hidden">
+                      <div className="divide-y divide-border-light">
+                        {data.schedules.slice(0, 15).map((schedule) => {
+                          const stopName = getStopName(schedule);
+                          const time = schedule.attributes.departure_time || schedule.attributes.arrival_time;
+                          const direction = schedule.attributes.direction_id === 0 ? "Outbound" : "Inbound";
+
+                          return (
+                            <div
+                              key={schedule.id}
+                              className="flex items-center justify-between px-5 py-3"
+                            >
+                              <div className="flex items-center gap-3">
+                                <Train size={16} className="text-[var(--primary)] flex-shrink-0" />
+                                <div>
+                                  <div className="text-[14px] font-medium text-text-primary">
+                                    {stopName || "Station"}
+                                  </div>
+                                  <div className="text-[12px] text-text-muted">
+                                    {direction}
+                                  </div>
+                                </div>
                               </div>
-                              <div className="text-[12px] text-text-muted">
-                                {direction}
+                              <div className="text-[15px] font-semibold text-text-primary">
+                                {formatTime(time)}
                               </div>
                             </div>
-                          </div>
-                          <div className="text-[15px] font-semibold text-text-primary">
-                            {formatTime(time)}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-white border border-border-light rounded-xl p-8 text-center">
+                      <p className="text-text-secondary">No upcoming departures found for today.</p>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="bg-white border border-border-light rounded-xl p-8 text-center">
-                  <p className="text-text-secondary">No upcoming departures found for today.</p>
-                </div>
-              )}
+              </div>
 
               <div className="flex items-center justify-center gap-4 mt-6">
                 <a

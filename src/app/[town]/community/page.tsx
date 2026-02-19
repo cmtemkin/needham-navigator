@@ -175,12 +175,12 @@ export default function CommunityPage() {
 
       <main className="min-h-screen bg-surface">
         {/* Hero Banner */}
-        <div className="bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] text-white py-12 px-4">
+        <div className="bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] text-white py-8 px-4">
           <div className="max-w-content mx-auto">
-            <h1 className="text-4xl font-bold mb-3">
+            <h1 className="text-3xl font-bold mb-2">
               {shortTownName} <span className="text-[var(--accent)]">Community</span>
             </h1>
-            <p className="text-lg text-white/90">
+            <p className="text-base text-white/90">
               Local resources, events, dining, and safety information
             </p>
           </div>
@@ -188,10 +188,13 @@ export default function CommunityPage() {
 
         <div className="max-w-content mx-auto px-4 sm:px-6 py-8">
 
+          {/* Safety & Events — side by side on desktop */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+
           {/* ═══════════════════════════════════════════════════════════════ */}
           {/* Section 1: Emergency & Safety */}
           {/* ═══════════════════════════════════════════════════════════════ */}
-          <section id="safety" className="mb-12">
+          <section id="safety">
             <div className="flex items-center gap-2 mb-6">
               <Shield size={22} className="text-[var(--primary)]" />
               <h2 className="text-2xl font-bold text-text-primary">Emergency & Safety</h2>
@@ -315,7 +318,7 @@ export default function CommunityPage() {
           {/* ═══════════════════════════════════════════════════════════════ */}
           {/* Section 2: Events */}
           {/* ═══════════════════════════════════════════════════════════════ */}
-          <section id="events" className="mb-12">
+          <section id="events">
             <div className="flex items-center gap-2 mb-6">
               <Calendar size={22} className="text-[var(--primary)]" />
               <h2 className="text-2xl font-bold text-text-primary">Events</h2>
@@ -393,6 +396,8 @@ export default function CommunityPage() {
               </div>
             )}
           </section>
+
+          </div>{/* end Safety & Events grid */}
 
           {/* ═══════════════════════════════════════════════════════════════ */}
           {/* Section 3: Local Dining */}
