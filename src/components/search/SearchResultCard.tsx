@@ -94,9 +94,9 @@ export function SearchResultCard({ result, onAskAbout, "data-pendo": dataPendo }
       {/* AI Tags (if present) */}
       {result.ai_tags && result.ai_tags.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-2">
-          {result.ai_tags.slice(0, 4).map((tag, idx) => (
+          {result.ai_tags.slice(0, 4).map((tag) => (
             <span
-              key={idx}
+              key={tag}
               className="inline-block px-2 py-0.5 text-[11px] bg-gray-50 text-gray-600 rounded border border-gray-200"
             >
               {tag}

@@ -109,7 +109,7 @@ export default function TransitPage() {
       }
     }
 
-    void fetchTransit();
+    fetchTransit().catch(() => {});
     return () => { controller.abort(); clearTimeout(timeout); };
   }, [routeId]);
 

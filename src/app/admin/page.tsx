@@ -1287,7 +1287,7 @@ function SourcesTab({ password }: { password: string }) {
   }
 
   // Categories present in the data
-  const categories = [...new Set(sources.map((s) => s.category))].sort();
+  const categories = [...new Set(sources.map((s) => s.category))].sort((a, b) => a.localeCompare(b));
 
   return (
     <div>

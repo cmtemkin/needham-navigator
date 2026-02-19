@@ -68,7 +68,7 @@ export default function ArticleDetailPage() {
       }
     }
 
-    void fetchArticle();
+    fetchArticle().catch(() => {});
   }, [id, town.town_id]);
 
   const handleFeedback = async (type: "helpful" | "not_helpful") => {
@@ -235,7 +235,7 @@ export default function ArticleDetailPage() {
                           }
                           return (
                             <a
-                              key={index}
+                              key={`source-${url}`}
                               href={url}
                               target="_blank"
                               rel="noopener noreferrer"
@@ -259,7 +259,7 @@ export default function ArticleDetailPage() {
                 </h2>
                 <div className="flex items-center gap-4">
                   <button
-                    onClick={() => void handleFeedback("helpful")}
+                    onClick={() => { handleFeedback("helpful").catch(() => {}); }}
                     disabled={feedback !== null}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
                       feedback === "helpful"
@@ -271,7 +271,7 @@ export default function ArticleDetailPage() {
                     Helpful
                   </button>
                   <button
-                    onClick={() => void handleFeedback("not_helpful")}
+                    onClick={() => { handleFeedback("not_helpful").catch(() => {}); }}
                     disabled={feedback !== null}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
                       feedback === "not_helpful"

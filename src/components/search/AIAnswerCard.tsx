@@ -111,8 +111,8 @@ export function AIAnswerCard(props: AIAnswerCardProps) {
         {/* Source pills */}
         {props.answer.sources.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-3">
-            {props.answer.sources.map((source, i) => (
-              <SourceChip key={i} source={source} />
+            {props.answer.sources.map((source) => (
+              <SourceChip key={source.url ?? source.title} source={source} />
             ))}
           </div>
         )}
@@ -148,8 +148,8 @@ export function AIAnswerCard(props: AIAnswerCardProps) {
       {/* Source pills */}
       {props.sources.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-3">
-          {props.sources.map((source, i) => (
-            <SourceChip key={i} source={source} />
+          {props.sources.map((source) => (
+            <SourceChip key={source.url ?? source.title} source={source} />
           ))}
         </div>
       )}

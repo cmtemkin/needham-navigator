@@ -70,7 +70,7 @@ export default function ArticlesPage() {
       }
     }
 
-    void fetchArticles();
+    fetchArticles().catch(() => {});
     return () => { controller.abort(); clearTimeout(timeout); };
   }, [town.town_id, selectedCategory, selectedContentType, retryCount]);
 
@@ -147,7 +147,7 @@ export default function ArticlesPage() {
           {loading && (
             <div className="space-y-4">
               {[...Array(6)].map((_, i) => (
-                <ArticleSkeleton key={i} variant="list" />
+                <ArticleSkeleton key={`skeleton-${i}`} variant="list" />
               ))}
             </div>
           )}
