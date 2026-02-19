@@ -3,11 +3,23 @@
 import { createContext, useContext, useRef, useCallback, type ReactNode } from "react";
 import type { FloatingChatHandle } from "@/components/search/FloatingChat";
 
+export interface ChatOpenContext {
+  searchQuery: string;
+  aiAnswer: string;
+  sources: { title: string; url: string }[];
+}
+
+export type ChatOpenOptions = {
+  message?: string;
+  context?: ChatOpenContext;
+};
+
 interface ChatContextValue {
   /**
-   * Open the chat widget and optionally send a message
+   * Open the chat widget and optionally send a message with search context.
+   * Accepts either a string (legacy: message only) or ChatOpenOptions (with context).
    */
-  openChat: (message?: string) => void;
+  openChat: (options?: ChatOpenOptions | string) => void;
 
   /**
    * Internal: Register the FloatingChat ref (used by ChatProvider)
@@ -24,12 +36,24 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     chatWidgetRef.current = ref;
   }, []);
 
-  const openChat = useCallback((message?: string) => {
-    if (message) {
-      chatWidgetRef.current?.openWithMessage(message);
+  const openChat = useCallback((options?: ChatOpenOptions | string) => {
+    if (!chatWidgetRef.current) return;
+
+    // Legacy support: if a string is passed, treat as message-only
+    if (typeof options === "string") {
+      chatWidgetRef.current.openWithMessage(options);
+      return;
+    }
+
+    if (options?.context) {
+      chatWidgetRef.current.openWithContext({
+        message: options.message,
+        context: options.context,
+      });
+    } else if (options?.message) {
+      chatWidgetRef.current.openWithMessage(options.message);
     } else {
-      // If no message, just open with a generic greeting
-      chatWidgetRef.current?.openWithMessage("");
+      chatWidgetRef.current.openWithMessage("");
     }
   }, []);
 
@@ -49,6 +73,12 @@ export function ChatProvider({ children }: { children: ReactNode }) {
  *
  * // Open chat with a specific message
  * openChat("Tell me about building permits");
+ *
+ * // Open chat with search context for follow-up
+ * openChat({
+ *   message: "What are the fees?",
+ *   context: { searchQuery: "building permits", aiAnswer: "...", sources: [...] }
+ * });
  *
  * // Or just open the chat
  * openChat();

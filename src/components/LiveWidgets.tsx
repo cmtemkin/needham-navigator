@@ -26,12 +26,23 @@ type TransitWidgetData = {
   alertHeader?: string;
 };
 
+function relativeTime(date: Date): string {
+  const diffMs = Date.now() - date.getTime();
+  const diffMin = Math.floor(diffMs / 60_000);
+  if (diffMin < 1) return "just now";
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHr = Math.floor(diffMs / 3_600_000);
+  if (diffHr < 24) return `${diffHr}h ago`;
+  return date.toLocaleDateString();
+}
+
 // ─── Weather Widget ───────────────────────────────────────────────────────────
 
 function WeatherWidget() {
   const town = useTown();
   const weatherHref = useTownHref("/weather");
   const [data, setData] = useState<WeatherWidgetData | null>(null);
+  const [fetchedAt, setFetchedAt] = useState<Date | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
@@ -75,6 +86,7 @@ function WeatherWidget() {
           highTemp: dayPeriod?.temperature,
           lowTemp: nightPeriod?.temperature,
         });
+        setFetchedAt(new Date());
       } catch (err) {
         if ((err as Error).name !== "AbortError") setError(true);
       } finally {
@@ -107,7 +119,10 @@ function WeatherWidget() {
           </div>
           <span className="text-xs font-semibold text-text-muted uppercase tracking-wide">Weather</span>
         </div>
-        <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-green-50 text-green-700 uppercase tracking-wider">Live</span>
+        <div className="flex items-center gap-2">
+          {fetchedAt && <span className="text-[10px] text-text-muted">{relativeTime(fetchedAt)}</span>}
+          <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-green-50 text-green-700 uppercase tracking-wider">Live</span>
+        </div>
       </div>
       <div className="text-3xl font-bold text-text-primary leading-none mb-1">
         {data.temperature}°{data.temperatureUnit}
@@ -132,6 +147,7 @@ function TransitWidget() {
   const town = useTown();
   const transitHref = useTownHref("/transit");
   const [data, setData] = useState<TransitWidgetData | null>(null);
+  const [fetchedAt, setFetchedAt] = useState<Date | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
@@ -181,6 +197,7 @@ function TransitWidget() {
           alertCount: alerts.length,
           alertHeader: alerts[0]?.attributes?.header,
         });
+        setFetchedAt(new Date());
       } catch (err) {
         if ((err as Error).name !== "AbortError") setError(true);
       } finally {
@@ -218,13 +235,16 @@ function TransitWidget() {
           </div>
           <span className="text-xs font-semibold text-text-muted uppercase tracking-wide">Commuter Rail</span>
         </div>
-        {data.alertCount > 0 ? (
-          <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-700 uppercase tracking-wider">
-            {data.alertCount} Alert{data.alertCount === 1 ? "" : "s"}
-          </span>
-        ) : (
-          <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-green-50 text-green-700 uppercase tracking-wider">On Time</span>
-        )}
+        <div className="flex items-center gap-2">
+          {fetchedAt && <span className="text-[10px] text-text-muted">{relativeTime(fetchedAt)}</span>}
+          {data.alertCount > 0 ? (
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-700 uppercase tracking-wider">
+              {data.alertCount} Alert{data.alertCount === 1 ? "" : "s"}
+            </span>
+          ) : (
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-green-50 text-green-700 uppercase tracking-wider">On Time</span>
+          )}
+        </div>
       </div>
       <div className="text-3xl font-bold text-text-primary leading-none mb-1">
         {formattedTime}
@@ -250,6 +270,7 @@ function TransitWidget() {
 function CommunityWidget() {
   const town = useTown();
   const communityHref = useTownHref("/community");
+  const shortTownName = town.name.replace(/,\s*[A-Z]{2}$/i, "");
   const hasCommunity = town.feature_flags.enableEvents || town.feature_flags.enableSafety;
 
   if (!hasCommunity) return null;
@@ -269,7 +290,7 @@ function CommunityWidget() {
         No Active Alerts
       </div>
       <div className="text-sm text-text-secondary mb-1">
-        Needham public safety status
+        {shortTownName} public safety status
       </div>
       <div className="text-xs text-text-muted">
         Emergency: 911 · Non-emergency: (781) 455-7570
@@ -316,20 +337,28 @@ function WidgetFallback({ href, icon, title, message }: Readonly<{ href: string;
 
 // ─── Main Export ──────────────────────────────────────────────────────────────
 
-export function LiveWidgets() {
+interface LiveWidgetsProps {
+  /** 'grid' (default) renders in a multi-column grid; 'sidebar' stacks vertically */
+  variant?: "grid" | "sidebar";
+}
+
+export function LiveWidgets({ variant = "grid" }: LiveWidgetsProps) {
   const town = useTown();
+  const shortTownName = town.name.replace(/,\s*[A-Z]{2}$/i, "");
   const hasWeather = town.feature_flags.enableWeather;
   const hasTransit = town.feature_flags.enableTransit && !!town.transit_route;
   const hasCommunity = town.feature_flags.enableEvents || town.feature_flags.enableSafety;
 
   if (!hasWeather && !hasTransit && !hasCommunity) return null;
 
+  const isSidebar = variant === "sidebar";
+
   return (
-    <section className="mt-8 mb-4">
-      <h2 className="text-2xl font-bold text-text-primary mb-5">
-        Right Now in Needham
+    <section className={isSidebar ? "" : "mt-8 mb-4"}>
+      <h2 className={`font-bold text-text-primary ${isSidebar ? "text-lg mb-3" : "text-2xl mb-5"}`}>
+        Right Now in {shortTownName}
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className={isSidebar ? "flex flex-col gap-4" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"}>
         {hasWeather && <WeatherWidget />}
         {hasTransit && <TransitWidget />}
         {hasCommunity && <CommunityWidget />}

@@ -98,12 +98,12 @@ export default function WeatherPage() {
       <Header />
 
       <main className="min-h-screen bg-surface">
-        <div className="bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] text-white py-12 px-4">
+        <div className="bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] text-white py-8 px-4">
           <div className="max-w-content mx-auto">
-            <h1 className="text-4xl font-bold mb-3">
+            <h1 className="text-3xl font-bold mb-2">
               {shortTownName} <span className="text-[var(--accent)]">Weather</span>
             </h1>
-            <p className="text-lg text-white/90">
+            <p className="text-base text-white/90">
               Current conditions and forecast from the National Weather Service
             </p>
           </div>
@@ -213,7 +213,7 @@ export default function WeatherPage() {
 
               {/* 7-Day Forecast */}
               <h2 className="text-xl font-bold text-text-primary mb-4">Extended Forecast</h2>
-              <div className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {weather.periods.slice(1, 14).map((period) => (
                   <div
                     key={period.number}

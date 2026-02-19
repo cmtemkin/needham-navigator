@@ -47,6 +47,14 @@ export type TownLocation = {
   lng: number;
 };
 
+export type TownAboutContent = {
+  mission: string;
+  how_it_works: string;
+  faq: { question: string; answer: string }[];
+  disclaimer: string;
+  github_url?: string;
+};
+
 export type TownConfig = {
   town_id: string;
   name: string;
@@ -59,6 +67,16 @@ export type TownConfig = {
   location: TownLocation;
   /** MBTA route ID (e.g. "CR-Needham") */
   transit_route?: string;
+  /** Display name for the app (e.g., "Needham Navigator", "Boston Hub") */
+  app_name: string;
+  /** Short tagline (e.g., "Your AI Town Guide") */
+  app_tagline: string;
+  /** Name for the AI assistant (e.g., "Needham AI", "Town Assistant") */
+  assistant_name: string;
+  /** News source labels — maps source_id to display name */
+  news_sources?: Record<string, string>;
+  /** About page content — if omitted, about page shows generic content */
+  about?: TownAboutContent;
 };
 
 export const TOWNS: TownConfig[] = [
@@ -139,6 +157,43 @@ export const TOWNS: TownConfig[] = [
     },
     location: { lat: 42.2828, lng: -71.2337 },
     transit_route: "CR-Needham",
+    app_name: "Needham Navigator",
+    app_tagline: "Your AI Town Guide",
+    assistant_name: "Needham AI",
+    news_sources: {
+      "needham:patch-news": "Needham Patch",
+      "needham:observer-news": "Needham Observer",
+      "needham:needham-local": "Needham Local",
+      "needham:town-rss": "Town of Needham",
+    },
+    about: {
+      mission: "Make Needham's public information accessible, searchable, and understandable for everyone.",
+      how_it_works: "We collect publicly available information from town websites, school district pages, local news, community organizations, and more. When you search, AI finds the most relevant information and generates a clear, sourced answer. Every answer links back to official sources so you can verify. Data is refreshed regularly to stay current.",
+      faq: [
+        {
+          question: "Is this an official Town of Needham website?",
+          answer: "No. This is an independent community project built by a Needham resident. Always verify important information at needhamma.gov or by calling Town Hall at (781) 455-7500.",
+        },
+        {
+          question: "Is my data being collected?",
+          answer: "We don't require accounts or collect personal information. Search queries are logged anonymously to improve results. We use Pendo for anonymous usage analytics (no personal data).",
+        },
+        {
+          question: "Can the AI be wrong?",
+          answer: "Yes. AI can make mistakes or misinterpret information. That's why we always link to original sources so you can verify. For important decisions like permits, taxes, or legal matters, check official town resources.",
+        },
+        {
+          question: "How can I help?",
+          answer: "Send us feedback, suggest new sources, or report errors. This is a community project and we'd love your input. If you're technical, contributions are welcome on GitHub!",
+        },
+        {
+          question: "Is this free?",
+          answer: "Yes, and it always will be. This is a passion project built to help the community.",
+        },
+      ],
+      disclaimer: "AI can be wrong — always check official sources for critical decisions (permits, taxes, legal matters).",
+      github_url: "https://github.com/cmtemkin/needham-navigator",
+    },
   },
   // Remove before production deployment — used for multi-tenant testing only
   {
@@ -195,6 +250,9 @@ export const TOWNS: TownConfig[] = [
       enableAnswerCache: true,
     },
     location: { lat: 42.0, lng: -71.0 },
+    app_name: "Mock Town Navigator",
+    app_tagline: "Your AI Town Guide",
+    assistant_name: "Town AI",
   },
 ];
 

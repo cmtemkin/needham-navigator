@@ -40,7 +40,7 @@ export async function generateMetadata({
   const town = getTownById(normalizeTownId(resolvedParams.town));
   if (!town) {
     return {
-      title: "Town Not Found | Needham Navigator",
+      title: "Town Not Found",
       description: "The requested town configuration could not be found.",
     };
   }
@@ -64,7 +64,7 @@ export default async function TownLayout({ children, params }: TownLayoutProps) 
               <div className="min-h-screen bg-surface" style={getTownThemeStyle(town)}>
                 {children}
               </div>
-              <FloatingChatWrapper townId={town.town_id} />
+              <FloatingChatWrapper townId={town.town_id} assistantName={town.assistant_name} />
             </ErrorBoundary>
           </PendoProvider>
         </ChatProvider>

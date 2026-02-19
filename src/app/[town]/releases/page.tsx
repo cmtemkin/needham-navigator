@@ -221,8 +221,7 @@ export default async function ReleasesPage({ params }: ReleasesPageProps) {
                 Release Notes
               </h1>
               <p className="mt-1 text-[13px] leading-relaxed text-text-secondary">
-                Product updates and technical changes for the Needham Navigator
-                platform.
+                Product updates and technical changes for the platform.
               </p>
             </div>
           </div>

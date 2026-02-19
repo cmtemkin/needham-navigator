@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
+import { TOWNS, DEFAULT_TOWN_ID } from "../../config/towns";
 import "./globals.css";
+
+const defaultTown = TOWNS.find((t) => t.town_id === DEFAULT_TOWN_ID) ?? TOWNS[0];
+const appName = defaultTown.app_name;
+const appTagline = defaultTown.app_tagline;
+const shortName = defaultTown.name.replace(/,\s*[A-Z]{2}$/i, "");
 
 export const metadata: Metadata = {
   title: {
-    default: "Needham Navigator — Your AI Town Guide",
-    template: "%s | Needham Navigator",
+    default: `${appName} — ${appTagline}`,
+    template: `%s | ${appName}`,
   },
-  description:
-    "AI-powered municipal information hub for Needham, MA. Get instant answers about town services, permits, zoning, schools, taxes, and more.",
+  description: `AI-powered information hub for ${shortName}. Get instant answers about services, permits, zoning, schools, taxes, and more.`,
   metadataBase: new URL("https://needhamnavigator.com"),
   icons: {
     icon: [
@@ -20,19 +25,17 @@ export const metadata: Metadata = {
     apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
-    title: "Needham Navigator — Your AI Town Guide",
-    description:
-      "Ask questions about Needham town services, permits, schools, zoning, and more. Get instant answers sourced from official documents.",
+    title: `${appName} — ${appTagline}`,
+    description: `Ask questions about ${shortName} services, permits, schools, zoning, and more. Get instant answers sourced from official documents.`,
     url: "https://needhamnavigator.com",
-    siteName: "Needham Navigator",
+    siteName: appName,
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Needham Navigator — Your AI Town Guide",
-    description:
-      "AI-powered answers about Needham, MA town services. Permits, zoning, schools, taxes, and more.",
+    title: `${appName} — ${appTagline}`,
+    description: `AI-powered answers about ${shortName} services. Permits, zoning, schools, taxes, and more.`,
   },
   robots: {
     index: true,

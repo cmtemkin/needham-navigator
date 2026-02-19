@@ -38,7 +38,7 @@ Examples:
 
 export async function rewriteQuery(
   originalQuery: string,
-  townName: string = "Needham"
+  townName: string = "Town"
 ): Promise<string | null> {
   try {
     const { text } = await generateText({

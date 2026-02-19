@@ -14,13 +14,16 @@ import { ChatBubble, type ChatMessage } from "@/components/ChatBubble";
 import { parseStreamResponse } from "@/lib/stream-parser";
 import type { MockSource } from "@/lib/mock-data";
 import { trackEvent } from "@/lib/pendo";
+import type { ChatOpenContext } from "@/lib/chat-context";
 
 export interface FloatingChatHandle {
   openWithMessage: (message: string) => void;
+  openWithContext: (options: { message?: string; context: ChatOpenContext }) => void;
 }
 
 interface FloatingChatProps {
   townId: string;
+  assistantName?: string;
   initialMessage?: string;
 }
 
@@ -35,7 +38,7 @@ function generateSessionId(): string {
 }
 
 export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
-  ({ townId, initialMessage }, ref) => {
+  ({ townId, assistantName = "AI Assistant", initialMessage }, ref) => {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
@@ -224,8 +227,49 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
       [pathname, sendMessage, townId]
     );
 
+    const openWithContext = useCallback(
+      (options: { message?: string; context: ChatOpenContext }) => {
+        trackEvent("chat_opened_with_context", {
+          search_query_length: options.context.searchQuery.length,
+          ai_answer_length: options.context.aiAnswer.length,
+          source_count: options.context.sources.length,
+          followup_length: options.message?.length ?? 0,
+          town_id: townId,
+          session_id: sessionIdRef.current,
+          interaction_surface: "floating_chat",
+          page_path: pathname,
+        });
+
+        // Pre-populate messages with search context
+        const contextMessages: ChatMessage[] = [
+          { id: `ctx-user-${Date.now()}`, role: "user", text: options.context.searchQuery },
+          {
+            id: `ctx-ai-${Date.now()}`,
+            role: "ai",
+            text: options.context.aiAnswer,
+            sources: options.context.sources.map((s) => ({
+              title: s.title,
+              url: s.url,
+              section: "",
+            })),
+          },
+        ];
+        setMessages(contextMessages);
+        setIsOpen(true);
+
+        // If a follow-up message is provided, send it after context is loaded
+        if (options.message?.trim()) {
+          setTimeout(() => {
+            sendMessage(options.message!, { isFromSearch: true });
+          }, 150);
+        }
+      },
+      [pathname, sendMessage, townId]
+    );
+
     useImperativeHandle(ref, () => ({
       openWithMessage,
+      openWithContext,
     }));
 
     // Handle initial message
@@ -281,7 +325,7 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 bg-[var(--primary)] text-white rounded-t-2xl max-sm:rounded-t-none">
               <div className="flex items-center gap-2">
-                <span className="text-[15px] font-semibold">Needham AI Assistant</span>
+                <span className="text-[15px] font-semibold">{assistantName}</span>
                 <span className="inline-block w-2 h-2 rounded-full bg-success animate-pulse" />
               </div>
               <div className="flex items-center gap-1">
@@ -323,7 +367,7 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
               {messages.length === 0 && !isTyping ? (
                 <div className="flex flex-col gap-4 mt-4">
                   <p className="text-[15px] text-text-primary text-center">
-                    👋 Hi! I&apos;m your Needham AI assistant. Ask me anything about town
+                    👋 Hi! I&apos;m your {assistantName} assistant. Ask me anything about
                     services, permits, schools, and more.
                   </p>
                   <div className="flex flex-col gap-2">
@@ -358,21 +402,7 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
                     />
                   ))}
                   {isTyping && (
-                    <div className="flex gap-2.5 justify-start animate-msg-in">
-                      <div className="w-[30px] h-[30px] rounded-full bg-gradient-to-br from-primary to-primary-light flex items-center justify-center text-white text-xs font-extrabold shrink-0 mt-0.5">
-                        N
-                      </div>
-                      <div className="bg-white border border-border-light rounded-2xl rounded-bl-md px-[18px] py-3.5 shadow-xs flex items-center gap-2">
-                        <div className="inline-flex gap-1 items-center">
-                          <span className="w-1.5 h-1.5 bg-text-muted rounded-full animate-blink" />
-                          <span className="w-1.5 h-1.5 bg-text-muted rounded-full animate-blink [animation-delay:0.2s]" />
-                          <span className="w-1.5 h-1.5 bg-text-muted rounded-full animate-blink [animation-delay:0.4s]" />
-                        </div>
-                        <span className="text-[13px] text-text-secondary">
-                          Needham AI is thinking...
-                        </span>
-                      </div>
-                    </div>
+                    <ChatBubble message={{ id: "typing", role: "typing", text: "" }} />
                   )}
                 </>
               )}

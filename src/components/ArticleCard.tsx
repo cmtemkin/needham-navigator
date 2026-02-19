@@ -3,11 +3,13 @@
 import { Clock, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import type { Article } from "@/types/article";
-import { useTownHref } from "@/lib/town-context";
+import { useTown, useTownHref } from "@/lib/town-context";
 
 interface ArticleCardProps {
   article: Article;
   variant?: "grid" | "list";
+  /** Timestamp of user's last visit — articles newer than this show a "NEW" badge */
+  lastVisitTimestamp?: number;
 }
 
 const CONTENT_TYPE_STYLES = {
@@ -58,8 +60,10 @@ function formatRelativeTime(dateString: string): string {
   }
 }
 
-export function ArticleCard({ article, variant = "grid" }: ArticleCardProps) {
+export function ArticleCard({ article, variant = "grid", lastVisitTimestamp }: ArticleCardProps) {
+  const town = useTown();
   const articleHref = useTownHref(`/articles/${article.id}`);
+  const isNew = lastVisitTimestamp != null && new Date(article.published_at).getTime() > lastVisitTimestamp;
   const contentTypeStyle = CONTENT_TYPE_STYLES[article.content_type];
   const categoryLabel = CATEGORY_LABELS[article.category] || article.category;
 
@@ -78,6 +82,11 @@ export function ArticleCard({ article, variant = "grid" }: ArticleCardProps) {
         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-50 text-gray-700">
           {categoryLabel}
         </span>
+        {isNew && (
+          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-[var(--accent)] text-white uppercase tracking-wider">
+            New
+          </span>
+        )}
         {article.content_type === "external" && (
           <ExternalLink size={14} className="text-gray-400" />
         )}
@@ -110,7 +119,7 @@ export function ArticleCard({ article, variant = "grid" }: ArticleCardProps) {
               {article.source_names[0]}
             </span>
           ) : (
-            <span>Needham Navigator</span>
+            <span>{town.app_name}</span>
           )}
         </div>
         <div className="flex items-center gap-1">

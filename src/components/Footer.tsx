@@ -10,9 +10,13 @@ const FOOTER_VERSION_LABEL = "v0.1.0";
 export function Footer() {
   const town = useTown();
   const releasesHref = useTownHref("/releases");
+  const aboutHref = useTownHref("/about");
+  const weatherHref = useTownHref("/weather");
+  const transitHref = useTownHref("/transit");
+  const communityHref = useTownHref("/community");
   const { t } = useI18n();
   const shortTownName = town.name.replace(/,\s*[A-Z]{2}$/i, "");
-  const appName = `${shortTownName} Navigator`;
+  const appName = town.app_name;
   const townHallPhone = town.departments[0]?.phone ?? "(781) 455-7500";
   const websiteText = town.website_url.replace(/^https?:\/\//, "");
 
@@ -27,8 +31,38 @@ export function Footer() {
   const beforeWebsite = splitParts[0] ?? disclaimerText;
   const afterWebsite = splitParts.slice(1).join(websiteText);
 
+  // Build navigation links based on feature flags
+  const navLinks: { href: string; label: string }[] = [];
+  if (town.feature_flags.enableAbout) {
+    navLinks.push({ href: aboutHref, label: "About" });
+  }
+  if (town.feature_flags.enableWeather) {
+    navLinks.push({ href: weatherHref, label: "Weather" });
+  }
+  if (town.feature_flags.enableTransit) {
+    navLinks.push({ href: transitHref, label: "Transit" });
+  }
+  if (town.feature_flags.enableEvents || town.feature_flags.enableSafety) {
+    navLinks.push({ href: communityHref, label: "Community" });
+  }
+
   return (
     <footer className="mx-auto mt-10 max-w-content border-t border-border-light px-4 py-6 pb-8 text-center sm:px-6">
+      {/* Footer navigation links */}
+      {navLinks.length > 0 && (
+        <nav className="mb-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="text-[12px] font-medium text-text-secondary transition-colors hover:text-primary"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+      )}
+
       <p className="mx-auto max-w-[720px] text-[11.5px] leading-relaxed text-text-muted">
         {beforeWebsite}
         <a

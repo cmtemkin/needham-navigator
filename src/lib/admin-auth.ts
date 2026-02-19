@@ -65,7 +65,7 @@ export function unauthorizedAdminResponse(): Response {
     { error: "Unauthorized" },
     {
       status: 401,
-      headers: { "WWW-Authenticate": 'Basic realm="Needham Navigator Admin"' },
+      headers: { "WWW-Authenticate": 'Basic realm="Navigator Admin"' },
     }
   );
 }

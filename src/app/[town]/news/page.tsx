@@ -34,7 +34,7 @@ export default function NewsPage() {
               Local News
             </h1>
             <p className="text-[13px] text-text-muted">
-              Latest from Needham Patch, Observer, and more
+              Latest local news and updates
             </p>
           </div>
         </div>
