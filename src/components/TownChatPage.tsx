@@ -17,7 +17,7 @@ import { trackEvent } from "@/lib/pendo";
 const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true";
 
 function generateSessionId(): string {
-  return `sess-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
+  return `sess-${crypto.randomUUID()}`;
 }
 
 function ChatLoadingFallback() {
@@ -57,7 +57,7 @@ function ChatContent() {
 
   const callRealAPI = useCallback(
     async (question: string) => {
-      const startTime = Date.now();
+      const startTime = performance.now();
       setErrorMessage(null);
       setIsTyping(true);
       scrollToBottom();
@@ -105,7 +105,7 @@ function ChatContent() {
           },
           onDone: () => {
             const aiMessage: ChatMessage = {
-              id: `ai-${Date.now()}`,
+              id: `ai-${crypto.randomUUID().slice(0, 8)}`,
               role: "ai",
               text: fullText || "No response received.",
               sources,
@@ -121,7 +121,7 @@ function ChatContent() {
               response_length: fullText.length,
               source_count: sources.length,
               confidence,
-              response_time_ms: Date.now() - startTime,
+              response_time_ms: Math.round(performance.now() - startTime),
             });
           },
           onError: (error) => {
@@ -156,7 +156,7 @@ function ChatContent() {
 
   const simulateMockResponse = useCallback(
     (question: string) => {
-      const startTime = Date.now();
+      const startTime = performance.now();
       setErrorMessage(null);
       setIsTyping(true);
       scrollToBottom();
@@ -166,7 +166,7 @@ function ChatContent() {
         try {
           const response = findMockResponse(question);
           const aiMessage: ChatMessage = {
-            id: `ai-${Date.now()}`,
+            id: `ai-${crypto.randomUUID().slice(0, 8)}`,
             role: "ai",
             text: response.text,
             sources: response.sources,
@@ -182,7 +182,7 @@ function ChatContent() {
             response_length: response.text.length,
             source_count: response.sources.length,
             confidence: response.confidence,
-            response_time_ms: Date.now() - startTime,
+            response_time_ms: Math.round(performance.now() - startTime),
             mock_mode: true,
           });
         } catch {
@@ -217,7 +217,7 @@ function ChatContent() {
       });
 
       const userMessage: ChatMessage = {
-        id: `user-${Date.now()}`,
+        id: `user-${crypto.randomUUID().slice(0, 8)}`,
         role: "user",
         text,
       };

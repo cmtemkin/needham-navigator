@@ -89,19 +89,16 @@ function stripCdata(text: string): string {
   return text.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1").trim();
 }
 
-const HTML_ENTITY_MAP: Record<string, string> = {
-  "&amp;": "&",
-  "&lt;": "<",
-  "&gt;": ">",
-  "&quot;": '"',
-  "&#39;": "'",
-  "&nbsp;": " ",
-};
-
 function stripHtml(text: string): string {
   return text
     .replace(/<[^>]+>/g, " ")
-    .replace(/&(?:amp|lt|gt|quot|nbsp|#39);/g, (entity) => HTML_ENTITY_MAP[entity] ?? entity)
+    // Decode named entities — &amp; must be last to prevent double-decoding
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
     .replace(/\s+/g, " ")
     .trim();
 }
