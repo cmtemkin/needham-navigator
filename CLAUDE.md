@@ -170,7 +170,7 @@ The CI pipeline includes multiple layers of security scanning:
 1. **ESLint Security Plugin** (`eslint-plugin-security`) — catches common JS/Node security anti-patterns (eval, non-literal regex, etc.) during local lint and CI
 2. **CodeQL** — GitHub's semantic code analysis runs as a parallel CI job and weekly schedule. Blocks auto-merge if findings are detected.
 3. **Semgrep SAST** — Runs on PRs and weekly (`semgrep.yml`). Results uploaded to GitHub Security tab as SARIF.
-4. **SonarCloud** — Code quality + security analysis on every PR and push to main (`sonarcloud.yml`). Free for public repos. Requires `SONAR_TOKEN` secret in GitHub repo settings.
+4. **SonarCloud** — Code quality + security analysis via automatic analysis (runs on SonarCloud's servers, not GitHub Actions). Free for public repos. Config in `sonar-project.properties`.
 5. **npm audit** — Two-tier check in CI:
    - `--audit-level=critical` — fails the build
    - `--audit-level=high` — emits a warning annotation
@@ -198,6 +198,6 @@ If there are open alerts, triage and fix them before writing new features.
 ## CI/CD Pipeline Status
 - **Last validated:** 2026-02-18
 - **Pipeline:** GitHub Actions (ci.yml) > auto-merge > Vercel deploy
-- **Security scanning:** CodeQL (inline + weekly), Semgrep (PR + weekly), SonarCloud (PR + push), ESLint security plugin, npm audit
+- **Security scanning:** CodeQL (inline + weekly), Semgrep (PR + weekly), SonarCloud (automatic analysis), ESLint security plugin, npm audit
 - **Branch protection:** Enforced on `main` (require PR + status checks)
 - **Repo visibility:** Public (MIT License)
