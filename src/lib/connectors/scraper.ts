@@ -122,14 +122,12 @@ async function discoverLinks(
       if (!href) return;
 
       try {
-        const resolved = new URL(href, baseUrl).href;
-        // Only allow http/https URLs
-        if (
-          !resolved.startsWith("http://") &&
-          !resolved.startsWith("https://")
-        ) {
+        const parsedUrl = new URL(href, baseUrl);
+        // Only allow http/https URLs (blocks javascript:, data:, vbscript:, etc.)
+        if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
           return;
         }
+        const resolved = parsedUrl.href;
         // Skip fragment-only links
         if (resolved.includes("#")) {
           return;
