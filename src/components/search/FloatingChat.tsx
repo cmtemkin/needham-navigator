@@ -50,6 +50,14 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
     const hasProcessedInitial = useRef(false);
     const latestAiMessageIdRef = useRef<string | null>(null);
 
+    const scrollToBottom = useCallback(() => {
+      requestAnimationFrame(() => {
+        if (messagesContainerRef.current) {
+          messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+        }
+      });
+    }, []);
+
     const scrollToLatestAiMessage = useCallback(() => {
       if (!latestAiMessageIdRef.current || !messagesContainerRef.current) return;
 
@@ -221,10 +229,11 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
         if (message.trim()) {
           setTimeout(() => {
             sendMessage(message, { isFromSearch: true });
+            setTimeout(scrollToBottom, 50);
           }, 100);
         }
       },
-      [pathname, sendMessage, townId]
+      [pathname, sendMessage, townId, scrollToBottom]
     );
 
     const openWithContext = useCallback(
@@ -256,15 +265,17 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
         ];
         setMessages(contextMessages);
         setIsOpen(true);
+        setTimeout(scrollToBottom, 100);
 
         // If a follow-up message is provided, send it after context is loaded
         if (options.message?.trim()) {
           setTimeout(() => {
             sendMessage(options.message!, { isFromSearch: true });
+            setTimeout(scrollToBottom, 50);
           }, 150);
         }
       },
-      [pathname, sendMessage, townId]
+      [pathname, sendMessage, townId, scrollToBottom]
     );
 
     useImperativeHandle(ref, () => ({
