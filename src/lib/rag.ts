@@ -10,7 +10,7 @@ import type { RetrievalConfig } from "@/lib/query-router";
 export const DEFAULT_TOWN_ID = DEFAULT_TOWN_ID_FROM_CONFIG;
 
 const DEFAULT_MATCH_THRESHOLD = 0.7;
-const DEFAULT_MATCH_COUNT = 30; // Retrieve more for reranking
+const DEFAULT_MATCH_COUNT = 20; // Retrieve more for reranking (reduced from 30 — reranking discards most beyond top 15)
 const DEFAULT_FINAL_COUNT = 10; // Final chunks to pass to LLM
 const MIN_SIMILARITY_FLOOR = 0.3; // Drop chunks below this — they're noise (tuned for better recall)
 
@@ -576,14 +576,16 @@ function selectTopChunks(
 /**
  * Run a vector search against content_items (external news, RSS, etc.)
  * and transform results to MatchDocumentRow shape for merging.
+ * Accepts a pre-computed embedding to avoid redundant OpenAI API calls.
  */
 async function vectorSearchContentItems(
   queryText: string,
   townId: string,
   matchThreshold: number,
   matchCount: number,
+  precomputedEmbedding?: number[],
 ): Promise<MatchDocumentRow[]> {
-  const embedding = await generateEmbedding(queryText);
+  const embedding = precomputedEmbedding ?? await generateEmbedding(queryText);
   const supabase = getSupabaseClient({ townId });
 
   const { data, error } = await supabase.rpc("match_content_items", {
@@ -630,14 +632,16 @@ async function vectorSearchContentItems(
 
 /**
  * Run a single vector search against Supabase match_documents RPC.
+ * Accepts a pre-computed embedding to avoid redundant OpenAI API calls.
  */
 async function vectorSearch(
   queryText: string,
   townId: string,
   matchThreshold: number,
   matchCount: number,
+  precomputedEmbedding?: number[],
 ): Promise<MatchDocumentRow[]> {
-  const embedding = await generateEmbedding(queryText);
+  const embedding = precomputedEmbedding ?? await generateEmbedding(queryText);
   const supabase = getSupabaseClient({ townId });
 
   const { data, error } = await supabase.rpc("match_documents", {
@@ -690,28 +694,44 @@ export async function retrieveRelevantChunks(
   // Step 3: Detect department for reranking (use expanded terms for better detection)
   const detectedDepartment = detectDepartment(fullExpandedQuery);
 
-  // Step 4: LLM query rewriting (runs in parallel with vector searches)
+  // Step 4: LLM query rewriting (runs in parallel with embedding generation)
   // This catches queries the synonym dictionary can't handle
   const rewrittenQueryPromise = rewriteQuery(trimmedQuery, townId);
 
-  // Step 5: Run vector searches in parallel — original + expanded + LLM-rewritten
+  // Step 5: Pre-compute embeddings to avoid duplicate OpenAI API calls.
+  // Generate each unique embedding once and share across search functions.
   const hasExpansions = expanded.length > 0 || intentKeywords.length > 0;
 
+  // Generate the original query embedding (shared by vectorSearch + vectorSearchContentItems)
+  const embeddingPromises: Promise<number[]>[] = [generateEmbedding(trimmedQuery)];
+  // If expansions exist, generate expanded query embedding in parallel
+  if (hasExpansions) {
+    embeddingPromises.push(generateEmbedding(fullExpandedQuery));
+  }
+
+  // Wait for embeddings + LLM rewrite in parallel
+  const [originalEmbedding, expandedEmbedding] = await Promise.all([
+    embeddingPromises[0],
+    hasExpansions ? embeddingPromises[1] : Promise.resolve(undefined),
+  ]);
+
+  // Step 6: Run vector searches in parallel — original + expanded + LLM-rewritten
+  // All searches reuse pre-computed embeddings (no duplicate API calls)
   const searchPromises: Promise<MatchDocumentRow[]>[] = [
-    vectorSearch(trimmedQuery, townId, matchThreshold, matchCount),
-    // Search external content (RSS, news) in parallel
-    vectorSearchContentItems(trimmedQuery, townId, matchThreshold, Math.ceil(matchCount / 2)),
+    vectorSearch(trimmedQuery, townId, matchThreshold, matchCount, originalEmbedding),
+    vectorSearchContentItems(trimmedQuery, townId, matchThreshold, Math.ceil(matchCount / 2), originalEmbedding),
   ];
 
-  if (hasExpansions) {
+  if (hasExpansions && expandedEmbedding) {
     searchPromises.push(
-      vectorSearch(fullExpandedQuery, townId, matchThreshold, matchCount),
+      vectorSearch(fullExpandedQuery, townId, matchThreshold, matchCount, expandedEmbedding),
     );
   }
 
-  // Wait for the LLM rewrite, then add a third search if it produced something
+  // Wait for the LLM rewrite, then add a search with a new embedding if it produced something
   const rewrittenQuery = await rewrittenQueryPromise;
   if (rewrittenQuery) {
+    // Rewritten query needs its own embedding (different text)
     searchPromises.push(
       vectorSearch(rewrittenQuery, townId, matchThreshold, matchCount),
     );

@@ -13,7 +13,7 @@ import {
 } from "@/lib/rag";
 import { getSupabaseClient } from "@/lib/supabase";
 import { getTownById } from "@/lib/towns";
-import { setCachedAnswer } from "@/lib/answer-cache";
+import { getCachedAnswer, setCachedAnswer } from "@/lib/answer-cache";
 
 const DEFAULT_CHAT_MODEL = "gpt-5-nano";
 const ALLOWED_MODELS = new Set([
@@ -144,6 +144,37 @@ export async function POST(request: Request): Promise<Response> {
   const responseId = randomUUID();
 
   try {
+    // Check answer cache first — skip entire RAG pipeline for cache hits
+    try {
+      const cached = await getCachedAnswer(latestUserMessage.content, townId);
+      if (cached) {
+        // Reconstruct source references from cached data
+        const cachedSources = (cached.sources ?? []).map((s, i) => ({
+          source_id: `S${i + 1}`,
+          citation: `[${s.title}]`,
+          document_title: s.title,
+          document_url: s.url,
+        }));
+
+        return staticStreamResponse({
+          text: cached.answer_html,
+          confidence: {
+            level: "high" as const,
+            label: "Verified from official sources",
+            color: "green" as const,
+            averageSimilarity: 0.9,
+            topSimilarity: 0.95,
+            supportingChunks: cachedSources.length,
+            reason: "Served from answer cache",
+          },
+          sources: cachedSources,
+          responseId,
+        });
+      }
+    } catch {
+      // Cache lookup failure is non-fatal — proceed with full RAG pipeline
+    }
+
     // Wrap retrieval in its own try/catch so embedding/Supabase failures
     // degrade gracefully to the "call Town Hall" fallback instead of a 500
     let chunks: RetrievedChunk[] = [];
@@ -229,64 +260,10 @@ export async function POST(request: Request): Promise<Response> {
       })),
     });
 
-    // Wait for full text to parse USED_SOURCES metadata and filter sources
-    const fullResponseText = await result.text;
-
-    // Parse USED_SOURCES metadata to determine which sources were actually used
-    let filteredSources = sources;
-    const usedSourcesMatch = fullResponseText.match(/USED_SOURCES:\s*(.+?)(?:\n|$)/i);
-
-    if (usedSourcesMatch) {
-      const usedSourcesStr = usedSourcesMatch[1].trim();
-      if (usedSourcesStr.toLowerCase() === "none") {
-        // LLM indicated no sources were used
-        filteredSources = [];
-      } else {
-        // Parse comma-separated source IDs (e.g., "S1, S3, S5")
-        const usedIds = new Set(
-          usedSourcesStr.split(",").map((id) => id.trim().toUpperCase())
-        );
-        filteredSources = sources.filter((source) =>
-          usedIds.has(source.source_id.toUpperCase())
-        );
-      }
-    }
-    // If no USED_SOURCES found, fall back to showing all sources (backwards compatible)
-
-    // Strip USED_SOURCES metadata from the text before displaying
-    const cleanedText = fullResponseText.replace(/USED_SOURCES:\s*.+?(?:\n|$)/gi, "").trim();
-
-    // Fire-and-forget: log token usage and cost
-    Promise.resolve(result.usage).then((usage) => {
-      const prompt = usage.inputTokens ?? 0;
-      const completion = usage.outputTokens ?? 0;
-      const total = usage.totalTokens ?? (prompt + completion);
-      trackCost({
-        townId,
-        endpoint: "chat",
-        model: chatModel,
-        promptTokens: prompt,
-        completionTokens: completion,
-        totalTokens: total,
-        metadata: {
-          question_length: latestUserMessage.content.length,
-          source_count: filteredSources.length,
-          confidence_level: confidence.level,
-        },
-      }).catch((err) => console.error("[api/chat] cost tracking error:", err));
-    }).catch((err) => console.error("[api/chat] usage retrieval error:", err));
-
-    // Fire-and-forget: cache this answer for search mode
-    setCachedAnswer(
-      latestUserMessage.content,
-      townId,
-      cleanedText,
-      filteredSources.map(s => ({ title: s.document_title, url: s.document_url ?? '' }))
-    ).catch(() => {}); // silent fail
-
-    // Stream the cleaned text with filtered sources
+    // Real streaming: pipe LLM tokens directly to the client as they arrive
     const stream = createUIMessageStream({
-      execute: ({ writer }) => {
+      execute: async ({ writer }) => {
+        // Send metadata immediately so the UI can render confidence + sources
         writer.write({
           type: "data-confidence",
           data: confidence,
@@ -294,7 +271,7 @@ export async function POST(request: Request): Promise<Response> {
         });
         writer.write({
           type: "data-sources",
-          data: filteredSources,
+          data: sources,
           transient: true,
         });
         writer.write({
@@ -303,18 +280,72 @@ export async function POST(request: Request): Promise<Response> {
           transient: true,
         });
 
-        // Stream the cleaned text (split into chunks for smooth streaming effect)
+        // Stream LLM text in real-time
         const textPartId = randomUUID();
         writer.write({ type: "text-start", id: textPartId });
 
-        // Stream text in chunks of ~50 chars for natural typing effect
-        const chunkSize = 50;
-        for (let i = 0; i < cleanedText.length; i += chunkSize) {
-          const chunk = cleanedText.slice(i, i + chunkSize);
-          writer.write({ type: "text-delta", id: textPartId, delta: chunk });
+        let fullText = "";
+        for await (const delta of result.textStream) {
+          fullText += delta;
+          writer.write({ type: "text-delta", id: textPartId, delta });
         }
 
         writer.write({ type: "text-end", id: textPartId });
+
+        // Post-stream: parse USED_SOURCES metadata and update sources
+        let filteredSources = sources;
+        const usedSourcesMatch = fullText.match(/USED_SOURCES:\s*(.+?)(?:\n|$)/i);
+
+        if (usedSourcesMatch) {
+          const usedSourcesStr = usedSourcesMatch[1].trim();
+          if (usedSourcesStr.toLowerCase() === "none") {
+            filteredSources = [];
+          } else {
+            const usedIds = new Set(
+              usedSourcesStr.split(",").map((id) => id.trim().toUpperCase())
+            );
+            filteredSources = sources.filter((source) =>
+              usedIds.has(source.source_id.toUpperCase())
+            );
+          }
+
+          // Send updated (filtered) sources after USED_SOURCES parsing
+          writer.write({
+            type: "data-sources",
+            data: filteredSources,
+            transient: true,
+          });
+        }
+
+        const cleanedText = fullText.replace(/USED_SOURCES:\s*.+?(?:\n|$)/gi, "").trim();
+
+        // Fire-and-forget: log token usage and cost
+        Promise.resolve(result.usage).then((usage) => {
+          const prompt = usage.inputTokens ?? 0;
+          const completion = usage.outputTokens ?? 0;
+          const total = usage.totalTokens ?? (prompt + completion);
+          trackCost({
+            townId,
+            endpoint: "chat",
+            model: chatModel,
+            promptTokens: prompt,
+            completionTokens: completion,
+            totalTokens: total,
+            metadata: {
+              question_length: latestUserMessage.content.length,
+              source_count: filteredSources.length,
+              confidence_level: confidence.level,
+            },
+          }).catch((err) => console.error("[api/chat] cost tracking error:", err));
+        }).catch((err) => console.error("[api/chat] usage retrieval error:", err));
+
+        // Fire-and-forget: cache this answer for future requests
+        setCachedAnswer(
+          latestUserMessage.content,
+          townId,
+          cleanedText,
+          filteredSources.map(s => ({ title: s.document_title, url: s.document_url ?? '' }))
+        ).catch(() => {}); // silent fail
       },
       onError: () =>
         "Something went wrong while generating the answer. Please try again.",
