@@ -5,15 +5,11 @@ on:
     branches: [main]
     types: [opened, synchronize, reopened]
 
-permissions:
-  contents: write
-  pull-requests: write
-  issues: write
-  security-events: write
-
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     env:
       # Dummy values so the build doesn't fail on missing env vars
       OPENAI_API_KEY: sk-test-dummy-key-for-ci-build
@@ -55,6 +51,9 @@ jobs:
 
   codeql:
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -70,6 +69,10 @@ jobs:
   auto-merge:
     needs: [build-and-test, codeql]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
     if: success()
     steps:
       - name: Auto-merge PR
@@ -140,6 +143,9 @@ jobs:
   on-failure:
     needs: [build-and-test, codeql]
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
     if: failure()
     steps:
       - name: Comment on PR with failure details

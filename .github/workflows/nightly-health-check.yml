@@ -7,12 +7,11 @@ on:
   workflow_dispatch:
     # Allow manual trigger
 
-permissions:
-  issues: write
-
 jobs:
   health-check:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
       - name: Check production site
         id: health

@@ -9,13 +9,12 @@ on:
     - cron: '0 5 * * 1'  # Every Monday at 5:00 AM UTC
   workflow_dispatch: {}
 
-permissions:
-  contents: write
-
 jobs:
   # Delete the head branch immediately after a PR is merged
   delete-on-merge:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
     steps:
       - name: Delete merged branch
@@ -41,6 +40,8 @@ jobs:
   # Weekly sweep: find and delete branches that were merged but never cleaned up
   sweep-stale:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout
