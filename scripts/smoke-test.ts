@@ -6,6 +6,7 @@
 
 import { getSupabaseServiceClient } from "../src/lib/supabase";
 import { generateEmbeddings } from "../src/lib/embeddings";
+import { queryPinecone, PINECONE_NS_CHUNKS } from "../src/lib/pinecone";
 
 const QUERIES = [
   "when is the dump open?",
@@ -30,7 +31,7 @@ async function main() {
   const supabase = getSupabaseServiceClient();
 
   console.log("=".repeat(60));
-  console.log("SMOKE TEST — 5 Queries Against Clean Data");
+  console.log("SMOKE TEST — 5 Queries Against Clean Data (Pinecone)");
   console.log("=".repeat(60));
 
   for (const query of QUERIES) {
@@ -39,27 +40,57 @@ async function main() {
     // Generate embedding for the query
     const [queryEmbedding] = await generateEmbeddings([query]);
 
-    // Semantic search
-    const { data: matches, error } = await supabase.rpc("match_documents", {
-      query_embedding: queryEmbedding,
-      match_threshold: 0.3,
-      match_count: 5,
-      match_town_id: "needham",
-    });
-
-    if (error) {
-      console.error(`  ERROR: ${error.message}`);
+    // Semantic search via Pinecone
+    let pineconeResults;
+    try {
+      pineconeResults = await queryPinecone(
+        PINECONE_NS_CHUNKS,
+        queryEmbedding,
+        5,
+        { town_id: { $eq: "needham" } },
+      );
+    } catch (err) {
+      console.error(`  ERROR: ${err}`);
       continue;
     }
 
-    if (!matches || matches.length === 0) {
+    // Filter by threshold
+    const filtered = pineconeResults.filter((r) => r.score >= 0.3);
+    if (filtered.length === 0) {
       console.log("  No matches found");
+      continue;
+    }
+
+    // Fetch chunk text + metadata from Supabase by IDs
+    const ids = filtered.map((r) => r.id);
+    const { data: chunkData, error } = await supabase
+      .from("document_chunks")
+      .select("id, chunk_text, metadata")
+      .in("id", ids);
+
+    if (error) {
+      console.error(`  ERROR fetching metadata: ${error.message}`);
+      continue;
+    }
+
+    // Merge scores with metadata
+    const chunkMap = new Map((chunkData ?? []).map((d: { id: string; chunk_text: string; metadata: Record<string, unknown> }) => [d.id, d]));
+    const matches = filtered
+      .map((r) => {
+        const chunk = chunkMap.get(r.id);
+        if (!chunk) return null;
+        return { ...chunk, similarity: r.score };
+      })
+      .filter((m): m is NonNullable<typeof m> => m !== null);
+
+    if (matches.length === 0) {
+      console.log("  No matches found (metadata fetch returned empty)");
       continue;
     }
 
     // Display results
     const topScore = matches[0].similarity;
-    const avgScore = matches.reduce((s: number, m: { similarity: number }) => s + m.similarity, 0) / matches.length;
+    const avgScore = matches.reduce((s, m) => s + m.similarity, 0) / matches.length;
 
     let confidence: string;
     if (topScore >= 0.85) confidence = "HIGH";
@@ -78,7 +109,7 @@ async function main() {
       for (const marker of BOILERPLATE_MARKERS) {
         if (match.chunk_text?.includes(marker)) {
           hasBoilerplate = true;
-          console.log(`  ⚠️  BOILERPLATE FOUND: "${marker}" in match from ${match.metadata?.document_url || "unknown"}`);
+          console.log(`  ⚠️  BOILERPLATE FOUND: "${marker}" in match from ${(match.metadata as Record<string, unknown>)?.document_url || "unknown"}`);
         }
       }
     }
@@ -88,7 +119,7 @@ async function main() {
 
     // Show top match preview
     const topChunk = matches[0].chunk_text || "";
-    console.log(`  Top match (${(matches[0].metadata as any)?.document_title || "unknown"}):`);
+    console.log(`  Top match (${(matches[0].metadata as Record<string, unknown>)?.document_title || "unknown"}):`);
     console.log(`    "${topChunk.substring(0, 200).replace(/\n/g, " ")}..."`);
   }
 

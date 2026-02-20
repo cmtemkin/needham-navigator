@@ -10,6 +10,7 @@
 import { createHash } from "crypto";
 import { getSupabaseServiceClient } from "@/lib/supabase";
 import { generateEmbedding } from "@/lib/embeddings";
+import { upsertToPinecone, PINECONE_NS_CONTENT } from "@/lib/pinecone";
 import { createConnector } from "./registry";
 import type {
   ConnectorConfig,
@@ -90,15 +91,15 @@ async function upsertContentItems(
   let skipped = 0;
 
   for (const item of items) {
-    // Generate embedding if configured
-    let embedding: number[] | null = null;
+    // Generate embedding if configured (stored in Pinecone, not Supabase)
+    let embeddingValues: number[] | null = null;
     if (shouldEmbed && item.content) {
       const textToEmbed = `${item.title}\n\n${item.summary || item.content}`.slice(
         0,
         8000
       );
       try {
-        embedding = await generateEmbedding(textToEmbed);
+        embeddingValues = await generateEmbedding(textToEmbed);
       } catch (err) {
         console.warn(
           `[runner] Failed to embed item "${item.title}": ${err}`
@@ -119,14 +120,14 @@ async function upsertContentItems(
       image_url: item.image_url ?? null,
       metadata: item.metadata,
       content_hash: item.content_hash,
-      embedding,
+      embedding: null, // Vectors stored in Pinecone, not Supabase
       updated_at: new Date().toISOString(),
     };
 
-    const { error } = await supabase.from("content_items").upsert(row, {
+    const { data: upsertedRow, error } = await supabase.from("content_items").upsert(row, {
       onConflict: "town_id,source_id,content_hash",
       ignoreDuplicates: false,
-    });
+    }).select("id").single();
 
     if (error) {
       // Duplicate = skip (content hasn't changed)
@@ -140,6 +141,19 @@ async function upsertContentItems(
       }
     } else {
       upserted++;
+
+      // Upsert embedding to Pinecone if we generated one
+      if (embeddingValues && upsertedRow?.id) {
+        try {
+          await upsertToPinecone(PINECONE_NS_CONTENT, [{
+            id: upsertedRow.id,
+            values: embeddingValues,
+            metadata: { town_id: townId, source_id: item.source_id },
+          }]);
+        } catch (pineconeErr) {
+          console.warn(`[runner] Pinecone upsert failed for "${item.title}": ${pineconeErr}`);
+        }
+      }
     }
   }
 

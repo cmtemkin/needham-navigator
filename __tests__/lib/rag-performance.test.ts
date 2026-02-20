@@ -2,6 +2,7 @@
  * Tests for RAG performance optimizations:
  * - Pre-computed embeddings (no duplicate API calls)
  * - Reduced match count (DEFAULT_MATCH_COUNT = 20)
+ * - Pinecone vector search + Supabase metadata fetch
  */
 
 // Track calls to generateEmbedding to verify dedup
@@ -13,16 +14,21 @@ jest.mock("@/lib/embeddings", () => ({
   EMBEDDING_DIMENSIONS: 1536,
 }));
 
-// Mock Supabase client
-const mockRpc = jest.fn();
+// Mock Pinecone
+const mockQueryPinecone = jest.fn();
+jest.mock("@/lib/pinecone", () => ({
+  queryPinecone: (...args: unknown[]) => mockQueryPinecone(...args),
+  PINECONE_NS_CHUNKS: "chunks",
+  PINECONE_NS_CONTENT: "content",
+}));
+
+// Mock Supabase client (used for metadata fetch after Pinecone query)
+const mockSelect = jest.fn();
+const mockIn = jest.fn();
 const mockFrom = jest.fn();
 jest.mock("@/lib/supabase", () => ({
   getSupabaseClient: () => ({
-    rpc: mockRpc,
-    from: (...args: unknown[]) => {
-      const result = mockFrom(...args);
-      return result;
-    },
+    from: (...args: unknown[]) => mockFrom(...args),
   }),
 }));
 
@@ -63,32 +69,39 @@ describe("RAG performance optimizations", () => {
     jest.clearAllMocks();
     mockGenerateEmbedding.mockResolvedValue(fakeEmbedding);
 
-    // Default: match_documents returns some results, match_content_items returns empty
-    mockRpc.mockImplementation((name: string) => {
-      if (name === "match_documents") {
-        return {
-          data: [
-            {
-              id: "chunk-1",
-              chunk_text: "Transfer station hours are Monday to Saturday 7am-3pm.",
-              metadata: { document_title: "DPW Info", document_url: "https://example.com/dpw" },
-              similarity: 0.85,
-            },
-            {
-              id: "chunk-2",
-              chunk_text: "The transfer station accepts yard waste in spring and fall.",
-              metadata: { document_title: "DPW Info", document_url: "https://example.com/dpw" },
-              similarity: 0.78,
-            },
-          ],
-          error: null,
-        };
+    // Default: Pinecone chunks query returns results, content query returns empty
+    mockQueryPinecone.mockImplementation((namespace: string) => {
+      if (namespace === "chunks") {
+        return [
+          { id: "chunk-1", score: 0.85 },
+          { id: "chunk-2", score: 0.78 },
+        ];
       }
-      if (name === "match_content_items") {
-        return { data: [], error: null };
+      if (namespace === "content") {
+        return [];
       }
-      return { data: [], error: null };
+      return [];
     });
+
+    // Default: Supabase metadata fetch returns matching data
+    mockIn.mockResolvedValue({
+      data: [
+        {
+          id: "chunk-1",
+          chunk_text: "Transfer station hours are Monday to Saturday 7am-3pm.",
+          metadata: { document_title: "DPW Info", document_url: "https://example.com/dpw" },
+        },
+        {
+          id: "chunk-2",
+          chunk_text: "The transfer station accepts yard waste in spring and fall.",
+          metadata: { document_title: "DPW Info", document_url: "https://example.com/dpw" },
+        },
+      ],
+      error: null,
+    });
+
+    mockSelect.mockReturnValue({ in: mockIn });
+    mockFrom.mockReturnValue({ select: mockSelect });
   });
 
   describe("pre-computed embeddings", () => {
@@ -96,26 +109,25 @@ describe("RAG performance optimizations", () => {
       await retrieveRelevantChunks("transfer station hours", { townId: "needham" });
 
       // Should only generate ONE embedding for the original query
-      // (previously generated 2: one for vectorSearch, one for vectorSearchContentItems)
       expect(mockGenerateEmbedding).toHaveBeenCalledTimes(1);
       expect(mockGenerateEmbedding).toHaveBeenCalledWith("transfer station hours");
     });
 
-    it("passes the same pre-computed embedding to both search RPCs", async () => {
+    it("passes the same pre-computed embedding to both Pinecone queries", async () => {
       await retrieveRelevantChunks("building permit", { townId: "needham" });
 
-      // Both match_documents and match_content_items should receive the same embedding
-      const matchDocumentsCall = mockRpc.mock.calls.find(
-        (call: unknown[]) => call[0] === "match_documents"
+      // Both chunks and content namespace queries should receive the same embedding
+      const chunksCall = mockQueryPinecone.mock.calls.find(
+        (call: unknown[]) => call[0] === "chunks"
       );
-      const matchContentItemsCall = mockRpc.mock.calls.find(
-        (call: unknown[]) => call[0] === "match_content_items"
+      const contentCall = mockQueryPinecone.mock.calls.find(
+        (call: unknown[]) => call[0] === "content"
       );
 
-      expect(matchDocumentsCall).toBeDefined();
-      expect(matchContentItemsCall).toBeDefined();
-      expect(matchDocumentsCall![1].query_embedding).toEqual(fakeEmbedding);
-      expect(matchContentItemsCall![1].query_embedding).toEqual(fakeEmbedding);
+      expect(chunksCall).toBeDefined();
+      expect(contentCall).toBeDefined();
+      expect(chunksCall![1]).toEqual(fakeEmbedding);
+      expect(contentCall![1]).toEqual(fakeEmbedding);
     });
 
     it("generates separate embedding for expanded query when synonyms exist", async () => {
@@ -148,21 +160,22 @@ describe("RAG performance optimizations", () => {
     it("requests 20 documents by default (not 30)", async () => {
       await retrieveRelevantChunks("zoning regulations", { townId: "needham" });
 
-      const matchDocumentsCall = mockRpc.mock.calls.find(
-        (call: unknown[]) => call[0] === "match_documents"
+      const chunksCall = mockQueryPinecone.mock.calls.find(
+        (call: unknown[]) => call[0] === "chunks"
       );
-      expect(matchDocumentsCall).toBeDefined();
-      expect(matchDocumentsCall![1].match_count).toBe(20);
+      expect(chunksCall).toBeDefined();
+      // topK is the 3rd argument (index 2)
+      expect(chunksCall![2]).toBe(20);
     });
 
     it("requests ceil(matchCount/2) = 10 content items by default", async () => {
       await retrieveRelevantChunks("zoning regulations", { townId: "needham" });
 
-      const contentItemsCall = mockRpc.mock.calls.find(
-        (call: unknown[]) => call[0] === "match_content_items"
+      const contentCall = mockQueryPinecone.mock.calls.find(
+        (call: unknown[]) => call[0] === "content"
       );
-      expect(contentItemsCall).toBeDefined();
-      expect(contentItemsCall![1].match_count).toBe(10);
+      expect(contentCall).toBeDefined();
+      expect(contentCall![2]).toBe(10);
     });
 
     it("allows overriding match count via options", async () => {
@@ -171,10 +184,10 @@ describe("RAG performance optimizations", () => {
         matchCount: 50,
       });
 
-      const matchDocumentsCall = mockRpc.mock.calls.find(
-        (call: unknown[]) => call[0] === "match_documents"
+      const chunksCall = mockQueryPinecone.mock.calls.find(
+        (call: unknown[]) => call[0] === "chunks"
       );
-      expect(matchDocumentsCall![1].match_count).toBe(50);
+      expect(chunksCall![2]).toBe(50);
     });
   });
 
@@ -191,23 +204,25 @@ describe("RAG performance optimizations", () => {
       expect(mockGenerateEmbedding).not.toHaveBeenCalled();
     });
 
-    it("handles Supabase content_items failure gracefully", async () => {
-      mockRpc.mockImplementation((name: string) => {
-        if (name === "match_documents") {
-          return {
-            data: [{
-              id: "chunk-1",
-              chunk_text: "Some content.",
-              metadata: { document_title: "Test" },
-              similarity: 0.8,
-            }],
-            error: null,
-          };
+    it("handles Pinecone content_items failure gracefully", async () => {
+      mockQueryPinecone.mockImplementation((namespace: string) => {
+        if (namespace === "chunks") {
+          return [{ id: "chunk-1", score: 0.8 }];
         }
-        if (name === "match_content_items") {
-          return { data: null, error: { message: "connection timeout" } };
+        if (namespace === "content") {
+          throw new Error("connection timeout");
         }
-        return { data: [], error: null };
+        return [];
+      });
+
+      // Supabase metadata fetch for the one chunk
+      mockIn.mockResolvedValue({
+        data: [{
+          id: "chunk-1",
+          chunk_text: "Some content.",
+          metadata: { document_title: "Test" },
+        }],
+        error: null,
       });
 
       // Should not throw — content_items failure is non-fatal

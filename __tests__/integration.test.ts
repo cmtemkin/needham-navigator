@@ -78,6 +78,14 @@ jest.mock("@/lib/embeddings", () => ({
     generateEmbedding: jest.fn().mockResolvedValue(new Array(1536).fill(0)),
 }));
 
+jest.mock("@/lib/pinecone", () => ({
+    queryPinecone: jest.fn().mockResolvedValue([]),
+    upsertToPinecone: jest.fn().mockResolvedValue(undefined),
+    deleteFromPinecone: jest.fn().mockResolvedValue(undefined),
+    PINECONE_NS_CHUNKS: "chunks",
+    PINECONE_NS_CONTENT: "content",
+}));
+
 // ---------------------------------------------------------------------------
 // Environment
 // ---------------------------------------------------------------------------
