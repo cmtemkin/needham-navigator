@@ -13,7 +13,7 @@ Visit your town's Navigator page:
 | Needham, MA | `/needham` |
 | Mock Town, MA (demo) | `/mock-town` |
 
-The home page shows popular questions, life-situation tiles, and department contacts. Click any tile or question to start a conversation.
+The home page shows a daily brief, latest news (AI articles + local news), topic cards, and popular questions. Click any tile or question to start a conversation.
 
 ### UI Modes
 
@@ -82,27 +82,28 @@ Click the language toggle (globe icon) in the footer to switch between:
 
 All navigation, labels, and system text are translated. AI chat responses are currently in English.
 
-### AI Articles Hub
+### News
 
-Navigate to **Articles** from the header or visit `/<town>/articles`.
+Navigate to **News** from the header or visit `/<town>/articles`.
 
-AI-generated articles covering town news, government decisions, schools, public safety, and more. Every article is grounded in real documents ingested from official town sources — no fabricated events, names, or votes. Each article links back to its official source.
+A unified feed combining AI-generated articles and external local news in a single timeline, sorted by date. Every AI article is grounded in real documents from official town sources. External news links directly to the original source.
 
-**Article types:**
+**Content types in the feed:**
 | Badge | Meaning |
 |-------|---------|
 | **AI Generated** | Full article written by AI from public records and meeting minutes |
 | **AI Summary** | AI-condensed summary of an external article or document |
-| **External** | Link to an article from an external source |
+| **Needham Patch** / **Observer** / **Needham Local** / **Town of Needham** | External news from local sources (links to original article) |
 
 **Features:**
-- Filter by category (Town Government, Schools, Public Safety, Community, Permits & Development, Business)
-- Filter by content type (AI Generated, AI Summary, External)
-- "Load more" to browse additional articles
-- Each article page shows: formatted content with headers and bullets, source type badge, clickable source links to official documents, AI disclaimer, thumbs up/down feedback, and an "Ask about this" button that opens chat pre-loaded with the article title
+- **Source filter** — filter by All Sources, AI Articles, Patch, Observer, Needham Local, or Town of Needham
+- **Category filter** — filter by Town Government, Schools, Public Safety, Community, Permits & Development, Business, or News
+- Unified feed shows both AI articles (click to read on-site) and external news (click to read at source)
+- Each AI article page shows: formatted content with headers and bullets, source type badge, clickable source links to official documents, AI disclaimer, thumbs up/down feedback, and an "Ask about this" button that opens chat pre-loaded with the article title
 - Articles are generated automatically each morning at 5 AM from newly ingested town documents
-- **External news integration** — AI summaries of articles from Needham Patch, Needham Observer, and Needham Local are generated alongside official town content. External sources are scraped every 4 hours and summarized daily.
-- External news appears in RAG-powered search and chat alongside official municipal content (official sources rank slightly higher)
+- External news from Needham Patch, Needham Observer, and Needham Local is scraped daily and displayed alongside AI content
+- **Geographic filtering** — content from other states or distant cities is automatically filtered out. Government/school content is Needham-only; events/dining/community content includes the broader Boston metro area.
+- All content appears in RAG-powered search and chat, with a locality boost for Needham-specific results
 
 ### Daily Brief
 
@@ -264,7 +265,7 @@ Daily change detection with content-hash comparison:
 |------|-----|-------------|
 | Home | `/<town>` | Landing page with quick links |
 | Chat | `/<town>/chat` | AI-powered Q&A |
-| News | `/<town>/news` | Aggregated local news feed |
+| News | `/<town>/articles` | Unified news feed (AI articles + local news) |
 | Permits & Zoning | `/<town>/permits` | Permit wizard + zoning info |
 | Events | `/<town>/events` | Community events calendar |
 | Weather | `/<town>/weather` | Live NWS weather & forecast |
