@@ -24,9 +24,25 @@ import {
   summarizeExternalArticle,
   generateDailyBrief,
 } from "@/lib/article-generator";
+import { getSupabaseClient } from "@/lib/supabase";
 
 // Register all connector factories so the runner can instantiate them
 import "@/lib/connectors/register-all";
+
+/** Wrap a promise with a timeout to prevent any single step from
+ *  monopolising disk IO on the Supabase free tier. */
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(
+      () => reject(new Error(`${label} timed out after ${ms / 1000}s`)),
+      ms,
+    );
+    promise.then(resolve, reject).finally(() => clearTimeout(timer));
+  });
+}
+
+/** Small delay to spread disk IO between cron steps. */
+const IO_COOLDOWN_MS = 3_000;
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -47,9 +63,21 @@ export async function GET(request: NextRequest) {
     timestamp: new Date().toISOString(),
   };
 
-  // Step 1: Monitor — change detection
+  // Keep-alive: lightweight query to prevent Supabase free-tier auto-pause
   try {
-    const monitor = await runChangeDetection("needham", "vercel-cron");
+    const supabase = getSupabaseClient({});
+    await supabase.from("towns").select("id", { head: true, count: "exact" });
+  } catch (e) {
+    console.warn("[cron/daily] Keep-alive ping failed:", e);
+  }
+
+  // Step 1: Monitor — change detection (timeout: 90s)
+  try {
+    const monitor = await withTimeout(
+      runChangeDetection("needham", "vercel-cron"),
+      90_000,
+      "Monitor",
+    );
     results.monitor = {
       status: "ok",
       checked: monitor.checkedUrls,
@@ -65,9 +93,16 @@ export async function GET(request: NextRequest) {
     results.monitor = { status: "error", error: message };
   }
 
-  // Step 2: Ingest — run connectors
+  // Cooldown: let disk IO settle before next step
+  await new Promise((r) => setTimeout(r, IO_COOLDOWN_MS));
+
+  // Step 2: Ingest — run connectors (timeout: 120s)
   try {
-    const connectorResults = await runConnectors({ townId: "needham" });
+    const connectorResults = await withTimeout(
+      runConnectors({ townId: "needham" }),
+      120_000,
+      "Ingest",
+    );
     results.ingest = {
       status: "ok",
       connectorsRun: connectorResults.length,
@@ -88,6 +123,9 @@ export async function GET(request: NextRequest) {
     console.error("[cron/daily] Ingest error:", message);
     results.ingest = { status: "error", error: message };
   }
+
+  // Cooldown: let disk IO settle before next step
+  await new Promise((r) => setTimeout(r, IO_COOLDOWN_MS));
 
   // Step 3: Generate — create articles from new content
   try {

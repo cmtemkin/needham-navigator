@@ -191,6 +191,9 @@ export interface RunOptions {
   force?: boolean;
 }
 
+/** Delay between connector runs to spread disk IO on Supabase free tier. */
+const CONNECTOR_COOLDOWN_MS = 2_000;
+
 export async function runConnectors(
   options: RunOptions = {}
 ): Promise<ConnectorResult[]> {
@@ -206,6 +209,11 @@ export async function runConnectors(
     // Filter by schedule if specified
     if (options.schedule && config.schedule !== options.schedule) {
       continue;
+    }
+
+    // Cooldown between connectors to avoid disk IO spikes
+    if (results.length > 0) {
+      await new Promise((r) => setTimeout(r, CONNECTOR_COOLDOWN_MS));
     }
 
     const startTime = Date.now();

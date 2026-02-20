@@ -59,8 +59,8 @@ export async function GET(request: NextRequest): Promise<Response> {
 
     return Response.json({
       items: filtered,
-      total: filtered.length,
-      hasMore: offset + limit < total && filtered.length === limit,
+      total,
+      hasMore: offset + limit < total,
       offset,
       limit,
     });
