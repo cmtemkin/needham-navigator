@@ -2,6 +2,38 @@
 
 ---
 
+## v0.12.0 — 2026-02-20
+
+**Geographic Content Filter + Unified News Experience**
+
+### New Features
+- **Unified News page** — Articles and external news are now combined into a single feed at `/<town>/articles`, replacing the separate News and Articles pages. Content is merged from both the AI article generator and external news scrapers, sorted by date.
+- **Source filter** — filter the unified feed by All Sources, AI Articles, Patch, Observer, Needham Local, or Town of Needham
+- **Geographic relevance filter** (`src/lib/geo-filter.ts`) — keyword-based pre-filter that blocks off-topic content (e.g. Connecticut articles) before it reaches the AI pipeline. Uses allowlists (Needham + 10 neighbors + Boston metro), blocklists (49 states, distant cities), and category-specific scope rules:
+  - **Needham only**: government, schools, public safety, development
+  - **Metro area OK**: community, events, dining, news
+- **Locality boost in search** — RAG re-ranking now includes a 0.15 weight locality factor, boosting Needham-specific content and demoting distant-location content
+- **Pipeline health endpoint** (`/api/debug/pipeline`) — diagnostic endpoint reporting source config status, content item counts by source, article counts by type, and last daily brief date (protected by CRON_SECRET)
+
+### Bug Fixes
+- **Daily briefing no longer includes off-topic geographic content** — geo-filter integrated into article generator prompts and daily brief generation
+- **Header navigation simplified** — separate "News" and "Articles" links replaced with a single "News" entry
+- **`/[town]/news` redirects to `/[town]/articles`** — old URL still works
+
+### Improvements
+- Article generator now runs geographic pre-filter before LLM calls (saves API costs on obviously irrelevant content)
+- Content API (`/api/content`) post-filters geographically irrelevant items
+- Daily cron enhanced with per-connector diagnostic logging (items found, upserted, errors per connector)
+- URL pattern filters added to Observer and Needham Local scrapers to restrict to on-domain content
+
+### Technical
+- New file: `src/lib/geo-filter.ts` — geographic relevance filter
+- New file: `src/app/api/debug/pipeline/route.ts` — pipeline health endpoint
+- Modified: `src/lib/article-generator.ts`, `src/lib/rag.ts`, `src/app/api/content/route.ts`, `src/app/api/cron/daily/route.ts`, `scripts/seed-sources.ts`
+- Modified: `src/components/Header.tsx`, `src/components/SearchHomePage.tsx`, `src/app/[town]/articles/page.tsx`, `src/app/[town]/news/page.tsx`
+
+---
+
 ## v0.11.2 — 2026-02-19
 
 **Fix: Search & Chat Resilience — Cold Start Timeouts, Retry Logic, Non-Fatal Text Search**

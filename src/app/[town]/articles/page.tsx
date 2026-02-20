@@ -307,7 +307,7 @@ export default function ArticlesPage() {
                   </button>
                   {categoryDropdownOpen && (
                     <>
-                      <div className="fixed inset-0 z-10" onClick={() => setCategoryDropdownOpen(false)} />
+                      <div className="fixed inset-0 z-10" onClick={() => setCategoryDropdownOpen(false)} onKeyDown={(e) => { if (e.key === "Escape") setCategoryDropdownOpen(false); }} role="presentation" />
                       <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-border-default rounded-md shadow-lg z-20 max-h-64 overflow-auto">
                         {CATEGORIES.map((cat) => (
                           <button
