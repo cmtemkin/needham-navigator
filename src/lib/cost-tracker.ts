@@ -44,9 +44,9 @@ export interface TrackCostParams {
 }
 
 export async function trackCost(params: TrackCostParams): Promise<void> {
-  // Sample embedding cost tracking at 20% to reduce write IO
+  // Sample embedding cost tracking at 5% to reduce write IO
   // Chat/search costs are less frequent and always logged
-  if (params.endpoint === 'embedding' && Math.random() > 0.2) return;
+  if (params.endpoint === 'embedding' && Math.random() > 0.05) return;
 
   const estimatedCost = calculateCost(params.model, params.promptTokens, params.completionTokens);
   const supabase = getSupabaseServiceClient();
