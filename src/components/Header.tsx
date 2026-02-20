@@ -16,7 +16,7 @@ export function Header() {
   const pathname = usePathname();
   const homeHref = useTownHref();
   const searchHref = useTownHref("/search");
-  const articlesHref = useTownHref("/articles");
+  const newsHref = useTownHref("/articles");
   const shortTownName = town.name.replace(/,\s*[A-Z]{2}$/i, "");
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -87,14 +87,14 @@ export function Header() {
             <Search size={18} />
           </button>
 
-          {/* Articles icon (desktop) */}
+          {/* News link (desktop) */}
           {town.feature_flags.enableNews && (
             <Link
-              href={articlesHref}
-              className="hidden md:flex h-9 w-9 items-center justify-center rounded-lg text-text-secondary transition-all hover:bg-surface hover:text-text-primary"
-              aria-label="Articles"
+              href={newsHref}
+              className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-text-secondary text-[13px] font-medium transition-all hover:bg-surface hover:text-text-primary"
             >
-              <Newspaper size={18} />
+              <Newspaper size={16} />
+              News
             </Link>
           )}
 

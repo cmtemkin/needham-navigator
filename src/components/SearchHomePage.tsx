@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Search, Trash2, Building2, School, DollarSign, Bus, ChevronRight } from "lucide-react";
+import { Search, Trash2, Building2, School, DollarSign, Bus, ChevronRight, ExternalLink, Clock } from "lucide-react";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -17,6 +17,86 @@ import { useChatWidget } from "@/lib/chat-context";
 import type { SearchResponse, CachedAnswer } from "@/types/search";
 import type { Article, ArticleListResponse } from "@/types/article";
 import { trackEvent } from "@/lib/pendo";
+
+// ---------------------------------------------------------------------------
+// Unified content types for homepage news feed
+// ---------------------------------------------------------------------------
+
+interface ContentItem {
+  id: string;
+  source_id: string;
+  category: string;
+  title: string;
+  content: string;
+  summary: string | null;
+  published_at: string;
+  url: string | null;
+  image_url: string | null;
+  metadata: Record<string, unknown>;
+}
+
+type UnifiedItem =
+  | { type: "article"; data: Article }
+  | { type: "content"; data: ContentItem };
+
+const SOURCE_COLORS: Record<string, string> = {
+  "needham:patch-news": "bg-orange-100 text-orange-700",
+  "needham:observer-news": "bg-blue-100 text-blue-700",
+  "needham:needham-local": "bg-green-100 text-green-700",
+  "needham:town-rss": "bg-purple-100 text-purple-700",
+};
+
+function formatRelativeTime(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+function ContentItemGridCard({ item, newsSources }: { item: ContentItem; newsSources?: Record<string, string> }) {
+  const displayText = item.summary || item.content?.slice(0, 150) || "";
+  const sourceLabel = newsSources?.[item.source_id] || item.source_id.split(":").pop() || item.source_id;
+  const sourceColor = SOURCE_COLORS[item.source_id] ?? "bg-gray-100 text-gray-700";
+
+  return (
+    <a
+      href={item.url || "#"}
+      target={item.url ? "_blank" : undefined}
+      rel={item.url ? "noopener noreferrer" : undefined}
+      className="group block bg-white border border-border-default rounded-lg hover:border-[var(--primary)] hover:shadow-md transition-all p-4"
+    >
+      <div className="flex items-center gap-2 mb-3">
+        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${sourceColor}`}>
+          {sourceLabel}
+        </span>
+        <ExternalLink size={14} className="text-gray-400" />
+      </div>
+      <h3 className="font-bold text-text-primary group-hover:text-[var(--primary)] transition-colors mb-2 text-base line-clamp-2">
+        {item.title}
+      </h3>
+      {displayText && (
+        <p className="text-sm text-text-secondary mb-3 line-clamp-2">
+          {displayText}
+        </p>
+      )}
+      <div className="flex items-center justify-between text-xs text-text-muted pt-2 border-t border-border-light">
+        <span>{sourceLabel}</span>
+        <div className="flex items-center gap-1">
+          <Clock size={12} />
+          <span>{formatRelativeTime(item.published_at)}</span>
+        </div>
+      </div>
+    </a>
+  );
+}
 
 const QUICK_LINKS = [
   { label: "Transfer Station", icon: Trash2 },
@@ -108,7 +188,7 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
   const [searchResults, setSearchResults] = useState<SearchResponse | null>(null);
   const [aiAnswer, setAiAnswer] = useState<AIAnswerState>({ type: "idle" });
   const [isSearching, setIsSearching] = useState(false);
-  const [featuredArticles, setFeaturedArticles] = useState<Article[]>([]);
+  const [featuredItems, setFeaturedItems] = useState<UnifiedItem[]>([]);
   const [articlesLoading, setArticlesLoading] = useState(true);
   const [lastVisitTimestamp, setLastVisitTimestamp] = useState<number | undefined>(undefined);
 
@@ -330,22 +410,42 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
     executeSearch(queryFromUrl).catch(() => {});
   }, [executeSearch, pathname, queryFromUrl, router, searchHref]);
 
-  // Fetch featured articles for homepage
+  // Fetch unified news for homepage (both AI articles + external content)
   useEffect(() => {
-    async function fetchArticles() {
+    async function fetchUnifiedNews() {
       try {
-        const res = await fetch(`/api/articles?town=${town.town_id}&limit=6`);
-        if (res.ok) {
-          const data: ArticleListResponse = await res.json();
-          setFeaturedArticles(data.articles);
+        const [articlesRes, contentRes] = await Promise.all([
+          fetch(`/api/articles?town=${town.town_id}&limit=6`),
+          fetch(`/api/content?town=${town.town_id}&limit=6`),
+        ]);
+
+        const items: UnifiedItem[] = [];
+
+        if (articlesRes.ok) {
+          const data: ArticleListResponse = await articlesRes.json();
+          items.push(...data.articles.map((a): UnifiedItem => ({ type: "article", data: a })));
         }
+
+        if (contentRes.ok) {
+          const data: { items: ContentItem[] } = await contentRes.json();
+          items.push(...data.items.map((c): UnifiedItem => ({ type: "content", data: c })));
+        }
+
+        // Sort by date, take top 6
+        items.sort((a, b) => {
+          const dateA = new Date(a.data.published_at).getTime();
+          const dateB = new Date(b.data.published_at).getTime();
+          return dateB - dateA;
+        });
+
+        setFeaturedItems(items.slice(0, 6));
       } catch (error) {
-        console.error("Failed to fetch articles:", error);
+        console.error("Failed to fetch news:", error);
       } finally {
         setArticlesLoading(false);
       }
     }
-    fetchArticles().catch(() => {});
+    fetchUnifiedNews().catch(() => {});
   }, [town.town_id]);
 
   const handleAskAbout = useCallback((question: string) => {
@@ -450,15 +550,15 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
               {/* Left column: articles, topics, questions */}
               <div>
-                {(articlesLoading || featuredArticles.length > 0) && (
+                {(articlesLoading || featuredItems.length > 0) && (
                   <div className="mb-10">
                     <div className="flex items-center justify-between mb-5">
-                      <h2 className="text-2xl font-bold text-text-primary">Latest Articles</h2>
+                      <h2 className="text-2xl font-bold text-text-primary">Latest News</h2>
                       <Link
                         href={articlesHref}
                         className="flex items-center gap-1 text-[var(--primary)] hover:text-[var(--primary-dark)] font-medium text-sm transition-colors group"
                       >
-                        View all articles
+                        View all news
                         <ChevronRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
                       </Link>
                     </div>
@@ -471,9 +571,13 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
                       </div>
                     ) : (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {featuredArticles.map((article) => (
-                          <ArticleCard key={article.id} article={article} variant="grid" lastVisitTimestamp={lastVisitTimestamp} />
-                        ))}
+                        {featuredItems.map((item) =>
+                          item.type === "article" ? (
+                            <ArticleCard key={`art-${item.data.id}`} article={item.data} variant="grid" lastVisitTimestamp={lastVisitTimestamp} />
+                          ) : (
+                            <ContentItemGridCard key={`cnt-${item.data.id}`} item={item.data} newsSources={town.news_sources} />
+                          )
+                        )}
                       </div>
                     )}
                   </div>

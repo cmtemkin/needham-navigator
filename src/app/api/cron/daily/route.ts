@@ -71,6 +71,14 @@ export async function GET(request: NextRequest) {
     results.ingest = {
       status: "ok",
       connectorsRun: connectorResults.length,
+      connectors: connectorResults.map(r => ({
+        id: r.connectorId,
+        found: r.itemsFound,
+        upserted: r.itemsUpserted,
+        skipped: r.itemsSkipped,
+        errors: r.errors,
+        durationMs: r.durationMs,
+      })),
       totalItemsUpserted: connectorResults.reduce((s, r) => s + r.itemsUpserted, 0),
       totalItemsSkipped: connectorResults.reduce((s, r) => s + r.itemsSkipped, 0),
       totalErrors: connectorResults.reduce((s, r) => s + r.errors.length, 0),
@@ -85,25 +93,44 @@ export async function GET(request: NextRequest) {
   try {
     let generated = 0;
     const genErrors: string[] = [];
+    const genDetails: Record<string, unknown> = {};
 
-    try { generated += (await generateFromMeetingMinutes()).length; }
+    try {
+      const meetingArticles = await generateFromMeetingMinutes();
+      generated += meetingArticles.length;
+      genDetails.meeting_minutes = { count: meetingArticles.length, titles: meetingArticles.map(a => a.title) };
+    }
     catch (e) { genErrors.push(`meeting_minutes: ${e instanceof Error ? e.message : String(e)}`); }
 
-    try { generated += (await generateFromPublicRecord()).length; }
+    try {
+      const recordArticles = await generateFromPublicRecord();
+      generated += recordArticles.length;
+      genDetails.public_record = { count: recordArticles.length, titles: recordArticles.map(a => a.title) };
+    }
     catch (e) { genErrors.push(`public_record: ${e instanceof Error ? e.message : String(e)}`); }
 
-    try { generated += (await summarizeExternalArticle()).length; }
+    try {
+      const externalArticles = await summarizeExternalArticle();
+      generated += externalArticles.length;
+      genDetails.external = { count: externalArticles.length, titles: externalArticles.map(a => a.title) };
+    }
     catch (e) { genErrors.push(`external: ${e instanceof Error ? e.message : String(e)}`); }
 
     try {
       const brief = await generateDailyBrief();
-      if (brief) generated += 1;
+      if (brief) {
+        generated += 1;
+        genDetails.daily_brief = { generated: true, title: brief.title };
+      } else {
+        genDetails.daily_brief = { generated: false, reason: "skipped (already exists or no articles)" };
+      }
     }
     catch (e) { genErrors.push(`daily_brief: ${e instanceof Error ? e.message : String(e)}`); }
 
     results.generate = {
       status: genErrors.length === 0 ? "ok" : "partial",
       articlesGenerated: generated,
+      details: genDetails,
       errors: genErrors,
     };
   } catch (err) {
