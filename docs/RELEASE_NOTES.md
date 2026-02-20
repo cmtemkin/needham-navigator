@@ -2,6 +2,23 @@
 
 ---
 
+## v0.12.1 — 2026-02-20
+
+**Fix: Supabase Disk IO Budget Protection + Content API Pagination**
+
+### Bug Fixes
+- **Content API pagination bug** — `/api/content` was returning `total: filtered.length` (post-geo-filter count) instead of the true database count, causing the News page to report wrong totals and breaking "load more" pagination logic
+- **Cron job disk IO protection** — daily cron now wraps each step (monitor, ingest, generate) with per-step timeouts (90s/120s) and 3-second cooldown delays between steps to prevent exhausting the Supabase Nano tier's 30-minute daily burst IO budget
+- **Connector IO throttling** — 2-second delay between sequential connector runs to avoid disk IO spikes during ingestion
+- **Keep-alive ping** — lightweight `SELECT` query at the start of the daily cron prevents Supabase free-tier auto-pause (7-day inactivity threshold)
+
+### Technical
+- Modified: `src/app/api/cron/daily/route.ts` — added `withTimeout()` wrapper, IO cooldowns, keep-alive ping
+- Modified: `src/lib/connectors/runner.ts` — added inter-connector cooldown delay
+- Modified: `src/app/api/content/route.ts` — fixed `total` and `hasMore` in JSON response
+
+---
+
 ## v0.12.0 — 2026-02-20
 
 **Geographic Content Filter + Unified News Experience**
