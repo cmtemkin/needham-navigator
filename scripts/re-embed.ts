@@ -14,6 +14,8 @@
 
 import { getSupabaseServiceClient } from "../src/lib/supabase";
 import { generateEmbeddings } from "../src/lib/embeddings";
+import { upsertToPinecone, PINECONE_NS_CHUNKS } from "../src/lib/pinecone";
+import type { PineconeVector } from "../src/lib/pinecone";
 
 // ---------------------------------------------------------------------------
 // Contextual Chunk Header Builder (same as in embed.ts)
@@ -77,7 +79,7 @@ async function reEmbed(options: ReEmbedOptions = {}): Promise<void> {
   // Fetch all chunks for the town
   const { data: chunks, error: fetchError } = await supabase
     .from("document_chunks")
-    .select("id, chunk_text, metadata")
+    .select("id, document_id, chunk_text, metadata")
     .eq("town_id", townId)
     .order("id");
 
@@ -126,22 +128,15 @@ async function reEmbed(options: ReEmbedOptions = {}): Promise<void> {
       // Generate new embeddings
       const embeddings = await generateEmbeddings(textsForEmbedding);
 
-      // Update each chunk's embedding
-      for (let j = 0; j < batch.length; j++) {
-        const chunk = batch[j];
-        const embedding = embeddings[j];
+      // Upsert vectors to Pinecone
+      const pineconeVectors: PineconeVector[] = batch.map((chunk, j) => ({
+        id: chunk.id,
+        values: embeddings[j],
+        metadata: { town_id: townId, document_id: chunk.document_id ?? "" },
+      }));
 
-        const { error: updateError } = await supabase
-          .from("document_chunks")
-          .update({ embedding: JSON.stringify(embedding) })
-          .eq("id", chunk.id);
-
-        if (updateError) {
-          console.error(`[re-embed] Error updating chunk ${chunk.id}: ${updateError.message}`);
-        } else {
-          reEmbedded++;
-        }
-      }
+      await upsertToPinecone(PINECONE_NS_CHUNKS, pineconeVectors);
+      reEmbedded += batch.length;
 
       console.log(`[re-embed] ✓ Batch ${batchNum}/${totalBatches} complete (${reEmbedded}/${chunks.length} total)`);
     } catch (err) {

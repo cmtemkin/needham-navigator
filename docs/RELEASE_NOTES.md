@@ -2,6 +2,39 @@
 
 ---
 
+## v0.13.0 — 2026-02-20
+
+**Infra: Migrate Vector Search from Supabase to Pinecone**
+
+### New Features
+- **Pinecone vector search** — All vector similarity search now runs on Pinecone serverless free tier instead of Supabase pgvector. This resolves the storage crisis (5 GB / 0.5 GB free tier limit) that was causing disk IO throttling and extremely slow search/chat responses.
+- **Migration script** — `scripts/migrate-to-pinecone.ts` bulk-exports all 244K vectors from Supabase to Pinecone with progress logging, batch processing, and rate limiting.
+
+### Architecture Changes
+- **Search flow**: Query → OpenAI embed → Pinecone query (vector similarity) → Supabase fetch (chunk text + metadata) → results
+- **Ingestion flow**: Generate embeddings → upsert vectors to Pinecone → store text/metadata in Supabase (no embedding column)
+- Vector embeddings remain at 1536 dimensions using `text-embedding-3-large` — no quality reduction
+- Supabase retains all structured data (chunk_text, metadata, documents, content_items)
+
+### Technical
+- New: `src/lib/pinecone.ts` — Pinecone client with query, upsert, and delete helpers
+- New: `scripts/migrate-to-pinecone.ts` — bulk vector export script
+- New: `supabase/migrations/20260221000002_drop_embeddings.sql` — drops embedding columns/indexes after migration (run manually)
+- Modified: `src/lib/rag.ts` — `vectorSearch()` and `vectorSearchContentItems()` use Pinecone
+- Modified: `scripts/embed.ts` — writes vectors to Pinecone, stores null embedding in Supabase
+- Modified: `src/lib/connectors/runner.ts` — writes content_item vectors to Pinecone
+- Modified: `scripts/re-embed.ts` — re-embeds to Pinecone
+- Modified: `scripts/smoke-test.ts` — uses Pinecone for test queries
+- New dependency: `@pinecone-database/pinecone` v7
+- New env var: `PINECONE_API_KEY`
+
+### Storage Impact
+- Supabase: ~5,010 MB → ~490 MB (under 500 MB free tier)
+- Pinecone: 0 → ~1.46 GB (under 2 GB free tier)
+- Combined cost: $0/month
+
+---
+
 ## v0.12.2 — 2026-02-20
 
 **Fix: Supabase Storage Bloat Prevention**

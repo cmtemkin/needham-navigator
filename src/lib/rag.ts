@@ -1,5 +1,6 @@
 import { generateEmbedding } from "@/lib/embeddings";
 import { getSupabaseClient } from "@/lib/supabase";
+import { queryPinecone, PINECONE_NS_CHUNKS, PINECONE_NS_CONTENT } from "@/lib/pinecone";
 import { DEFAULT_TOWN_ID as DEFAULT_TOWN_ID_FROM_CONFIG } from "@/lib/towns";
 import { expandQuery } from "@/lib/synonyms";
 import { rewriteQuery } from "@/lib/query-rewriter";
@@ -609,7 +610,7 @@ function selectTopChunks(
 
 /**
  * Run a vector search against content_items (external news, RSS, etc.)
- * and transform results to MatchDocumentRow shape for merging.
+ * via Pinecone, then fetch metadata from Supabase.
  * Accepts a pre-computed embedding to avoid redundant OpenAI API calls.
  */
 async function vectorSearchContentItems(
@@ -620,20 +621,41 @@ async function vectorSearchContentItems(
   precomputedEmbedding?: number[],
 ): Promise<MatchDocumentRow[]> {
   const embedding = precomputedEmbedding ?? await generateEmbedding(queryText);
-  const supabase = getSupabaseClient({ townId });
 
-  const { data, error } = await supabase.rpc("match_content_items", {
-    query_embedding: embedding,
-    match_threshold: matchThreshold,
-    match_count: matchCount,
-    filter_town_id: townId,
-  });
-
-  if (error) {
+  // Query Pinecone for content_items vectors
+  let pineconeResults;
+  try {
+    pineconeResults = await queryPinecone(
+      PINECONE_NS_CONTENT,
+      embedding,
+      matchCount,
+      { town_id: { $eq: townId } },
+    );
+  } catch (err) {
     // Non-fatal — content_items search is supplementary
-    console.warn(`[rag] content_items search failed: ${error.message}`);
+    console.warn(`[rag] Pinecone content_items search failed:`, err);
     return [];
   }
+
+  // Filter by threshold
+  const filtered = pineconeResults.filter((r) => r.score >= matchThreshold);
+  if (filtered.length === 0) return [];
+
+  // Fetch full content_item data from Supabase by IDs
+  const ids = filtered.map((r) => r.id);
+  const supabase = getSupabaseClient({ townId });
+  const { data, error } = await supabase
+    .from("content_items")
+    .select("id, title, content, summary, url, source_id, category, published_at, metadata")
+    .in("id", ids);
+
+  if (error) {
+    console.warn(`[rag] content_items metadata fetch failed: ${error.message}`);
+    return [];
+  }
+
+  // Build score map from Pinecone results
+  const scoreMap = new Map(filtered.map((r) => [r.id, r.score]));
 
   // Transform content_items results to MatchDocumentRow shape,
   // filtering out geographically irrelevant content.
@@ -647,7 +669,6 @@ async function vectorSearchContentItems(
     category: string;
     published_at: string;
     metadata: ChunkMetadata | null;
-    similarity: number;
   };
 
   return ((data ?? []) as ContentItemRow[])
@@ -674,12 +695,12 @@ async function vectorSearchContentItems(
         published_at: row.published_at,
       },
       // Apply 0.95x penalty so official municipal content ranks above news at similar scores
-      similarity: row.similarity * 0.95,
+      similarity: (scoreMap.get(row.id) ?? 0) * 0.95,
     }));
 }
 
 /**
- * Run a single vector search against Supabase match_documents RPC.
+ * Run a vector search via Pinecone, then fetch chunk text/metadata from Supabase.
  * Accepts a pre-computed embedding to avoid redundant OpenAI API calls.
  */
 async function vectorSearch(
@@ -690,20 +711,46 @@ async function vectorSearch(
   precomputedEmbedding?: number[],
 ): Promise<MatchDocumentRow[]> {
   const embedding = precomputedEmbedding ?? await generateEmbedding(queryText);
-  const supabase = getSupabaseClient({ townId });
 
-  const { data, error } = await supabase.rpc("match_documents", {
-    query_embedding: embedding,
-    match_town_id: townId,
-    match_threshold: matchThreshold,
-    match_count: matchCount,
-  });
+  // Query Pinecone for document_chunks vectors
+  const pineconeResults = await queryPinecone(
+    PINECONE_NS_CHUNKS,
+    embedding,
+    matchCount,
+    { town_id: { $eq: townId } },
+  );
+
+  // Filter by similarity threshold
+  const filtered = pineconeResults.filter((r) => r.score >= matchThreshold);
+  if (filtered.length === 0) return [];
+
+  // Fetch chunk_text and metadata from Supabase by IDs
+  const ids = filtered.map((r) => r.id);
+  const supabase = getSupabaseClient({ townId });
+  const { data, error } = await supabase
+    .from("document_chunks")
+    .select("id, chunk_text, metadata")
+    .in("id", ids);
 
   if (error) {
-    throw new Error(`Failed to retrieve semantic matches: ${error.message}`);
+    throw new Error(`Failed to fetch chunk data from Supabase: ${error.message}`);
   }
 
-  return (data ?? []) as MatchDocumentRow[];
+  // Merge Pinecone scores with Supabase data
+  const chunkMap = new Map((data ?? []).map((d: { id: string; chunk_text: string; metadata: ChunkMetadata | null }) => [d.id, d]));
+
+  return filtered
+    .map((r) => {
+      const chunk = chunkMap.get(r.id);
+      if (!chunk) return null;
+      return {
+        id: chunk.id,
+        chunk_text: chunk.chunk_text,
+        metadata: chunk.metadata,
+        similarity: r.score,
+      } as MatchDocumentRow;
+    })
+    .filter((row): row is MatchDocumentRow => row !== null);
 }
 
 export async function retrieveRelevantChunks(

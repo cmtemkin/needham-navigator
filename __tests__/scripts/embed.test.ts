@@ -1,13 +1,30 @@
 import { embedAndStoreChunks } from "../../scripts/embed";
 import type { Chunk } from "../../scripts/chunk";
 
-// Mock dependencies
-const mockDelete = jest.fn().mockReturnValue({ eq: jest.fn().mockResolvedValue({ error: null }) });
-const mockInsert = jest.fn().mockResolvedValue({ error: null });
-const mockUpdate = jest.fn().mockReturnValue({ eq: jest.fn().mockResolvedValue({ error: null }) });
+// Mock Pinecone
+const mockUpsertToPinecone = jest.fn().mockResolvedValue(undefined);
+const mockDeleteFromPinecone = jest.fn().mockResolvedValue(undefined);
+jest.mock("@/lib/pinecone", () => ({
+  upsertToPinecone: (...args: unknown[]) => mockUpsertToPinecone(...args),
+  deleteFromPinecone: (...args: unknown[]) => mockDeleteFromPinecone(...args),
+  PINECONE_NS_CHUNKS: "chunks",
+}));
+
+// Mock Supabase dependencies
+const mockSelectId = jest.fn();
+const mockDeleteEq = jest.fn();
+const mockDelete = jest.fn().mockReturnValue({ eq: (...args: unknown[]) => mockDeleteEq(...args) });
+const mockInsertSelect = jest.fn();
+const mockInsert = jest.fn().mockReturnValue({ select: (...args: unknown[]) => mockInsertSelect(...args) });
+const mockUpdateEq = jest.fn();
+const mockUpdate = jest.fn().mockReturnValue({ eq: (...args: unknown[]) => mockUpdateEq(...args) });
 const mockFrom = jest.fn().mockImplementation((table: string) => {
   if (table === "document_chunks") {
-    return { delete: mockDelete, insert: mockInsert };
+    return {
+      delete: mockDelete,
+      insert: mockInsert,
+      select: (...args: unknown[]) => mockSelectId(...args),
+    };
   }
   if (table === "documents") {
     return { update: mockUpdate };
@@ -29,9 +46,12 @@ jest.mock("@/lib/embeddings", () => ({
 describe("embed", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    // Reset mockFrom's implementation to handle chained calls properly
-    mockDelete.mockReturnValue({ eq: jest.fn().mockResolvedValue({ error: null }) });
-    mockUpdate.mockReturnValue({ eq: jest.fn().mockResolvedValue({ error: null }) });
+    // Default: no existing chunks to delete from Pinecone
+    mockSelectId.mockReturnValue({
+      eq: jest.fn().mockResolvedValue({ data: [], error: null }),
+    });
+    mockDeleteEq.mockResolvedValue({ error: null });
+    mockUpdateEq.mockResolvedValue({ error: null });
   });
 
   const createTestChunks = (count: number): Chunk[] =>
@@ -54,6 +74,11 @@ describe("embed", () => {
     const chunks = createTestChunks(3);
     const fakeEmbeddings = chunks.map(() => new Array(1536).fill(0.1));
     mockGenerateEmbeddings.mockResolvedValueOnce(fakeEmbeddings);
+    // Insert returns IDs
+    mockInsertSelect.mockResolvedValueOnce({
+      data: chunks.map((_, i) => ({ id: `id-${i}` })),
+      error: null,
+    });
 
     await embedAndStoreChunks(chunks, "test-doc-id");
 
@@ -68,6 +93,10 @@ describe("embed", () => {
     mockGenerateEmbeddings.mockResolvedValueOnce(
       chunks.map(() => new Array(1536).fill(0.1))
     );
+    mockInsertSelect.mockResolvedValueOnce({
+      data: chunks.map((_, i) => ({ id: `id-${i}` })),
+      error: null,
+    });
 
     const result = await embedAndStoreChunks(chunks, "test-doc-id");
 
@@ -79,9 +108,53 @@ describe("embed", () => {
     });
   });
 
+  it("upserts vectors to Pinecone after inserting to Supabase", async () => {
+    const chunks = createTestChunks(2);
+    const fakeEmbeddings = chunks.map(() => new Array(1536).fill(0.1));
+    mockGenerateEmbeddings.mockResolvedValueOnce(fakeEmbeddings);
+    mockInsertSelect.mockResolvedValueOnce({
+      data: [{ id: "uuid-1" }, { id: "uuid-2" }],
+      error: null,
+    });
+
+    await embedAndStoreChunks(chunks, "test-doc-id");
+
+    expect(mockUpsertToPinecone).toHaveBeenCalledWith(
+      "chunks",
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "uuid-1",
+          values: expect.any(Array),
+          metadata: { town_id: "needham", document_id: "test-doc-id" },
+        }),
+      ])
+    );
+  });
+
+  it("stores null embedding in Supabase", async () => {
+    const chunks = createTestChunks(1);
+    mockGenerateEmbeddings.mockResolvedValueOnce([new Array(1536).fill(0.1)]);
+    mockInsertSelect.mockResolvedValueOnce({
+      data: [{ id: "uuid-1" }],
+      error: null,
+    });
+
+    await embedAndStoreChunks(chunks, "test-doc-id");
+
+    expect(mockInsert).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({ embedding: null }),
+      ])
+    );
+  });
+
   it("deletes existing chunks before inserting", async () => {
     const chunks = createTestChunks(1);
     mockGenerateEmbeddings.mockResolvedValueOnce([new Array(1536).fill(0.1)]);
+    mockInsertSelect.mockResolvedValueOnce({
+      data: [{ id: "uuid-1" }],
+      error: null,
+    });
 
     await embedAndStoreChunks(chunks, "test-doc-id");
 
@@ -109,6 +182,10 @@ describe("embed", () => {
   it("uses provided townId", async () => {
     const chunks = createTestChunks(1);
     mockGenerateEmbeddings.mockResolvedValueOnce([new Array(1536).fill(0.1)]);
+    mockInsertSelect.mockResolvedValueOnce({
+      data: [{ id: "uuid-1" }],
+      error: null,
+    });
 
     await embedAndStoreChunks(chunks, "test-doc-id", {
       townId: "custom-town",

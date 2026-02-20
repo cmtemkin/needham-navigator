@@ -1,14 +1,17 @@
 /**
- * scripts/embed.ts — Embedding generation + Supabase pgvector upsert
+ * scripts/embed.ts — Embedding generation + Pinecone vector upsert + Supabase metadata storage
  *
  * Takes chunked documents and:
- * 1. Generates embeddings via OpenAI text-embedding-3-small
- * 2. Upserts chunks + embeddings into Supabase document_chunks table
- * 3. Updates the parent document record with chunk count and timestamps
+ * 1. Generates embeddings via OpenAI text-embedding-3-large
+ * 2. Upserts vectors to Pinecone (vector search)
+ * 3. Stores chunk text + metadata in Supabase document_chunks table (no embedding column)
+ * 4. Updates the parent document record with chunk count and timestamps
  */
 
 import { getSupabaseServiceClient } from "../src/lib/supabase";
 import { generateEmbeddings } from "../src/lib/embeddings";
+import { upsertToPinecone, deleteFromPinecone, PINECONE_NS_CHUNKS } from "../src/lib/pinecone";
+import type { PineconeVector } from "../src/lib/pinecone";
 import { Chunk } from "./chunk";
 
 // ---------------------------------------------------------------------------
@@ -93,6 +96,21 @@ export async function embedAndStoreChunks(
   let errors = 0;
 
   // Delete existing chunks for this document (replace strategy)
+  // First, get IDs of existing chunks to delete from Pinecone
+  const { data: existingChunks } = await supabase
+    .from("document_chunks")
+    .select("id")
+    .eq("document_id", documentId);
+
+  if (existingChunks && existingChunks.length > 0) {
+    const existingIds = existingChunks.map((c: { id: string }) => c.id);
+    try {
+      await deleteFromPinecone(PINECONE_NS_CHUNKS, existingIds);
+    } catch (err) {
+      console.warn(`[embed] Failed to delete old vectors from Pinecone: ${err}`);
+    }
+  }
+
   const { error: deleteError } = await supabase
     .from("document_chunks")
     .delete()
@@ -124,19 +142,20 @@ export async function embedAndStoreChunks(
 
       const embeddings = await generateEmbeddings(textsForEmbedding);
 
-      // Prepare rows for upsert
+      // Prepare Supabase rows (no embedding — vectors go to Pinecone)
       const rows = batch.map((chunk, idx) => ({
         document_id: documentId,
         town_id: townId,
         chunk_index: i + idx,
         chunk_text: chunk.text,
-        embedding: JSON.stringify(embeddings[idx]),
+        embedding: null,
         metadata: chunk.metadata,
       }));
 
-      const { error: insertError } = await supabase
+      const { data: insertedRows, error: insertError } = await supabase
         .from("document_chunks")
-        .insert(rows);
+        .insert(rows)
+        .select("id");
 
       if (insertError) {
         console.error(
@@ -144,6 +163,21 @@ export async function embedAndStoreChunks(
         );
         errors += batch.length;
       } else {
+        // Upsert vectors to Pinecone using the Supabase-generated IDs
+        const inserted = insertedRows as Array<{ id: string }>;
+        const pineconeVectors: PineconeVector[] = inserted.map((row, idx) => ({
+          id: row.id,
+          values: embeddings[idx],
+          metadata: { town_id: townId, document_id: documentId },
+        }));
+
+        try {
+          await upsertToPinecone(PINECONE_NS_CHUNKS, pineconeVectors);
+        } catch (pineconeErr) {
+          console.error(`[embed] Pinecone upsert failed:`, pineconeErr);
+          errors += batch.length;
+        }
+
         totalEmbedded += batch.length;
       }
     } catch (err) {
