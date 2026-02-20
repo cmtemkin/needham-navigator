@@ -4,6 +4,7 @@ import { DEFAULT_TOWN_ID as DEFAULT_TOWN_ID_FROM_CONFIG } from "@/lib/towns";
 import { expandQuery } from "@/lib/synonyms";
 import { rewriteQuery } from "@/lib/query-rewriter";
 import { trackEvent } from "@/lib/pendo";
+import { checkGeographicRelevance } from "@/lib/geo-filter";
 import type { RetrievalConfig } from "@/lib/query-router";
 
 export const DEFAULT_TOWN_ID = DEFAULT_TOWN_ID_FROM_CONFIG;
@@ -481,8 +482,30 @@ function rerankChunks(
       }
     }
 
-    // Formula score (existing 5-factor formula with adjusted weights)
-    const formulaScore = semanticScore + keywordScore + recencyScore + authorityScore + sourceBoostScore;
+    // Locality boost (0.15 weight) — heavily reward local content, penalize distant
+    let localityScore = 0;
+    const docUrl = readString(metadata, ["document_url", "url"]) ?? "";
+    const docTitle = readString(metadata, ["document_title", "title"]) ?? "";
+    const category = readString(metadata, ["category"]) ?? "";
+    const geoResult = checkGeographicRelevance(chunkLower, docTitle, docUrl, category);
+
+    if (geoResult.isRelevant) {
+      // Bonus for content that explicitly mentions Needham
+      if (chunkLower.includes("needham")) {
+        localityScore = 0.15;
+      } else if (geoResult.detectedLocations.length > 0) {
+        localityScore = 0.10;
+      } else {
+        // No strong geo signals but not blocked — small positive
+        localityScore = 0.05;
+      }
+    } else {
+      // Content about distant locations — apply penalty
+      localityScore = -0.10;
+    }
+
+    // Formula score (6-factor formula with locality)
+    const formulaScore = semanticScore + keywordScore + recencyScore + authorityScore + sourceBoostScore + localityScore;
 
     // Blend Cohere score if available: 60% Cohere, 30% formula, 10% source boost
     const relevanceScore = hasCohereScore
@@ -612,8 +635,9 @@ async function vectorSearchContentItems(
     return [];
   }
 
-  // Transform content_items results to MatchDocumentRow shape
-  return ((data ?? []) as Array<{
+  // Transform content_items results to MatchDocumentRow shape,
+  // filtering out geographically irrelevant content.
+  type ContentItemRow = {
     id: string;
     title: string;
     content: string;
@@ -624,21 +648,34 @@ async function vectorSearchContentItems(
     published_at: string;
     metadata: ChunkMetadata | null;
     similarity: number;
-  }>).map((row) => ({
-    id: row.id,
-    chunk_text: row.summary || row.content?.slice(0, 1500) || row.title,
-    metadata: {
-      ...(row.metadata ?? {}),
-      document_title: row.title,
-      document_url: row.url,
-      content_type: "external_news",
-      source_id: row.source_id,
-      category: row.category,
-      published_at: row.published_at,
-    },
-    // Apply 0.95x penalty so official municipal content ranks above news at similar scores
-    similarity: row.similarity * 0.95,
-  }));
+  };
+
+  return ((data ?? []) as ContentItemRow[])
+    .filter((row) => {
+      // Pre-filter: reject content about distant locations
+      const text = row.summary || row.content?.slice(0, 2000) || "";
+      const geo = checkGeographicRelevance(text, row.title, row.url ?? "", row.category);
+      if (!geo.isRelevant) {
+        console.log(`[rag] Geo-filtered content_item: "${row.title}" — ${geo.reason}`);
+        return false;
+      }
+      return true;
+    })
+    .map((row) => ({
+      id: row.id,
+      chunk_text: row.summary || row.content?.slice(0, 1500) || row.title,
+      metadata: {
+        ...(row.metadata ?? {}),
+        document_title: row.title,
+        document_url: row.url,
+        content_type: "external_news",
+        source_id: row.source_id,
+        category: row.category,
+        published_at: row.published_at,
+      },
+      // Apply 0.95x penalty so official municipal content ranks above news at similar scores
+      similarity: row.similarity * 0.95,
+    }));
 }
 
 /**

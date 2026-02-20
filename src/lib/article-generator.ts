@@ -8,6 +8,7 @@
 
 import OpenAI from 'openai';
 import { getSupabaseServiceClient } from '@/lib/supabase';
+import { checkGeographicRelevance, isUrlGeographicallyRelevant } from '@/lib/geo-filter';
 import type { Article, CreateArticleInput, ArticleCategory, SourceType } from '@/types/article';
 
 const MODEL = 'gpt-4o-mini';
@@ -384,6 +385,7 @@ CRITICAL RULES — NEVER VIOLATE:
 - Do NOT speculate or fill gaps with assumptions
 - If the content is too vague or lacks substantive facts, respond with exactly: {"skip": true}
 - Include specific dates, meeting dates, or decision dates if mentioned in the source
+- GEOGRAPHIC SCOPE: Only write about ${TOWN_NAME} content. If this document is primarily about another municipality or state, respond with {"skip": true}
 
 Respond with valid JSON in exactly this format:
 {
@@ -401,6 +403,7 @@ CRITICAL RULES — NEVER VIOLATE:
 - Do NOT invent names, dates, dollar amounts, or details not in the source
 - Do NOT speculate or fill gaps with assumptions
 - If the content is too vague or lacks substantive facts, respond with exactly: {"skip": true}
+- GEOGRAPHIC SCOPE: Only write about ${TOWN_NAME} content. If this document is primarily about another municipality or state, respond with {"skip": true}
 
 Respond with valid JSON in exactly this format:
 {
@@ -641,6 +644,25 @@ export async function summarizeExternalArticle(options?: {
     // Skip items with too little content
     const content = item.content ?? '';
     if (content.length < 100 && (!item.summary || item.summary.length < 50)) {
+      console.log(`[article-generator] Skipping short content: "${item.title}" (${content.length} chars)`);
+      continue;
+    }
+
+    // Geographic relevance pre-filter (URL-level)
+    if (!isUrlGeographicallyRelevant(normalizedUrl)) {
+      console.log(`[article-generator] URL geo-filtered: ${normalizedUrl}`);
+      continue;
+    }
+
+    // Geographic relevance pre-filter (content-level)
+    const geoResult = checkGeographicRelevance(
+      content,
+      item.title ?? '',
+      normalizedUrl,
+      item.category ?? 'news',
+    );
+    if (!geoResult.isRelevant) {
+      console.log(`[article-generator] Geo-filtered: "${item.title}" — ${geoResult.reason}`);
       continue;
     }
 
@@ -659,6 +681,7 @@ RULES:
 - Write a clear, factual summary — no speculation
 - If the content is too short or vague, respond with {"skip": true}
 - Include key facts, names, and dates from the article
+- GEOGRAPHIC FILTER: This article MUST be relevant to Needham, MA or the immediate Boston metro area (neighboring towns like Wellesley, Newton, Dedham, Dover, Westwood are acceptable). If the article is primarily about another state (Connecticut, New York, etc.) or a distant city with no connection to Needham residents, respond with {"skip": true}
 
 Output valid JSON:
 {
@@ -840,6 +863,7 @@ Rules:
 - "heading" is a short topic label (3-6 words, no trailing colon)
 - "detail" is one factual sentence from the source
 - Include 3-5 topics, one per source (skip a source if its content is too vague)
+- GEOGRAPHIC FILTER: Only include topics relevant to Needham, MA residents. Skip any topic about other states or distant locations. Neighboring town content (Wellesley, Newton, Dedham, Dover, Westwood, Boston metro) is acceptable for events and community topics.
 
 Output format:
 {"topics": [{"heading": "...", "detail": "...", "source_url": "..."}]}`;

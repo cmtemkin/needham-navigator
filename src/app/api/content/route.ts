@@ -10,6 +10,7 @@
 import { NextRequest } from "next/server";
 import { getSupabaseClient } from "@/lib/supabase";
 import { DEFAULT_TOWN_ID } from "@/lib/towns";
+import { checkGeographicRelevance } from "@/lib/geo-filter";
 
 export async function GET(request: NextRequest): Promise<Response> {
   const { searchParams } = request.nextUrl;
@@ -46,12 +47,20 @@ export async function GET(request: NextRequest): Promise<Response> {
       throw new Error(error.message);
     }
 
+    // Post-filter: remove geographically irrelevant content
+    type ContentRow = { title?: string; content?: string; summary?: string; url?: string; category?: string };
+    const filtered = (data ?? []).filter((item: ContentRow) => {
+      const text = (item.summary || item.content?.slice(0, 2000)) ?? "";
+      const geo = checkGeographicRelevance(text, item.title ?? "", item.url ?? "", item.category ?? "news");
+      return geo.isRelevant;
+    });
+
     const total = count ?? 0;
 
     return Response.json({
-      items: data ?? [],
-      total,
-      hasMore: offset + limit < total,
+      items: filtered,
+      total: filtered.length,
+      hasMore: offset + limit < total && filtered.length === limit,
       offset,
       limit,
     });
