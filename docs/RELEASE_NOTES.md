@@ -2,6 +2,26 @@
 
 ---
 
+## v0.12.2 — 2026-02-20
+
+**Fix: Supabase Storage Bloat Prevention**
+
+### Bug Fixes
+- **Tighter data retention** — reduced retention periods to prevent PostgreSQL dead-tuple bloat that caused the database to balloon from ~50 MB actual data to 5 GB on the free tier:
+  - `search_telemetry`: 30 days → 7 days
+  - `api_costs`: 30 days → 7 days
+  - `ingestion_log`: 90 days → 14 days
+  - `conversations`: added 30-day retention (was unbounded)
+  - `feedback`: added 30-day retention (was unbounded)
+- **Reduced telemetry write frequency** — embedding cost sampling reduced from 20% to 5%, search telemetry from 20% to 10%, cutting database write IO by ~60%
+
+### Technical
+- New migration: `supabase/migrations/20260221000001_tighten_retention.sql` — updated `cleanup_old_data()` function
+- Modified: `src/lib/cost-tracker.ts` — embedding cost sampling 20% → 5%
+- Modified: `src/lib/telemetry.ts` — search telemetry sampling 20% → 10%
+
+---
+
 ## v0.12.1 — 2026-02-20
 
 **Fix: Supabase Disk IO Budget Protection + Content API Pagination**

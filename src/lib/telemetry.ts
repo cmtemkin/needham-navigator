@@ -30,8 +30,8 @@ export interface SearchTelemetry {
  */
 export async function logSearchTelemetry(data: SearchTelemetry): Promise<void> {
   try {
-    // Sample at 20% to reduce write IO on Supabase free tier
-    if (Math.random() > 0.2) return;
+    // Sample at 10% to reduce write IO on Supabase free tier
+    if (Math.random() > 0.1) return;
 
     const supabase = getSupabaseServiceClient();
 
