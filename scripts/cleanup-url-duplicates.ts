@@ -7,7 +7,7 @@
  *
  * Steps:
  * 1. Backfills canonical_url for all documents
- * 2. Finds duplicate groups (same town_id + canonical_url)
+ * 2. Finds duplicate groups (same town_id + canonical_url) using service client
  * 3. Keeps the document with the most chunks (tiebreak: most recent last_ingested_at)
  * 4. Deletes loser documents' chunks from Supabase and Pinecone
  * 5. Deletes the loser document rows
@@ -71,37 +71,90 @@ async function backfillCanonicalUrls(supabase: SupabaseClient, dryRun: boolean):
 }
 
 // ---------------------------------------------------------------------------
-// Step 2: Find duplicate groups via Supabase Management API
+// Step 2: Find duplicate groups using service client (no Management API)
 // ---------------------------------------------------------------------------
 
-async function findDuplicateGroups(token: string, projectRef: string): Promise<DupGroup[]> {
-  const response = await fetch(
-    `https://api.supabase.com/v1/projects/${projectRef}/database/query`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: `
-          SELECT canonical_url, town_id,
-                 array_agg(id ORDER BY chunk_count DESC, last_ingested_at DESC NULLS LAST) as doc_ids,
-                 array_agg(chunk_count ORDER BY chunk_count DESC, last_ingested_at DESC NULLS LAST) as chunk_counts,
-                 COUNT(*) as variant_count
-          FROM documents
-          WHERE canonical_url IS NOT NULL
-          GROUP BY canonical_url, town_id
-          HAVING COUNT(*) > 1
-          ORDER BY SUM(chunk_count) DESC
-          LIMIT 500;
-        `,
-      }),
-    }
-  );
+interface DocRow {
+  id: string;
+  town_id: string;
+  canonical_url: string | null;
+  chunk_count: number;
+  last_ingested_at: string | null;
+}
 
-  const groups = (await response.json()) as DupGroup[];
-  return Array.isArray(groups) ? groups : [];
+async function findDuplicateGroups(supabase: SupabaseClient): Promise<DupGroup[]> {
+  // Load all documents with canonical_url set
+  const allDocs: DocRow[] = [];
+  let cursor: string | null = null;
+
+  while (true) {
+    let q = supabase
+      .from("documents")
+      .select("id, town_id, canonical_url, chunk_count, last_ingested_at")
+      .not("canonical_url", "is", null)
+      .order("id")
+      .limit(1000);
+
+    if (cursor) q = q.gt("id", cursor);
+
+    const { data, error } = await q;
+    if (error) {
+      console.error("[cleanup] Error loading documents:", error.message);
+      await new Promise((r) => setTimeout(r, 3000));
+      continue;
+    }
+    if (!data || data.length === 0) break;
+
+    allDocs.push(...(data as DocRow[]));
+    cursor = data[data.length - 1].id;
+
+    if (allDocs.length % 10000 === 0) {
+      console.log(`[cleanup] Loaded ${allDocs.length} documents...`);
+    }
+  }
+
+  console.log(`[cleanup] Loaded ${allDocs.length} documents total`);
+
+  // Group by (town_id, canonical_url)
+  const groups = new Map<string, DocRow[]>();
+  for (const doc of allDocs) {
+    if (!doc.canonical_url) continue;
+    const key = `${doc.town_id}|${doc.canonical_url}`;
+    const existing = groups.get(key) ?? [];
+    existing.push(doc);
+    groups.set(key, existing);
+  }
+
+  // Filter to groups with duplicates, sort docs within each group
+  const dupGroups: DupGroup[] = [];
+  for (const docs of groups.values()) {
+    if (docs.length < 2) continue;
+
+    // Sort: most chunks first, then most recently ingested
+    docs.sort((a, b) => {
+      if (b.chunk_count !== a.chunk_count) return b.chunk_count - a.chunk_count;
+      const aTime = a.last_ingested_at ? new Date(a.last_ingested_at).getTime() : 0;
+      const bTime = b.last_ingested_at ? new Date(b.last_ingested_at).getTime() : 0;
+      return bTime - aTime;
+    });
+
+    dupGroups.push({
+      canonical_url: docs[0].canonical_url!,
+      town_id: docs[0].town_id,
+      doc_ids: docs.map((d) => d.id),
+      chunk_counts: docs.map((d) => d.chunk_count),
+      variant_count: docs.length,
+    });
+  }
+
+  // Sort by total chunk impact (most wasted chunks first)
+  dupGroups.sort((a, b) => {
+    const aTotal = a.chunk_counts.reduce((s, c) => s + c, 0);
+    const bTotal = b.chunk_counts.reduce((s, c) => s + c, 0);
+    return bTotal - aTotal;
+  });
+
+  return dupGroups.slice(0, 500);
 }
 
 // ---------------------------------------------------------------------------
@@ -112,7 +165,6 @@ async function deleteLoserDoc(
   supabase: SupabaseClient,
   loserId: string,
 ): Promise<{ chunksDeleted: number; vectorsDeleted: number; docDeleted: boolean }> {
-  // Fetch chunk IDs in batches
   let chunkCursor: string | null = null;
   const chunkIds: string[] = [];
 
@@ -183,16 +235,8 @@ async function main() {
 
   // Step 2
   console.log("\n[cleanup] Step 2: Finding duplicate groups...");
-  const token = process.env.SUPABASE_ACCESS_TOKEN;
-  const projectRef = process.env.SUPABASE_PROJECT_REF ?? "myivfxpbgmzkncshwnup";
-  if (!token) {
-    console.error("[cleanup] SUPABASE_ACCESS_TOKEN env var is required for duplicate detection");
-    process.exit(1);
-  }
+  const dupGroups = await findDuplicateGroups(supabase);
 
-  if (!dryRun) await new Promise((r) => setTimeout(r, 2000));
-
-  const dupGroups = await findDuplicateGroups(token, projectRef);
   if (dupGroups.length === 0) {
     console.log("[cleanup] No duplicate groups found.");
     return;

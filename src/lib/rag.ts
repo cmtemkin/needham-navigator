@@ -719,10 +719,8 @@ async function vectorSearch(
   const embedding = precomputedEmbedding ?? await generateEmbedding(queryText);
 
   // Build Pinecone filter — always filter by town_id, optionally by relevance tier.
-  // Tier filtering is gated behind ENABLE_TIER_FILTERING because existing vectors
-  // need a metadata backfill (classify-documents.ts) before the filter will match.
   const filter: Record<string, unknown> = { town_id: { $eq: townId } };
-  if (tiers && tiers.length > 0 && process.env.ENABLE_TIER_FILTERING === "true") {
+  if (tiers && tiers.length > 0) {
     filter.relevance_tier = { $in: tiers };
   }
 
