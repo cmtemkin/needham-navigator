@@ -2,6 +2,41 @@
 
 ---
 
+## v0.14.0 — 2026-02-21
+
+**Search Quality: Tiered Relevance Filtering + Document Deduplication**
+
+### New Features
+- **Relevance tier classification** — All 244K+ documents are now classified into tiers: primary (Needham-specific), regional (Norfolk County/MBTA), state (mass.gov), supplementary (utilities/reviews), archive (historical meeting minutes), and irrelevant (wrong towns). Default search returns only primary + regional content.
+- **Smart tier expansion** — Queries about state-level topics (taxes, RMV, MassHealth, unemployment, building codes, etc.) automatically expand search to include mass.gov and state content.
+- **Zero-result fallback** — If no results match within the default tiers, search automatically expands to all tiers so users always get an answer.
+- **Document-level deduplication** — Search results now show each page only once (best-matching chunk), eliminating the "same page 5 times" problem caused by multiple chunks per document.
+- **URL canonicalization** — Shared utility normalizes URLs (force https, strip www, strip trailing slash, remove tracking params) to properly deduplicate pages ingested via http/https/www URL variants.
+- **Source pill dedup** — Chat source pills now deduplicate by canonical URL instead of title, preventing duplicate source links.
+
+### Architecture Changes
+- New `relevance_tier` column on `documents` table with CHECK constraint and index
+- New `canonical_url` column on `documents` table for deduplication
+- Pinecone vector metadata now includes `relevance_tier` for query-time filtering
+- Query tier routing: `getSearchTiers(query)` detects state-level queries via 30+ regex patterns
+
+### Technical
+- New: `src/lib/url-canonicalize.ts` — shared URL canonicalization
+- New: `src/lib/relevance-classifier.ts` — domain-to-tier mapping + archive detection
+- New: `src/lib/query-tier-router.ts` — query intent detection for tier expansion
+- New: `scripts/classify-documents.ts` — backfill script for relevance_tier (Supabase + Pinecone)
+- New: `scripts/cleanup-url-duplicates.ts` — URL duplicate cleanup script
+- New: `supabase/migrations/20260222000000_add_canonical_url.sql`
+- New: `supabase/migrations/20260222000001_add_relevance_tier.sql`
+- Modified: `src/lib/rag.ts` — tier filtering in vectorSearch, document-level dedup, fallback expansion
+- Modified: `src/app/api/search/route.ts` — uses shared canonicalizeUrl for dedup
+- Modified: `scripts/embed.ts` — includes relevance_tier in Pinecone metadata
+- Modified: `src/lib/connectors/runner.ts` — includes relevance_tier in Pinecone metadata
+- Modified: `scripts/re-embed.ts` — includes relevance_tier in Pinecone metadata
+- Modified: `scripts/scraper-config.ts` — removed wrong-town domains from allowedDomains
+
+---
+
 ## v0.13.0 — 2026-02-20
 
 **Infra: Migrate Vector Search from Supabase to Pinecone**

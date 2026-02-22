@@ -4,6 +4,7 @@ import { getCachedAnswer } from '@/lib/answer-cache';
 import { DEFAULT_TOWN_ID } from '@/lib/towns';
 import { stripMarkdown } from '@/lib/utils';
 import { logSearchTelemetry } from '@/lib/telemetry';
+import { canonicalizeUrl } from '@/lib/url-canonicalize';
 
 // Search-specific threshold (higher than chat since results are user-facing)
 // Chat uses 0.3, but search results need stricter filtering to avoid irrelevant matches
@@ -94,56 +95,24 @@ function toSearchResult(result: HybridSearchResult): SearchResult {
 }
 
 /**
- * Normalize a URL for deduplication by removing variations that represent the same page.
- */
-function normalizeUrl(url: string): string {
-  let normalized = url.trim();
-
-  // Remove protocol (http:// or https://)
-  normalized = normalized.replace(/^https?:\/\//i, '');
-
-  // For FAQ pages with query parameters (e.g., Faq.aspx?QID=123, FAQ.asp?TID=45),
-  // strip the query params to group all FAQ entries from the same page together.
-  // This prevents showing "Frequently Asked Questions" 3+ times with different QIDs.
-  if (/\/faq\.(aspx?|php)/i.test(normalized)) {
-    normalized = normalized.split('?')[0];
-  }
-
-  // Remove trailing slashes
-  normalized = normalized.replace(/\/+$/, '');
-
-  // Convert to lowercase for case-insensitive comparison
-  normalized = normalized.toLowerCase();
-
-  return normalized;
-}
-
-/**
- * Deduplicate search results by source URL.
+ * Deduplicate search results by canonical URL.
  * For each unique URL, keeps only the result with the highest similarity score.
  */
 function deduplicateByUrl(results: SearchResult[]): SearchResult[] {
   const bestByUrl = new Map<string, SearchResult>();
 
   for (const result of results) {
-    // Skip results without a source URL
-    if (!result.source_url) {
-      continue;
-    }
+    if (!result.source_url) continue;
 
-    // Normalize URL to handle variations (trailing slashes, case, protocol)
-    const normalizedUrl = normalizeUrl(result.source_url);
-
-    const existing = bestByUrl.get(normalizedUrl);
+    const key = canonicalizeUrl(result.source_url);
+    const existing = bestByUrl.get(key);
     if (!existing || result.similarity > existing.similarity) {
-      bestByUrl.set(normalizedUrl, result);
+      bestByUrl.set(key, result);
     }
   }
 
-  // Return deduplicated results sorted by similarity (highest first)
   const deduplicated = Array.from(bestByUrl.values()).sort((a, b) => b.similarity - a.similarity);
 
-  // Log deduplication in development to help debug
   if (process.env.NODE_ENV === 'development' && results.length !== deduplicated.length) {
     console.log(`[search] Deduplicated ${results.length} results → ${deduplicated.length} unique URLs`);
   }

@@ -12,6 +12,7 @@ import { getSupabaseServiceClient } from "../src/lib/supabase";
 import { generateEmbeddings } from "../src/lib/embeddings";
 import { upsertToPinecone, deleteFromPinecone, PINECONE_NS_CHUNKS } from "../src/lib/pinecone";
 import type { PineconeVector } from "../src/lib/pinecone";
+import { classifyDocument } from "../src/lib/relevance-classifier";
 import { Chunk } from "./chunk";
 
 // ---------------------------------------------------------------------------
@@ -95,6 +96,12 @@ export async function embedAndStoreChunks(
   const supabase = getSupabaseServiceClient();
   let errors = 0;
 
+  // Classify document relevance tier from the first chunk's URL metadata
+  const firstChunkMeta = chunks[0]?.metadata;
+  const docUrl = firstChunkMeta?.document_url ?? "";
+  const docTitle = firstChunkMeta?.document_title;
+  const relevanceTier = docUrl ? classifyDocument(docUrl, docTitle) : "primary";
+
   // Delete existing chunks for this document (replace strategy)
   // First, get IDs of existing chunks to delete from Pinecone
   const { data: existingChunks } = await supabase
@@ -168,7 +175,7 @@ export async function embedAndStoreChunks(
         const pineconeVectors: PineconeVector[] = inserted.map((row, idx) => ({
           id: row.id,
           values: embeddings[idx],
-          metadata: { town_id: townId, document_id: documentId },
+          metadata: { town_id: townId, document_id: documentId, relevance_tier: relevanceTier },
         }));
 
         try {

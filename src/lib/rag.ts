@@ -6,7 +6,10 @@ import { expandQuery } from "@/lib/synonyms";
 import { rewriteQuery } from "@/lib/query-rewriter";
 import { trackEvent } from "@/lib/pendo";
 import { checkGeographicRelevance } from "@/lib/geo-filter";
+import { canonicalizeUrl } from "@/lib/url-canonicalize";
+import { getSearchTiers } from "@/lib/query-tier-router";
 import type { RetrievalConfig } from "@/lib/query-router";
+import { ALL_SEARCH_TIERS, type RelevanceTier } from "@/lib/relevance-classifier";
 
 export const DEFAULT_TOWN_ID = DEFAULT_TOWN_ID_FROM_CONFIG;
 
@@ -260,10 +263,12 @@ export function dedupeSources(chunks: RetrievedChunk[]): SourceReference[] {
     // Skip sources with generic/meaningless titles
     if (isGenericTitle(chunk.source.documentTitle)) continue;
 
-    // Primary dedup key: cleaned document title (not URL)
-    // This prevents "Frequently Asked Questions" from appearing 3x
-    // when it comes from different CivicPlus URLs
-    const key = chunk.source.documentTitle.toLowerCase().trim();
+    // Dedup by canonical URL first (handles http/https/www variants),
+    // fallback to cleaned title for sources without a URL
+    const url = chunk.source.documentUrl;
+    const key = url
+      ? canonicalizeUrl(url)
+      : chunk.source.documentTitle.toLowerCase().trim();
 
     if (!seen.has(key)) {
       seen.set(key, chunk.source);
@@ -709,15 +714,24 @@ async function vectorSearch(
   matchThreshold: number,
   matchCount: number,
   precomputedEmbedding?: number[],
+  tiers?: RelevanceTier[],
 ): Promise<MatchDocumentRow[]> {
   const embedding = precomputedEmbedding ?? await generateEmbedding(queryText);
+
+  // Build Pinecone filter — always filter by town_id, optionally by relevance tier.
+  // Tier filtering is gated behind ENABLE_TIER_FILTERING because existing vectors
+  // need a metadata backfill (classify-documents.ts) before the filter will match.
+  const filter: Record<string, unknown> = { town_id: { $eq: townId } };
+  if (tiers && tiers.length > 0 && process.env.ENABLE_TIER_FILTERING === "true") {
+    filter.relevance_tier = { $in: tiers };
+  }
 
   // Query Pinecone for document_chunks vectors
   const pineconeResults = await queryPinecone(
     PINECONE_NS_CHUNKS,
     embedding,
     matchCount,
-    { town_id: { $eq: townId } },
+    filter,
   );
 
   // Filter by similarity threshold
@@ -812,14 +826,17 @@ export async function retrieveRelevantChunks(
 
   // Step 6: Run vector searches in parallel — original + expanded + LLM-rewritten
   // All searches reuse pre-computed embeddings (no duplicate API calls)
+  // Determine relevance tiers based on query intent (e.g., state tax questions expand to mass.gov)
+  const tiers = getSearchTiers(trimmedQuery);
+
   const searchPromises: Promise<MatchDocumentRow[]>[] = [
-    vectorSearch(trimmedQuery, townId, matchThreshold, matchCount, originalEmbedding),
+    vectorSearch(trimmedQuery, townId, matchThreshold, matchCount, originalEmbedding, tiers),
     vectorSearchContentItems(trimmedQuery, townId, matchThreshold, Math.ceil(matchCount / 2), originalEmbedding),
   ];
 
   if (hasExpansions && expandedEmbedding) {
     searchPromises.push(
-      vectorSearch(fullExpandedQuery, townId, matchThreshold, matchCount, expandedEmbedding),
+      vectorSearch(fullExpandedQuery, townId, matchThreshold, matchCount, expandedEmbedding, tiers),
     );
   }
 
@@ -828,7 +845,7 @@ export async function retrieveRelevantChunks(
   if (rewrittenQuery) {
     // Rewritten query needs its own embedding (different text)
     searchPromises.push(
-      vectorSearch(rewrittenQuery, townId, matchThreshold, matchCount),
+      vectorSearch(rewrittenQuery, townId, matchThreshold, matchCount, undefined, tiers),
     );
 
     // Track query rewrites for analytics (non-blocking, fire-and-forget)
@@ -859,11 +876,44 @@ export async function retrieveRelevantChunks(
     }
   }
 
-  const mergedRows = Array.from(bestByChunkId.values());
+  // Document-level dedup: keep only the best chunk per source document
+  // This prevents the same page from appearing multiple times in results
+  const bestByDocument = new Map<string, MatchDocumentRow>();
+  for (const row of bestByChunkId.values()) {
+    const docUrl = (row.metadata as Record<string, unknown>)?.document_url;
+    const key = typeof docUrl === "string" ? canonicalizeUrl(docUrl) : row.id;
+    const existing = bestByDocument.get(key);
+    if (!existing || coerceSimilarity(row.similarity) > coerceSimilarity(existing.similarity)) {
+      bestByDocument.set(key, row);
+    }
+  }
+
+  const mergedRows = Array.from(bestByDocument.values());
   const allChunks = mergedRows.map((row, index) => toRetrievedChunk(row, index));
 
   // Filter out noise — chunks below the similarity floor are irrelevant
-  const chunks = allChunks.filter((c) => c.similarity >= MIN_SIMILARITY_FLOOR);
+  let chunks = allChunks.filter((c) => c.similarity >= MIN_SIMILARITY_FLOOR);
+
+  // Zero-result fallback: if we got no results with restricted tiers, retry with all tiers.
+  // This ensures users always get some answer even for niche queries.
+  if (chunks.length === 0 && tiers.length < ALL_SEARCH_TIERS.length) {
+    console.log(`[rag] Zero results with tiers [${tiers.join(",")}], expanding to all tiers`);
+    const fallbackResults = await vectorSearch(
+      trimmedQuery, townId, matchThreshold, matchCount, originalEmbedding, ALL_SEARCH_TIERS,
+    );
+    const fallbackBestByDoc = new Map<string, MatchDocumentRow>();
+    for (const row of fallbackResults) {
+      const docUrl = (row.metadata as Record<string, unknown>)?.document_url;
+      const key = typeof docUrl === "string" ? canonicalizeUrl(docUrl) : row.id;
+      const existing = fallbackBestByDoc.get(key);
+      if (!existing || coerceSimilarity(row.similarity) > coerceSimilarity(existing.similarity)) {
+        fallbackBestByDoc.set(key, row);
+      }
+    }
+    chunks = Array.from(fallbackBestByDoc.values())
+      .map((row, index) => toRetrievedChunk(row, index))
+      .filter((c) => c.similarity >= MIN_SIMILARITY_FLOOR);
+  }
 
   // Log filtered-out chunks in development for debugging
   if (process.env.NODE_ENV === "development") {

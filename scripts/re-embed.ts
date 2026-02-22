@@ -16,6 +16,7 @@ import { getSupabaseServiceClient } from "../src/lib/supabase";
 import { generateEmbeddings } from "../src/lib/embeddings";
 import { upsertToPinecone, PINECONE_NS_CHUNKS } from "../src/lib/pinecone";
 import type { PineconeVector } from "../src/lib/pinecone";
+import { classifyDocument } from "../src/lib/relevance-classifier";
 
 // ---------------------------------------------------------------------------
 // Contextual Chunk Header Builder (same as in embed.ts)
@@ -128,12 +129,18 @@ async function reEmbed(options: ReEmbedOptions = {}): Promise<void> {
       // Generate new embeddings
       const embeddings = await generateEmbeddings(textsForEmbedding);
 
-      // Upsert vectors to Pinecone
-      const pineconeVectors: PineconeVector[] = batch.map((chunk, j) => ({
-        id: chunk.id,
-        values: embeddings[j],
-        metadata: { town_id: townId, document_id: chunk.document_id ?? "" },
-      }));
+      // Upsert vectors to Pinecone (include relevance_tier from document URL)
+      const pineconeVectors: PineconeVector[] = batch.map((chunk, j) => {
+        const meta = (chunk.metadata ?? {}) as Record<string, unknown>;
+        const url = typeof meta.document_url === "string" ? meta.document_url : "";
+        const title = typeof meta.document_title === "string" ? meta.document_title : undefined;
+        const tier = url ? classifyDocument(url, title) : "primary";
+        return {
+          id: chunk.id,
+          values: embeddings[j],
+          metadata: { town_id: townId, document_id: chunk.document_id ?? "", relevance_tier: tier },
+        };
+      });
 
       await upsertToPinecone(PINECONE_NS_CHUNKS, pineconeVectors);
       reEmbedded += batch.length;
