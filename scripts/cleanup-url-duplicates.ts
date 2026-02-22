@@ -19,18 +19,21 @@ import { deleteFromPinecone, PINECONE_NS_CHUNKS } from "../src/lib/pinecone";
 
 const PAGE_SIZE = 500;
 
-async function main() {
-  const args = process.argv.slice(2);
-  const dryRun = !args.includes("--execute");
+type SupabaseClient = ReturnType<typeof getSupabaseServiceClient>;
 
-  if (dryRun) {
-    console.log("[cleanup] DRY RUN — pass --execute to actually delete duplicates\n");
-  }
+interface DupGroup {
+  canonical_url: string;
+  town_id: string;
+  doc_ids: string[];
+  chunk_counts: number[];
+  variant_count: number;
+}
 
-  const supabase = getSupabaseServiceClient();
+// ---------------------------------------------------------------------------
+// Step 1: Backfill canonical_url
+// ---------------------------------------------------------------------------
 
-  // Step 1: Backfill canonical_url
-  console.log("[cleanup] Step 1: Backfilling canonical_url...");
+async function backfillCanonicalUrls(supabase: SupabaseClient, dryRun: boolean): Promise<number> {
   let backfilled = 0;
   let cursor: string | null = null;
 
@@ -51,14 +54,10 @@ async function main() {
     }
     if (!data || data.length === 0) break;
 
-    // Batch update canonical_url
-    for (const doc of data) {
-      const canonical = canonicalizeUrl(doc.url);
-      if (!dryRun) {
-        await supabase
-          .from("documents")
-          .update({ canonical_url: canonical })
-          .eq("id", doc.id);
+    if (!dryRun) {
+      for (const doc of data) {
+        const canonical = canonicalizeUrl(doc.url);
+        await supabase.from("documents").update({ canonical_url: canonical }).eq("id", doc.id);
       }
     }
 
@@ -68,22 +67,15 @@ async function main() {
       console.log(`[cleanup] Backfilled ${backfilled} documents...`);
     }
   }
-  console.log(`[cleanup] Backfilled canonical_url for ${backfilled} documents`);
+  return backfilled;
+}
 
-  // Step 2: Find duplicate groups
-  console.log("\n[cleanup] Step 2: Finding duplicate groups...");
+// ---------------------------------------------------------------------------
+// Step 2: Find duplicate groups via Supabase Management API
+// ---------------------------------------------------------------------------
 
-  // Use Supabase Management API for the GROUP BY query
-  const token = "sbp_979709664b87b79d5ef39c571378c9d76c1faec3";
-  const projectRef = "myivfxpbgmzkncshwnup";
-
-  // First, let the backfill settle
-  if (!dryRun) {
-    await new Promise((r) => setTimeout(r, 2000));
-  }
-
-  // Query for duplicate canonical_urls via management API
-  const dupResponse = await fetch(
+async function findDuplicateGroups(token: string, projectRef: string): Promise<DupGroup[]> {
+  const response = await fetch(
     `https://api.supabase.com/v1/projects/${projectRef}/database/query`,
     {
       method: "POST",
@@ -108,35 +100,118 @@ async function main() {
     }
   );
 
-  const dupGroups = (await dupResponse.json()) as Array<{
-    canonical_url: string;
-    town_id: string;
-    doc_ids: string[];
-    chunk_counts: number[];
-    variant_count: number;
-  }>;
+  const groups = (await response.json()) as DupGroup[];
+  return Array.isArray(groups) ? groups : [];
+}
 
-  if (!Array.isArray(dupGroups) || dupGroups.length === 0) {
-    console.log("[cleanup] No duplicate groups found (backfill may not have completed).");
-    return;
+// ---------------------------------------------------------------------------
+// Step 3: Delete a single loser document's chunks + vectors
+// ---------------------------------------------------------------------------
+
+async function deleteLoserDoc(
+  supabase: SupabaseClient,
+  loserId: string,
+): Promise<{ chunksDeleted: number; vectorsDeleted: number; docDeleted: boolean }> {
+  // Fetch chunk IDs in batches
+  let chunkCursor: string | null = null;
+  const chunkIds: string[] = [];
+
+  while (true) {
+    let q = supabase
+      .from("document_chunks")
+      .select("id")
+      .eq("document_id", loserId)
+      .order("id")
+      .limit(1000);
+
+    if (chunkCursor) q = q.gt("id", chunkCursor);
+    const { data: chunks } = await q;
+    if (!chunks || chunks.length === 0) break;
+
+    chunkIds.push(...chunks.map((c) => c.id));
+    chunkCursor = chunks[chunks.length - 1].id;
   }
 
+  // Delete from Pinecone
+  let vectorsDeleted = 0;
+  if (chunkIds.length > 0) {
+    try {
+      for (let i = 0; i < chunkIds.length; i += 1000) {
+        await deleteFromPinecone(PINECONE_NS_CHUNKS, chunkIds.slice(i, i + 1000));
+      }
+      vectorsDeleted = chunkIds.length;
+    } catch (err) {
+      console.error(`[cleanup] Pinecone delete error for doc ${loserId}:`, err);
+    }
+  }
+
+  // Delete chunks from Supabase
+  const { error: chunkErr } = await supabase.from("document_chunks").delete().eq("document_id", loserId);
+  if (chunkErr) {
+    console.error(`[cleanup] Error deleting chunks for ${loserId}:`, chunkErr.message);
+    return { chunksDeleted: 0, vectorsDeleted, docDeleted: false };
+  }
+
+  // Delete the document itself
+  const { error: docErr } = await supabase.from("documents").delete().eq("id", loserId);
+  if (docErr) {
+    console.error(`[cleanup] Error deleting doc ${loserId}:`, docErr.message);
+    return { chunksDeleted: chunkIds.length, vectorsDeleted, docDeleted: false };
+  }
+
+  return { chunksDeleted: chunkIds.length, vectorsDeleted, docDeleted: true };
+}
+
+// ---------------------------------------------------------------------------
+// Main
+// ---------------------------------------------------------------------------
+
+async function main() {
+  const args = process.argv.slice(2);
+  const dryRun = !args.includes("--execute");
+
+  if (dryRun) {
+    console.log("[cleanup] DRY RUN — pass --execute to actually delete duplicates\n");
+  }
+
+  const supabase = getSupabaseServiceClient();
+
+  // Step 1
+  console.log("[cleanup] Step 1: Backfilling canonical_url...");
+  const backfilled = await backfillCanonicalUrls(supabase, dryRun);
+  console.log(`[cleanup] Backfilled canonical_url for ${backfilled} documents`);
+
+  // Step 2
+  console.log("\n[cleanup] Step 2: Finding duplicate groups...");
+  const token = process.env.SUPABASE_ACCESS_TOKEN;
+  const projectRef = process.env.SUPABASE_PROJECT_REF ?? "myivfxpbgmzkncshwnup";
+  if (!token) {
+    console.error("[cleanup] SUPABASE_ACCESS_TOKEN env var is required for duplicate detection");
+    process.exit(1);
+  }
+
+  if (!dryRun) await new Promise((r) => setTimeout(r, 2000));
+
+  const dupGroups = await findDuplicateGroups(token, projectRef);
+  if (dupGroups.length === 0) {
+    console.log("[cleanup] No duplicate groups found.");
+    return;
+  }
   console.log(`[cleanup] Found ${dupGroups.length} duplicate groups`);
 
-  // Step 3: Process each group — keep winner, delete losers
+  // Step 3: Process each group
   let totalDocsDeleted = 0;
   let totalChunksDeleted = 0;
   let totalVectorsDeleted = 0;
 
   for (const group of dupGroups) {
-    const winnerId = group.doc_ids[0]; // Highest chunk_count, most recent
     const loserIds = group.doc_ids.slice(1);
 
     if (dryRun) {
       const loserChunks = group.chunk_counts.slice(1).reduce((a, b) => a + b, 0);
       console.log(
         `  ${group.canonical_url}: ${group.variant_count} variants → ` +
-        `keep ${winnerId.slice(0, 8)}... (${group.chunk_counts[0]} chunks), ` +
+        `keep ${group.doc_ids[0].slice(0, 8)}... (${group.chunk_counts[0]} chunks), ` +
         `delete ${loserIds.length} docs (${loserChunks} chunks)`
       );
       totalDocsDeleted += loserIds.length;
@@ -144,67 +219,11 @@ async function main() {
       continue;
     }
 
-    // Get chunk IDs for losers (for Pinecone deletion)
     for (const loserId of loserIds) {
-      // Fetch chunk IDs in batches
-      let chunkCursor: string | null = null;
-      const chunkIdsToDelete: string[] = [];
-
-      while (true) {
-        let q = supabase
-          .from("document_chunks")
-          .select("id")
-          .eq("document_id", loserId)
-          .order("id")
-          .limit(1000);
-
-        if (chunkCursor) q = q.gt("id", chunkCursor);
-
-        const { data: chunks } = await q;
-        if (!chunks || chunks.length === 0) break;
-
-        chunkIdsToDelete.push(...chunks.map((c) => c.id));
-        chunkCursor = chunks[chunks.length - 1].id;
-      }
-
-      // Delete from Pinecone
-      if (chunkIdsToDelete.length > 0) {
-        try {
-          // Pinecone deleteMany has a limit per call; batch in groups of 1000
-          for (let i = 0; i < chunkIdsToDelete.length; i += 1000) {
-            const batch = chunkIdsToDelete.slice(i, i + 1000);
-            await deleteFromPinecone(PINECONE_NS_CHUNKS, batch);
-          }
-          totalVectorsDeleted += chunkIdsToDelete.length;
-        } catch (err) {
-          console.error(`[cleanup] Pinecone delete error for doc ${loserId}:`, err);
-        }
-      }
-
-      // Delete chunks from Supabase
-      const { error: chunkDeleteError } = await supabase
-        .from("document_chunks")
-        .delete()
-        .eq("document_id", loserId);
-
-      if (chunkDeleteError) {
-        console.error(`[cleanup] Error deleting chunks for ${loserId}:`, chunkDeleteError.message);
-        continue;
-      }
-
-      totalChunksDeleted += chunkIdsToDelete.length;
-
-      // Delete the document itself
-      const { error: docDeleteError } = await supabase
-        .from("documents")
-        .delete()
-        .eq("id", loserId);
-
-      if (docDeleteError) {
-        console.error(`[cleanup] Error deleting doc ${loserId}:`, docDeleteError.message);
-      } else {
-        totalDocsDeleted++;
-      }
+      const result = await deleteLoserDoc(supabase, loserId);
+      if (result.docDeleted) totalDocsDeleted++;
+      totalChunksDeleted += result.chunksDeleted;
+      totalVectorsDeleted += result.vectorsDeleted;
     }
 
     if (totalDocsDeleted % 50 === 0 && totalDocsDeleted > 0) {
