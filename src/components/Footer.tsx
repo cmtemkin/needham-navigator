@@ -14,6 +14,7 @@ export function Footer() {
   const weatherHref = useTownHref("/weather");
   const transitHref = useTownHref("/transit");
   const communityHref = useTownHref("/community");
+  const eventsHref = useTownHref("/events");
   const { t } = useI18n();
   const shortTownName = town.name.replace(/,\s*[A-Z]{2}$/i, "");
   const appName = town.app_name;
@@ -42,7 +43,10 @@ export function Footer() {
   if (town.feature_flags.enableTransit) {
     navLinks.push({ href: transitHref, label: "Transit" });
   }
-  if (town.feature_flags.enableEvents || town.feature_flags.enableSafety) {
+  if (town.feature_flags.enableEvents) {
+    navLinks.push({ href: eventsHref, label: "Events" });
+  }
+  if (town.feature_flags.enableSafety) {
     navLinks.push({ href: communityHref, label: "Community" });
   }
 
