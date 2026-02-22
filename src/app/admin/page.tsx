@@ -40,7 +40,7 @@ import {
 // Types
 // ---------------------------------------------------------------------------
 
-type Tab = "documents" | "analytics" | "costs" | "logs" | "settings" | "sources";
+type Tab = "documents" | "analytics" | "search-analytics" | "content-quality" | "costs" | "logs" | "settings" | "sources";
 
 interface AdminDocument {
   id: string;
@@ -92,6 +92,36 @@ interface CostSummaryData {
   month: CostPeriodSummary;
   daily: Array<{ date: string; cost: number; requests: number; tokens: number }>;
   by_model: Array<{ model: string; cost: number; requests: number }>;
+}
+
+interface SearchStatsData {
+  search: {
+    kpis: {
+      total_queries: number;
+      avg_latency_ms: number;
+      zero_result_rate: number;
+      avg_confidence: number;
+    };
+    top_queries: Array<{
+      query: string;
+      count: number;
+      avg_similarity: number | null;
+      avg_latency: number | null;
+    }>;
+    zero_result_queries: Array<{ query: string; count: number }>;
+    confidence_distribution: { high: number; medium: number; low: number };
+  };
+  content: {
+    kpis: {
+      total_documents: number;
+      total_chunks: number;
+      stale_count: number;
+      avg_chunks_per_doc: number;
+    };
+    by_domain: Array<{ domain: string; doc_count: number; chunk_count: number }>;
+    stale_documents: Array<{ url: string; title: string; updated_at: string }>;
+    freshness: { under7: number; under30: number; under90: number; over90: number };
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -480,6 +510,262 @@ function ConfidenceBar({ label, count, total, color }: { label: string; count: n
         <div className={`${color} h-2 rounded-full transition-all`} style={{ width: `${pct}%` }} />
       </div>
       <span className="text-xs text-text-secondary w-16 text-right">{count} ({Math.round(pct)}%)</span>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Search Analytics Tab
+// ---------------------------------------------------------------------------
+
+function SearchAnalyticsTab({ password }: { password: string }) {
+  const [data, setData] = useState<SearchStatsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const res = await adminFetch("/api/admin/stats", password);
+      if (res.ok) setData(await res.json());
+      else setError(true);
+      setLoading(false);
+    })();
+  }, [password]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <RefreshCw size={24} className="animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return <div className="text-center py-12 text-text-muted text-sm">Unable to load search analytics.</div>;
+  }
+
+  const { kpis, top_queries, zero_result_queries, confidence_distribution } = data.search;
+  const confTotal = confidence_distribution.high + confidence_distribution.medium + confidence_distribution.low;
+
+  return (
+    <div>
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <KpiCard icon={Search} label="Total Queries" value={kpis.total_queries.toLocaleString()} />
+        <KpiCard icon={Clock} label="Avg Response Time" value={`${kpis.avg_latency_ms}ms`} />
+        <KpiCard icon={AlertTriangle} label="Zero-Result Rate" value={`${kpis.zero_result_rate}%`} />
+        <KpiCard icon={Activity} label="Avg Confidence" value={kpis.avg_confidence.toFixed(3)} />
+      </div>
+
+      {/* Top Queries Table */}
+      {top_queries.length > 0 && (
+        <div className="bg-white border border-border-default rounded-lg p-5 mb-4">
+          <h3 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
+            <TrendingUp size={15} className="text-primary" />
+            Top 20 Queries
+          </h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border-default">
+                  <th className="text-left py-2 pr-4 font-medium text-text-secondary">Query</th>
+                  <th className="text-right py-2 px-3 font-medium text-text-secondary">Count</th>
+                  <th className="text-right py-2 px-3 font-medium text-text-secondary">Avg Similarity</th>
+                  <th className="text-right py-2 pl-3 font-medium text-text-secondary">Avg Latency</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border-light">
+                {top_queries.map((q, i) => (
+                  <tr key={i} className="hover:bg-gray-50">
+                    <td className="py-2 pr-4 text-text-primary max-w-[300px] truncate">{q.query}</td>
+                    <td className="py-2 px-3 text-right text-text-secondary font-medium">{q.count}</td>
+                    <td className="py-2 px-3 text-right text-text-secondary">
+                      {q.avg_similarity !== null ? q.avg_similarity.toFixed(3) : "-"}
+                    </td>
+                    <td className="py-2 pl-3 text-right text-text-secondary">
+                      {q.avg_latency !== null ? `${q.avg_latency}ms` : "-"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Zero-Result Queries */}
+      {zero_result_queries.length > 0 && (
+        <div className="bg-white border border-border-default rounded-lg p-5 mb-4">
+          <h3 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
+            <XCircle size={15} className="text-red-500" />
+            Zero-Result Queries (Content Gaps)
+          </h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border-default">
+                  <th className="text-left py-2 pr-4 font-medium text-text-secondary">Query</th>
+                  <th className="text-right py-2 pl-3 font-medium text-text-secondary">Count</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border-light">
+                {zero_result_queries.map((q, i) => (
+                  <tr key={i} className="hover:bg-gray-50">
+                    <td className="py-2 pr-4 text-text-primary">{q.query}</td>
+                    <td className="py-2 pl-3 text-right text-text-secondary font-medium">{q.count}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Confidence Distribution */}
+      {confTotal > 0 && (
+        <div className="bg-white border border-border-default rounded-lg p-5">
+          <h3 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
+            <Activity size={15} className="text-primary" />
+            Confidence Distribution
+          </h3>
+          <div className="space-y-2">
+            <ConfidenceBar label="High" count={confidence_distribution.high} total={confTotal} color="bg-green-500" />
+            <ConfidenceBar label="Medium" count={confidence_distribution.medium} total={confTotal} color="bg-yellow-500" />
+            <ConfidenceBar label="Low" count={confidence_distribution.low} total={confTotal} color="bg-orange-500" />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Content Quality Tab
+// ---------------------------------------------------------------------------
+
+function ContentQualityTab({ password }: { password: string }) {
+  const [data, setData] = useState<SearchStatsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const res = await adminFetch("/api/admin/stats", password);
+      if (res.ok) setData(await res.json());
+      else setError(true);
+      setLoading(false);
+    })();
+  }, [password]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <RefreshCw size={24} className="animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return <div className="text-center py-12 text-text-muted text-sm">Unable to load content quality data.</div>;
+  }
+
+  const { kpis, by_domain, stale_documents, freshness } = data.content;
+  const freshnessTotal = freshness.under7 + freshness.under30 + freshness.under90 + freshness.over90;
+  const maxFreshness = Math.max(freshness.under7, freshness.under30, freshness.under90, freshness.over90, 1);
+
+  return (
+    <div>
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <KpiCard icon={Database} label="Total Documents" value={kpis.total_documents.toLocaleString()} />
+        <KpiCard icon={Layers} label="Total Chunks" value={kpis.total_chunks.toLocaleString()} />
+        <KpiCard icon={AlertTriangle} label="Stale Documents" value={kpis.stale_count} />
+        <KpiCard icon={BarChart3} label="Avg Chunks/Doc" value={kpis.avg_chunks_per_doc} />
+      </div>
+
+      {/* Documents by Domain */}
+      {by_domain.length > 0 && (
+        <div className="bg-white border border-border-default rounded-lg p-5 mb-4">
+          <h3 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
+            <Globe size={15} className="text-primary" />
+            Documents by Domain
+          </h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border-default">
+                  <th className="text-left py-2 pr-4 font-medium text-text-secondary">Domain</th>
+                  <th className="text-right py-2 px-3 font-medium text-text-secondary">Documents</th>
+                  <th className="text-right py-2 pl-3 font-medium text-text-secondary">Chunks</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border-light">
+                {by_domain.map((d, i) => (
+                  <tr key={i} className="hover:bg-gray-50">
+                    <td className="py-2 pr-4 text-text-primary font-medium">{d.domain}</td>
+                    <td className="py-2 px-3 text-right text-text-secondary">{d.doc_count}</td>
+                    <td className="py-2 pl-3 text-right text-text-secondary">{d.chunk_count}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Stale Documents */}
+      {stale_documents.length > 0 && (
+        <div className="bg-white border border-border-default rounded-lg p-5 mb-4">
+          <h3 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
+            <AlertTriangle size={15} className="text-yellow-500" />
+            Stale Documents ({stale_documents.length})
+          </h3>
+          <div className="space-y-2 max-h-80 overflow-y-auto">
+            {stale_documents.map((doc, i) => (
+              <div key={i} className="flex items-start justify-between gap-3 py-2 border-b border-border-light last:border-0">
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-medium text-text-primary truncate">{doc.title || "Untitled"}</div>
+                  <div className="text-xs text-text-muted truncate">{doc.url}</div>
+                </div>
+                <div className="shrink-0 text-xs text-text-secondary">
+                  {formatDate(doc.updated_at)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Document Freshness */}
+      {freshnessTotal > 0 && (
+        <div className="bg-white border border-border-default rounded-lg p-5">
+          <h3 className="text-sm font-semibold text-text-primary mb-4 flex items-center gap-2">
+            <Clock size={15} className="text-primary" />
+            Document Freshness
+          </h3>
+          <div className="space-y-3">
+            {([
+              { label: "< 7 days", count: freshness.under7, color: "bg-green-500" },
+              { label: "7-30 days", count: freshness.under30, color: "bg-blue-500" },
+              { label: "30-90 days", count: freshness.under90, color: "bg-yellow-500" },
+              { label: "90+ days", count: freshness.over90, color: "bg-red-500" },
+            ] as const).map((bucket) => {
+              const pct = (bucket.count / maxFreshness) * 100;
+              return (
+                <div key={bucket.label} className="flex items-center gap-3">
+                  <span className="text-xs text-text-secondary w-20">{bucket.label}</span>
+                  <div className="flex-1 bg-gray-100 rounded-full h-2.5">
+                    <div className={`${bucket.color} h-2.5 rounded-full transition-all`} style={{ width: `${Math.max(pct, 2)}%` }} />
+                  </div>
+                  <span className="text-xs text-text-secondary w-20 text-right">
+                    {bucket.count} ({freshnessTotal > 0 ? Math.round((bucket.count / freshnessTotal) * 100) : 0}%)
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1491,6 +1777,8 @@ export default function AdminPage() {
   const tabs: { id: Tab; label: string; icon: React.ComponentType<any> }[] = [
     { id: "documents", label: "Documents", icon: FileText },
     { id: "analytics", label: "Analytics", icon: BarChart3 },
+    { id: "search-analytics", label: "Search", icon: Search },
+    { id: "content-quality", label: "Content", icon: Layers },
     { id: "costs", label: "Costs", icon: DollarSign },
     { id: "logs", label: "Ingestion Logs", icon: Activity },
     { id: "settings", label: "Settings", icon: Settings },
@@ -1543,6 +1831,8 @@ export default function AdminPage() {
       <main className="max-w-5xl mx-auto px-6 py-6">
         {activeTab === "documents" && <DocumentsTab password={password} />}
         {activeTab === "analytics" && <AnalyticsTab password={password} />}
+        {activeTab === "search-analytics" && <SearchAnalyticsTab password={password} />}
+        {activeTab === "content-quality" && <ContentQualityTab password={password} />}
         {activeTab === "costs" && <CostsTab password={password} />}
         {activeTab === "logs" && <LogsTab password={password} />}
         {activeTab === "settings" && <SettingsTab password={password} />}
