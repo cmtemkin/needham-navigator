@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { Search, MessageSquare, Newspaper, X } from "lucide-react";
+import { Search, MessageSquare, Newspaper, Calendar, X } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useTown, useTownHref } from "@/lib/town-context";
 import { useChatWidget } from "@/lib/chat-context";
@@ -17,6 +17,7 @@ export function Header() {
   const homeHref = useTownHref();
   const searchHref = useTownHref("/search");
   const newsHref = useTownHref("/articles");
+  const eventsHref = useTownHref("/events");
   const shortTownName = town.name.replace(/,\s*[A-Z]{2}$/i, "");
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -95,6 +96,17 @@ export function Header() {
             >
               <Newspaper size={16} />
               News
+            </Link>
+          )}
+
+          {/* Events link (desktop) */}
+          {town.feature_flags.enableEvents && (
+            <Link
+              href={eventsHref}
+              className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-text-secondary text-[13px] font-medium transition-all hover:bg-surface hover:text-text-primary"
+            >
+              <Calendar size={16} />
+              Events
             </Link>
           )}
 

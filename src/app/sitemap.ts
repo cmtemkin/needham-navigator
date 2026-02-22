@@ -52,6 +52,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: 0.6,
       });
     }
+    if (town.feature_flags.enableEvents) {
+      urls.push({
+        url: `${baseUrl}/${town.town_id}/events`,
+        lastModified: now,
+        changeFrequency: "daily",
+        priority: 0.6,
+      });
+    }
   }
 
   return urls;
