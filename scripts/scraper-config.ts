@@ -125,17 +125,8 @@ export const NEEDHAM_CONFIG: ScraperConfig = {
     "www.norfolkcountyma.gov",
     "mass.gov",
     "www.mass.gov",
-    // Surrounding Towns (limited crawl)
-    "wellesleyma.gov",
-    "www.wellesleyma.gov",
-    "newtonma.gov",
-    "www.newtonma.gov",
-    "dedham-ma.gov",
-    "www.dedham-ma.gov",
-    "doverma.gov",
-    "www.doverma.gov",
-    "townhall.westwood.ma.us",
-    "www.townhall.westwood.ma.us",
+    // Surrounding towns removed — their content is classified as "irrelevant"
+    // and excluded from default search. No need to crawl them.
     // Utilities
     "eversource.com",
     "www.eversource.com",

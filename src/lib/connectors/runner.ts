@@ -11,6 +11,7 @@ import { createHash } from "crypto";
 import { getSupabaseServiceClient } from "@/lib/supabase";
 import { generateEmbedding } from "@/lib/embeddings";
 import { upsertToPinecone, PINECONE_NS_CONTENT } from "@/lib/pinecone";
+import { classifyDocument } from "@/lib/relevance-classifier";
 import { createConnector } from "./registry";
 import type {
   ConnectorConfig,
@@ -145,10 +146,11 @@ async function upsertContentItems(
       // Upsert embedding to Pinecone if we generated one
       if (embeddingValues && upsertedRow?.id) {
         try {
+          const tier = item.url ? classifyDocument(item.url, item.title) : "supplementary";
           await upsertToPinecone(PINECONE_NS_CONTENT, [{
             id: upsertedRow.id,
             values: embeddingValues,
-            metadata: { town_id: townId, source_id: item.source_id },
+            metadata: { town_id: townId, source_id: item.source_id, relevance_tier: tier },
           }]);
         } catch (pineconeErr) {
           console.warn(`[runner] Pinecone upsert failed for "${item.title}": ${pineconeErr}`);

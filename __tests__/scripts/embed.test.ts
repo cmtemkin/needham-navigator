@@ -125,7 +125,7 @@ describe("embed", () => {
         expect.objectContaining({
           id: "uuid-1",
           values: expect.any(Array),
-          metadata: { town_id: "needham", document_id: "test-doc-id" },
+          metadata: { town_id: "needham", document_id: "test-doc-id", relevance_tier: "supplementary" },
         }),
       ])
     );

@@ -7,6 +7,9 @@ const NEEDHAM_HOSTS =
   "(?:needhamnavigator\\.com|www\\.needhamnavigator\\.com|localhost(?::\\d+)?|.*\\.vercel\\.app)";
 
 const nextConfig = {
+  turbopack: {
+    root: ".",
+  },
   async rewrites() {
     return {
       beforeFiles: [

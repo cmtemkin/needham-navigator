@@ -103,6 +103,8 @@ A unified feed combining AI-generated articles and external local news in a sing
 - Articles are generated automatically each morning at 5 AM from newly ingested town documents
 - External news from Needham Patch, Needham Observer, and Needham Local is scraped daily and displayed alongside AI content
 - **Geographic filtering** — content from other states or distant cities is automatically filtered out. Government/school content is Needham-only; events/dining/community content includes the broader Boston metro area.
+- **Tiered search** — search results prioritize Needham-specific content by default. State-level content (mass.gov) is automatically included when you ask about state programs, taxes, or regulations relevant to Needham residents. If no local results match, the search automatically expands to include broader sources.
+- **Deduplicated results** — each source page appears only once in results, even if multiple sections match your query. The most relevant section is shown.
 - All content appears in RAG-powered search and chat, with a locality boost for Needham-specific results
 
 ### Daily Brief
