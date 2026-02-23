@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { Cloud, Train, Shield, ChevronRight, AlertTriangle } from "lucide-react";
 import { useTown, useTownHref } from "@/lib/town-context";
+import { filterActiveAlerts } from "@/lib/transit-utils";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -152,62 +153,74 @@ function TransitWidget() {
   const [error, setError] = useState(false);
 
   const routeId = town.transit_route ?? null;
+  const abortRef = useRef<AbortController | null>(null);
 
-  useEffect(() => {
-    if (!routeId) {
-      setLoading(false);
-      return;
-    }
-
+  const fetchTransit = useCallback(async (isInitial = false) => {
+    if (!routeId) return;
+    abortRef.current?.abort();
     const controller = new AbortController();
+    abortRef.current = controller;
 
-    async function fetchTransit() {
-      try {
-        const now = new Date().toISOString();
-        const minTime = now.split("T")[1]?.slice(0, 5) ?? "00:00";
+    try {
+      const now = new Date().toISOString();
+      const minTime = now.split("T")[1]?.slice(0, 5) ?? "00:00";
 
-        const [alertsRes, schedulesRes] = await Promise.all([
-          fetch(
-            `https://api-v3.mbta.com/alerts?filter[route]=${routeId}&sort=-updated_at`,
-            { signal: controller.signal }
-          ),
-          fetch(
-            `https://api-v3.mbta.com/schedules?filter[route]=${routeId}&filter[min_time]=${minTime}&sort=departure_time&page[limit]=5&include=stop`,
-            { signal: controller.signal }
-          ),
-        ]);
+      const [alertsRes, schedulesRes] = await Promise.all([
+        fetch(
+          `https://api-v3.mbta.com/alerts?filter[route]=${routeId}&filter[datetime]=${now}&sort=-updated_at`,
+          { signal: controller.signal }
+        ),
+        fetch(
+          `https://api-v3.mbta.com/schedules?filter[route]=${routeId}&filter[min_time]=${minTime}&sort=departure_time&page[limit]=5&include=stop`,
+          { signal: controller.signal }
+        ),
+      ]);
 
-        const alertsData = await alertsRes.json();
-        const schedulesData = await schedulesRes.json();
+      const alertsData = await alertsRes.json();
+      const schedulesData = await schedulesRes.json();
 
-        const alerts = alertsData.data ?? [];
-        const schedules = schedulesData.data ?? [];
-        const stops = schedulesData.included?.filter((i: { type: string }) => i.type === "stop") ?? [];
+      const rawAlerts = alertsData.data ?? [];
+      const activeAlerts = filterActiveAlerts(rawAlerts);
+      const schedules = schedulesData.data ?? [];
+      const stops = schedulesData.included?.filter((i: { type: string }) => i.type === "stop") ?? [];
 
-        const firstSchedule = schedules[0];
-        const departureTime = firstSchedule?.attributes?.departure_time || firstSchedule?.attributes?.arrival_time || null;
-        const stopId = firstSchedule?.relationships?.stop?.data?.id;
-        const stopName = stops.find((s: { id: string }) => s.id === stopId)?.attributes?.name ?? "Station";
-        const direction = firstSchedule?.attributes?.direction_id === 0 ? "Outbound" : "Inbound";
+      const firstSchedule = schedules[0];
+      const departureTime = firstSchedule?.attributes?.departure_time || firstSchedule?.attributes?.arrival_time || null;
+      const stopId = firstSchedule?.relationships?.stop?.data?.id;
+      const stopName = stops.find((s: { id: string }) => s.id === stopId)?.attributes?.name ?? "";
+      const direction = firstSchedule?.attributes?.direction_id === 0 ? "Outbound" : "Inbound";
 
-        setData({
-          nextDeparture: departureTime,
-          direction,
-          stopName,
-          alertCount: alerts.length,
-          alertHeader: alerts[0]?.attributes?.header,
-        });
-        setFetchedAt(new Date());
-      } catch (err) {
-        if ((err as Error).name !== "AbortError") setError(true);
-      } finally {
-        setLoading(false);
-      }
+      setData({
+        nextDeparture: departureTime,
+        direction,
+        stopName,
+        alertCount: activeAlerts.length,
+        alertHeader: activeAlerts[0]?.attributes?.header as string | undefined,
+      });
+      setFetchedAt(new Date());
+    } catch (err) {
+      if ((err as Error).name !== "AbortError" && isInitial) setError(true);
+    } finally {
+      if (isInitial) setLoading(false);
     }
-
-    fetchTransit().catch(() => {});
-    return () => controller.abort();
   }, [routeId]);
+
+  // Initial fetch + visibility refresh
+  useEffect(() => {
+    if (!routeId) { setLoading(false); return; }
+
+    fetchTransit(true);
+
+    function handleVisibility() {
+      if (document.visibilityState === "visible") fetchTransit();
+    }
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      abortRef.current?.abort();
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, [routeId, fetchTransit]);
 
   if (!routeId) return null;
   if (loading) return <WidgetSkeleton />;
@@ -250,7 +263,9 @@ function TransitWidget() {
         {formattedTime}
       </div>
       <div className="text-sm text-text-secondary mb-1">
-        Next train · {data.stopName}
+        {data.nextDeparture
+          ? `Next train${data.stopName ? ` · ${data.stopName}` : ""}`
+          : "No upcoming departures today"}
       </div>
       {data.alertCount > 0 && data.alertHeader && (
         <div className="text-xs text-amber-700 flex items-start gap-1 mt-1">
