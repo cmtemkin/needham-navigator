@@ -103,7 +103,16 @@ function extractTime(text: string): string | null {
   return null;
 }
 
+const ALLOWED_HOSTS = new Set(["www.needhamma.gov", "needhamma.gov"]);
+
 async function fetchPage(url: string): Promise<string | null> {
+  // Restrict fetching to known municipal domains (prevents SSRF)
+  const parsed = new URL(url);
+  if (!ALLOWED_HOSTS.has(parsed.hostname)) {
+    console.error(`[scrape-events] Blocked fetch to untrusted host: ${parsed.hostname}`);
+    return null;
+  }
+
   try {
     const response = await fetch(url, {
       headers: {
