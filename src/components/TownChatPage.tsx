@@ -23,6 +23,9 @@ import {
 
 const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true";
 
+const toolbarBtnCls =
+  "inline-flex items-center gap-1.5 rounded-lg border border-border-default bg-white px-3.5 py-[7px] text-[13px] font-medium text-text-secondary transition-all hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary";
+
 function generateSessionId(): string {
   return `sess-${crypto.randomUUID()}`;
 }
@@ -167,6 +170,31 @@ function ChatContent() {
     }, 50);
   }, []);
 
+  /** Shared handler: append AI message + track receipt. */
+  const completeResponse = useCallback(
+    (msg: ChatMessage, startTime: number, extras: Record<string, unknown> = {}) => {
+      setMessages((prev) => [...prev, msg]);
+      trackChatEvent("chat_response_received", {
+        response_length: msg.text.length,
+        source_count: msg.sources?.length ?? 0,
+        confidence: msg.confidence,
+        response_time_ms: Math.round(performance.now() - startTime),
+        ...extras,
+      });
+    },
+    [trackChatEvent]
+  );
+
+  /** Shared handler: show error + track failure. */
+  const handleResponseError = useCallback(
+    (stage: string, err?: unknown) => {
+      if (err) console.error("Chat error:", err);
+      setErrorMessage(t("chat.error_response"));
+      trackChatEvent("chat_response_error", { error_stage: stage });
+    },
+    [t, trackChatEvent]
+  );
+
   const callRealAPI = useCallback(
     async (question: string) => {
       const startTime = performance.now();
@@ -216,38 +244,21 @@ function ChatContent() {
             sources = srcs;
           },
           onDone: () => {
-            const aiMessage: ChatMessage = {
-              id: `ai-${crypto.randomUUID().slice(0, 8)}`,
-              role: "ai",
-              text: fullText || "No response received.",
-              sources,
-              confidence,
-              followups: [], // Real API doesn't return followups yet
-            };
-            setMessages((prev) => [...prev, aiMessage]);
-            trackChatEvent("chat_response_received", {
-              response_length: fullText.length,
-              source_count: sources.length,
-              confidence,
-              response_time_ms: Math.round(performance.now() - startTime),
-            });
+            completeResponse(
+              { id: `ai-${crypto.randomUUID().slice(0, 8)}`, role: "ai", text: fullText || "No response received.", sources, confidence, followups: [] },
+              startTime
+            );
           },
-          onError: (error) => {
-            console.error("Chat stream error:", error);
-            setErrorMessage(t("chat.error_response"));
-            trackChatEvent("chat_response_error", { error_stage: "stream" });
-          },
+          onError: (error) => handleResponseError("stream", error),
         });
       } catch (error) {
-        console.error("Chat API error:", error);
-        setErrorMessage(t("chat.error_response"));
-        trackChatEvent("chat_response_error", { error_stage: "request" });
+        handleResponseError("request", error);
       } finally {
         setIsTyping(false);
         scrollToBottom();
       }
     },
-    [pathname, scrollToBottom, t, town.town_id]
+    [completeResponse, handleResponseError, scrollToBottom, town.town_id]
   );
 
   const simulateMockResponse = useCallback(
@@ -261,32 +272,20 @@ function ChatContent() {
       setTimeout(() => {
         try {
           const response = findMockResponse(question);
-          const aiMessage: ChatMessage = {
-            id: `ai-${crypto.randomUUID().slice(0, 8)}`,
-            role: "ai",
-            text: response.text,
-            sources: response.sources,
-            confidence: response.confidence,
-            followups: response.followups,
-          };
-          setMessages((prev) => [...prev, aiMessage]);
-          trackChatEvent("chat_response_received", {
-            response_length: response.text.length,
-            source_count: response.sources.length,
-            confidence: response.confidence,
-            response_time_ms: Math.round(performance.now() - startTime),
-            mock_mode: true,
-          });
+          completeResponse(
+            { id: `ai-${crypto.randomUUID().slice(0, 8)}`, role: "ai", text: response.text, sources: response.sources, confidence: response.confidence, followups: response.followups },
+            startTime,
+            { mock_mode: true }
+          );
         } catch {
-          setErrorMessage(t("chat.error_response"));
-          trackChatEvent("chat_response_error", { error_stage: "mock" });
+          handleResponseError("mock");
         } finally {
           setIsTyping(false);
           scrollToBottom();
         }
       }, delay);
     },
-    [pathname, scrollToBottom, t, town.town_id]
+    [completeResponse, handleResponseError, scrollToBottom]
   );
 
   const handleResponse = USE_MOCK_DATA ? simulateMockResponse : callRealAPI;
@@ -416,36 +415,24 @@ function ChatContent() {
 
       {/* Top bar */}
       <div className="flex items-center gap-2 px-4 py-3 sm:px-6">
-        <Link
-          href={homeHref}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-border-default bg-white px-3.5 py-[7px] text-[13px] font-medium text-text-secondary transition-all hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-        >
+        <Link href={homeHref} className={toolbarBtnCls}>
           <ChevronLeft size={14} aria-hidden="true" />
           {t("chat.back_home")}
         </Link>
 
-        <button
-          onClick={handleNewChat}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-border-default bg-white px-3.5 py-[7px] text-[13px] font-medium text-text-secondary transition-all hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-        >
+        <button onClick={handleNewChat} className={toolbarBtnCls}>
           <Plus size={14} aria-hidden="true" />
           {t("chat.new_chat")}
         </button>
 
-        <button
-          onClick={() => setHistoryOpen(true)}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-border-default bg-white px-3.5 py-[7px] text-[13px] font-medium text-text-secondary transition-all hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-        >
+        <button onClick={() => setHistoryOpen(true)} className={toolbarBtnCls}>
           <History size={14} aria-hidden="true" />
           {t("chat.history")}
         </button>
 
         {/* Share button — only visible when there are messages */}
         {hasMessages && (
-          <button
-            onClick={handleShare}
-            className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-border-default bg-white px-3.5 py-[7px] text-[13px] font-medium text-text-secondary transition-all hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-          >
+          <button onClick={handleShare} className={`ml-auto ${toolbarBtnCls}`}>
             <Share2 size={14} aria-hidden="true" />
             {copyFeedback ? t("chat.copied") : t("chat.share")}
           </button>
