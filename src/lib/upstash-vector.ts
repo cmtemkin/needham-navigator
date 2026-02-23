@@ -62,7 +62,7 @@ function buildFilter(filter?: Record<string, unknown>): string | undefined {
         const items = (op.$in as unknown[])
           .map((v) => (typeof v === "string" ? `'${v}'` : String(v)))
           .join(", ");
-        clauses.push(`${key} In [${items}]`);
+        clauses.push(`${key} IN (${items})`);
       } else if ("$ne" in op) {
         const v = op.$ne;
         clauses.push(
