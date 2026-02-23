@@ -41,6 +41,16 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  themeColor: "#1B4D7A",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Needham Navigator",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
 };
 
 export default function RootLayout({
@@ -52,6 +62,17 @@ export default function RootLayout({
     <html lang="en">
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
         {children}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                  navigator.serviceWorker.register('/sw.js');
+                });
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   );
