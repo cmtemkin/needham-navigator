@@ -115,6 +115,20 @@ function ChatContent() {
   const town = useTown();
   const { t } = useI18n();
 
+  /** DRY helper — shared base context for all Pendo chat tracking calls. */
+  const trackChatEvent = useCallback(
+    (eventName: string, extras: Record<string, unknown> = {}) => {
+      trackEvent(eventName, {
+        town_id: town.town_id,
+        session_id: sessionIdRef.current,
+        interaction_surface: "full_chat_page",
+        page_path: pathname,
+        ...extras,
+      });
+    },
+    [pathname, town.town_id]
+  );
+
   // Load conversations for the history drawer
   const [conversations, setConversations] = useState<SavedConversation[]>([]);
 
@@ -211,11 +225,7 @@ function ChatContent() {
               followups: [], // Real API doesn't return followups yet
             };
             setMessages((prev) => [...prev, aiMessage]);
-            trackEvent("chat_response_received", {
-              town_id: town.town_id,
-              session_id: sessionIdRef.current,
-              interaction_surface: "full_chat_page",
-              page_path: pathname,
+            trackChatEvent("chat_response_received", {
               response_length: fullText.length,
               source_count: sources.length,
               confidence,
@@ -225,25 +235,13 @@ function ChatContent() {
           onError: (error) => {
             console.error("Chat stream error:", error);
             setErrorMessage(t("chat.error_response"));
-            trackEvent("chat_response_error", {
-              town_id: town.town_id,
-              session_id: sessionIdRef.current,
-              interaction_surface: "full_chat_page",
-              page_path: pathname,
-              error_stage: "stream",
-            });
+            trackChatEvent("chat_response_error", { error_stage: "stream" });
           },
         });
       } catch (error) {
         console.error("Chat API error:", error);
         setErrorMessage(t("chat.error_response"));
-        trackEvent("chat_response_error", {
-          town_id: town.town_id,
-          session_id: sessionIdRef.current,
-          interaction_surface: "full_chat_page",
-          page_path: pathname,
-          error_stage: "request",
-        });
+        trackChatEvent("chat_response_error", { error_stage: "request" });
       } finally {
         setIsTyping(false);
         scrollToBottom();
@@ -272,11 +270,7 @@ function ChatContent() {
             followups: response.followups,
           };
           setMessages((prev) => [...prev, aiMessage]);
-          trackEvent("chat_response_received", {
-            town_id: town.town_id,
-            session_id: sessionIdRef.current,
-            interaction_surface: "full_chat_page",
-            page_path: pathname,
+          trackChatEvent("chat_response_received", {
             response_length: response.text.length,
             source_count: response.sources.length,
             confidence: response.confidence,
@@ -285,13 +279,7 @@ function ChatContent() {
           });
         } catch {
           setErrorMessage(t("chat.error_response"));
-          trackEvent("chat_response_error", {
-            town_id: town.town_id,
-            session_id: sessionIdRef.current,
-            interaction_surface: "full_chat_page",
-            page_path: pathname,
-            error_stage: "mock",
-          });
+          trackChatEvent("chat_response_error", { error_stage: "mock" });
         } finally {
           setIsTyping(false);
           scrollToBottom();
@@ -305,11 +293,7 @@ function ChatContent() {
 
   const handleSend = useCallback(
     (text: string) => {
-      trackEvent("chat_message_sent", {
-        town_id: town.town_id,
-        session_id: sessionIdRef.current,
-        interaction_surface: "full_chat_page",
-        page_path: pathname,
+      trackChatEvent("chat_message_sent", {
         message_length: text.length,
         is_from_search: initialQuery === text,
       });
@@ -332,12 +316,7 @@ function ChatContent() {
     sessionIdRef.current = generateSessionId();
     setCurrentConvoId(generateConvoId());
     hasProcessedInitial.current = true; // prevent re-processing ?q= param
-    trackEvent("chat_new_started", {
-      town_id: town.town_id,
-      session_id: sessionIdRef.current,
-      interaction_surface: "full_chat_page",
-      page_path: pathname,
-    });
+    trackChatEvent("chat_new_started");
   }, [pathname, town.town_id]);
 
   const handleRestoreConversation = useCallback(
@@ -347,11 +326,7 @@ function ChatContent() {
       sessionIdRef.current = generateSessionId();
       setErrorMessage(null);
       hasProcessedInitial.current = true; // prevent re-processing ?q= param
-      trackEvent("chat_history_restored", {
-        town_id: town.town_id,
-        session_id: sessionIdRef.current,
-        interaction_surface: "full_chat_page",
-        page_path: pathname,
+      trackChatEvent("chat_history_restored", {
         restored_message_count: convo.messages.length,
       });
       scrollToBottom();
@@ -395,27 +370,17 @@ function ChatContent() {
       await navigator.clipboard.writeText(shareText);
       setCopyFeedback(true);
       setTimeout(() => setCopyFeedback(false), 2000);
-      trackEvent("chat_shared", {
-        town_id: town.town_id,
-        session_id: sessionIdRef.current,
-        interaction_surface: "full_chat_page",
-        page_path: pathname,
-        message_count: messages.length,
-      });
+      trackChatEvent("chat_shared", { message_count: messages.length });
     } catch {
       // Fallback: do nothing if clipboard API is unavailable
     }
   }, [messages, pathname, town.town_id]);
 
   useEffect(() => {
-    trackEvent("chat_page_viewed", {
-      town_id: town.town_id,
-      session_id: sessionIdRef.current,
-      interaction_surface: "full_chat_page",
-      page_path: pathname,
+    trackChatEvent("chat_page_viewed", {
       initial_query_present: Boolean(initialQuery),
     });
-  }, [initialQuery, pathname, town.town_id]);
+  }, [initialQuery, trackChatEvent]);
 
   useEffect(() => {
     if (initialQuery && !hasProcessedInitial.current) {
