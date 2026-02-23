@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Train, Clock, ExternalLink, AlertCircle, RefreshCw } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useTown } from "@/lib/town-context";
 import { useChatWidget } from "@/lib/chat-context";
+import { filterActiveAlerts } from "@/lib/transit-utils";
 
 type MbtaAlert = {
   id: string;
@@ -64,54 +65,67 @@ export default function TransitPage() {
   const shortTownName = town.name.replace(/,\s*[A-Z]{2}$/i, "");
   const routeId = town.transit_route ?? null;
 
-  useEffect(() => {
-    if (!routeId) {
-      setLoading(false);
-      return;
-    }
+  const POLL_INTERVAL_MS = 60_000; // refresh every 60 seconds
+  const abortRef = useRef<AbortController | null>(null);
 
+  const fetchTransit = useCallback(async (isInitial = false) => {
+    if (!routeId) return;
+    abortRef.current?.abort();
     const controller = new AbortController();
+    abortRef.current = controller;
     const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
-    async function fetchTransit() {
-      setLoading(true);
+    if (isInitial) { setLoading(true); setError(null); }
+
+    try {
+      const now = new Date().toISOString();
+      const alertsPromise = fetch(
+        `https://api-v3.mbta.com/alerts?filter[route]=${routeId}&filter[datetime]=${now}&sort=-updated_at`,
+        { signal: controller.signal }
+      ).then((r) => r.json());
+
+      const schedulesPromise = fetch(
+        `https://api-v3.mbta.com/schedules?filter[route]=${routeId}&filter[min_time]=${now.split("T")[1]?.slice(0, 5) ?? "00:00"}&sort=departure_time&page[limit]=20&include=stop`,
+        { signal: controller.signal }
+      ).then((r) => r.json());
+
+      const [alertsData, schedulesData] = await Promise.all([alertsPromise, schedulesPromise]);
+
+      setData({
+        alerts: filterActiveAlerts(alertsData.data ?? []),
+        schedules: schedulesData.data ?? [],
+        stops: schedulesData.included?.filter((i: { type: string }) => i.type === "stop") ?? [],
+      });
       setError(null);
-
-      try {
-        // Fetch alerts for this route
-        const alertsPromise = fetch(
-          `https://api-v3.mbta.com/alerts?filter[route]=${routeId}&sort=-updated_at`,
-          { signal: controller.signal }
-        ).then((r) => r.json());
-
-        // Fetch upcoming schedules
-        const now = new Date().toISOString();
-        const schedulesPromise = fetch(
-          `https://api-v3.mbta.com/schedules?filter[route]=${routeId}&filter[min_time]=${now.split("T")[1]?.slice(0, 5) ?? "00:00"}&sort=departure_time&page[limit]=20&include=stop`,
-          { signal: controller.signal }
-        ).then((r) => r.json());
-
-        const [alertsData, schedulesData] = await Promise.all([alertsPromise, schedulesPromise]);
-
-        setData({
-          alerts: alertsData.data ?? [],
-          schedules: schedulesData.data ?? [],
-          stops: schedulesData.included?.filter((i: { type: string }) => i.type === "stop") ?? [],
-        });
-      } catch (err) {
-        if ((err as Error).name !== "AbortError") {
-          console.error("Transit fetch error:", err);
-          setError("Unable to load transit data. Please try again.");
-        }
-      } finally {
-        clearTimeout(timeout);
-        setLoading(false);
+    } catch (err) {
+      if ((err as Error).name !== "AbortError") {
+        console.error("Transit fetch error:", err);
+        if (isInitial) setError("Unable to load transit data. Please try again.");
       }
+    } finally {
+      clearTimeout(timeout);
+      if (isInitial) setLoading(false);
     }
-
-    fetchTransit().catch(() => {});
-    return () => { controller.abort(); clearTimeout(timeout); };
   }, [routeId]);
+
+  // Initial fetch + 60s polling + visibility refresh
+  useEffect(() => {
+    if (!routeId) { setLoading(false); return; }
+
+    fetchTransit(true);
+    const interval = setInterval(() => fetchTransit(), POLL_INTERVAL_MS);
+
+    function handleVisibility() {
+      if (document.visibilityState === "visible") fetchTransit();
+    }
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      abortRef.current?.abort();
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, [routeId, fetchTransit]);
 
   const getStopName = (schedule: MbtaSchedule): string => {
     const stopId = schedule.relationships?.stop?.data?.id;
