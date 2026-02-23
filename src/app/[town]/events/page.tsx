@@ -258,12 +258,43 @@ export default function EventsPage() {
             <div className="text-center py-16">
               <Calendar size={48} className="mx-auto text-text-muted mb-4 opacity-60" />
               <h2 className="text-2xl font-bold text-text-primary mb-2">
-                No upcoming events
+                Events are coming soon
               </h2>
-              <p className="text-text-secondary max-w-md mx-auto">
-                Events from town calendars, the library, and schools will appear
-                here when available. Check back soon!
+              <p className="text-text-secondary max-w-md mx-auto mb-6">
+                In the meantime, check these community calendars:
               </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <a
+                  href="https://www.needhamma.gov/calendar"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-border-default rounded-lg text-sm font-medium text-text-primary hover:border-[var(--primary)] hover:text-[var(--primary)] transition-colors"
+                >
+                  <Calendar size={16} />
+                  Town Calendar
+                  <ExternalLink size={12} className="text-text-muted" />
+                </a>
+                <a
+                  href="https://www.needhamlibrary.org/events"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-border-default rounded-lg text-sm font-medium text-text-primary hover:border-[var(--primary)] hover:text-[var(--primary)] transition-colors"
+                >
+                  <Calendar size={16} />
+                  Library Events
+                  <ExternalLink size={12} className="text-text-muted" />
+                </a>
+                <a
+                  href="https://www.needham.k12.ma.us/calendars"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-border-default rounded-lg text-sm font-medium text-text-primary hover:border-[var(--primary)] hover:text-[var(--primary)] transition-colors"
+                >
+                  <Calendar size={16} />
+                  School Calendar
+                  <ExternalLink size={12} className="text-text-muted" />
+                </a>
+              </div>
             </div>
           )}
         </div>
