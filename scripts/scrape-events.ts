@@ -97,8 +97,8 @@ function parseEventDate(dateStr: string): Date | null {
  * Returns something like "7:00 PM" or null.
  */
 function extractTime(text: string): string | null {
-  if (!text) return null;
-  const timeMatch = text.match(/\b(\d{1,2}:\d{2}\s*(?:AM|PM|am|pm))\b/);
+  if (!text || text.length > 200) return null; // Length limit prevents ReDoS
+  const timeMatch = text.match(/\b(\d{1,2}:\d{2}\s?(?:AM|PM))\b/i);
   if (timeMatch) return timeMatch[1].trim();
   return null;
 }
