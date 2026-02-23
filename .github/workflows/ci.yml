@@ -2,7 +2,7 @@ name: CI — Build, Test, Auto-Merge
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, develop]
     types: [opened, synchronize, reopened]
 
 jobs:
@@ -117,7 +117,7 @@ jobs:
       contents: write
       pull-requests: write
       issues: write
-    if: success()
+    if: success() && github.event.pull_request.base.ref == 'develop'
     steps:
       - name: Auto-merge PR
         uses: actions/github-script@v7
@@ -157,7 +157,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: prNumber,
-              body: '✅ **CI Passed** — Build succeeded. Auto-merging to main.\n\nVercel will deploy to production automatically.'
+              body: '✅ **CI Passed** — Build succeeded. Auto-merging to develop.\n\nVercel will deploy to staging automatically.'
             });
 
             // Merge the PR via squash
@@ -183,6 +183,26 @@ jobs:
             } catch (e) {
               console.log(`Branch deletion skipped: ${e.message}`);
             }
+
+  production-gate:
+    needs: [build-and-test, codeql]
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+    if: success() && github.event.pull_request.base.ref == 'main'
+    steps:
+      - name: Comment on production PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: '✅ **CI Passed** — This PR targets **main** (production). Merge manually when ready to deploy to production.\n\nVercel will deploy to needhamnavigator.com after merge.'
+            });
 
   on-failure:
     needs: [build-and-test, codeql]
