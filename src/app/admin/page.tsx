@@ -515,10 +515,10 @@ function ConfidenceBar({ label, count, total, color }: { label: string; count: n
 }
 
 // ---------------------------------------------------------------------------
-// Search Analytics Tab
+// Shared hook for stats data (used by Search Analytics + Content Quality)
 // ---------------------------------------------------------------------------
 
-function SearchAnalyticsTab({ password }: { password: string }) {
+function useStatsData(password: string) {
   const [data, setData] = useState<SearchStatsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -531,6 +531,58 @@ function SearchAnalyticsTab({ password }: { password: string }) {
       setLoading(false);
     })();
   }, [password]);
+
+  return { data, loading, error };
+}
+
+// Reusable admin table — avoids duplicated table markup across tabs
+type AdminColumn<T> = {
+  header: string;
+  align?: "left" | "right";
+  render: (row: T, i: number) => React.ReactNode;
+};
+
+function AdminTable<T>({ columns, rows }: { columns: AdminColumn<T>[]; rows: T[] }) {
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-border-default">
+            {columns.map((col, ci) => (
+              <th
+                key={ci}
+                className={`py-2 ${ci === 0 ? "pr-4 text-left" : ci === columns.length - 1 ? "pl-3 text-right" : "px-3 text-right"} font-medium text-text-secondary`}
+              >
+                {col.header}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-border-light">
+          {rows.map((row, i) => (
+            <tr key={i} className="hover:bg-gray-50">
+              {columns.map((col, ci) => (
+                <td
+                  key={ci}
+                  className={`py-2 ${ci === 0 ? "pr-4 text-text-primary" : ci === columns.length - 1 ? "pl-3 text-right text-text-secondary" : "px-3 text-right text-text-secondary"}`}
+                >
+                  {col.render(row, i)}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Search Analytics Tab
+// ---------------------------------------------------------------------------
+
+function SearchAnalyticsTab({ password }: { password: string }) {
+  const { data, loading, error } = useStatsData(password);
 
   if (loading) {
     return (
@@ -564,32 +616,15 @@ function SearchAnalyticsTab({ password }: { password: string }) {
             <TrendingUp size={15} className="text-primary" />
             Top 20 Queries
           </h3>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border-default">
-                  <th className="text-left py-2 pr-4 font-medium text-text-secondary">Query</th>
-                  <th className="text-right py-2 px-3 font-medium text-text-secondary">Count</th>
-                  <th className="text-right py-2 px-3 font-medium text-text-secondary">Avg Similarity</th>
-                  <th className="text-right py-2 pl-3 font-medium text-text-secondary">Avg Latency</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border-light">
-                {top_queries.map((q, i) => (
-                  <tr key={i} className="hover:bg-gray-50">
-                    <td className="py-2 pr-4 text-text-primary max-w-[300px] truncate">{q.query}</td>
-                    <td className="py-2 px-3 text-right text-text-secondary font-medium">{q.count}</td>
-                    <td className="py-2 px-3 text-right text-text-secondary">
-                      {q.avg_similarity !== null ? q.avg_similarity.toFixed(3) : "-"}
-                    </td>
-                    <td className="py-2 pl-3 text-right text-text-secondary">
-                      {q.avg_latency !== null ? `${q.avg_latency}ms` : "-"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <AdminTable
+            rows={top_queries}
+            columns={[
+              { header: "Query", render: (q) => <span className="max-w-[300px] truncate block">{q.query}</span> },
+              { header: "Count", render: (q) => <span className="font-medium">{q.count}</span> },
+              { header: "Avg Similarity", render: (q) => q.avg_similarity !== null ? q.avg_similarity.toFixed(3) : "-" },
+              { header: "Avg Latency", render: (q) => q.avg_latency !== null ? `${q.avg_latency}ms` : "-" },
+            ]}
+          />
         </div>
       )}
 
@@ -600,24 +635,13 @@ function SearchAnalyticsTab({ password }: { password: string }) {
             <XCircle size={15} className="text-red-500" />
             Zero-Result Queries (Content Gaps)
           </h3>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border-default">
-                  <th className="text-left py-2 pr-4 font-medium text-text-secondary">Query</th>
-                  <th className="text-right py-2 pl-3 font-medium text-text-secondary">Count</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border-light">
-                {zero_result_queries.map((q, i) => (
-                  <tr key={i} className="hover:bg-gray-50">
-                    <td className="py-2 pr-4 text-text-primary">{q.query}</td>
-                    <td className="py-2 pl-3 text-right text-text-secondary font-medium">{q.count}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <AdminTable
+            rows={zero_result_queries}
+            columns={[
+              { header: "Query", render: (q) => q.query },
+              { header: "Count", render: (q) => <span className="font-medium">{q.count}</span> },
+            ]}
+          />
         </div>
       )}
 
@@ -644,18 +668,7 @@ function SearchAnalyticsTab({ password }: { password: string }) {
 // ---------------------------------------------------------------------------
 
 function ContentQualityTab({ password }: { password: string }) {
-  const [data, setData] = useState<SearchStatsData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-
-  useEffect(() => {
-    (async () => {
-      const res = await adminFetch("/api/admin/stats", password);
-      if (res.ok) setData(await res.json());
-      else setError(true);
-      setLoading(false);
-    })();
-  }, [password]);
+  const { data, loading, error } = useStatsData(password);
 
   if (loading) {
     return (
@@ -690,26 +703,14 @@ function ContentQualityTab({ password }: { password: string }) {
             <Globe size={15} className="text-primary" />
             Documents by Domain
           </h3>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border-default">
-                  <th className="text-left py-2 pr-4 font-medium text-text-secondary">Domain</th>
-                  <th className="text-right py-2 px-3 font-medium text-text-secondary">Documents</th>
-                  <th className="text-right py-2 pl-3 font-medium text-text-secondary">Chunks</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border-light">
-                {by_domain.map((d, i) => (
-                  <tr key={i} className="hover:bg-gray-50">
-                    <td className="py-2 pr-4 text-text-primary font-medium">{d.domain}</td>
-                    <td className="py-2 px-3 text-right text-text-secondary">{d.doc_count}</td>
-                    <td className="py-2 pl-3 text-right text-text-secondary">{d.chunk_count}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <AdminTable
+            rows={by_domain}
+            columns={[
+              { header: "Domain", render: (d) => <span className="font-medium">{d.domain}</span> },
+              { header: "Documents", render: (d) => d.doc_count },
+              { header: "Chunks", render: (d) => d.chunk_count },
+            ]}
+          />
         </div>
       )}
 
