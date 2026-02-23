@@ -1,4 +1,5 @@
 import type { MockSource } from "@/lib/mock-data";
+import { stripInternalMetadata } from "@/lib/text-utils";
 
 /**
  * Callbacks for SSE stream events
@@ -87,7 +88,7 @@ export async function parseStreamResponse(
       }
     }
 
-    callbacks.onDone?.(fullText);
+    callbacks.onDone?.(stripInternalMetadata(fullText));
   } catch (error) {
     callbacks.onError?.(error instanceof Error ? error : new Error(String(error)));
   }

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Newspaper, ExternalLink, Filter, Loader2 } from "lucide-react";
 import { useTown } from "@/lib/town-context";
+import { formatRelativeTime, stripMarkdown } from "@/lib/text-utils";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -31,21 +32,6 @@ interface ContentResponse {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function timeAgo(dateStr: string): string {
-  const now = Date.now();
-  const then = new Date(dateStr).getTime();
-  const diffMs = now - then;
-  const diffMin = Math.floor(diffMs / 60_000);
-  const diffHr = Math.floor(diffMs / 3_600_000);
-  const diffDay = Math.floor(diffMs / 86_400_000);
-
-  if (diffMin < 1) return "just now";
-  if (diffMin < 60) return `${diffMin}m ago`;
-  if (diffHr < 24) return `${diffHr}h ago`;
-  if (diffDay < 7) return `${diffDay}d ago`;
-  return new Date(dateStr).toLocaleDateString();
-}
-
 function getSourceLabel(sourceId: string, townNewsSources?: Record<string, string>): string {
   if (townNewsSources?.[sourceId]) return townNewsSources[sourceId];
   return sourceId.split(":").pop() ?? sourceId;
@@ -66,7 +52,7 @@ function getSourceColor(sourceId: string): string {
 // ---------------------------------------------------------------------------
 
 function NewsCard({ item, newsSources }: { item: ContentItem; newsSources?: Record<string, string> }) {
-  const displayText = item.summary || item.content?.slice(0, 200) || "";
+  const displayText = stripMarkdown(item.summary || item.content?.slice(0, 200) || "");
 
   return (
     <article className="group rounded-xl border border-border-light bg-white p-4 transition-all hover:border-border hover:shadow-sm">
@@ -89,7 +75,7 @@ function NewsCard({ item, newsSources }: { item: ContentItem; newsSources?: Reco
               {getSourceLabel(item.source_id, newsSources)}
             </span>
             <span className="text-[12px] text-text-muted">
-              {timeAgo(item.published_at)}
+              {formatRelativeTime(item.published_at, true)}
             </span>
           </div>
 
