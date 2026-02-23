@@ -17,6 +17,7 @@ import { useChatWidget } from "@/lib/chat-context";
 import type { SearchResponse, CachedAnswer } from "@/types/search";
 import type { Article, ArticleListResponse } from "@/types/article";
 import { trackEvent } from "@/lib/pendo";
+import { stripInternalMetadata, formatRelativeTime, stripMarkdown } from "@/lib/text-utils";
 
 // ---------------------------------------------------------------------------
 // Unified content types for homepage news feed
@@ -46,23 +47,8 @@ const SOURCE_COLORS: Record<string, string> = {
   "needham:town-rss": "bg-purple-100 text-purple-700",
 };
 
-function formatRelativeTime(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
-
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays === 1) return "Yesterday";
-  if (diffDays < 7) return `${diffDays}d ago`;
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-}
-
 function ContentItemGridCard({ item, newsSources }: { item: ContentItem; newsSources?: Record<string, string> }) {
-  const displayText = item.summary || item.content?.slice(0, 150) || "";
+  const displayText = stripMarkdown(item.summary || item.content?.slice(0, 150) || "");
   const sourceLabel = newsSources?.[item.source_id] || item.source_id.split(":").pop() || item.source_id;
   const sourceColor = SOURCE_COLORS[item.source_id] ?? "bg-gray-100 text-gray-700";
 
@@ -91,7 +77,7 @@ function ContentItemGridCard({ item, newsSources }: { item: ContentItem; newsSou
         <span>{sourceLabel}</span>
         <div className="flex items-center gap-1">
           <Clock size={12} />
-          <span>{formatRelativeTime(item.published_at)}</span>
+          <span>{formatRelativeTime(item.published_at, true)}</span>
         </div>
       </div>
     </a>
@@ -345,8 +331,9 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
               }
             }
 
-            if (answerHtml) {
-              setAiAnswer({ type: "loaded", html: answerHtml, sources });
+            const cleanedHtml = stripInternalMetadata(answerHtml);
+            if (cleanedHtml) {
+              setAiAnswer({ type: "loaded", html: cleanedHtml, sources });
             } else {
               setAiAnswer({ type: "error", message: "No answer generated" });
             }
