@@ -96,6 +96,23 @@ export async function setCachedAnswer(
 }
 
 /**
+ * Invalidate a specific cached answer (e.g., stale entry with no sources).
+ */
+export async function invalidateCachedAnswer(
+  query: string,
+  townId: string,
+): Promise<void> {
+  const normalized = normalizeQuery(query);
+  const supabase = getSupabaseServiceClient();
+
+  await supabase
+    .from('cached_answers')
+    .delete()
+    .eq('town_id', townId)
+    .eq('normalized_query', normalized);
+}
+
+/**
  * Delete expired cache entries to reclaim disk space.
  * Called daily from the monitor cron.
  */
