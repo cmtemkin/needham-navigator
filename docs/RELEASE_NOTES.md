@@ -2,6 +2,84 @@
 
 ---
 
+## v0.16.0 — 2026-02-23
+
+**Parallel Feature Build: Chat UX, PWA, Admin Dashboard v2, Events Scraper**
+
+Four features built and merged in parallel from independent branches.
+
+### New Features
+- **Chat UX improvements** (PR #118) — Conversation history drawer (localStorage, max 20 per town, FIFO), Share button (copies Q&A to clipboard), follow-up suggestion chips (context-aware: permits, schools, taxes, etc.), New Chat button
+- **Progressive Web App (PWA)** (PR #119) — Web app manifest for "Add to Home Screen" installability, service worker with network-first navigation and cache-first static assets, branded offline fallback page, PWA icons (192px and 512px)
+- **Admin Dashboard: Search Analytics & Content Quality** (PR #120) — Two new admin tabs: Search Analytics (total queries, avg latency, zero-result rate, confidence distribution, top 20 queries, content gaps) and Content Quality (documents by domain, stale documents, freshness distribution). New `/api/admin/stats` endpoint.
+- **Events Calendar scraper** (PR #121) — Cheerio-based scraper for needhamma.gov calendar and CivicAlerts pages. Supports `--dry-run` flag. Upserts to `content_items` with `category: 'events'`. Includes SSRF protection (host allowlist) and Supabase migration for source config.
+
+### Technical
+- New: `src/lib/chat-history.ts` — localStorage conversation persistence
+- New: `src/components/ChatHistory.tsx` — Slide-in drawer component
+- New: `public/manifest.json`, `public/sw.js`, `public/offline.html` — PWA assets
+- New: `src/app/api/admin/stats/route.ts` — Admin stats API
+- New: `scripts/scrape-events.ts` — Events scraper (469 lines)
+- New: `supabase/migrations/20260222_add_events_scraper_source.sql`
+- Modified: `src/components/TownChatPage.tsx` — Chat UX features + DRY refactoring
+- Modified: `src/app/admin/page.tsx` — Search Analytics + Content Quality tabs
+- Modified: `src/app/layout.tsx` — PWA manifest link, meta tags, SW registration
+- Modified: `src/lib/i18n.tsx` — 13 new i18n keys (chat + events) in en/es/zh
+- Modified: `next.config.mjs` — Added `events` to rewrite path regex
+- All 4 PRs passed build, CodeQL, Semgrep, and 19 Playwright E2E tests
+
+---
+
+## v0.15.0 — 2026-02-22
+
+**Infra: Migrate Vector Search from Pinecone back to Supabase pgvector**
+
+Pinecone vector count exceeded the free tier limit. Rather than pay $50/month, all vector search is migrated back to Supabase pgvector — which was already enabled in the database (never dropped), costs $0 extra, and eliminates an external service dependency.
+
+### New Features
+- **Single-query vector search** — RAG search now executes a single Supabase RPC call instead of 2 round-trips (Pinecone query → Supabase metadata fetch). This reduces latency and simplifies the code path.
+- **Enhanced `match_documents` RPC** — The restored RPC function includes a new `filter_tiers TEXT[]` parameter for relevance tier filtering directly in the database query, replacing client-side tier filtering.
+- **Inline embeddings** — Embeddings are stored directly in the `document_chunks` and `content_items` rows (pgvector `vector(1536)` columns), eliminating the need for a separate vector database.
+
+### Architecture Changes
+- **Search flow**: Query → OpenAI embed → Supabase `match_documents` RPC (vector similarity + text + metadata in one query) → results
+- **Ingestion flow**: Generate embeddings → insert to Supabase with embedding column populated (single write)
+- Vector embeddings remain at 1536 dimensions using `text-embedding-3-large` — no quality reduction
+- HNSW indexes (m=16, ef_construction=64) provide fast approximate nearest neighbor search
+- Pinecone dependency completely removed
+
+### Technical
+- New: `supabase/migrations/20260223000000_restore_pgvector.sql` — restores embedding columns, HNSW indexes, and RPC functions
+- New: `src/lib/vector-store.ts` — pgvector-backed vector operations (replaces pinecone.ts)
+- Deleted: `src/lib/pinecone.ts` — Pinecone client wrapper
+- Deleted: `scripts/migrate-to-pinecone.ts` — obsolete migration script
+- Deleted: `scripts/classify-pinecone-fast.ts` — Pinecone-specific metadata backfill
+- Deleted: `scripts/find-cursor.ts` — Pinecone pagination utility
+- Modified: `src/lib/rag.ts` — `vectorSearch()` and `vectorSearchContentItems()` use Supabase RPC directly
+- Modified: `src/lib/connectors/runner.ts` — inline embedding in Supabase insert (removed Pinecone upsert)
+- Modified: `scripts/embed.ts` — inline embedding + relevance_tier in metadata
+- Modified: `scripts/re-embed.ts` — updates Supabase embedding column directly
+- Modified: `scripts/re-embed-content.ts` — updates Supabase embedding column directly
+- Modified: `scripts/smoke-test.ts` — uses Supabase RPC for test queries
+- Modified: `scripts/classify-documents.ts` — updates chunk metadata JSONB instead of Pinecone
+- Modified: `scripts/cleanup-url-duplicates.ts` — removed Pinecone delete (cascade handles it)
+- Removed dependency: `@pinecone-database/pinecone`
+- Removed env var: `PINECONE_API_KEY`
+
+### Cost Impact
+- Pinecone: $0–50/month → $0/month (eliminated)
+- Supabase: no change (pgvector included in existing plan)
+- Re-embedding: ~$0.05 one-time cost via OpenAI API
+
+### Post-Merge Steps
+1. Apply migration: `supabase/migrations/20260223000000_restore_pgvector.sql`
+2. Re-embed documents: `npx tsx --env-file=.env.local scripts/re-embed.ts --town=needham`
+3. Re-embed content items: `npx tsx --env-file=.env.local scripts/re-embed-content.ts`
+4. Remove `PINECONE_API_KEY` from Vercel Dashboard and `.env.local`
+5. Delete the Pinecone index to stop any billing
+
+---
+
 ## v0.14.0 — 2026-02-21
 
 **Search Quality: Tiered Relevance Filtering + Document Deduplication**
@@ -17,7 +95,7 @@
 ### Architecture Changes
 - New `relevance_tier` column on `documents` table with CHECK constraint and index
 - New `canonical_url` column on `documents` table for deduplication
-- Pinecone vector metadata now includes `relevance_tier` for query-time filtering
+- Vector metadata now includes `relevance_tier` for query-time filtering
 - Query tier routing: `getSearchTiers(query)` detects state-level queries via 30+ regex patterns
 
 ### Technical
