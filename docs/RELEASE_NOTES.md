@@ -32,51 +32,45 @@ Four features built and merged in parallel from independent branches.
 
 ## v0.15.0 — 2026-02-22
 
-**Infra: Migrate Vector Search from Pinecone back to Supabase pgvector**
+**Infra: Migrate Vector Search from Pinecone to Upstash Vector**
 
-Pinecone vector count exceeded the free tier limit. Rather than pay $50/month, all vector search is migrated back to Supabase pgvector — which was already enabled in the database (never dropped), costs $0 extra, and eliminates an external service dependency.
+Pinecone vector count (~244K vectors) exceeded the free tier limit. Rather than pay $50/month for Pinecone, vector search is migrated to **Upstash Vector** — a serverless vector DB with pay-as-you-go pricing (~$0.50/month for our usage). Supabase pgvector was considered but rejected because Supabase is already near its 500 MB free tier limit and can't absorb ~1.46 GB of embeddings.
 
-### New Features
-- **Single-query vector search** — RAG search now executes a single Supabase RPC call instead of 2 round-trips (Pinecone query → Supabase metadata fetch). This reduces latency and simplifies the code path.
-- **Enhanced `match_documents` RPC** — The restored RPC function includes a new `filter_tiers TEXT[]` parameter for relevance tier filtering directly in the database query, replacing client-side tier filtering.
-- **Inline embeddings** — Embeddings are stored directly in the `document_chunks` and `content_items` rows (pgvector `vector(1536)` columns), eliminating the need for a separate vector database.
-
-### Architecture Changes
-- **Search flow**: Query → OpenAI embed → Supabase `match_documents` RPC (vector similarity + text + metadata in one query) → results
-- **Ingestion flow**: Generate embeddings → insert to Supabase with embedding column populated (single write)
-- Vector embeddings remain at 1536 dimensions using `text-embedding-3-large` — no quality reduction
-- HNSW indexes (m=16, ef_construction=64) provide fast approximate nearest neighbor search
-- Pinecone dependency completely removed
+### Architecture
+- **Same 2-query pattern** — Query → OpenAI embed → Upstash Vector query (returns IDs + scores) → Supabase fetch (text + metadata) → merge results. Drop-in replacement for Pinecone with identical data flow.
+- **Two namespaces**: `chunks` (document_chunks) and `content` (content_items) — same as Pinecone
+- **Minimal metadata in Upstash** (for filtering only): `{ town_id, relevance_tier }` for chunks, `{ town_id, category }` for content
+- **Supabase remains source of truth** for all text, metadata, and structured data
+- Vector embeddings remain at 1536 dimensions using `text-embedding-3-large`
+- Upstash uses DiskANN algorithm (~0.95 recall, comparable to Pinecone's HNSW)
 
 ### Technical
-- New: `supabase/migrations/20260223000000_restore_pgvector.sql` — restores embedding columns, HNSW indexes, and RPC functions
-- New: `src/lib/vector-store.ts` — pgvector-backed vector operations (replaces pinecone.ts)
+- New: `src/lib/upstash-vector.ts` — Upstash Vector SDK wrapper with backward-compatible function names (`queryPinecone`, `upsertToPinecone`, `deleteFromPinecone`)
+- New: Filter builder converts Pinecone filter syntax (`$eq`, `$in`, `$ne`) to Upstash SQL-like syntax
 - Deleted: `src/lib/pinecone.ts` — Pinecone client wrapper
 - Deleted: `scripts/migrate-to-pinecone.ts` — obsolete migration script
-- Deleted: `scripts/classify-pinecone-fast.ts` — Pinecone-specific metadata backfill
-- Deleted: `scripts/find-cursor.ts` — Pinecone pagination utility
-- Modified: `src/lib/rag.ts` — `vectorSearch()` and `vectorSearchContentItems()` use Supabase RPC directly
-- Modified: `src/lib/connectors/runner.ts` — inline embedding in Supabase insert (removed Pinecone upsert)
-- Modified: `scripts/embed.ts` — inline embedding + relevance_tier in metadata
-- Modified: `scripts/re-embed.ts` — updates Supabase embedding column directly
-- Modified: `scripts/re-embed-content.ts` — updates Supabase embedding column directly
-- Modified: `scripts/smoke-test.ts` — uses Supabase RPC for test queries
-- Modified: `scripts/classify-documents.ts` — updates chunk metadata JSONB instead of Pinecone
-- Modified: `scripts/cleanup-url-duplicates.ts` — removed Pinecone delete (cascade handles it)
-- Removed dependency: `@pinecone-database/pinecone`
+- Modified: `src/lib/rag.ts` — import swap only (1 line)
+- Modified: `src/lib/connectors/runner.ts` — import swap only
+- Modified: `scripts/embed.ts`, `scripts/re-embed.ts`, `scripts/smoke-test.ts`, `scripts/cleanup-url-duplicates.ts` — import swap only
+- Modified: `scripts/re-embed-content.ts` — updated to upsert to Upstash Vector instead of Supabase embedding column
+- Modified: `scripts/classify-documents.ts` — removed Pinecone metadata update (Supabase-only; re-embed refreshes Upstash metadata)
+- Modified: all test files — mock target changed from `@/lib/pinecone` to `@/lib/upstash-vector`
+- Swapped dependency: `@pinecone-database/pinecone` → `@upstash/vector`
+- New env vars: `UPSTASH_VECTOR_REST_URL`, `UPSTASH_VECTOR_REST_TOKEN`
 - Removed env var: `PINECONE_API_KEY`
 
 ### Cost Impact
 - Pinecone: $0–50/month → $0/month (eliminated)
-- Supabase: no change (pgvector included in existing plan)
+- Upstash Vector: ~$0.50/month (PAYG: $0.25/GB storage + $0.40/100K requests)
 - Re-embedding: ~$0.05 one-time cost via OpenAI API
 
 ### Post-Merge Steps
-1. Apply migration: `supabase/migrations/20260223000000_restore_pgvector.sql`
-2. Re-embed documents: `npx tsx --env-file=.env.local scripts/re-embed.ts --town=needham`
-3. Re-embed content items: `npx tsx --env-file=.env.local scripts/re-embed-content.ts`
-4. Remove `PINECONE_API_KEY` from Vercel Dashboard and `.env.local`
-5. Delete the Pinecone index to stop any billing
+1. Create Upstash Vector index at upstash.com (1536 dims, cosine metric)
+2. Set `UPSTASH_VECTOR_REST_URL` and `UPSTASH_VECTOR_REST_TOKEN` in `.env.local` and Vercel Dashboard
+3. Re-embed documents: `npx tsx --env-file=.env.local scripts/re-embed.ts --town=needham`
+4. Re-embed content items: `npx tsx --env-file=.env.local scripts/re-embed-content.ts`
+5. Remove `PINECONE_API_KEY` from Vercel Dashboard and `.env.local`
+6. Delete the Pinecone index to stop any billing
 
 ---
 

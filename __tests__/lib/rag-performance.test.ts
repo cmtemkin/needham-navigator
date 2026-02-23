@@ -2,7 +2,7 @@
  * Tests for RAG performance optimizations:
  * - Pre-computed embeddings (no duplicate API calls)
  * - Reduced match count (DEFAULT_MATCH_COUNT = 20)
- * - Pinecone vector search + Supabase metadata fetch
+ * - Upstash vector search + Supabase metadata fetch
  */
 
 // Track calls to generateEmbedding to verify dedup
@@ -14,9 +14,9 @@ jest.mock("@/lib/embeddings", () => ({
   EMBEDDING_DIMENSIONS: 1536,
 }));
 
-// Mock Pinecone
+// Mock Upstash Vector
 const mockQueryPinecone = jest.fn();
-jest.mock("@/lib/pinecone", () => ({
+jest.mock("@/lib/upstash-vector", () => ({
   queryPinecone: (...args: unknown[]) => mockQueryPinecone(...args),
   PINECONE_NS_CHUNKS: "chunks",
   PINECONE_NS_CONTENT: "content",

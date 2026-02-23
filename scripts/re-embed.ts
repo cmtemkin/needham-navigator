@@ -14,8 +14,8 @@
 
 import { getSupabaseServiceClient } from "../src/lib/supabase";
 import { generateEmbeddings } from "../src/lib/embeddings";
-import { upsertToPinecone, PINECONE_NS_CHUNKS } from "../src/lib/pinecone";
-import type { PineconeVector } from "../src/lib/pinecone";
+import { upsertToPinecone, PINECONE_NS_CHUNKS } from "../src/lib/upstash-vector";
+import type { PineconeVector } from "../src/lib/upstash-vector";
 import { classifyDocument } from "../src/lib/relevance-classifier";
 
 // ---------------------------------------------------------------------------

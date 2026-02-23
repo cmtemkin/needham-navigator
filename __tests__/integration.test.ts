@@ -78,7 +78,7 @@ jest.mock("@/lib/embeddings", () => ({
     generateEmbedding: jest.fn().mockResolvedValue(new Array(1536).fill(0)),
 }));
 
-jest.mock("@/lib/pinecone", () => ({
+jest.mock("@/lib/upstash-vector", () => ({
     queryPinecone: jest.fn().mockResolvedValue([]),
     upsertToPinecone: jest.fn().mockResolvedValue(undefined),
     deleteFromPinecone: jest.fn().mockResolvedValue(undefined),
