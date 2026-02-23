@@ -45,7 +45,10 @@ Navigate to **Ask a Question** from the header or visit `/<town>/chat`.
 - **Clickable sources** — each response shows source pills linking directly to official town pages
 - **Clickable phone numbers** — phone numbers in answers are tap-to-call on mobile
 - **Confidence levels** — "Verified from official sources" (green), "Based on town documents" (yellow), or "Limited information" (orange) helps you know when to verify
-- Click a follow-up suggestion to continue the conversation
+- **Follow-up suggestion chips** — after each AI response, contextual follow-up questions appear (e.g., permit-related questions after a permit answer, school questions after a school answer)
+- **Conversation history** — click the History button to view, restore, or delete past conversations. Up to 20 conversations are saved per town in your browser's local storage.
+- **New Chat** — click the + button to start a fresh conversation at any time
+- **Share** — click Share to copy the entire Q&A thread to your clipboard for easy sharing
 - **Feedback**: Every AI response has thumbs up/down buttons — your feedback helps improve answers. You can optionally add a comment.
 
 ### Permit Wizard
@@ -175,6 +178,8 @@ The home page lists key town departments with phone numbers. Click any departmen
 Visit `/admin` to access:
 
 - **Analytics** — feedback trends, query volume, response quality metrics
+- **Search Analytics** — total queries, average response time, zero-result rate, average confidence score, top 20 queries, zero-result queries (content gaps), and confidence distribution
+- **Content Quality** — total documents/chunks, stale document count, average chunks per document, documents by domain, stale document list, and document freshness distribution
 - **Costs** — OpenAI API spend monitoring: today/week/month totals, projected monthly cost, daily cost chart (last 30 days), cost-by-model breakdown, average cost per query
 - **System Logs** — ingestion status, error tracking, sync history
 - **Document Management** — view indexed content and sources
@@ -195,7 +200,7 @@ npm run validate [town_id]
 **What it validates:**
 - ✓ All chunks have required metadata (document_title, document_type, document_url, chunk_type, etc.)
 - ✓ No duplicate chunks (same content_hash)
-- ✓ Embedding dimensions are correct (1536 for text-embedding-3-large, stored in Pinecone)
+- ✓ Embedding dimensions are correct (1536 for text-embedding-3-large, stored in Supabase pgvector)
 - ✓ No orphaned chunks (document_id references non-existent documents)
 - ✓ Coverage report showing chunk count per department
 
@@ -289,6 +294,18 @@ The site includes standard SEO features that work automatically:
 - **sitemap.xml** — lists all public pages for Google and other crawlers, auto-generated from town configs
 - **Open Graph / Twitter cards** — when the site link is shared on social media, it shows a proper title and description instead of a blank preview
 - **Branded 404 page** — visiting a bad URL shows a helpful "Page not found" page with a link back to the homepage
+
+---
+
+## Install as App (PWA)
+
+Needham Navigator can be installed as a standalone app on your phone or desktop:
+
+- **iOS**: Open the site in Safari → tap the Share button → "Add to Home Screen"
+- **Android**: Open the site in Chrome → tap the menu → "Install app" or "Add to Home Screen"
+- **Desktop**: In Chrome/Edge, click the install icon in the address bar
+
+Once installed, the app launches in its own window without browser chrome and works offline (showing a branded offline page when no connection is available).
 
 ---
 
