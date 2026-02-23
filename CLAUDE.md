@@ -33,7 +33,7 @@ Needham Navigator is an AI-powered municipal information hub built with Next.js 
 - **Vision:** Beyond Q&A - full AI-driven local information hub / autonomous newspaper. Events, reviews, community news. Fully automated CI/CD.
 - **Web Crawling:** Custom scraper (cheerio + @mozilla/readability + turndown) - replaces Firecrawl ($16/mo savings). Built specifically for municipal CivicPlus sites. Entry points: `scripts/scraper.ts` (core), `scripts/scraper-config.ts` (config), `scripts/reingest-clean.ts` (full refresh), `scripts/smoke-test.ts` (validation). FIRECRAWL_API_KEY no longer needed.
 - **Vector Search:** Upstash Vector (serverless, PAYG ~$0.50/month) — replaced Pinecone (exceeded free tier). Same 2-query pattern: Upstash for vector similarity → Supabase for text/metadata. SDK: `@upstash/vector`, wrapper: `src/lib/upstash-vector.ts`. Env vars: `UPSTASH_VECTOR_REST_URL`, `UPSTASH_VECTOR_REST_TOKEN`.
-- **CI/CD:** GitHub Actions - Vercel deploy on push to main
+- **CI/CD:** GitHub Actions with staging/production split — PRs auto-merge to `develop` (staging.needhamnavigator.com), manual promotion to `main` (needhamnavigator.com)
 
 ## Analytics
 - **Pendo** (free tier, 500 MAU cap): Product analytics, behavioral tracking, in-app guides
@@ -86,16 +86,27 @@ Every time code is merged to `main`, complete these steps before pushing:
 
 **CRITICAL - All agents MUST follow these rules:**
 
-1. **NEVER push directly to main** - main is protected, direct pushes will be rejected
+1. **NEVER push directly to main or develop** - both branches are protected, direct pushes will be rejected
 2. **ALWAYS create a feature branch** - `git checkout -b feature/your-feature-name`
-3. **Push your branch and create a PR** - `git push origin feature/your-feature-name && gh pr create --fill`
-4. **NEVER merge your own PR** - GitHub Actions will auto-merge if CI passes
-5. **If CI fails, fix the errors on your branch and push again** - CI will re-run automatically
-6. **Keep PRs focused** - one feature or fix per PR, not everything at once
-7. **Write clear commit messages** - describe what changed and why
-8. **Before starting any new work**, check for open issues labeled `ci-failure` or `prod-down`:
+3. **PRs target `develop` by default** - `gh pr create --base develop --fill`
+4. **NEVER merge your own PR** - GitHub Actions will auto-merge PRs targeting `develop` if CI passes
+5. **PRs targeting `main` are NOT auto-merged** - production deploys require manual merge
+6. **If CI fails, fix the errors on your branch and push again** - CI will re-run automatically
+7. **Keep PRs focused** - one feature or fix per PR, not everything at once
+8. **Write clear commit messages** - describe what changed and why
+9. **Before starting any new work**, check for open issues labeled `ci-failure` or `prod-down`:
    `gh issue list --label ci-failure --label prod-down --state open`
    If any exist, **fix those first** before starting new features
+
+## Production Promotion Checklist
+
+When ready to deploy staging to production:
+
+1. **Verify staging** - check staging.needhamnavigator.com works as expected
+2. **Create PR from `develop` to `main`** - `gh pr create --base main --head develop --title "chore: promote to production" --body "Staging verified. Promoting to production."`
+3. **CI will run** on the PR but will NOT auto-merge (posts a comment instead)
+4. **Manually merge** the PR when ready to deploy
+5. **Update docs** - ensure `docs/USER_GUIDE.md` and `docs/RELEASE_NOTES.md` are up to date before merging
 
 ## Pre-Push Verification Loop (MANDATORY - DO NOT SKIP)
 
@@ -146,7 +157,7 @@ Every agent session MUST start with these steps before writing any new code:
 
 1. Check for open issues: `gh issue list --label ci-failure --label prod-down --state open`
 2. Check for open security alerts: `gh api repos/{owner}/{repo}/code-scanning/alerts --jq '[.[] | select(.state=="open")] | length'`
-3. Verify build health: `git checkout main && git pull origin main && npm ci && npm run build`
+3. Verify build health: `git checkout develop && git pull origin develop && npm ci && npm run build`
 4. Check in-flight work: `gh pr list --state open`
 5. If anything is broken (issues, security alerts, build failures), fix it FIRST - create a `fix/` branch, push, and create a PR
 6. Only after everything is green should you start new feature work
@@ -198,7 +209,7 @@ If there are open alerts, triage and fix them before writing new features.
 
 ## Branch Cleanup Automation
 - **On PR merge** (`branch-cleanup.yml` + `ci.yml`): Head branch is automatically deleted immediately after merge
-- **Weekly sweep** (`branch-cleanup.yml`, Mondays 5:00 AM UTC): Scans all branches, deletes any that were merged via PR but not yet cleaned up. Skips branches with open PRs and protected branches (main, master, develop).
+- **Weekly sweep** (`branch-cleanup.yml`, Mondays 5:00 AM UTC): Scans all branches, deletes any that were merged via PR but not yet cleaned up. Skips branches with open PRs and protected branches (`main`, `develop`).
 - **GitHub repo setting** (REQUIRED): Enable "Automatically delete head branches" in Settings > General. This is the most reliable method and catches merges done via the GitHub UI.
 - **Manual trigger**: The branch-cleanup workflow can also be triggered manually via `workflow_dispatch`
 
@@ -264,9 +275,11 @@ For every specific issue (bug, smell, design concern, or risk):
 **FOR EACH STAGE OF REVIEW:** Output the explanation and pros and cons of each stage's questions AND your opinionated recommendation and why, and then use AskUserQuestion. Also NUMBER issues and then give LETTERS for options and when using AskUserQuestion make sure each option clearly labels the issue NUMBER and option LETTER so the user doesn't get confused. Make the recommended option always the 1st option.
 
 ## CI/CD Pipeline Status
-- **Last validated:** 2026-02-19
-- **Pipeline:** GitHub Actions (ci.yml) > auto-merge > Vercel deploy
+- **Last validated:** 2026-02-22
+- **Pipeline:** GitHub Actions (ci.yml) > auto-merge to `develop` (staging) > manual promotion to `main` (production)
+- **Staging:** staging.needhamnavigator.com (deploys from `develop` branch)
+- **Production:** needhamnavigator.com (deploys from `main` branch)
 - **Security scanning:** CodeQL (inline + weekly), Semgrep (PR + weekly), SonarCloud (automatic analysis), ESLint security plugin, npm audit
 - **Branch cleanup:** Automatic on merge + weekly sweep (branch-cleanup.yml)
-- **Branch protection:** Enforced on `main` (require PR + status checks)
+- **Branch protection:** Enforced on `main` and `develop` (require PR + status checks)
 - **Repo visibility:** Public (MIT License)
