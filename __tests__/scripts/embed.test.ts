@@ -1,10 +1,10 @@
 import { embedAndStoreChunks } from "../../scripts/embed";
 import type { Chunk } from "../../scripts/chunk";
 
-// Mock Pinecone
+// Mock Upstash Vector
 const mockUpsertToPinecone = jest.fn().mockResolvedValue(undefined);
 const mockDeleteFromPinecone = jest.fn().mockResolvedValue(undefined);
-jest.mock("@/lib/pinecone", () => ({
+jest.mock("@/lib/upstash-vector", () => ({
   upsertToPinecone: (...args: unknown[]) => mockUpsertToPinecone(...args),
   deleteFromPinecone: (...args: unknown[]) => mockDeleteFromPinecone(...args),
   PINECONE_NS_CHUNKS: "chunks",

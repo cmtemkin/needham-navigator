@@ -32,6 +32,7 @@ Needham Navigator is an AI-powered municipal information hub built with Next.js 
 - **Hosting:** Vercel (changed from Replit - cheaper for Next.js apps, better CI/CD)
 - **Vision:** Beyond Q&A - full AI-driven local information hub / autonomous newspaper. Events, reviews, community news. Fully automated CI/CD.
 - **Web Crawling:** Custom scraper (cheerio + @mozilla/readability + turndown) - replaces Firecrawl ($16/mo savings). Built specifically for municipal CivicPlus sites. Entry points: `scripts/scraper.ts` (core), `scripts/scraper-config.ts` (config), `scripts/reingest-clean.ts` (full refresh), `scripts/smoke-test.ts` (validation). FIRECRAWL_API_KEY no longer needed.
+- **Vector Search:** Upstash Vector (serverless, PAYG ~$0.50/month) — replaced Pinecone (exceeded free tier). Same 2-query pattern: Upstash for vector similarity → Supabase for text/metadata. SDK: `@upstash/vector`, wrapper: `src/lib/upstash-vector.ts`. Env vars: `UPSTASH_VECTOR_REST_URL`, `UPSTASH_VECTOR_REST_TOKEN`.
 - **CI/CD:** GitHub Actions - Vercel deploy on push to main
 
 ## Analytics

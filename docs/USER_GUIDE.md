@@ -200,7 +200,7 @@ npm run validate [town_id]
 **What it validates:**
 - ✓ All chunks have required metadata (document_title, document_type, document_url, chunk_type, etc.)
 - ✓ No duplicate chunks (same content_hash)
-- ✓ Embedding dimensions are correct (1536 for text-embedding-3-large, stored in Supabase pgvector)
+- ✓ Embedding dimensions are correct (1536 for text-embedding-3-large, stored in Upstash Vector)
 - ✓ No orphaned chunks (document_id references non-existent documents)
 - ✓ Coverage report showing chunk count per department
 

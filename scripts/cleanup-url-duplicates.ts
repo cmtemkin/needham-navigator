@@ -15,7 +15,7 @@
 
 import { getSupabaseServiceClient } from "../src/lib/supabase";
 import { canonicalizeUrl } from "../src/lib/url-canonicalize";
-import { deleteFromPinecone, PINECONE_NS_CHUNKS } from "../src/lib/pinecone";
+import { deleteFromPinecone, PINECONE_NS_CHUNKS } from "../src/lib/upstash-vector";
 
 const PAGE_SIZE = 500;
 

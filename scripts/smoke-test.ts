@@ -6,7 +6,7 @@
 
 import { getSupabaseServiceClient } from "../src/lib/supabase";
 import { generateEmbeddings } from "../src/lib/embeddings";
-import { queryPinecone, PINECONE_NS_CHUNKS } from "../src/lib/pinecone";
+import { queryPinecone, PINECONE_NS_CHUNKS } from "../src/lib/upstash-vector";
 
 const QUERIES = [
   "when is the dump open?",
