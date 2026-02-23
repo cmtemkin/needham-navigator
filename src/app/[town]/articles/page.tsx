@@ -8,6 +8,7 @@ import { ArticleSkeleton } from "@/components/ArticleSkeleton";
 import { useTown } from "@/lib/town-context";
 import { ExternalLink, Clock, Filter, ChevronDown } from "lucide-react";
 import type { Article, ArticleListResponse } from "@/types/article";
+import { formatRelativeTime, stripMarkdown } from "@/lib/text-utils";
 
 const FETCH_TIMEOUT_MS = 10000;
 
@@ -73,23 +74,8 @@ const SOURCE_COLORS: Record<string, string> = {
   "needham:town-rss": "bg-purple-100 text-purple-700",
 };
 
-function formatRelativeTime(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
-
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays === 1) return "Yesterday";
-  if (diffDays < 7) return `${diffDays}d ago`;
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-}
-
 function ContentItemCard({ item, newsSources }: { item: ContentItem; newsSources?: Record<string, string> }) {
-  const displayText = item.summary || item.content?.slice(0, 200) || "";
+  const displayText = stripMarkdown(item.summary || item.content?.slice(0, 200) || "");
   const sourceLabel = newsSources?.[item.source_id] || item.source_id.split(":").pop() || item.source_id;
   const sourceColor = SOURCE_COLORS[item.source_id] ?? "bg-gray-100 text-gray-700";
 
@@ -143,7 +129,7 @@ function ContentItemCard({ item, newsSources }: { item: ContentItem; newsSources
             )}
             <div className="flex items-center gap-1">
               <Clock size={12} />
-              <span>{formatRelativeTime(item.published_at)}</span>
+              <span>{formatRelativeTime(item.published_at, true)}</span>
             </div>
           </div>
         </div>

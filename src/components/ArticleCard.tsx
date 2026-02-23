@@ -4,6 +4,7 @@ import { Clock, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import type { Article } from "@/types/article";
 import { useTown, useTownHref } from "@/lib/town-context";
+import { formatRelativeTime, stripMarkdown } from "@/lib/text-utils";
 
 interface ArticleCardProps {
   article: Article;
@@ -38,27 +39,6 @@ const CATEGORY_LABELS: Record<string, string> = {
   development: "Permits & Development",
   business: "Business",
 };
-
-function formatRelativeTime(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
-
-  if (diffMins < 60) {
-    return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`;
-  } else if (diffHours < 24) {
-    return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
-  } else if (diffDays === 1) {
-    return 'Yesterday';
-  } else if (diffDays < 7) {
-    return `${diffDays} days ago`;
-  } else {
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  }
-}
 
 export function ArticleCard({ article, variant = "grid", lastVisitTimestamp }: ArticleCardProps) {
   const town = useTown();
@@ -108,7 +88,7 @@ export function ArticleCard({ article, variant = "grid", lastVisitTimestamp }: A
 
       {/* Summary */}
       <p className={`text-sm text-text-secondary mb-3 ${variant === "list" ? "line-clamp-3" : "line-clamp-2"}`}>
-        {article.summary || article.body.substring(0, 150) + "..."}
+        {stripMarkdown(article.summary || article.body).substring(0, 150) + "..."}
       </p>
 
       {/* Footer - Source and timestamp */}
