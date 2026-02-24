@@ -165,6 +165,7 @@ export function createScraperConnector(
   const articleSelector =
     (config.config.articleSelector as string) ?? "a[href]";
   const urlPatternStr = config.config.articleUrlPattern as string | undefined;
+  // nosemgrep: detect-non-literal-regexp -- pattern from admin-controlled connector config
   const urlPattern = urlPatternStr ? new RegExp(urlPatternStr) : undefined;
   const maxPages = (config.config.maxPages as number) ?? 20;
 

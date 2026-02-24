@@ -88,6 +88,7 @@ export function SearchResultCard({ result, onAskAbout, "data-pendo": dataPendo }
       {/* Snippet/Summary - prefer AI summary for cleaner display */}
       <div
         className="text-[14px] text-text-secondary leading-relaxed line-clamp-3 mb-2 [&_mark]:bg-[var(--accent-light)] [&_mark]:text-text-primary [&_mark]:font-medium [&_mark]:px-0.5"
+        // nosemgrep: react-dangerouslysetinnerhtml -- search highlight markup from server
         dangerouslySetInnerHTML={{ __html: displaySnippet }}
       />
 

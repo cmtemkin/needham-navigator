@@ -56,6 +56,7 @@ function parseICalFeed(icsText: string): ICalEvent[] {
 
 function extractICalProp(block: string, prop: string): string {
   // iCal properties can have parameters like DTSTART;VALUE=DATE:20260101
+  // nosemgrep: detect-non-literal-regexp -- prop is a hardcoded iCal property name
   const regex = new RegExp(`^${prop}[;:](.*)$`, "im");
   const match = block.match(regex);
   if (!match) return "";
@@ -73,6 +74,7 @@ function extractICalProp(block: string, prop: string): string {
 
 function extractICalDate(block: string, prop: string): string {
   // Handle both DTSTART:20260101T120000Z and DTSTART;VALUE=DATE:20260101
+  // nosemgrep: detect-non-literal-regexp -- prop is a hardcoded iCal property name
   const regex = new RegExp(`^${prop}[^:]*:(.*)$`, "im");
   const match = block.match(regex);
   return match?.[1]?.trim() ?? "";
