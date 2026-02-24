@@ -95,29 +95,61 @@ function toSearchResult(result: HybridSearchResult): SearchResult {
 }
 
 /**
- * Deduplicate search results by canonical URL.
- * For each unique URL, keeps only the result with the highest similarity score.
+ * Deduplicate search results by canonical URL, falling back to title for results
+ * without a source URL. Keeps the highest similarity score per unique key.
  */
 function deduplicateByUrl(results: SearchResult[]): SearchResult[] {
-  const bestByUrl = new Map<string, SearchResult>();
+  const bestByKey = new Map<string, SearchResult>();
 
   for (const result of results) {
-    if (!result.source_url) continue;
+    // Use canonical URL as key, or fall back to title-based key
+    const key = result.source_url
+      ? canonicalizeUrl(result.source_url)
+      : `title:${result.title.toLowerCase().trim()}`;
 
-    const key = canonicalizeUrl(result.source_url);
-    const existing = bestByUrl.get(key);
+    const existing = bestByKey.get(key);
     if (!existing || result.similarity > existing.similarity) {
-      bestByUrl.set(key, result);
+      bestByKey.set(key, result);
     }
   }
 
-  const deduplicated = Array.from(bestByUrl.values()).sort((a, b) => b.similarity - a.similarity);
+  const deduplicated = Array.from(bestByKey.values()).sort((a, b) => b.similarity - a.similarity);
 
   if (process.env.NODE_ENV === 'development' && results.length !== deduplicated.length) {
-    console.log(`[search] Deduplicated ${results.length} results → ${deduplicated.length} unique URLs`);
+    console.log(`[search] Deduplicated ${results.length} results → ${deduplicated.length} unique entries`);
   }
 
   return deduplicated;
+}
+
+/**
+ * Secondary dedup pass: merge results with near-identical titles
+ * (e.g., "Transfer Station - Town of Needham" and "Transfer Station").
+ */
+function deduplicateByTitle(results: SearchResult[]): SearchResult[] {
+  const bestByTitle = new Map<string, SearchResult>();
+
+  for (const result of results) {
+    const normalized = result.title
+      .toLowerCase()
+      // eslint-disable-next-line security/detect-unsafe-regex -- anchored regex on short title strings, no backtracking risk
+      .replace(/\s*[-–|]\s*(?:town of\s+)?needham(?:,?\s*ma)?$/i, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    // Skip very short or generic titles to avoid false merges
+    if (normalized.length < 10) {
+      bestByTitle.set(result.id, result);
+      continue;
+    }
+
+    const existing = bestByTitle.get(normalized);
+    if (!existing || result.similarity > existing.similarity) {
+      bestByTitle.set(normalized, result);
+    }
+  }
+
+  return Array.from(bestByTitle.values()).sort((a, b) => b.similarity - a.similarity);
 }
 
 export const maxDuration = 60;
@@ -175,8 +207,9 @@ export async function POST(request: Request): Promise<Response> {
     // Apply similarity threshold filter (same as chat RAG pipeline)
     results = results.filter(r => r.similarity >= MIN_SIMILARITY_THRESHOLD);
 
-    // Deduplicate by source URL (keep highest-scoring chunk per page)
+    // Deduplicate: first by URL, then by normalized title
     results = deduplicateByUrl(results);
+    results = deduplicateByTitle(results);
 
     // Limit to requested count after deduplication
     results = results.slice(0, limit);

@@ -26,6 +26,36 @@ export function stripMarkdown(text: string): string {
 }
 
 /**
+ * Extract a meaningful preview snippet from content.
+ * Strips markdown, finds sentence boundaries, avoids mid-sentence truncation.
+ */
+export function extractPreviewText(text: string, maxLength = 150): string {
+  const stripped = stripMarkdown(text);
+
+  // Split on sentence-ending punctuation followed by whitespace
+  const sentences = stripped
+    .split(/(?<=[.!?])\s+/)
+    .filter((s) => s.length > 20);
+
+  if (sentences.length === 0) {
+    if (stripped.length <= maxLength) return stripped;
+    const truncated = stripped.slice(0, maxLength);
+    const lastSpace = truncated.lastIndexOf(" ");
+    return (lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated) + "...";
+  }
+
+  let preview = "";
+  for (const sentence of sentences) {
+    if ((preview + " " + sentence).length > maxLength && preview) break;
+    preview = preview ? preview + " " + sentence : sentence;
+  }
+
+  return preview.length > maxLength
+    ? preview.slice(0, maxLength).replace(/\s+\S*$/, "") + "..."
+    : preview;
+}
+
+/**
  * Format a date string as a relative time (e.g. "5 minutes ago" or "3h ago").
  *
  * @param dateString  ISO date string (or any string parseable by `new Date()`)

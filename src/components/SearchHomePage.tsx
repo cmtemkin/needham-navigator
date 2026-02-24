@@ -17,7 +17,7 @@ import { useChatWidget } from "@/lib/chat-context";
 import type { SearchResponse, CachedAnswer } from "@/types/search";
 import type { Article, ArticleListResponse } from "@/types/article";
 import { trackEvent } from "@/lib/pendo";
-import { stripInternalMetadata, formatRelativeTime, stripMarkdown } from "@/lib/text-utils";
+import { stripInternalMetadata, formatRelativeTime, extractPreviewText } from "@/lib/text-utils";
 
 // ---------------------------------------------------------------------------
 // Unified content types for homepage news feed
@@ -48,7 +48,7 @@ const SOURCE_COLORS: Record<string, string> = {
 };
 
 function ContentItemGridCard({ item, newsSources }: { item: ContentItem; newsSources?: Record<string, string> }) {
-  const displayText = stripMarkdown(item.summary || item.content?.slice(0, 150) || "");
+  const displayText = extractPreviewText(item.summary || item.content || "", 150);
   const sourceLabel = newsSources?.[item.source_id] || item.source_id.split(":").pop() || item.source_id;
   const sourceColor = SOURCE_COLORS[item.source_id] ?? "bg-gray-100 text-gray-700";
 

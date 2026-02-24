@@ -214,6 +214,13 @@ export async function runConnectors(
   options: RunOptions = {}
 ): Promise<ConnectorResult[]> {
   const configs = await loadSourceConfigs(options.townId);
+
+  if (configs.length === 0) {
+    console.warn(
+      `[runner] No source_configs found for town=${options.townId ?? "all"}. Run seed-sources.ts to populate.`
+    );
+  }
+
   const results: ConnectorResult[] = [];
 
   for (const config of configs as LoadedConfig[]) {
@@ -275,6 +282,14 @@ export async function runConnectors(
         durationMs: Date.now() - startTime,
       });
     }
+  }
+
+  if (results.length > 0) {
+    const totalUpserted = results.reduce((s, r) => s + r.itemsUpserted, 0);
+    const totalErrors = results.reduce((s, r) => s + r.errors.length, 0);
+    console.log(
+      `[runner] Completed: ${results.length} connectors, ${totalUpserted} items upserted, ${totalErrors} errors`
+    );
   }
 
   return results;

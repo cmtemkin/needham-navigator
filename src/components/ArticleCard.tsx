@@ -4,7 +4,7 @@ import { Clock, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import type { Article } from "@/types/article";
 import { useTown, useTownHref } from "@/lib/town-context";
-import { formatRelativeTime, stripMarkdown } from "@/lib/text-utils";
+import { formatRelativeTime, extractPreviewText } from "@/lib/text-utils";
 
 interface ArticleCardProps {
   article: Article;
@@ -88,7 +88,7 @@ export function ArticleCard({ article, variant = "grid", lastVisitTimestamp }: A
 
       {/* Summary */}
       <p className={`text-sm text-text-secondary mb-3 ${variant === "list" ? "line-clamp-3" : "line-clamp-2"}`}>
-        {stripMarkdown(article.summary || article.body).substring(0, 150) + "..."}
+        {extractPreviewText(article.summary || article.body, 150)}
       </p>
 
       {/* Footer - Source and timestamp */}

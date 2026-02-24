@@ -24,8 +24,11 @@ export function Header() {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const mobileSearchRef = useRef<HTMLInputElement>(null);
 
-  // Hide header search bar when on results page (it has its own sticky bar)
+  // Hide header search bar on the homepage (which has its own hero search bar)
+  // and on the search results page (which has its own sticky search bar)
   const isOnSearchResults = pathname?.includes("/search");
+  const isOnHomepage = pathname ? /^\/[a-z][a-z0-9-]*\/?$/.test(pathname) : false;
+  const hideHeaderSearch = isOnSearchResults || isOnHomepage;
 
   useEffect(() => {
     if (mobileSearchOpen && mobileSearchRef.current) {
@@ -59,8 +62,8 @@ export function Header() {
           </div>
         </Link>
 
-        {/* Desktop search bar — centered, always visible except on search results page */}
-        {!isOnSearchResults && (
+        {/* Desktop search bar — hidden on homepage (hero bar) and search results (sticky bar) */}
+        {!hideHeaderSearch && (
           <div className="hidden md:flex flex-1 max-w-[480px] mx-4">
             <div className="flex w-full items-center rounded-lg border border-border-default bg-surface px-3 py-1.5 transition-all focus-within:border-primary focus-within:bg-white focus-within:shadow-sm">
               <Search size={16} className="text-text-muted shrink-0 mr-2" />
@@ -79,14 +82,16 @@ export function Header() {
 
         {/* Right-side actions */}
         <div className="flex items-center gap-1.5">
-          {/* Mobile search toggle */}
-          <button
-            onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-text-secondary transition-all hover:bg-surface md:hidden"
-            aria-label="Search"
-          >
-            <Search size={18} />
-          </button>
+          {/* Mobile search toggle — hidden when hero/sticky search is present */}
+          {!hideHeaderSearch && (
+            <button
+              onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-text-secondary transition-all hover:bg-surface md:hidden"
+              aria-label="Search"
+            >
+              <Search size={18} />
+            </button>
+          )}
 
           {/* News link (desktop) */}
           {town.feature_flags.enableNews && (
@@ -131,7 +136,7 @@ export function Header() {
       </div>
 
       {/* Mobile search overlay */}
-      {mobileSearchOpen && (
+      {mobileSearchOpen && !hideHeaderSearch && (
         <div className="absolute inset-x-0 top-0 z-50 flex h-[60px] items-center gap-2 bg-white px-4 shadow-md md:hidden">
           <Search size={18} className="text-text-muted shrink-0" />
           <input
