@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Search, Zap } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useTown, useTownHref } from "@/lib/town-context";
+import { useRotatingPlaceholder } from "@/lib/use-rotating-placeholder";
 
 export function HeroSection() {
   const [query, setQuery] = useState("");
@@ -13,6 +14,14 @@ export function HeroSection() {
   const chatHref = useTownHref("/chat");
   const { t } = useI18n();
   const shortTownName = town.name.replace(/,\s*[A-Z]{2}$/i, "");
+  const placeholders = [
+    t("hero.search_placeholder"),
+    t("hero.placeholder_2"),
+    t("hero.placeholder_3"),
+    t("hero.placeholder_4"),
+    t("hero.placeholder_5"),
+  ];
+  const rotatingPlaceholder = useRotatingPlaceholder(placeholders, 3500, query.length > 0);
 
   const handleSubmit = () => {
     const trimmed = query.trim();
@@ -63,13 +72,13 @@ export function HeroSection() {
               type="text"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder={t("hero.search_placeholder")}
+              placeholder={rotatingPlaceholder}
               className="flex-1 border-none bg-transparent py-3 text-[15px] text-text-primary outline-none placeholder:text-[#B0B5C0]"
               aria-label={t("hero.search_placeholder")}
             />
             <button
               type="submit"
-              className="whitespace-nowrap rounded-[10px] bg-primary px-5 py-[11px] text-sm font-semibold text-white transition-colors hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary max-sm:w-full"
+              className="whitespace-nowrap rounded-[10px] bg-primary px-5 py-[11px] text-sm font-semibold text-white transition-colors hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary max-sm:w-full max-sm:min-h-[44px]"
             >
               {t("hero.ask_navigator")}
             </button>
