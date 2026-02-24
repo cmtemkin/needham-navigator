@@ -44,7 +44,7 @@ export function ChatHistory({
   onClose,
   onSelect,
   onDelete,
-}: ChatHistoryProps) {
+}: Readonly<ChatHistoryProps>) {
   const { t } = useI18n();
   const drawerRef = useRef<HTMLDivElement>(null);
 

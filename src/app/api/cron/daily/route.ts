@@ -44,41 +44,14 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise
 /** Small delay to spread disk IO between cron steps. */
 const IO_COOLDOWN_MS = 3_000;
 
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-export const maxDuration = 300; // 5 minutes max for cron jobs
-
-export async function GET(request: NextRequest) {
-  // Verify cron secret (skip in development)
-  const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret) {
-    const authHeader = request.headers.get("authorization");
-    if (authHeader !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-  }
-
-  const startTime = Date.now();
-  const results: Record<string, unknown> = {
-    timestamp: new Date().toISOString(),
-  };
-
-  // Keep-alive: lightweight query to prevent Supabase free-tier auto-pause
-  try {
-    const supabase = getSupabaseClient({});
-    await supabase.from("towns").select("id", { head: true, count: "exact" });
-  } catch (e) {
-    console.warn("[cron/daily] Keep-alive ping failed:", e);
-  }
-
-  // Step 1: Monitor — change detection (timeout: 90s)
+async function runMonitorStep(): Promise<Record<string, unknown>> {
   try {
     const monitor = await withTimeout(
       runChangeDetection("needham", "vercel-cron"),
       90_000,
       "Monitor",
     );
-    results.monitor = {
+    return {
       status: "ok",
       checked: monitor.checkedUrls,
       changed: monitor.changedUrls.length,
@@ -90,13 +63,11 @@ export async function GET(request: NextRequest) {
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error("[cron/daily] Monitor error:", message);
-    results.monitor = { status: "error", error: message };
+    return { status: "error", error: message };
   }
+}
 
-  // Cooldown: let disk IO settle before next step
-  await new Promise((r) => setTimeout(r, IO_COOLDOWN_MS));
-
-  // Step 2: Ingest — run connectors (timeout: 120s)
+async function runIngestStep(): Promise<Record<string, unknown>> {
   try {
     const connectorResults = await withTimeout(
       runConnectors({ townId: "needham" }),
@@ -106,7 +77,7 @@ export async function GET(request: NextRequest) {
     if (connectorResults.length === 0) {
       console.warn("[cron/daily] No connectors executed — source_configs may be empty or none are due");
     }
-    results.ingest = {
+    return {
       status: "ok",
       connectorsRun: connectorResults.length,
       connectors: connectorResults.map(r => ({
@@ -124,13 +95,11 @@ export async function GET(request: NextRequest) {
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error("[cron/daily] Ingest error:", message);
-    results.ingest = { status: "error", error: message };
+    return { status: "error", error: message };
   }
+}
 
-  // Cooldown: let disk IO settle before next step
-  await new Promise((r) => setTimeout(r, IO_COOLDOWN_MS));
-
-  // Step 3: Generate — create articles from new content
+async function runGenerateStep(): Promise<Record<string, unknown>> {
   try {
     let generated = 0;
     const genErrors: string[] = [];
@@ -168,7 +137,7 @@ export async function GET(request: NextRequest) {
     }
     catch (e) { genErrors.push(`daily_brief: ${e instanceof Error ? e.message : String(e)}`); }
 
-    results.generate = {
+    return {
       status: genErrors.length === 0 ? "ok" : "partial",
       articlesGenerated: generated,
       details: genDetails,
@@ -177,8 +146,46 @@ export async function GET(request: NextRequest) {
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error("[cron/daily] Generate error:", message);
-    results.generate = { status: "error", error: message };
+    return { status: "error", error: message };
   }
+}
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const maxDuration = 300; // 5 minutes max for cron jobs
+
+export async function GET(request: NextRequest) {
+  // Verify cron secret (skip in development)
+  const cronSecret = process.env.CRON_SECRET;
+  if (cronSecret) {
+    const authHeader = request.headers.get("authorization");
+    if (authHeader !== `Bearer ${cronSecret}`) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+  }
+
+  const startTime = Date.now();
+  const results: Record<string, unknown> = {
+    timestamp: new Date().toISOString(),
+  };
+
+  // Keep-alive: lightweight query to prevent Supabase free-tier auto-pause
+  try {
+    const supabase = getSupabaseClient({});
+    await supabase.from("towns").select("id", { head: true, count: "exact" });
+  } catch (e) {
+    console.warn("[cron/daily] Keep-alive ping failed:", e);
+  }
+
+  results.monitor = await runMonitorStep();
+
+  await new Promise((r) => setTimeout(r, IO_COOLDOWN_MS));
+
+  results.ingest = await runIngestStep();
+
+  await new Promise((r) => setTimeout(r, IO_COOLDOWN_MS));
+
+  results.generate = await runGenerateStep();
 
   results.totalDurationMs = Date.now() - startTime;
 

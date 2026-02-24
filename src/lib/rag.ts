@@ -500,14 +500,14 @@ function rerankChunks(
       if (chunkLower.includes("needham")) {
         localityScore = 0.15;
       } else if (geoResult.detectedLocations.length > 0) {
-        localityScore = 0.10;
+        localityScore = 0.1;
       } else {
         // No strong geo signals but not blocked — small positive
         localityScore = 0.05;
       }
     } else {
       // Content about distant locations — apply penalty
-      localityScore = -0.10;
+      localityScore = -0.1;
     }
 
     // Formula score (6-factor formula with locality)

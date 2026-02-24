@@ -104,7 +104,7 @@ const SOURCE_COLORS: Record<string, string> = {
   "needham:town-rss": "bg-purple-100 text-purple-700",
 };
 
-function ContentItemCard({ item, newsSources }: { item: ContentItem; newsSources?: Record<string, string> }) {
+function ContentItemCard({ item, newsSources }: Readonly<{ item: ContentItem; newsSources?: Record<string, string> }>) {
   const displayText = stripMarkdown(item.summary || item.content?.slice(0, 200) || "");
   const sourceLabel = newsSources?.[item.source_id] || item.source_id.split(":").pop() || item.source_id;
   const sourceColor = SOURCE_COLORS[item.source_id] ?? "bg-gray-100 text-gray-700";
@@ -350,13 +350,14 @@ export default function ArticlesPage() {
           <div className="bg-white border border-border-default rounded-lg p-4 mb-6">
             {/* Row 1: Keyword search */}
             <div className="mb-4">
-              <label className="block text-xs font-medium text-text-muted mb-1.5">
+              <label htmlFor="article-keyword-search" className="block text-xs font-medium text-text-muted mb-1.5">
                 <Search size={12} className="inline mr-1" />
                 Search articles
               </label>
               <div className="flex items-center bg-white border border-border-default rounded-md px-3 py-2 focus-within:border-[var(--primary)] transition-colors">
                 <Search size={16} className="text-text-muted shrink-0 mr-2" />
                 <input
+                  id="article-keyword-search"
                   type="text"
                   value={keyword}
                   onChange={(e) => setKeyword(e.target.value)}
@@ -413,7 +414,7 @@ export default function ArticlesPage() {
                   </button>
                   {categoryDropdownOpen && (
                     <>
-                      <div className="fixed inset-0 z-10" onClick={() => setCategoryDropdownOpen(false)} onKeyDown={(e) => { if (e.key === "Escape") setCategoryDropdownOpen(false); }} role="presentation" />
+                      <div className="fixed inset-0 z-10" onClick={() => setCategoryDropdownOpen(false)} onKeyDown={(e) => { if (e.key === "Escape") setCategoryDropdownOpen(false); }} aria-hidden="true" />
                       <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-border-default rounded-md shadow-lg z-20 max-h-64 overflow-auto">
                         {CATEGORIES.map((cat) => (
                           <button
@@ -462,14 +463,14 @@ export default function ArticlesPage() {
 
           {!loading && !error && (
             <div className="text-sm text-text-muted mb-4">
-              {filteredItems.length} of {totalItems} item{totalItems !== 1 ? "s" : ""}
+              {filteredItems.length} of {totalItems} item{totalItems === 1 ? "" : "s"}
               {(keyword || dateRange !== "all") ? " (filtered)" : ""}
             </div>
           )}
 
           {loading && (
             <div className="space-y-4">
-              {[...Array(6)].map((_, i) => (
+              {[...new Array(6)].map((_, i) => (
                 <ArticleSkeleton key={`skeleton-${i}`} variant="list" />
               ))}
             </div>

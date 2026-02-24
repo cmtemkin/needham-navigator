@@ -40,7 +40,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   business: "Business",
 };
 
-export function ArticleCard({ article, variant = "grid", lastVisitTimestamp }: ArticleCardProps) {
+export function ArticleCard({ article, variant = "grid", lastVisitTimestamp }: Readonly<ArticleCardProps>) {
   const town = useTown();
   const articleHref = useTownHref(`/articles/${article.id}`);
   const isNew = lastVisitTimestamp != null && new Date(article.published_at).getTime() > lastVisitTimestamp;

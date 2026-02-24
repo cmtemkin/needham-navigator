@@ -47,7 +47,7 @@ const SOURCE_COLORS: Record<string, string> = {
   "needham:town-rss": "bg-purple-100 text-purple-700",
 };
 
-function ContentItemGridCard({ item, newsSources }: { item: ContentItem; newsSources?: Record<string, string> }) {
+function ContentItemGridCard({ item, newsSources }: Readonly<{ item: ContentItem; newsSources?: Record<string, string> }>) {
   const displayText = extractPreviewText(item.summary || item.content || "", 150);
   const sourceLabel = newsSources?.[item.source_id] || item.source_id.split(":").pop() || item.source_id;
   const sourceColor = SOURCE_COLORS[item.source_id] ?? "bg-gray-100 text-gray-700";
@@ -157,7 +157,7 @@ interface SearchHomePageProps {
   initialQuery?: string;
 }
 
-export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
+export function SearchHomePage({ initialQuery = "" }: Readonly<SearchHomePageProps>) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -186,7 +186,7 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
     try {
       const stored = localStorage.getItem("nn_last_visit");
       if (stored) {
-        setLastVisitTimestamp(parseInt(stored, 10));
+        setLastVisitTimestamp(Number.parseInt(stored, 10));
       }
       localStorage.setItem("nn_last_visit", String(Date.now()));
     } catch {
@@ -654,7 +654,7 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
 
                     {articlesLoading ? (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {[...Array(4)].map((_, i) => (
+                        {[...new Array(4)].map((_, i) => (
                           <ArticleSkeleton key={`skeleton-${i}`} variant="grid" />
                         ))}
                       </div>

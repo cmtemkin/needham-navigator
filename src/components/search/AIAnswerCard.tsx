@@ -35,7 +35,7 @@ function LoadingDots() {
   );
 }
 
-function FollowUpInput({ onSubmit }: { onSubmit: (question: string) => void }) {
+function FollowUpInput({ onSubmit }: Readonly<{ onSubmit: (question: string) => void }>) {
   const [value, setValue] = useState("");
 
   const handleSubmit = () => {

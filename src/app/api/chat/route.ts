@@ -319,7 +319,7 @@ export async function POST(request: Request): Promise<Response> {
           });
         }
 
-        const cleanedText = fullText.replace(/USED_SOURCES:\s*.+?(?:\n|$)/gi, "").trim();
+        const cleanedText = fullText.replaceAll(/USED_SOURCES:\s*.+?(?:\n|$)/gi, "").trim();
 
         // Fire-and-forget: log token usage and cost
         Promise.resolve(result.usage).then((usage) => {

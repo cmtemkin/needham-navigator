@@ -18,7 +18,7 @@ type PageType =
 
 /** Generate or retrieve a persistent anonymous visitor ID */
 export function getVisitorId(): string {
-  if (typeof globalThis.window === 'undefined') return 'server';
+  if (globalThis.window === undefined) return 'server';
 
   const STORAGE_KEY = 'nn_visitor_id';
   let id = localStorage.getItem(STORAGE_KEY);
@@ -31,7 +31,7 @@ export function getVisitorId(): string {
 
 /** Generate or retrieve the first-seen timestamp for this visitor */
 function getFirstSeen(): string {
-  if (typeof globalThis.window === 'undefined') return new Date().toISOString();
+  if (globalThis.window === undefined) return new Date().toISOString();
 
   const STORAGE_KEY = 'nn_first_seen';
   let firstSeen = localStorage.getItem(STORAGE_KEY);
@@ -44,7 +44,7 @@ function getFirstSeen(): string {
 
 /** Initialize Pendo with visitor and account data */
 export function initializePendo(townId: string, townName: string): void {
-  if (!PENDO_API_KEY || typeof globalThis.window === 'undefined') return;
+  if (!PENDO_API_KEY || globalThis.window === undefined) return;
 
   const pendo = globalThis.pendo;
   if (!pendo) return;
@@ -84,7 +84,7 @@ export function resolvePageType(pathname: string, query?: string): PageType {
 
 /** Track a page view from the current browser URL */
 export function trackCurrentPageView(townId: string): void {
-  if (typeof globalThis.window === "undefined") return;
+  if (globalThis.window === undefined) return;
 
   const path = globalThis.location.pathname;
   const query = new URLSearchParams(globalThis.location.search).get("q")?.trim() ?? "";
@@ -99,7 +99,7 @@ export function trackCurrentPageView(townId: string): void {
 
 /** Track a custom event in Pendo */
 export function trackEvent(eventName: string, metadata?: Record<string, unknown>): void {
-  if (typeof globalThis.window === 'undefined') return;
+  if (globalThis.window === undefined) return;
   const pendo = globalThis.pendo;
   if (!pendo?.track) return;
 
