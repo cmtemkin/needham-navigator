@@ -918,6 +918,7 @@ export async function retrieveRelevantChunks(
     const filteredOut = allChunks.filter((c) => c.similarity < MIN_SIMILARITY_FLOOR);
     if (filteredOut.length > 0) {
       console.log(
+        // nosemgrep: unsafe-formatstring -- dev-only debug log, no user input
         `[rag] Filtered ${filteredOut.length} low-relevance chunks (similarity < ${MIN_SIMILARITY_FLOOR}):`,
         filteredOut.map((c) => ({
           id: c.id,

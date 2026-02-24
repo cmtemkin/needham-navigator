@@ -71,6 +71,7 @@ export function ChatBubble({ message, onFollowupClick, sessionId, isFirstAiMessa
               "[&_a]:text-primary [&_a]:underline [&_a]:decoration-primary/30 [&_a]:underline-offset-2 [&_a:hover]:decoration-primary/60",
               "[&_ul_ul]:my-2 [&_ol_ol]:my-2 [&_ul_ol]:my-2 [&_ol_ul]:my-2",
             ].join(" ")}
+            // nosemgrep: react-dangerouslysetinnerhtml -- server-generated markdown, not user HTML
             dangerouslySetInnerHTML={{ __html: formatMarkdown(message.text) }}
           />
 

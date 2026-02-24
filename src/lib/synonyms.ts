@@ -303,6 +303,7 @@ export function expandQuery(
       }
       // Single-word triggers use word-boundary matching to avoid
       // false positives like "tree" inside "street"
+      // nosemgrep: detect-non-literal-regexp -- trigger values are hardcoded synonym strings
       const wordBoundary = new RegExp(`\\b${trigger}\\b`, "i");
       return wordBoundary.test(lowerQuery);
     });

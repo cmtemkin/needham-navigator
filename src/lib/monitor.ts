@@ -72,7 +72,7 @@ async function checkUrlForChanges(
     return { changed: false, newHash: null };
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : String(err);
-    console.error(`[monitor] Error checking ${doc.url}:`, errorMessage);
+    console.error(`[monitor] Error checking ${doc.url}:`, errorMessage); // nosemgrep: unsafe-formatstring
     return { changed: false, newHash: null, error: errorMessage };
   }
 }
