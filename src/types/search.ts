@@ -14,7 +14,7 @@ export interface SearchResult {
 
 export interface CachedAnswer {
   answer_html: string;
-  sources: { title: string; url: string }[];
+  sources: { title: string; url: string; date?: string }[];
   created_at: string;
   is_cached: true;
 }

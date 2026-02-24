@@ -1,4 +1,7 @@
+"use client";
+
 import { ExternalLink } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 import type { MockSource } from "@/lib/mock-data";
 
 interface SourceChipProps {
@@ -20,10 +23,14 @@ function isBoilerplateSection(section: string | undefined): boolean {
 }
 
 export function SourceChip({ source }: SourceChipProps) {
+  const { t } = useI18n();
   const showSection = source.section && !isBoilerplateSection(source.section);
 
   const formattedDate = source.date
-    ? new Date(source.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+    ? new Date(source.date).toLocaleDateString("en-US", { month: "short", year: "numeric" })
+    : null;
+  const verifiedLabel = formattedDate
+    ? t("source.verified", { date: formattedDate })
     : null;
 
   const content = (
@@ -33,8 +40,8 @@ export function SourceChip({ source }: SourceChipProps) {
       {showSection && (
         <span className="text-text-muted truncate"> &middot; {source.section}</span>
       )}
-      {formattedDate && (
-        <span className="text-text-muted truncate"> &middot; {formattedDate}</span>
+      {verifiedLabel && (
+        <span className="text-text-muted truncate"> &middot; {verifiedLabel}</span>
       )}
     </>
   );

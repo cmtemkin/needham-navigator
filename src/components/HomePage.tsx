@@ -37,7 +37,7 @@ export function HomePage() {
         <HeroSection />
 
         <section className="relative z-10 mx-auto -mt-7 max-w-content px-4 sm:px-6">
-          <div className="scrollbar-hide flex gap-2.5 overflow-x-auto pb-2">
+          <div className="scrollbar-hide scroll-fade-right flex gap-2.5 overflow-x-auto pb-2">
             {quickPrompts.map((prompt) => (
               <PromptPill
                 key={prompt.label}
@@ -87,7 +87,7 @@ export function HomePage() {
               {t("home.departments_subtitle")}
             </span>
           </div>
-          <div className="scrollbar-hide flex gap-2.5 overflow-x-auto pb-1">
+          <div className="scrollbar-hide scroll-fade-right flex gap-2.5 overflow-x-auto pb-1">
             {town.departments.map((dept) => (
               <DepartmentChip
                 key={dept.name}

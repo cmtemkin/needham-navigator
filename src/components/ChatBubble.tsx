@@ -95,7 +95,7 @@ export function ChatBubble({ message, onFollowupClick, sessionId, isFirstAiMessa
                 <button
                   key={followup}
                     onClick={() => onFollowupClick?.(followup)}
-                    className="px-3.5 py-[7px] bg-white border border-border-default rounded-[20px] text-[12.5px] text-text-secondary font-medium hover:border-primary hover:text-primary hover:bg-[#F5F8FC] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    className="px-3.5 py-2.5 min-h-[44px] flex items-center bg-white border border-border-default rounded-[20px] text-[12.5px] text-text-secondary font-medium hover:border-primary hover:text-primary hover:bg-[#F5F8FC] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                   >
                     {followup}
                   </button>

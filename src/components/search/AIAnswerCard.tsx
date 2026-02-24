@@ -17,7 +17,7 @@ type AIAnswerCardProps =
   | {
       state: "loaded";
       answerHtml: string;
-      sources: { title: string; url: string }[];
+      sources: { title: string; url: string; date?: string }[];
       onFollowUp: (question: string) => void;
     }
   | {
