@@ -260,10 +260,18 @@ export default function ArticlesPage() {
 
       await Promise.all(promises);
 
+      // Deduplicate: remove content items whose URL already has an AI summary article
+      const articleSourceUrls = new Set(
+        articles.flatMap((a) => a.source_urls ?? [])
+      );
+      const dedupedContent = contentItems.filter(
+        (c) => !c.url || !articleSourceUrls.has(c.url)
+      );
+
       // Merge and sort by published_at descending
       const merged: UnifiedItem[] = [
         ...articles.map((a): UnifiedItem => ({ type: "article", data: a })),
-        ...contentItems.map((c): UnifiedItem => ({ type: "content", data: c })),
+        ...dedupedContent.map((c): UnifiedItem => ({ type: "content", data: c })),
       ];
       merged.sort((a, b) => {
         const dateA = new Date(a.data.published_at).getTime();

@@ -146,7 +146,7 @@ type AIAnswerState =
   | { type: "idle" }
   | { type: "loading" }
   | { type: "cached"; answer: CachedAnswer }
-  | { type: "loaded"; html: string; sources: { title: string; url: string }[] }
+  | { type: "loaded"; html: string; sources: { title: string; url: string; date?: string }[] }
   | { type: "error"; message: string };
 
 function normalizeQuery(value: string | null): string {
@@ -298,7 +298,7 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
             }
 
             let answerHtml = "";
-            let sources: { title: string; url: string }[] = [];
+            let sources: { title: string; url: string; date?: string }[] = [];
             const decoder = new TextDecoder();
 
             while (true) {
@@ -323,9 +323,10 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
 
                   // Handle sources
                   if (parsed.type === "data-sources") {
-                    sources = parsed.data.map((s: { document_title: string; document_url?: string }) => ({
+                    sources = parsed.data.map((s: { document_title: string; document_url?: string; date?: string }) => ({
                       title: s.document_title,
                       url: s.document_url ?? "",
+                      date: s.date,
                     }));
                   }
                 } catch {
@@ -409,17 +410,31 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
           fetch(`/api/content?town=${town.town_id}&limit=6`),
         ]);
 
-        const items: UnifiedItem[] = [];
+        let articles: { type: "article"; data: Article }[] = [];
+        let contentItems: ContentItem[] = [];
 
         if (articlesRes.ok) {
           const data: ArticleListResponse = await articlesRes.json();
-          items.push(...data.articles.map((a): UnifiedItem => ({ type: "article", data: a })));
+          articles = data.articles.map((a): UnifiedItem & { type: "article" } => ({ type: "article", data: a }));
         }
 
         if (contentRes.ok) {
           const data: { items: ContentItem[] } = await contentRes.json();
-          items.push(...data.items.map((c): UnifiedItem => ({ type: "content", data: c })));
+          contentItems = data.items;
         }
+
+        // Deduplicate: remove content items whose URL already has an AI summary article
+        const articleSourceUrls = new Set(
+          articles.flatMap((a) => a.data.source_urls ?? [])
+        );
+        const dedupedContent = contentItems.filter(
+          (c) => !c.url || !articleSourceUrls.has(c.url)
+        );
+
+        const items: UnifiedItem[] = [
+          ...articles,
+          ...dedupedContent.map((c): UnifiedItem => ({ type: "content", data: c })),
+        ];
 
         // Sort by date, take top 6
         items.sort((a, b) => {
@@ -456,7 +471,7 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
       context: {
         searchQuery: query,
         aiAnswer: answerText,
-        sources: sources.map((s) => ({ title: s.title, url: s.url ?? "" })),
+        sources: sources.map((s) => ({ title: s.title, url: s.url ?? "", date: s.date })),
       },
     });
   }, [openChat, query, aiAnswer]);

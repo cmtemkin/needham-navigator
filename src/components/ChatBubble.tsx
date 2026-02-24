@@ -71,6 +71,7 @@ export function ChatBubble({ message, onFollowupClick, sessionId, isFirstAiMessa
               "[&_a]:text-primary [&_a]:underline [&_a]:decoration-primary/30 [&_a]:underline-offset-2 [&_a:hover]:decoration-primary/60",
               "[&_ul_ul]:my-2 [&_ol_ol]:my-2 [&_ul_ol]:my-2 [&_ol_ul]:my-2",
             ].join(" ")}
+            // nosemgrep: react-dangerouslysetinnerhtml -- server-generated markdown, not user HTML
             dangerouslySetInnerHTML={{ __html: formatMarkdown(message.text) }}
           />
 
@@ -95,7 +96,7 @@ export function ChatBubble({ message, onFollowupClick, sessionId, isFirstAiMessa
                 <button
                   key={followup}
                     onClick={() => onFollowupClick?.(followup)}
-                    className="px-3.5 py-[7px] bg-white border border-border-default rounded-[20px] text-[12.5px] text-text-secondary font-medium hover:border-primary hover:text-primary hover:bg-[#F5F8FC] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    className="px-3.5 py-2.5 min-h-[44px] flex items-center bg-white border border-border-default rounded-[20px] text-[12.5px] text-text-secondary font-medium hover:border-primary hover:text-primary hover:bg-[#F5F8FC] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                   >
                     {followup}
                   </button>

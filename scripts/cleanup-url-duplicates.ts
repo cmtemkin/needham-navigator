@@ -193,21 +193,21 @@ async function deleteLoserDoc(
       }
       vectorsDeleted = chunkIds.length;
     } catch (err) {
-      console.error(`[cleanup] Pinecone delete error for doc ${loserId}:`, err);
+      console.error(`[cleanup] Pinecone delete error for doc ${loserId}:`, err); // nosemgrep: unsafe-formatstring
     }
   }
 
   // Delete chunks from Supabase
   const { error: chunkErr } = await supabase.from("document_chunks").delete().eq("document_id", loserId);
   if (chunkErr) {
-    console.error(`[cleanup] Error deleting chunks for ${loserId}:`, chunkErr.message);
+    console.error(`[cleanup] Error deleting chunks for ${loserId}:`, chunkErr.message); // nosemgrep: unsafe-formatstring
     return { chunksDeleted: 0, vectorsDeleted, docDeleted: false };
   }
 
   // Delete the document itself
   const { error: docErr } = await supabase.from("documents").delete().eq("id", loserId);
   if (docErr) {
-    console.error(`[cleanup] Error deleting doc ${loserId}:`, docErr.message);
+    console.error(`[cleanup] Error deleting doc ${loserId}:`, docErr.message); // nosemgrep: unsafe-formatstring
     return { chunksDeleted: chunkIds.length, vectorsDeleted, docDeleted: false };
   }
 

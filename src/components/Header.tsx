@@ -86,7 +86,7 @@ export function Header() {
           {!hideHeaderSearch && (
             <button
               onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-text-secondary transition-all hover:bg-surface md:hidden"
+              className="flex h-11 w-11 items-center justify-center rounded-lg text-text-secondary transition-all hover:bg-surface md:hidden"
               aria-label="Search"
             >
               <Search size={18} />
@@ -128,7 +128,7 @@ export function Header() {
           <button
             onClick={() => openChat()}
             aria-label={t("header.ask_question")}
-            className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white transition-all hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:hidden"
+            className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary text-white transition-all hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:hidden"
           >
             <MessageSquare size={16} />
           </button>
@@ -154,7 +154,7 @@ export function Header() {
           />
           <button
             onClick={() => setMobileSearchOpen(false)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-text-secondary hover:bg-surface"
+            className="flex h-11 w-11 items-center justify-center rounded-lg text-text-secondary hover:bg-surface"
             aria-label="Close search"
           >
             <X size={18} />

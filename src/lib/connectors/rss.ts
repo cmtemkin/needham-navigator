@@ -73,6 +73,7 @@ function parseRssXml(xml: string): RssEntry[] {
 
 function extractTag(xml: string, tag: string): string {
   const match = xml.match(
+    // nosemgrep: detect-non-literal-regexp -- tag is a hardcoded XML element name
     new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, "i")
   );
   return match?.[1]?.trim() ?? "";
@@ -80,6 +81,7 @@ function extractTag(xml: string, tag: string): string {
 
 function extractAttr(xml: string, tag: string, attr: string): string {
   const match = xml.match(
+    // nosemgrep: detect-non-literal-regexp -- tag/attr are hardcoded XML names
     new RegExp(`<${tag}[^>]*${attr}="([^"]*)"`, "i")
   );
   return match?.[1]?.trim() ?? "";
