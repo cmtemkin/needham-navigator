@@ -138,9 +138,12 @@ export function AIAnswerCard(props: AIAnswerCardProps) {
 
         {/* Rendered answer HTML */}
         <div
-          className="text-[14px] text-text-primary leading-relaxed mb-4 [&_p]:my-3 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0 [&_strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-3 [&_li]:my-1"
+          className="text-[14px] text-text-primary leading-relaxed mb-3 [&_p]:my-3 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0 [&_strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-3 [&_li]:my-1"
           dangerouslySetInnerHTML={{ __html: props.answer.answer_html }}
         />
+        <p className="text-[11px] text-text-muted mb-4">
+          AI answers may not be current — always verify with official sources for critical decisions.
+        </p>
 
         {/* Source pills */}
         {props.answer.sources.length > 0 && (
@@ -169,9 +172,12 @@ export function AIAnswerCard(props: AIAnswerCardProps) {
 
       {/* Rendered answer HTML */}
       <div
-        className="text-[14px] text-text-primary leading-relaxed mb-4 [&_p]:my-3 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0 [&_strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-3 [&_li]:my-1"
+        className="text-[14px] text-text-primary leading-relaxed mb-3 [&_p]:my-3 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0 [&_strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-3 [&_li]:my-1"
         dangerouslySetInnerHTML={{ __html: props.answerHtml }}
       />
+      <p className="text-[11px] text-text-muted mb-4">
+        AI answers may not be current — always verify with official sources for critical decisions.
+      </p>
 
       {/* Source pills */}
       {props.sources.length > 0 && (

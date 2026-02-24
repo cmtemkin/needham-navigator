@@ -18,9 +18,11 @@ interface ChatBubbleProps {
   message: ChatMessage;
   onFollowupClick?: (question: string) => void;
   sessionId?: string;
+  /** When true, shows an AI disclaimer below the message */
+  isFirstAiMessage?: boolean;
 }
 
-export function ChatBubble({ message, onFollowupClick, sessionId }: ChatBubbleProps) {
+export function ChatBubble({ message, onFollowupClick, sessionId, isFirstAiMessage }: ChatBubbleProps) {
   if (message.role === "typing") {
     return (
       <div
@@ -56,7 +58,7 @@ export function ChatBubble({ message, onFollowupClick, sessionId }: ChatBubblePr
         N
       </div>
       <div>
-        <div className="max-w-[92%] sm:max-w-[80%] bg-white border border-border-light rounded-2xl rounded-bl-md px-[18px] py-3.5 shadow-xs text-[14.5px] text-text-primary leading-relaxed">
+        <div className="max-w-[92%] sm:max-w-[80%] bg-white border border-border-light rounded-2xl rounded-bl-md px-[18px] py-3.5 shadow-xs text-[14.5px] text-text-primary leading-relaxed overflow-hidden break-words">
           {/* Render markdown-like text */}
           <div
             className={[
@@ -103,6 +105,13 @@ export function ChatBubble({ message, onFollowupClick, sessionId }: ChatBubblePr
 
           {/* Feedback */}
           <FeedbackButtons responseId={message.id} sessionId={sessionId} />
+
+          {/* AI disclaimer — shown on first AI response only */}
+          {isFirstAiMessage && (
+            <p className="text-[10px] text-text-muted mt-2">
+              AI answers may not be current — always verify with official sources.
+            </p>
+          )}
         </div>
       </div>
     </div>
