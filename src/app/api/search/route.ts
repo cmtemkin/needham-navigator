@@ -122,6 +122,18 @@ function deduplicateByUrl(results: SearchResult[]): SearchResult[] {
   return deduplicated;
 }
 
+/** Strip trailing " - Town of Needham, MA" style suffixes from titles (no backtracking-prone regex). */
+function stripTownSuffix(title: string): string {
+  const separators = [' - ', ' – ', ' | '];
+  for (const sep of separators) {
+    const idx = title.lastIndexOf(sep);
+    if (idx > 0 && title.slice(idx).includes('needham')) {
+      return title.slice(0, idx);
+    }
+  }
+  return title;
+}
+
 /**
  * Secondary dedup pass: merge results with near-identical titles
  * (e.g., "Transfer Station - Town of Needham" and "Transfer Station").
@@ -130,10 +142,7 @@ function deduplicateByTitle(results: SearchResult[]): SearchResult[] {
   const bestByTitle = new Map<string, SearchResult>();
 
   for (const result of results) {
-    const normalized = result.title
-      .toLowerCase()
-      // eslint-disable-next-line security/detect-unsafe-regex -- anchored regex on short title strings, no backtracking risk
-      .replace(/\s*[-–|]\s*(?:town of\s+)?needham(?:,?\s*ma)?$/i, '')
+    const normalized = stripTownSuffix(result.title.toLowerCase())
       .replace(/\s+/g, ' ')
       .trim();
 
