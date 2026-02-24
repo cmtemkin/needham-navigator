@@ -103,6 +103,9 @@ export async function GET(request: NextRequest) {
       120_000,
       "Ingest",
     );
+    if (connectorResults.length === 0) {
+      console.warn("[cron/daily] No connectors executed — source_configs may be empty or none are due");
+    }
     results.ingest = {
       status: "ok",
       connectorsRun: connectorResults.length,

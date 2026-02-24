@@ -9,7 +9,7 @@ import { checkGeographicRelevance } from "@/lib/geo-filter";
 import { canonicalizeUrl } from "@/lib/url-canonicalize";
 import { getSearchTiers } from "@/lib/query-tier-router";
 import type { RetrievalConfig } from "@/lib/query-router";
-import { ALL_SEARCH_TIERS, type RelevanceTier } from "@/lib/relevance-classifier";
+import { FALLBACK_SEARCH_TIERS, type RelevanceTier } from "@/lib/relevance-classifier";
 
 export const DEFAULT_TOWN_ID = DEFAULT_TOWN_ID_FROM_CONFIG;
 
@@ -892,12 +892,12 @@ export async function retrieveRelevantChunks(
   // Filter out noise — chunks below the similarity floor are irrelevant
   let chunks = allChunks.filter((c) => c.similarity >= MIN_SIMILARITY_FLOOR);
 
-  // Zero-result fallback: if we got no results with restricted tiers, retry with all tiers.
-  // This ensures users always get some answer even for niche queries.
-  if (chunks.length === 0 && tiers.length < ALL_SEARCH_TIERS.length) {
-    console.log(`[rag] Zero results with tiers [${tiers.join(",")}], expanding to all tiers`);
+  // Zero-result fallback: if we got no results with restricted tiers, retry with broader
+  // tiers — but never include "archive" or "irrelevant" content.
+  if (chunks.length === 0 && tiers.length < FALLBACK_SEARCH_TIERS.length) {
+    console.log(`[rag] Zero results with tiers [${tiers.join(",")}], expanding to fallback tiers`);
     const fallbackResults = await vectorSearch(
-      trimmedQuery, townId, matchThreshold, matchCount, originalEmbedding, ALL_SEARCH_TIERS,
+      trimmedQuery, townId, matchThreshold, matchCount, originalEmbedding, FALLBACK_SEARCH_TIERS,
     );
     const fallbackBestByDoc = new Map<string, MatchDocumentRow>();
     for (const row of fallbackResults) {

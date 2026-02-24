@@ -157,6 +157,7 @@ export function createRssConnector(
           category: config.category as ContentCategory,
           title: entry.title,
           content,
+          summary: entry.description ? entry.description.slice(0, 300) : undefined,
           published_at: entry.pubDate
             ? new Date(entry.pubDate)
             : new Date(),
