@@ -46,16 +46,15 @@ function formatEventTime(dateStr: string): string {
 function EventCard({
   event,
   sourceLabels,
-}: {
+}: Readonly<{
   event: EventItem;
   sourceLabels?: Record<string, string>;
-}) {
+}>) {
   const start = event.metadata?.event_start
     ? new Date(event.metadata.event_start)
     : new Date(event.published_at);
-  const end = event.metadata?.event_end
-    ? new Date(event.metadata.event_end)
-    : null;
+  const eventEndStr = event.metadata?.event_end;
+  const end = eventEndStr ? new Date(eventEndStr) : null;
   const sourceLabel =
     sourceLabels?.[event.source_id] ||
     event.metadata?.source_name ||
@@ -104,10 +103,10 @@ function EventCard({
                 {event.metadata?.event_start && (
                   <> at {formatEventTime(event.metadata.event_start)}</>
                 )}
-                {end && (
+                {end && eventEndStr && (
                   <>
                     {" – "}
-                    {formatEventTime(event.metadata!.event_end!)}
+                    {formatEventTime(eventEndStr)}
                   </>
                 )}
               </span>
@@ -214,7 +213,7 @@ export default function EventsPage() {
         <div className="max-w-content mx-auto px-4 sm:px-6 py-8">
           {loading && (
             <div className="space-y-4">
-              {[...Array(4)].map((_, i) => (
+              {[...new Array(4)].map((_, i) => (
                 <div
                   key={i}
                   className="h-32 animate-pulse rounded-lg bg-white border border-border-default"

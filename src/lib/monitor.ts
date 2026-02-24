@@ -105,6 +105,120 @@ async function checkRssFeed(rssFeedUrl: string): Promise<string[]> {
 }
 
 // ---------------------------------------------------------------------------
+// Helper functions for change detection stages
+// ---------------------------------------------------------------------------
+
+type MonitorSupabaseClient = ReturnType<typeof getSupabaseServiceClient>;
+
+async function checkDocumentsForChanges(
+  supabase: MonitorSupabaseClient,
+  tracked: TrackedDocument[]
+): Promise<{ changedUrls: string[]; unchangedIds: string[]; errorCount: number }> {
+  const changedUrls: string[] = [];
+  const unchangedIds: string[] = [];
+  let errorCount = 0;
+
+  for (const doc of tracked) {
+    const { changed, newHash, error } = await checkUrlForChanges(doc);
+
+    if (error) {
+      errorCount++;
+      continue;
+    }
+
+    if (changed) {
+      changedUrls.push(doc.url);
+      const now = new Date().toISOString();
+      await supabase
+        .from("documents")
+        .update({
+          content_hash: newHash,
+          last_verified_at: now,
+          is_stale: false,
+          metadata: { ...doc.metadata, last_changed: now, last_checked: now },
+        })
+        .eq("id", doc.id);
+    } else {
+      unchangedIds.push(doc.id);
+    }
+  }
+
+  return { changedUrls, unchangedIds, errorCount };
+}
+
+async function batchUpdateUnchanged(
+  supabase: MonitorSupabaseClient,
+  unchangedIds: string[]
+): Promise<number> {
+  if (unchangedIds.length === 0) return 0;
+
+  const now = new Date().toISOString();
+  const { error: batchError } = await supabase
+    .from("documents")
+    .update({ last_verified_at: now })
+    .in("id", unchangedIds);
+
+  if (batchError) {
+    console.error(`[monitor] Batch update failed: ${batchError.message}`);
+    return 1;
+  }
+  return 0;
+}
+
+async function findNewUrlsFromRss(
+  supabase: MonitorSupabaseClient,
+  townId: string
+): Promise<string[]> {
+  const rssUrls = await checkRssFeed("https://www.needhamma.gov/rss.aspx");
+
+  const { data: allUrlDocs } = await supabase
+    .from("documents")
+    .select("url")
+    .eq("town_id", townId);
+  const existingUrls = new Set((allUrlDocs || []).map((d: { url: string }) => d.url));
+  return rssUrls.filter((u) => !existingUrls.has(u));
+}
+
+async function flagStaleDocuments(
+  supabase: MonitorSupabaseClient,
+  townId: string
+): Promise<number> {
+  const ninetyDaysAgo = new Date();
+  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+  const { error: staleError } = await supabase
+    .from("documents")
+    .update({ is_stale: true })
+    .eq("town_id", townId)
+    .lt("last_verified_at", ninetyDaysAgo.toISOString());
+
+  if (staleError) {
+    console.error(`[monitor] Error flagging stale docs: ${staleError.message}`);
+    return 1;
+  }
+  return 0;
+}
+
+async function runCleanupTasks(supabase: MonitorSupabaseClient): Promise<void> {
+  try {
+    const { data: cleanupResults } = await supabase.rpc("cleanup_old_data");
+    if (cleanupResults) {
+      console.log("[monitor] Retention cleanup:", cleanupResults);
+    }
+  } catch (err) {
+    console.warn("[monitor] Retention cleanup failed:", err);
+  }
+
+  try {
+    const cacheDeleted = await cleanupExpiredCache();
+    if (cacheDeleted > 0) {
+      console.log(`[monitor] Cleaned up ${cacheDeleted} expired cache entries`);
+    }
+  } catch (err) {
+    console.warn("[monitor] Cache cleanup failed:", err);
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Main monitoring function
 // ---------------------------------------------------------------------------
 
@@ -114,10 +228,8 @@ export async function runChangeDetection(
 ): Promise<ChangeDetectionResult> {
   const startTime = Date.now();
   const supabase = getSupabaseServiceClient();
-  let errorCount = 0;
 
   // Stage 1: Fetch a rotating daily subset (~1/7 of documents)
-  // This spreads IO across the week instead of slamming all 800+ docs daily
   const dayOfYear = Math.floor(
     (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
   );
@@ -146,95 +258,22 @@ export async function runChangeDetection(
 
   const tracked = (documents || []) as TrackedDocument[];
 
-  // Stage 2: Content-hash change detection with batched updates
-  const changedUrls: string[] = [];
-  const unchangedIds: string[] = [];
+  // Stage 2: Content-hash change detection
+  const { changedUrls, unchangedIds, errorCount: changeErrors } =
+    await checkDocumentsForChanges(supabase, tracked);
+  let errorCount = changeErrors;
 
-  for (const doc of tracked) {
-    const { changed, newHash, error } = await checkUrlForChanges(doc);
+  // Stage 3: Batch update unchanged docs
+  errorCount += await batchUpdateUnchanged(supabase, unchangedIds);
 
-    if (error) {
-      errorCount++;
-      continue;
-    }
+  // Stage 4: RSS feed check
+  const newUrls = await findNewUrlsFromRss(supabase, townId);
 
-    if (changed) {
-      changedUrls.push(doc.url);
-      const now = new Date().toISOString();
-      // Changed docs get a full update (including content_hash)
-      await supabase
-        .from("documents")
-        .update({
-          content_hash: newHash,
-          last_verified_at: now,
-          is_stale: false,
-          metadata: { ...doc.metadata, last_changed: now, last_checked: now },
-        })
-        .eq("id", doc.id);
-    } else {
-      // Unchanged docs — collect for batch update (no JSONB rewrite)
-      unchangedIds.push(doc.id);
-    }
-  }
+  // Stage 5: Staleness flagging
+  errorCount += await flagStaleDocuments(supabase, townId);
 
-  // Batch update all unchanged docs in one query (instead of N individual UPDATEs)
-  if (unchangedIds.length > 0) {
-    const now = new Date().toISOString();
-    const { error: batchError } = await supabase
-      .from("documents")
-      .update({ last_verified_at: now })
-      .in("id", unchangedIds);
-
-    if (batchError) {
-      errorCount++;
-      console.error(`[monitor] Batch update failed: ${batchError.message}`);
-    }
-  }
-
-  // Stage 3: RSS feed check
-  const rssUrls = await checkRssFeed("https://www.needhamma.gov/rss.aspx");
-
-  // Need all URLs for dedup (not just the subset we checked)
-  const { data: allUrlDocs } = await supabase
-    .from("documents")
-    .select("url")
-    .eq("town_id", townId);
-  const existingUrls = new Set((allUrlDocs || []).map((d: { url: string }) => d.url));
-  const newUrls = rssUrls.filter((u) => !existingUrls.has(u));
-
-  // Stage 4: Staleness flagging
-  const ninetyDaysAgo = new Date();
-  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
-  const { error: staleError } = await supabase
-    .from("documents")
-    .update({ is_stale: true })
-    .eq("town_id", townId)
-    .lt("last_verified_at", ninetyDaysAgo.toISOString());
-
-  if (staleError) {
-    errorCount++;
-    console.error(`[monitor] Error flagging stale docs: ${staleError.message}`);
-  }
-
-  // Stage 5: Daily retention cleanup (non-blocking)
-  try {
-    const { data: cleanupResults } = await supabase.rpc("cleanup_old_data");
-    if (cleanupResults) {
-      console.log("[monitor] Retention cleanup:", cleanupResults);
-    }
-  } catch (err) {
-    console.warn("[monitor] Retention cleanup failed:", err);
-  }
-
-  // Stage 6: Expired cache cleanup (non-blocking)
-  try {
-    const cacheDeleted = await cleanupExpiredCache();
-    if (cacheDeleted > 0) {
-      console.log(`[monitor] Cleaned up ${cacheDeleted} expired cache entries`);
-    }
-  } catch (err) {
-    console.warn("[monitor] Cache cleanup failed:", err);
-  }
+  // Stage 6: Cleanup tasks
+  await runCleanupTasks(supabase);
 
   const durationMs = Date.now() - startTime;
 

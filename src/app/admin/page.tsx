@@ -542,7 +542,13 @@ type AdminColumn<T> = {
   render: (row: T, i: number) => React.ReactNode;
 };
 
-function AdminTable<T>({ columns, rows }: { columns: AdminColumn<T>[]; rows: T[] }) {
+function columnAlignment(ci: number, total: number, isHeader: boolean): string {
+  if (ci === 0) return isHeader ? "pr-4 text-left" : "pr-4 text-text-primary";
+  if (ci === total - 1) return isHeader ? "pl-3 text-right" : "pl-3 text-right text-text-secondary";
+  return isHeader ? "px-3 text-right" : "px-3 text-right text-text-secondary";
+}
+
+function AdminTable<T>({ columns, rows }: Readonly<{ columns: AdminColumn<T>[]; rows: T[] }>) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
@@ -550,8 +556,8 @@ function AdminTable<T>({ columns, rows }: { columns: AdminColumn<T>[]; rows: T[]
           <tr className="border-b border-border-default">
             {columns.map((col, ci) => (
               <th
-                key={ci}
-                className={`py-2 ${ci === 0 ? "pr-4 text-left" : ci === columns.length - 1 ? "pl-3 text-right" : "px-3 text-right"} font-medium text-text-secondary`}
+                key={col.header}
+                className={`py-2 ${columnAlignment(ci, columns.length, true)} font-medium text-text-secondary`}
               >
                 {col.header}
               </th>
@@ -563,8 +569,8 @@ function AdminTable<T>({ columns, rows }: { columns: AdminColumn<T>[]; rows: T[]
             <tr key={i} className="hover:bg-gray-50">
               {columns.map((col, ci) => (
                 <td
-                  key={ci}
-                  className={`py-2 ${ci === 0 ? "pr-4 text-text-primary" : ci === columns.length - 1 ? "pl-3 text-right text-text-secondary" : "px-3 text-right text-text-secondary"}`}
+                  key={col.header}
+                  className={`py-2 ${columnAlignment(ci, columns.length, false)}`}
                 >
                   {col.render(row, i)}
                 </td>
@@ -581,7 +587,7 @@ function AdminTable<T>({ columns, rows }: { columns: AdminColumn<T>[]; rows: T[]
 // Search Analytics Tab
 // ---------------------------------------------------------------------------
 
-function SearchAnalyticsTab({ password }: { password: string }) {
+function SearchAnalyticsTab({ password }: Readonly<{ password: string }>) {
   const { data, loading, error } = useStatsData(password);
 
   if (loading) {
@@ -621,8 +627,8 @@ function SearchAnalyticsTab({ password }: { password: string }) {
             columns={[
               { header: "Query", render: (q) => <span className="max-w-[300px] truncate block">{q.query}</span> },
               { header: "Count", render: (q) => <span className="font-medium">{q.count}</span> },
-              { header: "Avg Similarity", render: (q) => q.avg_similarity !== null ? q.avg_similarity.toFixed(3) : "-" },
-              { header: "Avg Latency", render: (q) => q.avg_latency !== null ? `${q.avg_latency}ms` : "-" },
+              { header: "Avg Similarity", render: (q) => q.avg_similarity === null ? "-" : q.avg_similarity.toFixed(3) },
+              { header: "Avg Latency", render: (q) => q.avg_latency === null ? "-" : `${q.avg_latency}ms` },
             ]}
           />
         </div>
@@ -667,7 +673,7 @@ function SearchAnalyticsTab({ password }: { password: string }) {
 // Content Quality Tab
 // ---------------------------------------------------------------------------
 
-function ContentQualityTab({ password }: { password: string }) {
+function ContentQualityTab({ password }: Readonly<{ password: string }>) {
   const { data, loading, error } = useStatsData(password);
 
   if (loading) {
@@ -722,8 +728,8 @@ function ContentQualityTab({ password }: { password: string }) {
             Stale Documents ({stale_documents.length})
           </h3>
           <div className="space-y-2 max-h-80 overflow-y-auto">
-            {stale_documents.map((doc, i) => (
-              <div key={i} className="flex items-start justify-between gap-3 py-2 border-b border-border-light last:border-0">
+            {stale_documents.map((doc) => (
+              <div key={doc.url} className="flex items-start justify-between gap-3 py-2 border-b border-border-light last:border-0">
                 <div className="min-w-0 flex-1">
                   <div className="text-sm font-medium text-text-primary truncate">{doc.title || "Untitled"}</div>
                   <div className="text-xs text-text-muted truncate">{doc.url}</div>

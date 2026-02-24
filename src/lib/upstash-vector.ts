@@ -44,38 +44,42 @@ export interface PineconeVector {
 // Filter builder — converts Pinecone filter syntax to Upstash SQL-like syntax
 // ---------------------------------------------------------------------------
 
+function buildClause(key: string, value: unknown): string | null {
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    const op = value as Record<string, unknown>;
+
+    if ("$eq" in op) {
+      const v = op.$eq;
+      return typeof v === "string" ? `${key} = '${v}'` : `${key} = ${v}`;
+    }
+    if ("$in" in op && Array.isArray(op.$in)) {
+      const items = (op.$in as unknown[])
+        .map((v) => (typeof v === "string" ? `'${v}'` : String(v)))
+        .join(", ");
+      return `${key} IN (${items})`;
+    }
+    if ("$ne" in op) {
+      const v = op.$ne;
+      return typeof v === "string" ? `${key} != '${v}'` : `${key} != ${v}`;
+    }
+    return null;
+  }
+
+  if (typeof value === "string") {
+    return `${key} = '${value}'`;
+  }
+  if (typeof value === "number" || typeof value === "boolean") {
+    return `${key} = ${value}`;
+  }
+  return null;
+}
+
 function buildFilter(filter?: Record<string, unknown>): string | undefined {
   if (!filter || Object.keys(filter).length === 0) return undefined;
 
-  const clauses: string[] = [];
-
-  for (const [key, value] of Object.entries(filter)) {
-    if (value && typeof value === "object" && !Array.isArray(value)) {
-      const op = value as Record<string, unknown>;
-
-      if ("$eq" in op) {
-        const v = op.$eq;
-        clauses.push(
-          typeof v === "string" ? `${key} = '${v}'` : `${key} = ${v}`,
-        );
-      } else if ("$in" in op && Array.isArray(op.$in)) {
-        const items = (op.$in as unknown[])
-          .map((v) => (typeof v === "string" ? `'${v}'` : String(v)))
-          .join(", ");
-        clauses.push(`${key} IN (${items})`);
-      } else if ("$ne" in op) {
-        const v = op.$ne;
-        clauses.push(
-          typeof v === "string" ? `${key} != '${v}'` : `${key} != ${v}`,
-        );
-      }
-    } else if (typeof value === "string") {
-      // Shorthand: { town_id: "needham" } → town_id = 'needham'
-      clauses.push(`${key} = '${value}'`);
-    } else if (typeof value === "number" || typeof value === "boolean") {
-      clauses.push(`${key} = ${value}`);
-    }
-  }
+  const clauses = Object.entries(filter)
+    .map(([key, value]) => buildClause(key, value))
+    .filter((clause): clause is string => clause !== null);
 
   return clauses.length > 0 ? clauses.join(" AND ") : undefined;
 }

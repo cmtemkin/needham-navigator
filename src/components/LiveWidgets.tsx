@@ -357,7 +357,7 @@ interface LiveWidgetsProps {
   variant?: "grid" | "sidebar";
 }
 
-export function LiveWidgets({ variant = "grid" }: LiveWidgetsProps) {
+export function LiveWidgets({ variant = "grid" }: Readonly<LiveWidgetsProps>) {
   const town = useTown();
   const shortTownName = town.name.replace(/,\s*[A-Z]{2}$/i, "");
   const hasWeather = town.feature_flags.enableWeather;

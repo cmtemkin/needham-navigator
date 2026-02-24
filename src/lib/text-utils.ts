@@ -6,7 +6,7 @@
  * Strip internal LLM metadata (e.g. USED_SOURCES lines) before displaying to users.
  */
 export function stripInternalMetadata(text: string): string {
-  return text.replace(/\n?USED_SOURCES:\s*.+?(?:\n|$)/gi, "\n").replace(/^\n+|\n+$/g, "").trim();
+  return text.replaceAll(/\n?USED_SOURCES:\s*.+?(?:\n|$)/gi, "\n").replaceAll(/^\n+|\n+$/g, "").trim();
 }
 
 /**
@@ -15,14 +15,24 @@ export function stripInternalMetadata(text: string): string {
  */
 export function stripMarkdown(text: string): string {
   return text
-    .replace(/!\[.*?\]\(.*?\)/g, "")        // images ![alt](url)
-    .replace(/\[([^\]]*)\]\(.*?\)/g, "$1")   // links [text](url) → keep link text
-    .replace(/\*\*(.*?)\*\*/g, "$1")         // bold **text** → text
-    .replace(/\*(.*?)\*/g, "$1")             // italic *text* → text
-    .replace(/#{1,6}\s/g, "")               // headings
-    .replace(/[•·]\s*/g, "")                // bullet characters
-    .replace(/\s{2,}/g, " ")               // collapse whitespace
+    .replaceAll(/!\[.*?\]\(.*?\)/g, "")        // images ![alt](url)
+    .replaceAll(/\[([^\]]*)\]\(.*?\)/g, "$1")   // links [text](url) → keep link text
+    .replaceAll(/\*\*(.*?)\*\*/g, "$1")         // bold **text** → text
+    .replaceAll(/\*(.*?)\*/g, "$1")             // italic *text* → text
+    .replaceAll(/#{1,6}\s/g, "")               // headings
+    .replaceAll(/[•·]\s*/g, "")                // bullet characters
+    .replaceAll(/\s{2,}/g, " ")               // collapse whitespace
     .trim();
+}
+
+/**
+ * Truncate text at the last space before maxLength, appending "...".
+ */
+function truncateAtWordBoundary(text: string, maxLength: number): string {
+  if (text.length <= maxLength) return text;
+  const truncated = text.slice(0, maxLength);
+  const lastSpace = truncated.lastIndexOf(" ");
+  return (lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated) + "...";
 }
 
 /**
@@ -38,10 +48,7 @@ export function extractPreviewText(text: string, maxLength = 150): string {
     .filter((s) => s.length > 20);
 
   if (sentences.length === 0) {
-    if (stripped.length <= maxLength) return stripped;
-    const truncated = stripped.slice(0, maxLength);
-    const lastSpace = truncated.lastIndexOf(" ");
-    return (lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated) + "...";
+    return truncateAtWordBoundary(stripped, maxLength);
   }
 
   let preview = "";
@@ -50,10 +57,7 @@ export function extractPreviewText(text: string, maxLength = 150): string {
     preview = preview ? preview + " " + sentence : sentence;
   }
 
-  if (preview.length <= maxLength) return preview;
-  const truncated = preview.slice(0, maxLength);
-  const lastSpace = truncated.lastIndexOf(" ");
-  return (lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated) + "...";
+  return truncateAtWordBoundary(preview, maxLength);
 }
 
 /**
@@ -66,7 +70,7 @@ export function formatRelativeTime(dateString: string, compact?: boolean): strin
   if (!dateString) return "";
 
   const date = new Date(dateString);
-  if (isNaN(date.getTime())) return "";
+  if (Number.isNaN(date.getTime())) return "";
 
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
@@ -84,10 +88,10 @@ export function formatRelativeTime(dateString: string, compact?: boolean): strin
     if (diffDays === 1) return "Yesterday";
     if (diffDays < 7) return `${diffDays}d ago`;
   } else {
-    if (diffMins < 60) return `${diffMins} minute${diffMins !== 1 ? "s" : ""} ago`;
-    if (diffHours < 24) return `${diffHours} hour${diffHours !== 1 ? "s" : ""} ago`;
+    if (diffMins < 60) return `${diffMins} minute${diffMins === 1 ? "" : "s"} ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? "" : "s"} ago`;
     if (diffDays === 1) return "Yesterday";
-    if (diffDays < 7) return `${diffDays} day${diffDays !== 1 ? "s" : ""} ago`;
+    if (diffDays < 7) return `${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
   }
 
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });

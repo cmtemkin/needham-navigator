@@ -355,7 +355,10 @@ function ChatContent() {
         let block = `A: ${m.text}`;
         if (m.sources && m.sources.length > 0) {
           const sourceList = m.sources
-            .map((s) => `  - ${s.title}${s.url ? ` (${s.url})` : ""}`)
+            .map((s) => {
+              const urlSuffix = s.url ? ` (${s.url})` : "";
+              return `  - ${s.title}${urlSuffix}`;
+            })
             .join("\n");
           block += `\nSources:\n${sourceList}`;
         }

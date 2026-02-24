@@ -139,11 +139,11 @@ export function checkGeographicRelevance(
   const detectedStateAbbrevs = OTHER_STATE_ABBREVS.filter(abbrev => {
     // Match ", CT" (comma + space + abbrev + word boundary)
     // nosemgrep: detect-non-literal-regexp -- abbrev values are hardcoded state abbreviations
-    const commaPattern = new RegExp(`,\\s*${abbrev}\\b`);
+    const commaPattern = new RegExp(String.raw`,\s*${abbrev}\b`);
     // Match "(CT)"
-    const parenPattern = new RegExp(`\\(${abbrev}\\)`); // nosemgrep: detect-non-literal-regexp
+    const parenPattern = new RegExp(String.raw`\(${abbrev}\)`); // nosemgrep: detect-non-literal-regexp
     // Match "CT 0XXXX" (abbreviation + zip code)
-    const zipPattern = new RegExp(`\\b${abbrev}\\s+\\d{5}`); // nosemgrep: detect-non-literal-regexp
+    const zipPattern = new RegExp(String.raw`\b${abbrev}\s+\d{5}`); // nosemgrep: detect-non-literal-regexp
     return commaPattern.test(titleAndText) ||
       parenPattern.test(titleAndText) ||
       zipPattern.test(titleAndText);
@@ -190,13 +190,18 @@ export function checkGeographicRelevance(
     };
   }
 
+  let reason: string;
+  if (hasNeedhamMention) {
+    reason = 'Content mentions Needham';
+  } else if (localMentions.length > 0) {
+    reason = `Content mentions local area (${localMentions.slice(0, 3).join(', ')})`;
+  } else {
+    reason = 'No strong geographic signals detected — allowing by default';
+  }
+
   return {
     isRelevant: true,
-    reason: hasNeedhamMention
-      ? 'Content mentions Needham'
-      : localMentions.length > 0
-        ? `Content mentions local area (${localMentions.slice(0, 3).join(', ')})`
-        : 'No strong geographic signals detected — allowing by default',
+    reason,
     detectedLocations: localMentions,
   };
 }
