@@ -50,9 +50,10 @@ export function extractPreviewText(text: string, maxLength = 150): string {
     preview = preview ? preview + " " + sentence : sentence;
   }
 
-  return preview.length > maxLength
-    ? preview.slice(0, maxLength).replace(/\s+\S*$/, "") + "..."
-    : preview;
+  if (preview.length <= maxLength) return preview;
+  const truncated = preview.slice(0, maxLength);
+  const lastSpace = truncated.lastIndexOf(" ");
+  return (lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated) + "...";
 }
 
 /**

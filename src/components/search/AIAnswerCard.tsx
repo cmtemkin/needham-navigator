@@ -68,8 +68,51 @@ function FollowUpInput({ onSubmit }: { onSubmit: (question: string) => void }) {
   );
 }
 
+function AnswerBody({
+  html,
+  sources,
+  onFollowUp,
+  badge,
+}: {
+  html: string;
+  sources: { title: string; url: string; date?: string }[];
+  onFollowUp: (question: string) => void;
+  badge?: React.ReactNode;
+}) {
+  return (
+    <div className="bg-gradient-to-br from-[#EBF5FF] to-[#F0F9FF] border border-[#BAE6FF] rounded-xl p-5 mb-6">
+      <div className="flex items-center gap-2 mb-4">
+        <Bot size={18} className="text-[var(--primary)]" />
+        <span className="text-[14px] font-semibold text-[var(--primary)]">
+          AI Answer
+        </span>
+        {badge}
+      </div>
+
+      {/* Rendered answer HTML */}
+      <div
+        className="text-[14px] text-text-primary leading-relaxed mb-3 [&_p]:my-3 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0 [&_strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-3 [&_li]:my-1"
+        // nosemgrep: react-dangerouslysetinnerhtml -- server-generated AI answer HTML
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+      <p className="text-[11px] text-text-muted mb-4">
+        AI answers may not be current — always verify with official sources for critical decisions.
+      </p>
+
+      {sources.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-3">
+          {sources.map((source) => (
+            <SourceChip key={source.url ?? source.title} source={source} />
+          ))}
+        </div>
+      )}
+
+      <FollowUpInput onSubmit={onFollowUp} />
+    </div>
+  );
+}
+
 export function AIAnswerCard(props: AIAnswerCardProps) {
-  // State: Loading
   if (props.state === "loading") {
     return (
       <div className="bg-gradient-to-br from-[#EBF5FF] to-[#F0F9FF] border border-[#BAE6FF] rounded-xl p-5 mb-6">
@@ -79,13 +122,10 @@ export function AIAnswerCard(props: AIAnswerCardProps) {
             AI Answer
           </span>
         </div>
-
         <div className="flex items-center gap-2 text-[13px] text-text-secondary mb-4">
           <LoadingDots />
           <span>Generating AI answer...</span>
         </div>
-
-        {/* Animated progress bar */}
         <div className="w-full h-1 bg-white/60 rounded-full overflow-hidden">
           <div className="h-full bg-gradient-to-r from-[var(--primary)] to-[var(--accent)] rounded-full animate-progress" />
         </div>
@@ -93,7 +133,6 @@ export function AIAnswerCard(props: AIAnswerCardProps) {
     );
   }
 
-  // State: Prompt (opt-in)
   if (props.state === "prompt") {
     return (
       <div className="border-2 border-dashed border-[#BAE6FF] bg-[#F8FCFF] rounded-xl p-5 mb-6 text-center">
@@ -121,77 +160,27 @@ export function AIAnswerCard(props: AIAnswerCardProps) {
     );
   }
 
-  // State: Cached (instant)
   if (props.state === "cached") {
     return (
-      <div className="bg-gradient-to-br from-[#EBF5FF] to-[#F0F9FF] border border-[#BAE6FF] rounded-xl p-5 mb-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Bot size={18} className="text-[var(--primary)]" />
-          <span className="text-[14px] font-semibold text-[var(--primary)]">
-            AI Answer
-          </span>
+      <AnswerBody
+        html={props.answer.answer_html}
+        sources={props.answer.sources}
+        onFollowUp={props.onFollowUp}
+        badge={
           <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-success/10 text-success text-[11px] font-semibold rounded-full ml-auto">
             <Check size={12} />
             Instant
           </span>
-        </div>
-
-        {/* Rendered answer HTML */}
-        <div
-          className="text-[14px] text-text-primary leading-relaxed mb-3 [&_p]:my-3 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0 [&_strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-3 [&_li]:my-1"
-          // nosemgrep: react-dangerouslysetinnerhtml -- server-generated AI answer HTML
-          dangerouslySetInnerHTML={{ __html: props.answer.answer_html }}
-        />
-        <p className="text-[11px] text-text-muted mb-4">
-          AI answers may not be current — always verify with official sources for critical decisions.
-        </p>
-
-        {/* Source pills */}
-        {props.answer.sources.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-3">
-            {props.answer.sources.map((source) => (
-              <SourceChip key={source.url ?? source.title} source={source} />
-            ))}
-          </div>
-        )}
-
-        {/* Inline follow-up input */}
-        <FollowUpInput onSubmit={props.onFollowUp} />
-      </div>
+        }
+      />
     );
   }
 
-  // State: Loaded (streamed in)
   return (
-    <div className="bg-gradient-to-br from-[#EBF5FF] to-[#F0F9FF] border border-[#BAE6FF] rounded-xl p-5 mb-6">
-      <div className="flex items-center gap-2 mb-4">
-        <Bot size={18} className="text-[var(--primary)]" />
-        <span className="text-[14px] font-semibold text-[var(--primary)]">
-          AI Answer
-        </span>
-      </div>
-
-      {/* Rendered answer HTML */}
-      <div
-        className="text-[14px] text-text-primary leading-relaxed mb-3 [&_p]:my-3 [&_p:first-child]:mt-0 [&_p:last-child]:mb-0 [&_strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-3 [&_li]:my-1"
-        // nosemgrep: react-dangerouslysetinnerhtml -- server-generated AI answer HTML
-        dangerouslySetInnerHTML={{ __html: props.answerHtml }}
-      />
-      <p className="text-[11px] text-text-muted mb-4">
-        AI answers may not be current — always verify with official sources for critical decisions.
-      </p>
-
-      {/* Source pills */}
-      {props.sources.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mb-3">
-          {props.sources.map((source) => (
-            <SourceChip key={source.url ?? source.title} source={source} />
-          ))}
-        </div>
-      )}
-
-      {/* Inline follow-up input */}
-      <FollowUpInput onSubmit={props.onFollowUp} />
-    </div>
+    <AnswerBody
+      html={props.answerHtml}
+      sources={props.sources}
+      onFollowUp={props.onFollowUp}
+    />
   );
 }
