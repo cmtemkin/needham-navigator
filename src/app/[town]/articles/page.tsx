@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ArticleCard } from "@/components/ArticleCard";
 import { ArticleSkeleton } from "@/components/ArticleSkeleton";
 import { useTown } from "@/lib/town-context";
-import { ExternalLink, Clock, Filter, ChevronDown } from "lucide-react";
+import { ExternalLink, Clock, Filter, ChevronDown, Search } from "lucide-react";
 import type { Article, ArticleListResponse } from "@/types/article";
 import { formatRelativeTime, stripMarkdown } from "@/lib/text-utils";
 
@@ -62,6 +62,36 @@ const CATEGORIES: { value: string; label: string }[] = [
   { value: "business", label: "Business" },
   { value: "news", label: "News" },
 ];
+
+// ---------------------------------------------------------------------------
+// Date range filter
+// ---------------------------------------------------------------------------
+
+type DateRange = "all" | "today" | "week" | "month";
+
+const DATE_FILTERS: { value: DateRange; label: string }[] = [
+  { value: "all", label: "All Time" },
+  { value: "today", label: "Today" },
+  { value: "week", label: "This Week" },
+  { value: "month", label: "This Month" },
+];
+
+function getDateCutoff(range: DateRange): Date | null {
+  if (range === "all") return null;
+  const now = new Date();
+  if (range === "today") {
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  }
+  if (range === "week") {
+    const d = new Date(now);
+    d.setDate(d.getDate() - 7);
+    return d;
+  }
+  // month
+  const d = new Date(now);
+  d.setDate(d.getDate() - 30);
+  return d;
+}
 
 // ---------------------------------------------------------------------------
 // Content Item Card (for external news)
@@ -153,6 +183,8 @@ export default function ArticlesPage() {
   const [sourceFilter, setSourceFilter] = useState<SourceFilter>("all");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
+  const [keyword, setKeyword] = useState("");
+  const [dateRange, setDateRange] = useState<DateRange>("all");
 
   // Track total counts for display
   const [articleTotal, setArticleTotal] = useState(0);
@@ -257,6 +289,35 @@ export default function ArticlesPage() {
     fetchUnifiedContent().catch(() => {});
   }, [fetchUnifiedContent, retryCount]);
 
+  // Client-side keyword + date filtering
+  const filteredItems = useMemo(() => {
+    let items = unifiedItems;
+
+    // Keyword filter
+    const kw = keyword.toLowerCase().trim();
+    if (kw) {
+      items = items.filter((item) => {
+        const title = item.data.title.toLowerCase();
+        const summary = (item.type === "article"
+          ? item.data.summary ?? ""
+          : item.data.summary ?? item.data.content ?? ""
+        ).toLowerCase();
+        return title.includes(kw) || summary.includes(kw);
+      });
+    }
+
+    // Date range filter
+    const cutoff = getDateCutoff(dateRange);
+    if (cutoff) {
+      items = items.filter((item) => {
+        const published = new Date(item.data.published_at);
+        return published >= cutoff;
+      });
+    }
+
+    return items;
+  }, [unifiedItems, keyword, dateRange]);
+
   const totalItems = articleTotal + contentTotal;
   const selectedCategoryLabel = CATEGORIES.find((c) => c.value === selectedCategory)?.label || "All Categories";
 
@@ -279,6 +340,57 @@ export default function ArticlesPage() {
         <div className="max-w-content mx-auto px-4 sm:px-6 py-8">
           {/* Filters */}
           <div className="bg-white border border-border-default rounded-lg p-4 mb-6">
+            {/* Row 1: Keyword search */}
+            <div className="mb-4">
+              <label className="block text-xs font-medium text-text-muted mb-1.5">
+                <Search size={12} className="inline mr-1" />
+                Search articles
+              </label>
+              <div className="flex items-center bg-white border border-border-default rounded-md px-3 py-2 focus-within:border-[var(--primary)] transition-colors">
+                <Search size={16} className="text-text-muted shrink-0 mr-2" />
+                <input
+                  type="text"
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value)}
+                  placeholder="Filter by keyword..."
+                  className="flex-1 border-none bg-transparent outline-none text-sm text-text-primary placeholder:text-text-muted"
+                />
+                {keyword && (
+                  <button
+                    onClick={() => setKeyword("")}
+                    className="text-text-muted hover:text-text-primary text-xs ml-2"
+                    aria-label="Clear keyword"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Row 2: Date range pills */}
+            <div className="mb-4">
+              <label className="block text-xs font-medium text-text-muted mb-1.5">
+                <Clock size={12} className="inline mr-1" />
+                Date range
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {DATE_FILTERS.map((df) => (
+                  <button
+                    key={df.value}
+                    onClick={() => setDateRange(df.value)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                      dateRange === df.value
+                        ? "bg-[var(--primary)] text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    {df.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Row 3: Category + Source */}
             <div className="flex flex-col sm:flex-row gap-4">
               {/* Category Dropdown */}
               <div className="relative flex-1">
@@ -342,7 +454,8 @@ export default function ArticlesPage() {
 
           {!loading && !error && (
             <div className="text-sm text-text-muted mb-4">
-              {totalItems} item{totalItems !== 1 ? "s" : ""} found
+              {filteredItems.length} of {totalItems} item{totalItems !== 1 ? "s" : ""}
+              {(keyword || dateRange !== "all") ? " (filtered)" : ""}
             </div>
           )}
 
@@ -354,9 +467,9 @@ export default function ArticlesPage() {
             </div>
           )}
 
-          {!loading && unifiedItems.length > 0 && (
+          {!loading && filteredItems.length > 0 && (
             <div className="space-y-4">
-              {unifiedItems.map((item) =>
+              {filteredItems.map((item) =>
                 item.type === "article" ? (
                   <ArticleCard key={`art-${item.data.id}`} article={item.data} variant="list" />
                 ) : (
@@ -384,13 +497,30 @@ export default function ArticlesPage() {
             </div>
           )}
 
-          {!loading && !error && unifiedItems.length === 0 && (
+          {!loading && !error && filteredItems.length === 0 && (
             <div className="text-center py-16">
               <div className="text-6xl mb-4">&#x1F4F0;</div>
-              <h2 className="text-2xl font-bold text-text-primary mb-2">No news yet</h2>
-              <p className="text-text-secondary max-w-md mx-auto">
-                News and articles are generated daily from {shortTownName}&apos;s public records, local news sources, and more. Check back soon!
-              </p>
+              {unifiedItems.length > 0 ? (
+                <>
+                  <h2 className="text-2xl font-bold text-text-primary mb-2">No matching articles</h2>
+                  <p className="text-text-secondary max-w-md mx-auto mb-4">
+                    Try adjusting your filters or search term.
+                  </p>
+                  <button
+                    onClick={() => { setKeyword(""); setDateRange("all"); }}
+                    className="px-5 py-2 bg-[var(--primary)] text-white font-medium rounded-lg hover:bg-[var(--primary-dark)] transition-colors text-sm"
+                  >
+                    Clear Filters
+                  </button>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-2xl font-bold text-text-primary mb-2">No news yet</h2>
+                  <p className="text-text-secondary max-w-md mx-auto">
+                    News and articles are generated daily from {shortTownName}&apos;s public records, local news sources, and more. Check back soon!
+                  </p>
+                </>
+              )}
             </div>
           )}
         </div>

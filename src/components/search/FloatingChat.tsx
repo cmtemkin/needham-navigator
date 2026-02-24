@@ -118,14 +118,13 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
             throw new Error("API request failed");
           }
 
-          let fullText = "";
           let confidence: "high" | "medium" | "low" | undefined;
           let sources: MockSource[] = [];
 
           await parseStreamResponse(response, {
-            onText: (delta) => {
-              fullText += delta;
-              // Optionally update UI incrementally here
+            onText: () => {
+              // Text accumulation handled internally by parseStreamResponse;
+              // cleaned result arrives via onDone.
             },
             onConfidence: (level) => {
               confidence = level;
@@ -133,12 +132,12 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
             onSources: (srcs) => {
               sources = srcs;
             },
-            onDone: () => {
+            onDone: (cleanedText) => {
               const aiMessageId = `ai-${crypto.randomUUID().slice(0, 8)}`;
               const aiMessage: ChatMessage = {
                 id: aiMessageId,
                 role: "ai",
-                text: fullText || "No response received.",
+                text: cleanedText || "No response received.",
                 sources,
                 confidence,
                 followups: [],
@@ -149,7 +148,7 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
               scrollToLatestAiMessage();
 
               trackEvent("chat_response_received", {
-                response_length: fullText.length,
+                response_length: cleanedText.length,
                 source_count: sources.length,
                 confidence,
                 response_time_ms: Math.round(performance.now() - startTime),
@@ -404,12 +403,13 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
                 </div>
               ) : (
                 <>
-                  {messages.map((msg) => (
+                  {messages.map((msg, idx) => (
                     <ChatBubble
                       key={msg.id}
                       message={msg}
                       onFollowupClick={sendMessage}
                       sessionId={sessionIdRef.current}
+                      isFirstAiMessage={msg.role === "ai" && messages.findIndex((m) => m.role === "ai") === idx}
                     />
                   ))}
                   {isTyping && (

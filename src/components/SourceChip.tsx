@@ -22,12 +22,19 @@ function isBoilerplateSection(section: string | undefined): boolean {
 export function SourceChip({ source }: SourceChipProps) {
   const showSection = source.section && !isBoilerplateSection(source.section);
 
+  const formattedDate = source.date
+    ? new Date(source.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+    : null;
+
   const content = (
     <>
       <ExternalLink size={10} className="shrink-0" />
       <span className="truncate">{source.title}</span>
       {showSection && (
         <span className="text-text-muted truncate"> &middot; {source.section}</span>
+      )}
+      {formattedDate && (
+        <span className="text-text-muted truncate"> &middot; {formattedDate}</span>
       )}
     </>
   );

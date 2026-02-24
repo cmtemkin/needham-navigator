@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Search, Trash2, Building2, School, DollarSign, Bus, ChevronRight, ExternalLink, Clock } from "lucide-react";
 import Link from "next/link";
@@ -166,6 +166,9 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
   const searchHref = useTownHref("/search");
   const shortTownName = town.name.replace(/,\s*[A-Z]{2}$/i, "");
   const latestExecutedQueryRef = useRef<string | null>(null);
+  const [heroInputFocused, setHeroInputFocused] = useState(false);
+  const heroInputRef = useRef<HTMLInputElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
 
   const articlesHref = useTownHref("/articles");
 
@@ -458,6 +461,29 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
     });
   }, [openChat, query, aiAnswer]);
 
+  // Filtered suggestions for the hero search input
+  const filteredSuggestions = useMemo(() => {
+    const q = query.toLowerCase().trim();
+    if (!q) return POPULAR_QUESTIONS;
+    return POPULAR_QUESTIONS.filter((pq) => pq.toLowerCase().includes(q));
+  }, [query]);
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        heroInputRef.current &&
+        !heroInputRef.current.contains(e.target as Node) &&
+        suggestionsRef.current &&
+        !suggestionsRef.current.contains(e.target as Node)
+      ) {
+        setHeroInputFocused(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const showResults = isSearching || searchResults !== null;
 
   return (
@@ -476,6 +502,67 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
               <p className="text-base text-white/90 mb-5">
                 Find answers from official documents, bylaws, meeting minutes, and more
               </p>
+
+              {/* Search input with suggestions */}
+              <div className="relative max-w-[520px] mx-auto mb-5">
+                <div className="flex items-center bg-white rounded-lg shadow-lg">
+                  <Search size={18} className="ml-4 text-text-muted shrink-0" />
+                  <input
+                    ref={heroInputRef}
+                    type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onFocus={() => setHeroInputFocused(true)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        setHeroInputFocused(false);
+                        handleSearch(query);
+                      }
+                      if (e.key === "Escape") {
+                        setHeroInputFocused(false);
+                      }
+                    }}
+                    placeholder={`Search ${shortTownName} documents...`}
+                    className="flex-1 border-none bg-transparent outline-none text-[15px] text-text-primary placeholder:text-text-muted py-3 px-3"
+                    data-pendo="search-input-hero"
+                  />
+                  <button
+                    onClick={() => {
+                      setHeroInputFocused(false);
+                      handleSearch(query);
+                    }}
+                    disabled={!query.trim()}
+                    className="mr-1.5 px-5 py-2 bg-[var(--primary)] text-white text-[14px] font-medium rounded-md hover:bg-[var(--primary-dark)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    data-pendo="search-button-hero"
+                  >
+                    Search
+                  </button>
+                </div>
+
+                {/* Suggestions dropdown */}
+                {heroInputFocused && filteredSuggestions.length > 0 && (
+                  <div
+                    ref={suggestionsRef}
+                    className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-lg border border-border-default z-50 max-h-64 overflow-auto"
+                  >
+                    {filteredSuggestions.map((suggestion) => (
+                      <button
+                        key={suggestion}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => {
+                          setQuery(suggestion);
+                          setHeroInputFocused(false);
+                          handleSearch(suggestion);
+                        }}
+                        className="w-full text-left px-4 py-2.5 text-[14px] text-text-primary hover:bg-gray-50 transition-colors flex items-center gap-2"
+                      >
+                        <Search size={14} className="text-text-muted shrink-0" />
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               {/* Quick-link pills */}
               <div className="flex flex-wrap justify-center gap-2">
