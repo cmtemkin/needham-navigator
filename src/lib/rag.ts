@@ -1111,10 +1111,35 @@ export async function hybridSearch(
     });
   });
 
+  // Document-level dedup: keep only the best entry per source document URL.
+  // Without this, semantic search returning chunk A from page X and text search
+  // returning chunk B from the same page X both survive the chunk-id merge above.
   const semanticWeight = 0.7;
   const textWeight = 0.3;
 
-  const ranked = Array.from(merged.entries()).map(([id, value]) => {
+  const bestByDocUrl = new Map<string, [string, typeof merged extends Map<string, infer V> ? V : never]>();
+  for (const [id, value] of merged.entries()) {
+    const docUrl = value.metadata?.document_url;
+    const key = typeof docUrl === "string" && docUrl ? canonicalizeUrl(docUrl) : id;
+    const existing = bestByDocUrl.get(key);
+    if (!existing) {
+      bestByDocUrl.set(key, [id, value]);
+    } else {
+      const existingScore = existing[1].similarity * semanticWeight + existing[1].textRank * textWeight;
+      const newScore = value.similarity * semanticWeight + value.textRank * textWeight;
+      if (newScore > existingScore) {
+        bestByDocUrl.set(key, [id, value]);
+      }
+    }
+  }
+
+  if (process.env.NODE_ENV === "development" && bestByDocUrl.size < merged.size) {
+    console.log(
+      `[hybridSearch] Document-level dedup: ${merged.size} chunks → ${bestByDocUrl.size} unique documents`
+    );
+  }
+
+  const ranked = Array.from(bestByDocUrl.values()).map(([id, value]) => {
     const score = value.similarity * semanticWeight + value.textRank * textWeight;
     return {
       id,

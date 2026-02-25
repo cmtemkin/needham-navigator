@@ -206,7 +206,7 @@ export async function POST(request: Request): Promise<Response> {
   try {
     // Run hybrid search and cache lookup in parallel
     const [hybridResults, cachedAnswer] = await Promise.all([
-      hybridSearch(query, { townId, limit: limit * 2 }), // Retrieve more for deduplication
+      hybridSearch(query, { townId, limit: limit * 3 }), // Over-fetch 3x for document-level dedup headroom
       getCachedAnswer(query, townId),
     ]);
 
