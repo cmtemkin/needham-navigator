@@ -46,15 +46,40 @@ const STATE_QUERY_PATTERNS = [
   /\bstate\s*(education|school)\s*(funding|aid)/i,
   /\bmcas\b/i, // State testing
 
-  // Public safety
+  // Public safety / licensing
   /\bstate\s*police/i,
   /\bfire\s*marshal/i,
   /\bbuilding\s*code/i,
+  /\bfirearms?\s*(license|permit|id|fid)/i,
+  /\bliquor\s*license/i,
+  /\bcontractor.?\s*(license|registration)/i,
+  /\bhome\s*improvement\s*contractor/i,
 
-  // Environment
+  // Building / construction (state codes & permits)
+  /\b(plumbing|electrical|gas)\s*(code|permit|license)/i,
+  /\bfire\s*(code|prevention|safety\s*code)/i,
+  /\b(stretch|energy)\s*code/i,
+  /\bseptic\s*(system|permit|inspection|failure)/i,
+  /\bboard\s*of\s*health\s*(regulation|requirement)/i,
+
+  // Property / real estate
+  /\bproperty\s*(assessment|valuation|transfer)/i,
+  /\bread\s*estate\s*(transfer|excise|deed)/i,
+  /\bdeed\s*(recording|transfer|registry)/i,
+
+  // Environment / conservation
   /\bdep\b.*\b(regulation|permit)/i,
-  /\bwetlands?\s*(protection|act)/i,
+  /\bwetlands?\s*(protection|act|bylaw)/i,
   /\btitle\s*5\b/i, // Septic
+  /\bconservation\s*(commission|law|act|regulation)/i,
+  /\bstormwater\s*(management|permit|regulation)/i,
+  /\benvironmental\s*(regulation|review|impact)/i,
+
+  // Education (state-level)
+  /\bspecial\s*education\s*(law|right|regulation|iep)/i,
+  /\b504\s*plan/i,
+  /\bcharter\s*school/i,
+  /\bschool\s*(choice|funding|aid)/i,
 ];
 
 /**
