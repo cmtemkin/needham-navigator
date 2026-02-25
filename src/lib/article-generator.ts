@@ -467,6 +467,18 @@ ${truncatedContent}`;
       return null;
     }
 
+    // Post-generation geographic relevance check on output content
+    const geoResult = checkGeographicRelevance(
+      parsed.body,
+      parsed.title,
+      doc.url,
+      category,
+    );
+    if (!geoResult.isRelevant) {
+      console.log(`[article-generator] Output geo-filtered: "${parsed.title}" — ${geoResult.reason}`);
+      return null;
+    }
+
     const sourceName = doc.title || (() => {
       try { return new URL(doc.url).hostname; } catch { return doc.url; }
     })();
@@ -721,6 +733,18 @@ Output valid JSON:
 
       const confidence = parsed.confidence_score ?? 0;
       if (confidence < MIN_CONFIDENCE) continue;
+
+      // Post-generation geographic relevance check on output content
+      const outputGeo = checkGeographicRelevance(
+        parsed.body,
+        parsed.title,
+        normalizedUrl,
+        item.category ?? 'news',
+      );
+      if (!outputGeo.isRelevant) {
+        console.log(`[article-generator] Output geo-filtered: "${parsed.title}" — ${outputGeo.reason}`);
+        continue;
+      }
 
       // Map content category to article category
       const articleCategory: ArticleCategory = 'community';

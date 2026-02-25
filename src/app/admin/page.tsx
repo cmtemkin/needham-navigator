@@ -34,13 +34,16 @@ import {
   Edit3,
   ExternalLink,
   X,
+  Zap,
+  Newspaper,
+  Play,
 } from "lucide-react";
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-type Tab = "documents" | "analytics" | "search-analytics" | "content-quality" | "costs" | "logs" | "settings" | "sources";
+type Tab = "documents" | "analytics" | "search-analytics" | "content-quality" | "costs" | "logs" | "settings" | "sources" | "pipeline";
 
 interface AdminDocument {
   id: string;
@@ -542,7 +545,13 @@ type AdminColumn<T> = {
   render: (row: T, i: number) => React.ReactNode;
 };
 
-function AdminTable<T>({ columns, rows }: { columns: AdminColumn<T>[]; rows: T[] }) {
+function columnAlignment(ci: number, total: number, isHeader: boolean): string {
+  if (ci === 0) return isHeader ? "pr-4 text-left" : "pr-4 text-text-primary";
+  if (ci === total - 1) return isHeader ? "pl-3 text-right" : "pl-3 text-right text-text-secondary";
+  return isHeader ? "px-3 text-right" : "px-3 text-right text-text-secondary";
+}
+
+function AdminTable<T>({ columns, rows }: Readonly<{ columns: AdminColumn<T>[]; rows: T[] }>) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
@@ -550,8 +559,8 @@ function AdminTable<T>({ columns, rows }: { columns: AdminColumn<T>[]; rows: T[]
           <tr className="border-b border-border-default">
             {columns.map((col, ci) => (
               <th
-                key={ci}
-                className={`py-2 ${ci === 0 ? "pr-4 text-left" : ci === columns.length - 1 ? "pl-3 text-right" : "px-3 text-right"} font-medium text-text-secondary`}
+                key={col.header}
+                className={`py-2 ${columnAlignment(ci, columns.length, true)} font-medium text-text-secondary`}
               >
                 {col.header}
               </th>
@@ -563,8 +572,8 @@ function AdminTable<T>({ columns, rows }: { columns: AdminColumn<T>[]; rows: T[]
             <tr key={i} className="hover:bg-gray-50">
               {columns.map((col, ci) => (
                 <td
-                  key={ci}
-                  className={`py-2 ${ci === 0 ? "pr-4 text-text-primary" : ci === columns.length - 1 ? "pl-3 text-right text-text-secondary" : "px-3 text-right text-text-secondary"}`}
+                  key={col.header}
+                  className={`py-2 ${columnAlignment(ci, columns.length, false)}`}
                 >
                   {col.render(row, i)}
                 </td>
@@ -581,7 +590,7 @@ function AdminTable<T>({ columns, rows }: { columns: AdminColumn<T>[]; rows: T[]
 // Search Analytics Tab
 // ---------------------------------------------------------------------------
 
-function SearchAnalyticsTab({ password }: { password: string }) {
+function SearchAnalyticsTab({ password }: Readonly<{ password: string }>) {
   const { data, loading, error } = useStatsData(password);
 
   if (loading) {
@@ -621,8 +630,8 @@ function SearchAnalyticsTab({ password }: { password: string }) {
             columns={[
               { header: "Query", render: (q) => <span className="max-w-[300px] truncate block">{q.query}</span> },
               { header: "Count", render: (q) => <span className="font-medium">{q.count}</span> },
-              { header: "Avg Similarity", render: (q) => q.avg_similarity !== null ? q.avg_similarity.toFixed(3) : "-" },
-              { header: "Avg Latency", render: (q) => q.avg_latency !== null ? `${q.avg_latency}ms` : "-" },
+              { header: "Avg Similarity", render: (q) => q.avg_similarity === null ? "-" : q.avg_similarity.toFixed(3) },
+              { header: "Avg Latency", render: (q) => q.avg_latency === null ? "-" : `${q.avg_latency}ms` },
             ]}
           />
         </div>
@@ -667,7 +676,7 @@ function SearchAnalyticsTab({ password }: { password: string }) {
 // Content Quality Tab
 // ---------------------------------------------------------------------------
 
-function ContentQualityTab({ password }: { password: string }) {
+function ContentQualityTab({ password }: Readonly<{ password: string }>) {
   const { data, loading, error } = useStatsData(password);
 
   if (loading) {
@@ -722,8 +731,8 @@ function ContentQualityTab({ password }: { password: string }) {
             Stale Documents ({stale_documents.length})
           </h3>
           <div className="space-y-2 max-h-80 overflow-y-auto">
-            {stale_documents.map((doc, i) => (
-              <div key={i} className="flex items-start justify-between gap-3 py-2 border-b border-border-light last:border-0">
+            {stale_documents.map((doc) => (
+              <div key={doc.url} className="flex items-start justify-between gap-3 py-2 border-b border-border-light last:border-0">
                 <div className="min-w-0 flex-1">
                   <div className="text-sm font-medium text-text-primary truncate">{doc.title || "Untitled"}</div>
                   <div className="text-xs text-text-muted truncate">{doc.url}</div>
@@ -1762,6 +1771,310 @@ function SourcesTab({ password }: { password: string }) {
 }
 
 // ---------------------------------------------------------------------------
+// Pipeline Health Tab
+// ---------------------------------------------------------------------------
+
+interface PipelineConnector {
+  id: string;
+  connector_type: string;
+  category: string;
+  enabled: boolean;
+  schedule: string;
+  last_fetched_at: string | null;
+  error_count: number;
+  last_error: string | null;
+  health: "healthy" | "warning" | "error" | "disabled" | "never_run";
+}
+
+interface PipelineData {
+  lastRun: { timestamp: string; duration_ms: number; status: string } | null;
+  connectors: PipelineConnector[];
+  generation: { articles_today: number; articles_this_week: number; last_daily_brief: string | null };
+  freshness: { total_items: number; items_last_24h: number; items_last_7d: number };
+}
+
+const HEALTH_CONFIG: Record<string, { label: string; className: string; icon: typeof CheckCircle2 }> = {
+  healthy: { label: "Healthy", className: "bg-green-50 text-green-700 border-green-200", icon: CheckCircle2 },
+  warning: { label: "Warning", className: "bg-yellow-50 text-yellow-700 border-yellow-200", icon: AlertTriangle },
+  error: { label: "Error", className: "bg-red-50 text-red-700 border-red-200", icon: XCircle },
+  disabled: { label: "Disabled", className: "bg-gray-50 text-gray-500 border-gray-200", icon: XCircle },
+  never_run: { label: "Never Run", className: "bg-blue-50 text-blue-600 border-blue-200", icon: Clock },
+};
+
+function healthBadge(health: string) {
+  const c = HEALTH_CONFIG[health] ?? HEALTH_CONFIG.error;
+  const Icon = c.icon;
+  return (
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${c.className}`}>
+      <Icon size={12} />
+      {c.label}
+    </span>
+  );
+}
+
+function relativeTime(dateStr: string | null): string {
+  if (!dateStr) return "Never";
+  const ms = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(ms / 60000);
+  if (mins < 1) return "Just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
+
+function PipelineTab({ password }: { password: string }) {
+  const [data, setData] = useState<PipelineData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [triggeringCron, setTriggeringCron] = useState(false);
+  const [cronResult, setCronResult] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(false);
+    const res = await adminFetch("/api/admin/pipeline-status", password);
+    if (res.ok) {
+      setData(await res.json());
+    } else {
+      setError(true);
+    }
+    setLoading(false);
+  }, [password]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleTriggerCron = async (phase: string) => {
+    setTriggeringCron(true);
+    setCronResult(null);
+    try {
+      const res = await fetch(`/api/cron/${phase}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_CRON_SECRET || ""}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (res.ok) {
+        setCronResult(`${phase} triggered successfully`);
+        // Refresh status after a short delay
+        setTimeout(() => fetchData(), 3000);
+      } else {
+        setCronResult(`${phase} failed (${res.status})`);
+      }
+    } catch {
+      setCronResult(`Failed to trigger ${phase}`);
+    }
+    setTriggeringCron(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <RefreshCw size={24} className="animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return <div className="text-center py-12 text-text-muted text-sm">Unable to load pipeline status.</div>;
+  }
+
+  const enabledConnectors = data.connectors.filter((c) => c.enabled);
+  const healthyCount = enabledConnectors.filter((c) => c.health === "healthy").length;
+  const warningCount = enabledConnectors.filter((c) => c.health === "warning").length;
+  const errorCount = enabledConnectors.filter((c) => c.health === "error").length;
+
+  const overallHealth: string =
+    errorCount > 0 ? "error" : warningCount > 0 ? "warning" : enabledConnectors.length === 0 ? "never_run" : "healthy";
+
+  return (
+    <div>
+      {/* Overview KPIs */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <KpiCard icon={Activity} label="Pipeline Status" value={overallHealth === "healthy" ? "Healthy" : overallHealth === "warning" ? "Warning" : overallHealth === "error" ? "Error" : "N/A"} />
+        <KpiCard icon={Zap} label="Connectors" value={`${healthyCount}/${enabledConnectors.length}`} />
+        <KpiCard icon={Newspaper} label="Articles Today" value={data.generation.articles_today} />
+        <KpiCard icon={Database} label="Content Items" value={data.freshness.total_items} />
+      </div>
+
+      {/* Last Cron Run + Manual Trigger */}
+      <div className="bg-white border border-border-default rounded-lg p-5 mb-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2">
+            <Clock size={15} className="text-primary" />
+            Last Pipeline Run
+          </h3>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => handleTriggerCron("daily")}
+              disabled={triggeringCron}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary border border-primary/30 rounded-lg hover:bg-primary/5 transition-colors disabled:opacity-50"
+            >
+              {triggeringCron ? <RefreshCw size={12} className="animate-spin" /> : <Play size={12} />}
+              Run Now
+            </button>
+            <button
+              onClick={() => fetchData()}
+              className="p-1.5 rounded-lg hover:bg-gray-100 text-text-muted transition-colors"
+              title="Refresh"
+            >
+              <RefreshCw size={14} />
+            </button>
+          </div>
+        </div>
+
+        {data.lastRun ? (
+          <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+            <div>
+              <span className="text-text-secondary">Ran:</span>{" "}
+              <span className="font-medium text-text-primary">{relativeTime(data.lastRun.timestamp)}</span>
+              <span className="text-text-muted ml-1">({formatDate(data.lastRun.timestamp)})</span>
+            </div>
+            <div>
+              <span className="text-text-secondary">Duration:</span>{" "}
+              <span className="font-medium text-text-primary">{formatDuration(data.lastRun.duration_ms)}</span>
+            </div>
+            <div>
+              <span className="text-text-secondary">Status:</span>{" "}
+              {data.lastRun.status === "ok" ? (
+                <span className="inline-flex items-center gap-1 text-green-600 font-medium"><CheckCircle2 size={13} />OK</span>
+              ) : (
+                <span className="inline-flex items-center gap-1 text-red-600 font-medium"><XCircle size={13} />Error</span>
+              )}
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm text-text-muted">No pipeline runs recorded yet.</p>
+        )}
+
+        {cronResult && (
+          <p className={`mt-2 text-xs ${cronResult.includes("successfully") ? "text-green-600" : "text-red-600"}`}>
+            {cronResult}
+          </p>
+        )}
+      </div>
+
+      {/* Article Generation */}
+      <div className="bg-white border border-border-default rounded-lg p-5 mb-4">
+        <h3 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
+          <Newspaper size={15} className="text-primary" />
+          Article Generation
+        </h3>
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <div className="text-2xl font-bold text-text-primary">{data.generation.articles_today}</div>
+            <div className="text-xs text-text-secondary">Today</div>
+          </div>
+          <div>
+            <div className="text-2xl font-bold text-text-primary">{data.generation.articles_this_week}</div>
+            <div className="text-xs text-text-secondary">This Week</div>
+          </div>
+          <div>
+            <div className="text-sm font-medium text-text-primary">{relativeTime(data.generation.last_daily_brief)}</div>
+            <div className="text-xs text-text-secondary">Last Daily Brief</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Content Freshness */}
+      <div className="bg-white border border-border-default rounded-lg p-5 mb-4">
+        <h3 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
+          <Layers size={15} className="text-primary" />
+          Content Freshness
+        </h3>
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <div className="text-2xl font-bold text-text-primary">{data.freshness.total_items}</div>
+            <div className="text-xs text-text-secondary">Total Items</div>
+          </div>
+          <div>
+            <div className="text-2xl font-bold text-text-primary">{data.freshness.items_last_24h}</div>
+            <div className="text-xs text-text-secondary">Last 24h</div>
+          </div>
+          <div>
+            <div className="text-2xl font-bold text-text-primary">{data.freshness.items_last_7d}</div>
+            <div className="text-xs text-text-secondary">Last 7 Days</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Connector Health Table */}
+      <div className="bg-white border border-border-default rounded-lg p-5">
+        <h3 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
+          <Zap size={15} className="text-primary" />
+          Connector Health ({data.connectors.length} total, {enabledConnectors.length} enabled)
+        </h3>
+
+        {warningCount > 0 && (
+          <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-lg text-xs text-yellow-800">
+            <AlertTriangle size={14} />
+            {warningCount} connector{warningCount > 1 ? "s" : ""} with warnings
+          </div>
+        )}
+        {errorCount > 0 && (
+          <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-xs text-red-800">
+            <XCircle size={14} />
+            {errorCount} connector{errorCount > 1 ? "s" : ""} in error state
+          </div>
+        )}
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border-default">
+                <th className="py-2 pr-4 text-left font-medium text-text-secondary">Connector</th>
+                <th className="py-2 px-3 text-left font-medium text-text-secondary">Category</th>
+                <th className="py-2 px-3 text-left font-medium text-text-secondary">Schedule</th>
+                <th className="py-2 px-3 text-left font-medium text-text-secondary">Last Fetched</th>
+                <th className="py-2 px-3 text-center font-medium text-text-secondary">Errors</th>
+                <th className="py-2 pl-3 text-right font-medium text-text-secondary">Health</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border-light">
+              {data.connectors.map((c) => (
+                <tr key={c.id} className="hover:bg-gray-50">
+                  <td className="py-2.5 pr-4">
+                    <div className="font-medium text-text-primary text-xs">{c.id}</div>
+                    <div className="text-[11px] text-text-muted">{c.connector_type}</div>
+                  </td>
+                  <td className="py-2.5 px-3">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700">
+                      {c.category}
+                    </span>
+                  </td>
+                  <td className="py-2.5 px-3 text-text-secondary text-xs">{c.schedule}</td>
+                  <td className="py-2.5 px-3 text-text-secondary text-xs">{relativeTime(c.last_fetched_at)}</td>
+                  <td className="py-2.5 px-3 text-center">
+                    {c.error_count > 0 ? (
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-red-50 text-red-700" title={c.last_error ?? ""}>
+                        {c.error_count}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-text-muted">0</span>
+                    )}
+                  </td>
+                  <td className="py-2.5 pl-3 text-right">{healthBadge(c.health)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {data.connectors.length === 0 && (
+          <div className="text-center py-8 text-text-muted text-sm">
+            No connectors configured. Add source configs in Supabase to enable the pipeline.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Main Admin Dashboard
 // ---------------------------------------------------------------------------
 
@@ -1784,6 +2097,7 @@ export default function AdminPage() {
     { id: "logs", label: "Ingestion Logs", icon: Activity },
     { id: "settings", label: "Settings", icon: Settings },
     { id: "sources", label: "Sources", icon: Globe },
+    { id: "pipeline", label: "Pipeline", icon: Zap },
   ];
 
   return (
@@ -1838,6 +2152,7 @@ export default function AdminPage() {
         {activeTab === "logs" && <LogsTab password={password} />}
         {activeTab === "settings" && <SettingsTab password={password} />}
         {activeTab === "sources" && <SourcesTab password={password} />}
+        {activeTab === "pipeline" && <PipelineTab password={password} />}
       </main>
     </div>
   );

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseClient, getSupabaseServiceClient } from '@/lib/supabase';
+import { checkGeographicRelevance } from '@/lib/geo-filter';
 import type { Article, ArticleListResponse, CreateArticleInput } from '@/types/article';
 
 /**
@@ -56,8 +57,19 @@ export async function GET(request: Request): Promise<Response> {
       );
     }
 
+    // Post-filter: remove geographically irrelevant articles (e.g., Connecticut content)
+    const articles = ((data as Article[]) || []).filter((article) => {
+      const text = article.summary || article.body?.slice(0, 2000) || '';
+      const sourceUrl = article.source_urls?.[0] ?? '';
+      const geo = checkGeographicRelevance(text, article.title, sourceUrl, article.category);
+      if (!geo.isRelevant) {
+        console.log(`[api/articles] Geo-filtered: "${article.title}" — ${geo.reason}`);
+      }
+      return geo.isRelevant;
+    });
+
     const response: ArticleListResponse = {
-      articles: (data as Article[]) || [],
+      articles,
       total: count || 0,
       limit,
       offset,

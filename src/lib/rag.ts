@@ -9,7 +9,7 @@ import { checkGeographicRelevance } from "@/lib/geo-filter";
 import { canonicalizeUrl } from "@/lib/url-canonicalize";
 import { getSearchTiers } from "@/lib/query-tier-router";
 import type { RetrievalConfig } from "@/lib/query-router";
-import { ALL_SEARCH_TIERS, type RelevanceTier } from "@/lib/relevance-classifier";
+import { FALLBACK_SEARCH_TIERS, type RelevanceTier } from "@/lib/relevance-classifier";
 
 export const DEFAULT_TOWN_ID = DEFAULT_TOWN_ID_FROM_CONFIG;
 
@@ -500,14 +500,14 @@ function rerankChunks(
       if (chunkLower.includes("needham")) {
         localityScore = 0.15;
       } else if (geoResult.detectedLocations.length > 0) {
-        localityScore = 0.10;
+        localityScore = 0.1;
       } else {
         // No strong geo signals but not blocked — small positive
         localityScore = 0.05;
       }
     } else {
       // Content about distant locations — apply penalty
-      localityScore = -0.10;
+      localityScore = -0.1;
     }
 
     // Formula score (6-factor formula with locality)
@@ -892,12 +892,12 @@ export async function retrieveRelevantChunks(
   // Filter out noise — chunks below the similarity floor are irrelevant
   let chunks = allChunks.filter((c) => c.similarity >= MIN_SIMILARITY_FLOOR);
 
-  // Zero-result fallback: if we got no results with restricted tiers, retry with all tiers.
-  // This ensures users always get some answer even for niche queries.
-  if (chunks.length === 0 && tiers.length < ALL_SEARCH_TIERS.length) {
-    console.log(`[rag] Zero results with tiers [${tiers.join(",")}], expanding to all tiers`);
+  // Zero-result fallback: if we got no results with restricted tiers, retry with broader
+  // tiers — but never include "archive" or "irrelevant" content.
+  if (chunks.length === 0 && tiers.length < FALLBACK_SEARCH_TIERS.length) {
+    console.log(`[rag] Zero results with tiers [${tiers.join(",")}], expanding to fallback tiers`);
     const fallbackResults = await vectorSearch(
-      trimmedQuery, townId, matchThreshold, matchCount, originalEmbedding, ALL_SEARCH_TIERS,
+      trimmedQuery, townId, matchThreshold, matchCount, originalEmbedding, FALLBACK_SEARCH_TIERS,
     );
     const fallbackBestByDoc = new Map<string, MatchDocumentRow>();
     for (const row of fallbackResults) {
@@ -918,6 +918,7 @@ export async function retrieveRelevantChunks(
     const filteredOut = allChunks.filter((c) => c.similarity < MIN_SIMILARITY_FLOOR);
     if (filteredOut.length > 0) {
       console.log(
+        // nosemgrep: unsafe-formatstring -- dev-only debug log, no user input
         `[rag] Filtered ${filteredOut.length} low-relevance chunks (similarity < ${MIN_SIMILARITY_FLOOR}):`,
         filteredOut.map((c) => ({
           id: c.id,
@@ -1110,10 +1111,35 @@ export async function hybridSearch(
     });
   });
 
+  // Document-level dedup: keep only the best entry per source document URL.
+  // Without this, semantic search returning chunk A from page X and text search
+  // returning chunk B from the same page X both survive the chunk-id merge above.
   const semanticWeight = 0.7;
   const textWeight = 0.3;
 
-  const ranked = Array.from(merged.entries()).map(([id, value]) => {
+  const bestByDocUrl = new Map<string, [string, typeof merged extends Map<string, infer V> ? V : never]>();
+  for (const [id, value] of merged.entries()) {
+    const docUrl = value.metadata?.document_url;
+    const key = typeof docUrl === "string" && docUrl ? canonicalizeUrl(docUrl) : id;
+    const existing = bestByDocUrl.get(key);
+    if (!existing) {
+      bestByDocUrl.set(key, [id, value]);
+    } else {
+      const existingScore = existing[1].similarity * semanticWeight + existing[1].textRank * textWeight;
+      const newScore = value.similarity * semanticWeight + value.textRank * textWeight;
+      if (newScore > existingScore) {
+        bestByDocUrl.set(key, [id, value]);
+      }
+    }
+  }
+
+  if (process.env.NODE_ENV === "development" && bestByDocUrl.size < merged.size) {
+    console.log(
+      `[hybridSearch] Document-level dedup: ${merged.size} chunks → ${bestByDocUrl.size} unique documents`
+    );
+  }
+
+  const ranked = Array.from(bestByDocUrl.values()).map(([id, value]) => {
     const score = value.similarity * semanticWeight + value.textRank * textWeight;
     return {
       id,

@@ -165,6 +165,7 @@ export function createScraperConnector(
   const articleSelector =
     (config.config.articleSelector as string) ?? "a[href]";
   const urlPatternStr = config.config.articleUrlPattern as string | undefined;
+  // nosemgrep: detect-non-literal-regexp -- pattern from admin-controlled connector config
   const urlPattern = urlPatternStr ? new RegExp(urlPatternStr) : undefined;
   const maxPages = (config.config.maxPages as number) ?? 20;
 
@@ -213,11 +214,18 @@ export function createScraperConnector(
             .update(page.url)
             .digest("hex");
 
+          // Extract first meaningful paragraph as summary
+          const firstParagraph = page.content
+            .split(/\n\n/)
+            .map((p) => p.replace(/^#+\s/, "").trim())
+            .find((p) => p.length > 50);
+
           return {
             source_id: config.id,
             category: config.category as ContentCategory,
             title: page.title,
             content: page.content,
+            summary: firstParagraph?.slice(0, 300),
             published_at: page.publishedDate
               ? new Date(page.publishedDate)
               : new Date(),

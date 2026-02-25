@@ -43,6 +43,10 @@ export function canonicalizeUrl(rawUrl: string): string {
   if (path.length > 1 && path.endsWith("/")) {
     path = path.slice(0, -1);
   }
+
+  // CivicPlus normalization: strip .asp/.aspx extensions (used interchangeably)
+  path = path.replace(/\.aspx?$/i, "");
+
   url.pathname = path;
 
   return url.toString().toLowerCase();

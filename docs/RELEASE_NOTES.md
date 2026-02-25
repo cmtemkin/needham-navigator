@@ -2,6 +2,46 @@
 
 ---
 
+## v0.17.0 — 2026-02-24
+
+**UX Polish, Search Quality, and Security Hardening**
+
+Ten PRs merged to staging since v0.16.0, covering UX improvements, search deduplication, security fixes, and code quality.
+
+### New Features
+- **AI disclaimers** — "AI answers may not be current" notice on search answer cards and first chat message (PR #130)
+- **Source date labels** — Source chips now show document date (e.g. "Verified Jan 2026") so users know how fresh the data is (PR #130, #133)
+- **Search suggestions dropdown** — Hero search input shows filtered suggestions on focus, populated from Popular Questions (PR #130)
+- **Article filters** — Keyword search and date range pills (Today / This Week / This Month / All Time) on the news page (PR #130)
+- **Rotating search placeholder** — Search bar cycles through 5 example queries every 3.5s, i18n in 3 languages, pauses when typing (PR #133)
+- **Events empty state** — Helpful prompt to ask Navigator about upcoming events when no calendar data is available (PR #129)
+
+### Bug Fixes
+- **Search deduplication** — Two-pass dedup (canonical URL + normalized title) eliminates duplicate results for common queries like "transfer station" and "building permits" (PR #131, #136)
+- **Document-level dedup in RAG** — `hybridSearch` now deduplicates at the document level, so the same page doesn't appear multiple times even when multiple chunks match (PR #136)
+- **USED_SOURCES leak** — Internal source metadata no longer appears in AI chat responses (PR #127, #130)
+- **Geographic filtering** — Off-topic articles from other states (e.g. Connecticut Eversource) filtered from homepage feed; article generation now applies geo-filter at output (PR #129, #131)
+- **Expired transit alerts** — Transit page now filters out expired MBTA alerts and auto-refreshes (PR #128)
+- **Negative timestamps** — Fixed edge case where malformed dates produced negative Unix timestamps (PR #127)
+- **Chat bubble overflow** — Long URLs in AI messages no longer break layout (PR #130)
+- **Preview text quality** — Sentence-boundary-aware truncation replaces raw substring for article previews (PR #131)
+- **RAG fallback quality** — Zero-result fallback now uses curated search tiers (excludes archive/irrelevant) (PR #131)
+- **Header search bar** — Hidden on pages that already have their own search input to avoid duplication (PR #131)
+
+### Security
+- **SSRF fix** — Admin test-url endpoint now validates URLs against a domain allowlist (PR #133)
+- **URL sanitization** — Geo-filter rewritten with proper hostname parsing (PR #133)
+- **106 SonarCloud issues resolved** — Code quality sweep across 39 files (PR #134)
+- **4 CodeQL alerts resolved** — Addressed all open code scanning findings (PR #134)
+- **28 nosemgrep suppressions** — Reviewed and annotated false-positive Semgrep alerts (PR #133, #134)
+- **Mobile tap targets** — All interactive elements meet 44×44px minimum for accessibility (PR #133)
+
+### Infrastructure
+- **Staging/production split** — `develop` branch deploys to staging.needhamnavigator.com; `main` deploys to production. PRs auto-merge to develop; production promotion requires manual merge (PR #125)
+- **CI hardening** — Updated CodeQL and Semgrep workflows, improved branch protection (PR #134, #135)
+
+---
+
 ## v0.16.0 — 2026-02-23
 
 **Parallel Feature Build: Chat UX, PWA, Admin Dashboard v2, Events Scraper**

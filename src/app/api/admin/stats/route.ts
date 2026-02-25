@@ -33,6 +33,155 @@ interface DocumentRow {
   updated_at: string;
 }
 
+function computeSearchKPIs(telemetry: TelemetryRow[]) {
+  const totalQueries = telemetry.length;
+
+  const latencies = telemetry
+    .filter((r) => r.total_latency_ms !== null)
+    .map((r) => r.total_latency_ms!);
+  const avgLatency =
+    latencies.length > 0
+      ? Math.round(latencies.reduce((sum, l) => sum + l, 0) / latencies.length)
+      : 0;
+
+  const zeroResultCount = telemetry.filter((r) => r.result_count === 0).length;
+  const zeroResultRate =
+    totalQueries > 0 ? Math.round((zeroResultCount / totalQueries) * 1000) / 10 : 0;
+
+  const similarities = telemetry
+    .filter((r) => r.top_similarity !== null)
+    .map((r) => r.top_similarity!);
+  const avgConfidence =
+    similarities.length > 0
+      ? Math.round((similarities.reduce((sum, s) => sum + s, 0) / similarities.length) * 1000) / 1000
+      : 0;
+
+  const confidenceDistribution = {
+    high: telemetry.filter((r) => r.confidence === "high").length,
+    medium: telemetry.filter((r) => r.confidence === "medium").length,
+    low: telemetry.filter((r) => r.confidence === "low").length,
+  };
+
+  return {
+    kpis: {
+      total_queries: totalQueries,
+      avg_latency_ms: avgLatency,
+      zero_result_rate: zeroResultRate,
+      avg_confidence: avgConfidence,
+    },
+    confidence_distribution: confidenceDistribution,
+  };
+}
+
+function computeTopQueries(telemetry: TelemetryRow[]) {
+  const queryMap = new Map<string, { count: number; totalSim: number; simCount: number; totalLatency: number; latencyCount: number }>();
+  for (const row of telemetry) {
+    const q = row.query?.toLowerCase().trim();
+    if (!q) continue;
+    const entry = queryMap.get(q) ?? { count: 0, totalSim: 0, simCount: 0, totalLatency: 0, latencyCount: 0 };
+    entry.count++;
+    if (row.top_similarity !== null) {
+      entry.totalSim += row.top_similarity;
+      entry.simCount++;
+    }
+    if (row.total_latency_ms !== null) {
+      entry.totalLatency += row.total_latency_ms;
+      entry.latencyCount++;
+    }
+    queryMap.set(q, entry);
+  }
+
+  return Array.from(queryMap.entries())
+    .map(([query, stats]) => ({
+      query,
+      count: stats.count,
+      avg_similarity: stats.simCount > 0 ? Math.round((stats.totalSim / stats.simCount) * 1000) / 1000 : null,
+      avg_latency: stats.latencyCount > 0 ? Math.round(stats.totalLatency / stats.latencyCount) : null,
+    }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 20);
+}
+
+function computeZeroResultQueries(telemetry: TelemetryRow[]) {
+  const zeroResultMap = new Map<string, number>();
+  for (const row of telemetry) {
+    if (row.result_count !== 0) continue;
+    const q = row.query?.toLowerCase().trim();
+    if (!q) continue;
+    zeroResultMap.set(q, (zeroResultMap.get(q) ?? 0) + 1);
+  }
+
+  return Array.from(zeroResultMap.entries())
+    .map(([query, count]) => ({ query, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 20);
+}
+
+function computeContentStats(documents: DocumentRow[]) {
+  const totalDocuments = documents.length;
+  const totalChunks = documents.reduce((sum, d) => sum + (d.chunk_count ?? 0), 0);
+  const staleCount = documents.filter((d) => d.is_stale).length;
+  const avgChunksPerDoc =
+    totalDocuments > 0
+      ? Math.round((totalChunks / totalDocuments) * 10) / 10
+      : 0;
+
+  const domainMap = new Map<string, { docCount: number; chunkCount: number }>();
+  for (const doc of documents) {
+    let domain = "unknown";
+    try {
+      domain = new URL(doc.url).hostname.replace(/^www\./, "");
+    } catch {
+      // keep "unknown"
+    }
+    const entry = domainMap.get(domain) ?? { docCount: 0, chunkCount: 0 };
+    entry.docCount++;
+    entry.chunkCount += doc.chunk_count ?? 0;
+    domainMap.set(domain, entry);
+  }
+
+  const documentsByDomain = Array.from(domainMap.entries())
+    .map(([domain, stats]) => ({
+      domain,
+      doc_count: stats.docCount,
+      chunk_count: stats.chunkCount,
+    }))
+    .sort((a, b) => b.doc_count - a.doc_count);
+
+  const staleDocuments = documents
+    .filter((d) => d.is_stale)
+    .map((d) => ({
+      url: d.url,
+      title: d.title,
+      updated_at: d.updated_at,
+    }))
+    .slice(0, 50);
+
+  const now = new Date();
+  const freshness = { under7: 0, under30: 0, under90: 0, over90: 0 };
+  for (const doc of documents) {
+    const updatedAt = new Date(doc.updated_at || doc.created_at);
+    const ageMs = now.getTime() - updatedAt.getTime();
+    const ageDays = ageMs / (1000 * 60 * 60 * 24);
+    if (ageDays < 7) freshness.under7++;
+    else if (ageDays < 30) freshness.under30++;
+    else if (ageDays < 90) freshness.under90++;
+    else freshness.over90++;
+  }
+
+  return {
+    kpis: {
+      total_documents: totalDocuments,
+      total_chunks: totalChunks,
+      stale_count: staleCount,
+      avg_chunks_per_doc: avgChunksPerDoc,
+    },
+    by_domain: documentsByDomain,
+    stale_documents: staleDocuments,
+    freshness,
+  };
+}
+
 export async function GET(request: Request): Promise<Response> {
   if (!isAdminAuthorized(request)) return unauthorizedAdminResponse();
 
@@ -41,9 +190,6 @@ export async function GET(request: Request): Promise<Response> {
   const supabase = getSupabaseServiceClient();
 
   try {
-    // -----------------------------------------------------------------------
-    // Fetch search telemetry (last 30 days)
-    // -----------------------------------------------------------------------
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -59,89 +205,10 @@ export async function GET(request: Request): Promise<Response> {
 
     const telemetry = (telemetryData ?? []) as TelemetryRow[];
 
-    // -----------------------------------------------------------------------
-    // Search KPIs
-    // -----------------------------------------------------------------------
-    const totalQueries = telemetry.length;
+    const searchStats = computeSearchKPIs(telemetry);
+    const topQueries = computeTopQueries(telemetry);
+    const zeroResultQueries = computeZeroResultQueries(telemetry);
 
-    const latencies = telemetry
-      .filter((r) => r.total_latency_ms !== null)
-      .map((r) => r.total_latency_ms!);
-    const avgLatency =
-      latencies.length > 0
-        ? Math.round(latencies.reduce((sum, l) => sum + l, 0) / latencies.length)
-        : 0;
-
-    const zeroResultCount = telemetry.filter((r) => r.result_count === 0).length;
-    const zeroResultRate =
-      totalQueries > 0 ? Math.round((zeroResultCount / totalQueries) * 1000) / 10 : 0;
-
-    const similarities = telemetry
-      .filter((r) => r.top_similarity !== null)
-      .map((r) => r.top_similarity!);
-    const avgConfidence =
-      similarities.length > 0
-        ? Math.round((similarities.reduce((sum, s) => sum + s, 0) / similarities.length) * 1000) / 1000
-        : 0;
-
-    // -----------------------------------------------------------------------
-    // Confidence distribution
-    // -----------------------------------------------------------------------
-    const confidenceDistribution = {
-      high: telemetry.filter((r) => r.confidence === "high").length,
-      medium: telemetry.filter((r) => r.confidence === "medium").length,
-      low: telemetry.filter((r) => r.confidence === "low").length,
-    };
-
-    // -----------------------------------------------------------------------
-    // Top 20 queries by frequency
-    // -----------------------------------------------------------------------
-    const queryMap = new Map<string, { count: number; totalSim: number; simCount: number; totalLatency: number; latencyCount: number }>();
-    for (const row of telemetry) {
-      const q = row.query?.toLowerCase().trim();
-      if (!q) continue;
-      const entry = queryMap.get(q) ?? { count: 0, totalSim: 0, simCount: 0, totalLatency: 0, latencyCount: 0 };
-      entry.count++;
-      if (row.top_similarity !== null) {
-        entry.totalSim += row.top_similarity;
-        entry.simCount++;
-      }
-      if (row.total_latency_ms !== null) {
-        entry.totalLatency += row.total_latency_ms;
-        entry.latencyCount++;
-      }
-      queryMap.set(q, entry);
-    }
-
-    const topQueries = Array.from(queryMap.entries())
-      .map(([query, stats]) => ({
-        query,
-        count: stats.count,
-        avg_similarity: stats.simCount > 0 ? Math.round((stats.totalSim / stats.simCount) * 1000) / 1000 : null,
-        avg_latency: stats.latencyCount > 0 ? Math.round(stats.totalLatency / stats.latencyCount) : null,
-      }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 20);
-
-    // -----------------------------------------------------------------------
-    // Zero-result queries
-    // -----------------------------------------------------------------------
-    const zeroResultMap = new Map<string, number>();
-    for (const row of telemetry) {
-      if (row.result_count !== 0) continue;
-      const q = row.query?.toLowerCase().trim();
-      if (!q) continue;
-      zeroResultMap.set(q, (zeroResultMap.get(q) ?? 0) + 1);
-    }
-
-    const zeroResultQueries = Array.from(zeroResultMap.entries())
-      .map(([query, count]) => ({ query, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 20);
-
-    // -----------------------------------------------------------------------
-    // Content quality — fetch documents
-    // -----------------------------------------------------------------------
     const { data: documentsData, error: documentsError } = await supabase
       .from("documents")
       .select("id, url, title, is_stale, chunk_count, created_at, updated_at")
@@ -152,85 +219,16 @@ export async function GET(request: Request): Promise<Response> {
     if (documentsError) throw new Error(documentsError.message);
 
     const documents = (documentsData ?? []) as DocumentRow[];
-
-    // Content KPIs
-    const totalDocuments = documents.length;
-    const totalChunks = documents.reduce((sum, d) => sum + (d.chunk_count ?? 0), 0);
-    const staleCount = documents.filter((d) => d.is_stale).length;
-    const avgChunksPerDoc =
-      totalDocuments > 0
-        ? Math.round((totalChunks / totalDocuments) * 10) / 10
-        : 0;
-
-    // Documents by domain
-    const domainMap = new Map<string, { docCount: number; chunkCount: number }>();
-    for (const doc of documents) {
-      let domain = "unknown";
-      try {
-        domain = new URL(doc.url).hostname.replace(/^www\./, "");
-      } catch {
-        // keep "unknown"
-      }
-      const entry = domainMap.get(domain) ?? { docCount: 0, chunkCount: 0 };
-      entry.docCount++;
-      entry.chunkCount += doc.chunk_count ?? 0;
-      domainMap.set(domain, entry);
-    }
-
-    const documentsByDomain = Array.from(domainMap.entries())
-      .map(([domain, stats]) => ({
-        domain,
-        doc_count: stats.docCount,
-        chunk_count: stats.chunkCount,
-      }))
-      .sort((a, b) => b.doc_count - a.doc_count);
-
-    // Stale documents list
-    const staleDocuments = documents
-      .filter((d) => d.is_stale)
-      .map((d) => ({
-        url: d.url,
-        title: d.title,
-        updated_at: d.updated_at,
-      }))
-      .slice(0, 50);
-
-    // Document freshness distribution
-    const now = new Date();
-    const freshness = { under7: 0, under30: 0, under90: 0, over90: 0 };
-    for (const doc of documents) {
-      const updatedAt = new Date(doc.updated_at || doc.created_at);
-      const ageMs = now.getTime() - updatedAt.getTime();
-      const ageDays = ageMs / (1000 * 60 * 60 * 24);
-      if (ageDays < 7) freshness.under7++;
-      else if (ageDays < 30) freshness.under30++;
-      else if (ageDays < 90) freshness.under90++;
-      else freshness.over90++;
-    }
+    const contentStats = computeContentStats(documents);
 
     return Response.json({
       search: {
-        kpis: {
-          total_queries: totalQueries,
-          avg_latency_ms: avgLatency,
-          zero_result_rate: zeroResultRate,
-          avg_confidence: avgConfidence,
-        },
+        kpis: searchStats.kpis,
         top_queries: topQueries,
         zero_result_queries: zeroResultQueries,
-        confidence_distribution: confidenceDistribution,
+        confidence_distribution: searchStats.confidence_distribution,
       },
-      content: {
-        kpis: {
-          total_documents: totalDocuments,
-          total_chunks: totalChunks,
-          stale_count: staleCount,
-          avg_chunks_per_doc: avgChunksPerDoc,
-        },
-        by_domain: documentsByDomain,
-        stale_documents: staleDocuments,
-        freshness,
-      },
+      content: contentStats,
     });
   } catch (error) {
     const details = error instanceof Error ? error.message : "Unexpected stats error.";

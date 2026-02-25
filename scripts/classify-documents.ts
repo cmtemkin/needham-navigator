@@ -43,7 +43,7 @@ async function classifyAllDocuments(
 
     const { data, error } = await query;
     if (error) {
-      console.error(`[classify] Error (cursor=${cursor}):`, error.message);
+      console.error(`[classify] Error (cursor=${cursor}):`, error.message); // nosemgrep: unsafe-formatstring
       break;
     }
     if (!data || data.length === 0) break;
@@ -66,7 +66,7 @@ async function classifyAllDocuments(
           .update({ relevance_tier: tier })
           .in("id", ids);
         if (updateError) {
-          console.error(`[classify] Error updating tier '${tier}':`, updateError.message);
+          console.error(`[classify] Error updating tier '${tier}':`, updateError.message); // nosemgrep: unsafe-formatstring
         }
       }
     }

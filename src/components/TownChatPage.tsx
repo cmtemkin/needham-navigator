@@ -343,13 +343,13 @@ function ChatContent() {
           throw new Error("API request failed");
         }
 
-        let fullText = "";
         let confidence: "high" | "medium" | "low" | undefined;
         let sources: NonNullable<ChatMessage["sources"]> = [];
 
         await parseStreamResponse(response, {
-          onText: (delta) => {
-            fullText += delta;
+          onText: () => {
+            // Text accumulation handled internally by parseStreamResponse;
+            // cleaned result arrives via onDone.
           },
           onConfidence: (level) => {
             confidence = level;
@@ -357,9 +357,9 @@ function ChatContent() {
           onSources: (srcs) => {
             sources = srcs;
           },
-          onDone: () => {
+          onDone: (cleanedText) => {
             completeResponse(
-              { id: `ai-${crypto.randomUUID().slice(0, 8)}`, role: "ai", text: fullText || "No response received.", sources, confidence, followups: [] },
+              { id: `ai-${crypto.randomUUID().slice(0, 8)}`, role: "ai", text: cleanedText || "No response received.", sources, confidence, followups: [] },
               startTime
             );
           },
@@ -469,7 +469,10 @@ function ChatContent() {
         let block = `A: ${m.text}`;
         if (m.sources && m.sources.length > 0) {
           const sourceList = m.sources
-            .map((s) => `  - ${s.title}${s.url ? ` (${s.url})` : ""}`)
+            .map((s) => {
+              const urlSuffix = s.url ? ` (${s.url})` : "";
+              return `  - ${s.title}${urlSuffix}`;
+            })
             .join("\n");
           block += `\nSources:\n${sourceList}`;
         }
@@ -568,8 +571,14 @@ function ChatContent() {
           <ChatWelcome onSuggestionClick={handleSend} />
         ) : (
           <>
-            {messages.map((msg) => (
-              <ChatBubble key={msg.id} message={msg} onFollowupClick={handleSend} sessionId={sessionIdRef.current} />
+            {messages.map((msg, idx) => (
+              <ChatBubble
+                key={msg.id}
+                message={msg}
+                onFollowupClick={handleSend}
+                sessionId={sessionIdRef.current}
+                isFirstAiMessage={msg.role === "ai" && messages.findIndex((m) => m.role === "ai") === idx}
+              />
             ))}
 
             {/* Follow-up suggestion chips (shown after last AI message when no built-in followups) */}

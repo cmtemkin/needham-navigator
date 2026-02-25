@@ -118,14 +118,13 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
             throw new Error("API request failed");
           }
 
-          let fullText = "";
           let confidence: "high" | "medium" | "low" | undefined;
           let sources: MockSource[] = [];
 
           await parseStreamResponse(response, {
-            onText: (delta) => {
-              fullText += delta;
-              // Optionally update UI incrementally here
+            onText: () => {
+              // Text accumulation handled internally by parseStreamResponse;
+              // cleaned result arrives via onDone.
             },
             onConfidence: (level) => {
               confidence = level;
@@ -133,12 +132,12 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
             onSources: (srcs) => {
               sources = srcs;
             },
-            onDone: () => {
+            onDone: (cleanedText) => {
               const aiMessageId = `ai-${crypto.randomUUID().slice(0, 8)}`;
               const aiMessage: ChatMessage = {
                 id: aiMessageId,
                 role: "ai",
-                text: fullText || "No response received.",
+                text: cleanedText || "No response received.",
                 sources,
                 confidence,
                 followups: [],
@@ -149,7 +148,7 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
               scrollToLatestAiMessage();
 
               trackEvent("chat_response_received", {
-                response_length: fullText.length,
+                response_length: cleanedText.length,
                 source_count: sources.length,
                 confidence,
                 response_time_ms: Math.round(performance.now() - startTime),
@@ -342,7 +341,7 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => setIsExpanded(!isExpanded)}
-                  className="w-7 h-7 rounded-md hover:bg-white/20 transition-colors flex items-center justify-center"
+                  className="w-9 h-9 min-w-[44px] min-h-[44px] rounded-md hover:bg-white/20 transition-colors flex items-center justify-center"
                   aria-label={isExpanded ? "Collapse chat" : "Expand chat"}
                 >
                   {isExpanded ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
@@ -359,7 +358,7 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
                     setIsOpen(false);
                     setIsExpanded(false);
                   }}
-                  className="w-7 h-7 rounded-md hover:bg-white/20 transition-colors flex items-center justify-center"
+                  className="w-9 h-9 min-w-[44px] min-h-[44px] rounded-md hover:bg-white/20 transition-colors flex items-center justify-center"
                   aria-label="Close chat"
                   data-pendo="chat-close"
                 >
@@ -395,7 +394,7 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
                           });
                           sendMessage(chip);
                         }}
-                        className="px-3 py-2 bg-white border border-border-default rounded-lg text-[13px] text-text-secondary hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[#F5F8FC] transition-all text-left"
+                        className="px-3 py-2 min-h-[44px] bg-white border border-border-default rounded-lg text-[13px] text-text-secondary hover:border-[var(--primary)] hover:text-[var(--primary)] hover:bg-[#F5F8FC] transition-all text-left"
                       >
                         {chip}
                       </button>
@@ -404,12 +403,13 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
                 </div>
               ) : (
                 <>
-                  {messages.map((msg) => (
+                  {messages.map((msg, idx) => (
                     <ChatBubble
                       key={msg.id}
                       message={msg}
                       onFollowupClick={sendMessage}
                       sessionId={sessionIdRef.current}
+                      isFirstAiMessage={msg.role === "ai" && messages.findIndex((m) => m.role === "ai") === idx}
                     />
                   ))}
                   {isTyping && (
@@ -441,11 +441,11 @@ export const FloatingChat = forwardRef<FloatingChatHandle, FloatingChatProps>(
                 <button
                   onClick={handleSend}
                   disabled={isTyping || !inputValue.trim()}
-                  className="w-9 h-9 rounded-md bg-[var(--primary)] text-white flex items-center justify-center hover:bg-[var(--primary-dark)] transition-colors shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-11 h-11 rounded-md bg-[var(--primary)] text-white flex items-center justify-center hover:bg-[var(--primary-dark)] transition-colors shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
                   aria-label="Send message"
                   data-pendo="chat-send"
                 >
-                  <Send size={16} />
+                  <Send size={18} />
                 </button>
               </div>
             </div>

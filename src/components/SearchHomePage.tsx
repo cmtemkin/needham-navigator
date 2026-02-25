@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Search, Trash2, Building2, School, DollarSign, Bus, ChevronRight, ExternalLink, Clock } from "lucide-react";
 import Link from "next/link";
@@ -17,7 +17,7 @@ import { useChatWidget } from "@/lib/chat-context";
 import type { SearchResponse, CachedAnswer } from "@/types/search";
 import type { Article, ArticleListResponse } from "@/types/article";
 import { trackEvent } from "@/lib/pendo";
-import { stripInternalMetadata, formatRelativeTime, stripMarkdown } from "@/lib/text-utils";
+import { stripInternalMetadata, formatRelativeTime, extractPreviewText } from "@/lib/text-utils";
 
 // ---------------------------------------------------------------------------
 // Unified content types for homepage news feed
@@ -47,8 +47,8 @@ const SOURCE_COLORS: Record<string, string> = {
   "needham:town-rss": "bg-purple-100 text-purple-700",
 };
 
-function ContentItemGridCard({ item, newsSources }: { item: ContentItem; newsSources?: Record<string, string> }) {
-  const displayText = stripMarkdown(item.summary || item.content?.slice(0, 150) || "");
+function ContentItemGridCard({ item, newsSources }: Readonly<{ item: ContentItem; newsSources?: Record<string, string> }>) {
+  const displayText = extractPreviewText(item.summary || item.content || "", 150);
   const sourceLabel = newsSources?.[item.source_id] || item.source_id.split(":").pop() || item.source_id;
   const sourceColor = SOURCE_COLORS[item.source_id] ?? "bg-gray-100 text-gray-700";
 
@@ -146,7 +146,7 @@ type AIAnswerState =
   | { type: "idle" }
   | { type: "loading" }
   | { type: "cached"; answer: CachedAnswer }
-  | { type: "loaded"; html: string; sources: { title: string; url: string }[] }
+  | { type: "loaded"; html: string; sources: { title: string; url: string; date?: string }[] }
   | { type: "error"; message: string };
 
 function normalizeQuery(value: string | null): string {
@@ -157,7 +157,7 @@ interface SearchHomePageProps {
   initialQuery?: string;
 }
 
-export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
+export function SearchHomePage({ initialQuery = "" }: Readonly<SearchHomePageProps>) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -166,6 +166,9 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
   const searchHref = useTownHref("/search");
   const shortTownName = town.name.replace(/,\s*[A-Z]{2}$/i, "");
   const latestExecutedQueryRef = useRef<string | null>(null);
+  const [heroInputFocused, setHeroInputFocused] = useState(false);
+  const heroInputRef = useRef<HTMLInputElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
 
   const articlesHref = useTownHref("/articles");
 
@@ -183,7 +186,7 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
     try {
       const stored = localStorage.getItem("nn_last_visit");
       if (stored) {
-        setLastVisitTimestamp(parseInt(stored, 10));
+        setLastVisitTimestamp(Number.parseInt(stored, 10));
       }
       localStorage.setItem("nn_last_visit", String(Date.now()));
     } catch {
@@ -295,7 +298,7 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
             }
 
             let answerHtml = "";
-            let sources: { title: string; url: string }[] = [];
+            let sources: { title: string; url: string; date?: string }[] = [];
             const decoder = new TextDecoder();
 
             while (true) {
@@ -320,9 +323,10 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
 
                   // Handle sources
                   if (parsed.type === "data-sources") {
-                    sources = parsed.data.map((s: { document_title: string; document_url?: string }) => ({
+                    sources = parsed.data.map((s: { document_title: string; document_url?: string; date?: string }) => ({
                       title: s.document_title,
                       url: s.document_url ?? "",
+                      date: s.date,
                     }));
                   }
                 } catch {
@@ -406,17 +410,31 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
           fetch(`/api/content?town=${town.town_id}&limit=6`),
         ]);
 
-        const items: UnifiedItem[] = [];
+        let articles: { type: "article"; data: Article }[] = [];
+        let contentItems: ContentItem[] = [];
 
         if (articlesRes.ok) {
           const data: ArticleListResponse = await articlesRes.json();
-          items.push(...data.articles.map((a): UnifiedItem => ({ type: "article", data: a })));
+          articles = data.articles.map((a): UnifiedItem & { type: "article" } => ({ type: "article", data: a }));
         }
 
         if (contentRes.ok) {
           const data: { items: ContentItem[] } = await contentRes.json();
-          items.push(...data.items.map((c): UnifiedItem => ({ type: "content", data: c })));
+          contentItems = data.items;
         }
+
+        // Deduplicate: remove content items whose URL already has an AI summary article
+        const articleSourceUrls = new Set(
+          articles.flatMap((a) => a.data.source_urls ?? [])
+        );
+        const dedupedContent = contentItems.filter(
+          (c) => !c.url || !articleSourceUrls.has(c.url)
+        );
+
+        const items: UnifiedItem[] = [
+          ...articles,
+          ...dedupedContent.map((c): UnifiedItem => ({ type: "content", data: c })),
+        ];
 
         // Sort by date, take top 6
         items.sort((a, b) => {
@@ -453,10 +471,33 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
       context: {
         searchQuery: query,
         aiAnswer: answerText,
-        sources: sources.map((s) => ({ title: s.title, url: s.url ?? "" })),
+        sources: sources.map((s) => ({ title: s.title, url: s.url ?? "", date: s.date })),
       },
     });
   }, [openChat, query, aiAnswer]);
+
+  // Filtered suggestions for the hero search input
+  const filteredSuggestions = useMemo(() => {
+    const q = query.toLowerCase().trim();
+    if (!q) return POPULAR_QUESTIONS;
+    return POPULAR_QUESTIONS.filter((pq) => pq.toLowerCase().includes(q));
+  }, [query]);
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        heroInputRef.current &&
+        !heroInputRef.current.contains(e.target as Node) &&
+        suggestionsRef.current &&
+        !suggestionsRef.current.contains(e.target as Node)
+      ) {
+        setHeroInputFocused(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const showResults = isSearching || searchResults !== null;
 
@@ -476,6 +517,67 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
               <p className="text-base text-white/90 mb-5">
                 Find answers from official documents, bylaws, meeting minutes, and more
               </p>
+
+              {/* Search input with suggestions */}
+              <div className="relative max-w-[520px] mx-auto mb-5">
+                <div className="flex items-center bg-white rounded-lg shadow-lg">
+                  <Search size={18} className="ml-4 text-text-muted shrink-0" />
+                  <input
+                    ref={heroInputRef}
+                    type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onFocus={() => setHeroInputFocused(true)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        setHeroInputFocused(false);
+                        handleSearch(query);
+                      }
+                      if (e.key === "Escape") {
+                        setHeroInputFocused(false);
+                      }
+                    }}
+                    placeholder={`Search ${shortTownName} documents...`}
+                    className="flex-1 border-none bg-transparent outline-none text-[15px] text-text-primary placeholder:text-text-muted py-3 px-3"
+                    data-pendo="search-input-hero"
+                  />
+                  <button
+                    onClick={() => {
+                      setHeroInputFocused(false);
+                      handleSearch(query);
+                    }}
+                    disabled={!query.trim()}
+                    className="mr-1.5 px-5 py-2 bg-[var(--primary)] text-white text-[14px] font-medium rounded-md hover:bg-[var(--primary-dark)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    data-pendo="search-button-hero"
+                  >
+                    Search
+                  </button>
+                </div>
+
+                {/* Suggestions dropdown */}
+                {heroInputFocused && filteredSuggestions.length > 0 && (
+                  <div
+                    ref={suggestionsRef}
+                    className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-lg border border-border-default z-50 max-h-64 overflow-auto"
+                  >
+                    {filteredSuggestions.map((suggestion) => (
+                      <button
+                        key={suggestion}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => {
+                          setQuery(suggestion);
+                          setHeroInputFocused(false);
+                          handleSearch(suggestion);
+                        }}
+                        className="w-full text-left px-4 py-2.5 text-[14px] text-text-primary hover:bg-gray-50 transition-colors flex items-center gap-2"
+                      >
+                        <Search size={14} className="text-text-muted shrink-0" />
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               {/* Quick-link pills */}
               <div className="flex flex-wrap justify-center gap-2">
@@ -552,7 +654,7 @@ export function SearchHomePage({ initialQuery = "" }: SearchHomePageProps) {
 
                     {articlesLoading ? (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {[...Array(4)].map((_, i) => (
+                        {[...new Array(4)].map((_, i) => (
                           <ArticleSkeleton key={`skeleton-${i}`} variant="grid" />
                         ))}
                       </div>
