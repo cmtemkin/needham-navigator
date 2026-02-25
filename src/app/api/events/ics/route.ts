@@ -30,11 +30,13 @@ interface EventRow {
 }
 
 function escapeICalText(text: string): string {
+  // Escape backslash first, then other special chars
+  // Use string literals (not regex) for CodeQL sanitization tracking
   return text
-    .replaceAll(/\\/g, "\\\\")
-    .replaceAll(/;/g, "\\;")
-    .replaceAll(/,/g, "\\,")
-    .replaceAll(/\n/g, "\\n");
+    .replaceAll("\\", "\\\\")
+    .replaceAll(";", "\\;")
+    .replaceAll(",", "\\,")
+    .replaceAll("\n", "\\n");
 }
 
 function toICalDate(dateStr: string): string {

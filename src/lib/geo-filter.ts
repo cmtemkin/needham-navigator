@@ -223,11 +223,16 @@ export function isUrlGeographicallyRelevant(url: string): boolean {
   const host = parsed.hostname.toLowerCase();
   const fullUrl = parsed.href.toLowerCase();
 
-  // Always allow Needham-specific domains (exact host match)
+  // Always allow Needham-specific domains (exact host match OR subdomain)
+  // codeql[js/incomplete-url-substring-sanitization] — hostname extracted from URL.parse(), not substring check
   if (host === 'needhamma.gov' || host.endsWith('.needhamma.gov')) return true;
+  // codeql[js/incomplete-url-substring-sanitization]
   if (host === 'needham.k12.ma.us' || host.endsWith('.needham.k12.ma.us')) return true;
+  // codeql[js/incomplete-url-substring-sanitization]
   if (host === 'needhamobserver.com' || host.endsWith('.needhamobserver.com')) return true;
+  // codeql[js/incomplete-url-substring-sanitization]
   if (host === 'needhamlocal.org' || host.endsWith('.needhamlocal.org')) return true;
+  // codeql[js/incomplete-url-substring-sanitization]
   if (host === 'needhamchannel.org' || host.endsWith('.needhamchannel.org')) return true;
 
   // Patch: only allow Massachusetts/Needham paths

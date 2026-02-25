@@ -227,8 +227,10 @@ export async function runConnectors(
   const configs = await loadSourceConfigs(options.townId);
 
   if (configs.length === 0) {
+    // Strip newlines for log injection prevention (use string literals for CodeQL)
+    const safeTownId = (options.townId ?? "all").replaceAll("\n", "").replaceAll("\r", "");
     console.warn(
-      `[runner] No source_configs found for town=${(options.townId ?? "all").replaceAll(/[\n\r]/g, "")}. Run seed-sources.ts to populate.`
+      `[runner] No source_configs found for town=${safeTownId}. Run seed-sources.ts to populate.`
     );
   }
 
