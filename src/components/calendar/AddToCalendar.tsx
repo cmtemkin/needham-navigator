@@ -29,14 +29,20 @@ function formatICalDate(dateStr: string): string {
   return d.toISOString().replaceAll(/[-:]/g, "").replace(/\.\d{3}/, "");
 }
 
+function escapeICalText(text: string): string {
+  // Escape backslash first, then other special chars
+  // Use string literals (not regex) for CodeQL sanitization tracking
+  return text
+    .replaceAll("\\", "\\\\")
+    .replaceAll(";", "\\;")
+    .replaceAll(",", "\\,")
+    .replaceAll("\n", "\\n");
+}
+
 function generateIcsContent(event: EventItem): string {
   const start = event.metadata?.event_start || event.published_at;
   const end = event.metadata?.event_end || start;
-  const description = (event.summary || event.content?.slice(0, 500) || "")
-    .replaceAll(/\\/g, "\\\\")
-    .replaceAll(/\n/g, "\\n")
-    .replaceAll(/,/g, "\\,")
-    .replaceAll(/;/g, "\\;");
+  const description = escapeICalText(event.summary || event.content?.slice(0, 500) || "");
 
   const lines = [
     "BEGIN:VCALENDAR",
@@ -46,8 +52,8 @@ function generateIcsContent(event: EventItem): string {
     "BEGIN:VEVENT",
     `DTSTART:${formatICalDate(start)}`,
     `DTEND:${formatICalDate(end)}`,
-    `SUMMARY:${event.title.replaceAll(/\\/g, "\\\\").replaceAll(/,/g, "\\,").replaceAll(/;/g, "\\;")}`,
-    `LOCATION:${(event.metadata?.event_location || "").replaceAll(/\\/g, "\\\\").replaceAll(/,/g, "\\,").replaceAll(/;/g, "\\;")}`,
+    `SUMMARY:${escapeICalText(event.title)}`,
+    `LOCATION:${escapeICalText(event.metadata?.event_location || "")}`,
     `DESCRIPTION:${description}`,
   ];
 
