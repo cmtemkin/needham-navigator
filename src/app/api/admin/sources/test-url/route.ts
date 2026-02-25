@@ -52,16 +52,21 @@ export async function POST(request: Request): Promise<Response> {
       const res = await fetch(safeUrl.href, {
         method: "HEAD",
         signal: controller.signal,
-        redirect: "follow",
+        redirect: "manual", // Prevent following redirects to non-allowlisted domains (SSRF mitigation)
       });
 
       clearTimeout(timeout);
 
+      // Treat 3xx redirects as accessible (URL is valid, just redirects)
+      const accessible = res.ok || (res.status >= 300 && res.status < 400);
+
       return Response.json({
-        accessible: res.ok,
+        accessible,
         status: res.status,
         statusText: res.statusText,
         contentType: res.headers.get("content-type") || "unknown",
+        redirected: res.status >= 300 && res.status < 400,
+        redirectUrl: res.headers.get("location") || undefined,
       });
     } catch (fetchErr) {
       clearTimeout(timeout);

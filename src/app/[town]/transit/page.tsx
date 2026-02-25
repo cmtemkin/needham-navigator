@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Train, Clock, ExternalLink, AlertCircle, RefreshCw } from "lucide-react";
+import { Train, Clock, ExternalLink, AlertCircle, RefreshCw, MapPin } from "lucide-react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useTown } from "@/lib/town-context";
 import { useChatWidget } from "@/lib/chat-context";
 import { filterActiveAlerts } from "@/lib/transit-utils";
+import { getEasternTimeHHMM, formatEasternTime } from "@/lib/timezone";
 
 type MbtaAlert = {
   id: string;
@@ -46,14 +47,7 @@ type TransitData = {
 };
 
 const FETCH_TIMEOUT_MS = 10000;
-
-function formatTime(isoStr: string | null): string {
-  if (!isoStr) return "";
-  return new Date(isoStr).toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
+const PREFERRED_STOP_KEY = "nn_preferred_stop";
 
 export default function TransitPage() {
   const town = useTown();
@@ -61,6 +55,13 @@ export default function TransitPage() {
   const [data, setData] = useState<TransitData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [preferredStop, setPreferredStop] = useState<string>("");
+
+  // Load preferred stop from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem(PREFERRED_STOP_KEY);
+    if (saved) setPreferredStop(saved);
+  }, []);
 
   const shortTownName = town.name.replace(/,\s*[A-Z]{2}$/i, "");
   const routeId = town.transit_route ?? null;
@@ -78,14 +79,15 @@ export default function TransitPage() {
     if (isInitial) { setLoading(true); setError(null); }
 
     try {
-      const now = new Date().toISOString();
+      const nowIso = new Date().toISOString();
+      const minTime = getEasternTimeHHMM();
       const alertsPromise = fetch(
-        `https://api-v3.mbta.com/alerts?filter[route]=${routeId}&filter[datetime]=${now}&sort=-updated_at`,
+        `https://api-v3.mbta.com/alerts?filter[route]=${routeId}&filter[datetime]=${nowIso}&sort=-updated_at`,
         { signal: controller.signal }
       ).then((r) => r.json());
 
       const schedulesPromise = fetch(
-        `https://api-v3.mbta.com/schedules?filter[route]=${routeId}&filter[min_time]=${now.split("T")[1]?.slice(0, 5) ?? "00:00"}&sort=departure_time&page[limit]=20&include=stop`,
+        `https://api-v3.mbta.com/schedules?filter[route]=${routeId}&filter[min_time]=${minTime}&sort=departure_time&page[limit]=20&include=stop`,
         { signal: controller.signal }
       ).then((r) => r.json());
 
@@ -132,6 +134,23 @@ export default function TransitPage() {
     if (!stopId || !data) return "";
     return data.stops.find((s) => s.id === stopId)?.attributes.name ?? "";
   };
+
+  const handleStopChange = (stopId: string) => {
+    setPreferredStop(stopId);
+    if (stopId) {
+      localStorage.setItem(PREFERRED_STOP_KEY, stopId);
+    } else {
+      localStorage.removeItem(PREFERRED_STOP_KEY);
+    }
+  };
+
+  const filteredSchedules = data
+    ? preferredStop
+      ? data.schedules.filter(
+          (s) => s.relationships?.stop?.data?.id === preferredStop
+        )
+      : data.schedules
+    : [];
 
   return (
     <>
@@ -195,6 +214,32 @@ export default function TransitPage() {
 
           {routeId && !loading && !error && data && (
             <>
+              {/* Stop selector */}
+              {data.stops.length > 0 && (
+                <div className="flex items-center gap-3 mb-6">
+                  <MapPin size={16} className="text-[var(--primary)] flex-shrink-0" />
+                  <label htmlFor="stop-filter" className="text-sm font-medium text-text-secondary">
+                    My stop:
+                  </label>
+                  <select
+                    id="stop-filter"
+                    value={preferredStop}
+                    onChange={(e) => handleStopChange(e.target.value)}
+                    className="text-sm border border-border-default rounded-lg px-3 py-2 bg-white text-text-primary focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent"
+                  >
+                    <option value="">All Stops</option>
+                    {data.stops
+                      .slice()
+                      .sort((a, b) => a.attributes.name.localeCompare(b.attributes.name))
+                      .map((stop) => (
+                        <option key={stop.id} value={stop.id}>
+                          {stop.attributes.name}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+              )}
+
               {/* Two-column layout when alerts exist: alerts left, schedule right */}
               <div className={data.alerts.length > 0 ? "grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-6" : ""}>
                 {/* Active Alerts */}
@@ -231,10 +276,10 @@ export default function TransitPage() {
                     Upcoming Departures
                   </h2>
 
-                  {data.schedules.length > 0 ? (
+                  {filteredSchedules.length > 0 ? (
                     <div className="bg-white border border-border-light rounded-xl overflow-hidden">
                       <div className="divide-y divide-border-light">
-                        {data.schedules.slice(0, 15).map((schedule) => {
+                        {filteredSchedules.slice(0, 15).map((schedule) => {
                           const stopName = getStopName(schedule);
                           const time = schedule.attributes.departure_time || schedule.attributes.arrival_time;
                           const direction = schedule.attributes.direction_id === 0 ? "Outbound" : "Inbound";
@@ -256,7 +301,7 @@ export default function TransitPage() {
                                 </div>
                               </div>
                               <div className="text-[15px] font-semibold text-text-primary">
-                                {formatTime(time)}
+                                {formatEasternTime(time)}
                               </div>
                             </div>
                           );
@@ -265,7 +310,11 @@ export default function TransitPage() {
                     </div>
                   ) : (
                     <div className="bg-white border border-border-light rounded-xl p-8 text-center">
-                      <p className="text-text-secondary">No upcoming departures found for today.</p>
+                      <p className="text-text-secondary">
+                        {preferredStop
+                          ? "No upcoming departures from this stop today."
+                          : "No upcoming departures found for today."}
+                      </p>
                     </div>
                   )}
                 </div>

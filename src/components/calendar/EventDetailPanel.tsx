@@ -3,6 +3,7 @@
 import { Calendar, Clock, MapPin, ExternalLink } from "lucide-react";
 import { AddToCalendar } from "./AddToCalendar";
 import type { EventItem } from "./CalendarView";
+import { formatEasternTime, EASTERN_TZ } from "@/lib/timezone";
 
 interface EventDetailPanelProps {
   date?: Date;
@@ -14,18 +15,11 @@ interface EventDetailPanelProps {
 function formatEventDate(dateStr: string): string {
   const d = new Date(dateStr);
   return d.toLocaleDateString("en-US", {
+    timeZone: EASTERN_TZ,
     weekday: "short",
     month: "short",
     day: "numeric",
     year: "numeric",
-  });
-}
-
-function formatEventTime(dateStr: string): string {
-  const d = new Date(dateStr);
-  return d.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
   });
 }
 
@@ -82,9 +76,9 @@ function EventRow({
               <span>
                 {formatEventDate(event.metadata?.event_start || event.published_at)}
                 {event.metadata?.event_start && (
-                  <> at {formatEventTime(event.metadata.event_start)}</>
+                  <> at {formatEasternTime(event.metadata.event_start)}</>
                 )}
-                {end && eventEndStr && <>{" – "}{formatEventTime(eventEndStr)}</>}
+                {end && eventEndStr && <>{" – "}{formatEasternTime(eventEndStr)}</>}
               </span>
             </div>
             {event.metadata?.event_location && (

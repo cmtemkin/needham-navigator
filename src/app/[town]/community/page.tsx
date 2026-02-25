@@ -9,6 +9,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { useTown } from "@/lib/town-context";
 import { useChatWidget } from "@/lib/chat-context";
+import { formatEasternTime, EASTERN_TZ } from "@/lib/timezone";
 
 type ContentItem = {
   id: string;
@@ -35,18 +36,11 @@ function formatDate(dateStr: string | null): string {
 function formatEventDate(dateStr: string | null): string {
   if (!dateStr) return "";
   return new Date(dateStr).toLocaleDateString("en-US", {
+    timeZone: EASTERN_TZ,
     weekday: "short",
     month: "short",
     day: "numeric",
     year: "numeric",
-  });
-}
-
-function formatEventTime(dateStr: string | null): string {
-  if (!dateStr) return "";
-  return new Date(dateStr).toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
   });
 }
 
@@ -352,7 +346,7 @@ export default function CommunityPage() {
                           {item.published_at && (
                             <span className="flex items-center gap-1">
                               <Clock size={14} className="text-[var(--primary)]" />
-                              {formatEventTime(item.published_at)}
+                              {formatEasternTime(item.published_at)}
                             </span>
                           )}
                           {item.metadata?.location && (
