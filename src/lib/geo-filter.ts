@@ -138,11 +138,12 @@ export function checkGeographicRelevance(
   const titleAndText = `${title} ${text}`;
   const detectedStateAbbrevs = OTHER_STATE_ABBREVS.filter(abbrev => {
     // Match ", CT" (comma + space + abbrev + word boundary)
-    const commaPattern = new RegExp(`,\\s*${abbrev}\\b`);
+    // nosemgrep: detect-non-literal-regexp -- abbrev values are hardcoded state abbreviations
+    const commaPattern = new RegExp(String.raw`,\s*${abbrev}\b`);
     // Match "(CT)"
-    const parenPattern = new RegExp(`\\(${abbrev}\\)`);
+    const parenPattern = new RegExp(String.raw`\(${abbrev}\)`); // nosemgrep: detect-non-literal-regexp
     // Match "CT 0XXXX" (abbreviation + zip code)
-    const zipPattern = new RegExp(`\\b${abbrev}\\s+\\d{5}`);
+    const zipPattern = new RegExp(String.raw`\b${abbrev}\s+\d{5}`); // nosemgrep: detect-non-literal-regexp
     return commaPattern.test(titleAndText) ||
       parenPattern.test(titleAndText) ||
       zipPattern.test(titleAndText);
@@ -189,13 +190,18 @@ export function checkGeographicRelevance(
     };
   }
 
+  let reason: string;
+  if (hasNeedhamMention) {
+    reason = 'Content mentions Needham';
+  } else if (localMentions.length > 0) {
+    reason = `Content mentions local area (${localMentions.slice(0, 3).join(', ')})`;
+  } else {
+    reason = 'No strong geographic signals detected — allowing by default';
+  }
+
   return {
     isRelevant: true,
-    reason: hasNeedhamMention
-      ? 'Content mentions Needham'
-      : localMentions.length > 0
-        ? `Content mentions local area (${localMentions.slice(0, 3).join(', ')})`
-        : 'No strong geographic signals detected — allowing by default',
+    reason,
     detectedLocations: localMentions,
   };
 }
@@ -207,23 +213,31 @@ export function checkGeographicRelevance(
  * Primarily catches Patch URLs from other states/towns.
  */
 export function isUrlGeographicallyRelevant(url: string): boolean {
-  const u = url.toLowerCase();
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return false; // Malformed URL — reject
+  }
 
-  // Always allow Needham-specific domains
-  if (u.includes('needhamma.gov')) return true;
-  if (u.includes('needham.k12')) return true;
-  if (u.includes('needhamobserver')) return true;
-  if (u.includes('needhamlocal')) return true;
-  if (u.includes('needhamchannel')) return true;
+  const host = parsed.hostname.toLowerCase();
+  const fullUrl = parsed.href.toLowerCase();
+
+  // Always allow Needham-specific domains (exact host match)
+  if (host.endsWith('needhamma.gov')) return true;
+  if (host.endsWith('needham.k12.ma.us')) return true;
+  if (host.endsWith('needhamobserver.com')) return true;
+  if (host.endsWith('needhamlocal.org')) return true;
+  if (host.endsWith('needhamchannel.org')) return true;
 
   // Patch: only allow Massachusetts/Needham paths
-  if (u.includes('patch.com')) {
-    return u.includes('patch.com/massachusetts/needham');
+  if (host === 'patch.com' || host.endsWith('.patch.com')) {
+    return fullUrl.includes('/massachusetts/needham');
   }
 
   // Wicked Local: only allow Needham paths
-  if (u.includes('wickedlocal.com')) {
-    return u.includes('needham');
+  if (host === 'wickedlocal.com' || host.endsWith('.wickedlocal.com')) {
+    return fullUrl.includes('needham');
   }
 
   // Block obviously non-MA paths on generic news sites
@@ -231,7 +245,7 @@ export function isUrlGeographicallyRelevant(url: string): boolean {
     '/connecticut/', '/new-york/', '/new-jersey/', '/california/',
     '/florida/', '/texas/', '/pennsylvania/', '/virginia/',
   ];
-  if (blockedPathSegments.some(seg => u.includes(seg))) {
+  if (blockedPathSegments.some(seg => fullUrl.includes(seg))) {
     return false;
   }
 

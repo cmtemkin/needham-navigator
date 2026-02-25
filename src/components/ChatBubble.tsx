@@ -18,9 +18,11 @@ interface ChatBubbleProps {
   message: ChatMessage;
   onFollowupClick?: (question: string) => void;
   sessionId?: string;
+  /** When true, shows an AI disclaimer below the message */
+  isFirstAiMessage?: boolean;
 }
 
-export function ChatBubble({ message, onFollowupClick, sessionId }: ChatBubbleProps) {
+export function ChatBubble({ message, onFollowupClick, sessionId, isFirstAiMessage }: ChatBubbleProps) {
   if (message.role === "typing") {
     return (
       <div
@@ -56,7 +58,7 @@ export function ChatBubble({ message, onFollowupClick, sessionId }: ChatBubblePr
         N
       </div>
       <div>
-        <div className="max-w-[92%] sm:max-w-[80%] bg-white border border-border-light rounded-2xl rounded-bl-md px-[18px] py-3.5 shadow-xs text-[14.5px] text-text-primary leading-relaxed">
+        <div className="max-w-[92%] sm:max-w-[80%] bg-white border border-border-light rounded-2xl rounded-bl-md px-[18px] py-3.5 shadow-xs text-[14.5px] text-text-primary leading-relaxed overflow-hidden break-words">
           {/* Render markdown-like text */}
           <div
             className={[
@@ -69,6 +71,7 @@ export function ChatBubble({ message, onFollowupClick, sessionId }: ChatBubblePr
               "[&_a]:text-primary [&_a]:underline [&_a]:decoration-primary/30 [&_a]:underline-offset-2 [&_a:hover]:decoration-primary/60",
               "[&_ul_ul]:my-2 [&_ol_ol]:my-2 [&_ul_ol]:my-2 [&_ol_ul]:my-2",
             ].join(" ")}
+            // nosemgrep: react-dangerouslysetinnerhtml -- server-generated markdown, not user HTML
             dangerouslySetInnerHTML={{ __html: formatMarkdown(message.text) }}
           />
 
@@ -93,7 +96,7 @@ export function ChatBubble({ message, onFollowupClick, sessionId }: ChatBubblePr
                 <button
                   key={followup}
                     onClick={() => onFollowupClick?.(followup)}
-                    className="px-3.5 py-[7px] bg-white border border-border-default rounded-[20px] text-[12.5px] text-text-secondary font-medium hover:border-primary hover:text-primary hover:bg-[#F5F8FC] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    className="px-3.5 py-2.5 min-h-[44px] flex items-center bg-white border border-border-default rounded-[20px] text-[12.5px] text-text-secondary font-medium hover:border-primary hover:text-primary hover:bg-[#F5F8FC] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                   >
                     {followup}
                   </button>
@@ -103,6 +106,13 @@ export function ChatBubble({ message, onFollowupClick, sessionId }: ChatBubblePr
 
           {/* Feedback */}
           <FeedbackButtons responseId={message.id} sessionId={sessionId} />
+
+          {/* AI disclaimer — shown on first AI response only */}
+          {isFirstAiMessage && (
+            <p className="text-[10px] text-text-muted mt-2">
+              AI answers may not be current — always verify with official sources.
+            </p>
+          )}
         </div>
       </div>
     </div>

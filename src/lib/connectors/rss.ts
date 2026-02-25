@@ -73,6 +73,7 @@ function parseRssXml(xml: string): RssEntry[] {
 
 function extractTag(xml: string, tag: string): string {
   const match = xml.match(
+    // nosemgrep: detect-non-literal-regexp -- tag is a hardcoded XML element name
     new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, "i")
   );
   return match?.[1]?.trim() ?? "";
@@ -80,6 +81,7 @@ function extractTag(xml: string, tag: string): string {
 
 function extractAttr(xml: string, tag: string, attr: string): string {
   const match = xml.match(
+    // nosemgrep: detect-non-literal-regexp -- tag/attr are hardcoded XML names
     new RegExp(`<${tag}[^>]*${attr}="([^"]*)"`, "i")
   );
   return match?.[1]?.trim() ?? "";
@@ -91,15 +93,15 @@ function stripCdata(text: string): string {
 
 function stripHtml(text: string): string {
   return text
-    .replace(/<[^>]+>/g, " ")
+    .replaceAll(/<[^>]+>/g, " ")
     // Decode named entities — &amp; must be last to prevent double-decoding
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/\s+/g, " ")
+    .replaceAll(/&lt;/g, "<")
+    .replaceAll(/&gt;/g, ">")
+    .replaceAll(/&quot;/g, '"')
+    .replaceAll(/&#39;/g, "'")
+    .replaceAll(/&nbsp;/g, " ")
+    .replaceAll(/&amp;/g, "&")
+    .replaceAll(/\s+/g, " ")
     .trim();
 }
 
@@ -157,6 +159,7 @@ export function createRssConnector(
           category: config.category as ContentCategory,
           title: entry.title,
           content,
+          summary: entry.description ? entry.description.slice(0, 300) : undefined,
           published_at: entry.pubDate
             ? new Date(entry.pubDate)
             : new Date(),

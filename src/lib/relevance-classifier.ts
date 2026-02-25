@@ -69,9 +69,10 @@ function isNeedhamDomain(hostname: string): boolean {
 // ---------------------------------------------------------------------------
 
 const ARCHIVE_URL_PATTERNS = [
-  /\/archive\.asp/i,
-  /\/archivecenter\//i,
-  /\/archive\//i,
+  /\/archive\.aspx?/i,       // archive.asp and archive.aspx
+  /\/archivecenter/i,         // /archivecenter/ or /ArchiveCenter.aspx
+  /\/archive\//i,             // /archive/ path segment
+  /\barchive_id=/i,           // CivicPlus archive query param
 ];
 
 function isArchiveUrl(url: string): boolean {
@@ -127,6 +128,9 @@ export function classifyDocument(url: string, title?: string): RelevanceTier {
  */
 export const DEFAULT_SEARCH_TIERS: RelevanceTier[] = ["primary", "regional"];
 export const EXPANDED_SEARCH_TIERS: RelevanceTier[] = ["primary", "regional", "state"];
+export const FALLBACK_SEARCH_TIERS: RelevanceTier[] = [
+  "primary", "regional", "state", "supplementary",
+];
 export const ALL_SEARCH_TIERS: RelevanceTier[] = [
   "primary", "regional", "state", "supplementary", "archive", "irrelevant",
 ];

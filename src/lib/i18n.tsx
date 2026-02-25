@@ -43,6 +43,10 @@ const DICTIONARIES: Record<LanguageCode, Record<string, string>> = {
     "hero.subtitle":
       "Ask questions about town services, permits, schools, zoning, and more. Get instant answers with official sources.",
     "hero.search_placeholder": "Try: \"What permits do I need for a deck?\"",
+    "hero.placeholder_2": "Try: \"When is the transfer station open?\"",
+    "hero.placeholder_3": "Try: \"How do I enroll my child in school?\"",
+    "hero.placeholder_4": "Try: \"What are the property tax rates?\"",
+    "hero.placeholder_5": "Try: \"Is there a snow parking ban?\"",
     "hero.ask_navigator": "Ask Navigator",
     "hero.powered_by": "Powered by AI · Sourced from official {town} documents",
     "home.help_title": "What can we help you with?",
@@ -88,6 +92,7 @@ const DICTIONARIES: Record<LanguageCode, Record<string, string>> = {
     "permits.back": "Back",
     "permits.disclaimer": "This is an estimate based on common scenarios. Actual requirements may vary based on your specific property, zoning district, and project details. Always verify with the {town} Building Department at {phone} before starting your project.",
     "permits.page_disclaimer": "This tool provides general guidance. Always verify requirements with the {town} Building Department at {phone}. This is not legal or professional advice.",
+    "source.verified": "Verified {date}",
   },
   es: {
     "language.label": "Idioma",
@@ -117,6 +122,10 @@ const DICTIONARIES: Record<LanguageCode, Record<string, string>> = {
     "hero.subtitle":
       "Haz preguntas sobre servicios municipales, permisos, escuelas, zonificacion y mas. Obten respuestas instantaneas con fuentes oficiales.",
     "hero.search_placeholder": "Prueba: \"Que permisos necesito para una terraza?\"",
+    "hero.placeholder_2": "Prueba: \"Cuando esta abierta la estacion de transferencia?\"",
+    "hero.placeholder_3": "Prueba: \"Como inscribo a mi hijo en la escuela?\"",
+    "hero.placeholder_4": "Prueba: \"Cuales son las tasas de impuestos?\"",
+    "hero.placeholder_5": "Prueba: \"Hay una prohibicion de estacionamiento por nieve?\"",
     "hero.ask_navigator": "Preguntar",
     "hero.powered_by": "Con IA · Basado en documentos oficiales de {town}",
     "home.help_title": "En que podemos ayudarte?",
@@ -162,6 +171,7 @@ const DICTIONARIES: Record<LanguageCode, Record<string, string>> = {
     "permits.back": "Atras",
     "permits.disclaimer": "Esta es una estimacion basada en escenarios comunes. Los requisitos reales pueden variar. Verifica siempre con el Departamento de Construccion de {town} al {phone} antes de comenzar tu proyecto.",
     "permits.page_disclaimer": "Esta herramienta proporciona orientacion general. Verifica siempre los requisitos con el Departamento de Construccion de {town} al {phone}. Esto no es asesoramiento legal ni profesional.",
+    "source.verified": "Verificado {date}",
   },
   zh: {
     "language.label": "语言",
@@ -191,6 +201,10 @@ const DICTIONARIES: Record<LanguageCode, Record<string, string>> = {
     "hero.subtitle":
       "可咨询城镇服务、许可、学校、分区等问题。基于官方来源快速获得答案。",
     "hero.search_placeholder": "例如：\"建露台需要什么许可？\"",
+    "hero.placeholder_2": "例如：\"垃圾中转站什么时候开放？\"",
+    "hero.placeholder_3": "例如：\"如何让孩子入学？\"",
+    "hero.placeholder_4": "例如：\"房产税率是多少？\"",
+    "hero.placeholder_5": "例如：\"有雪天停车禁令吗？\"",
     "hero.ask_navigator": "开始提问",
     "hero.powered_by": "由 AI 提供支持 · 基于 {town} 官方文件",
     "home.help_title": "我们可以帮您什么？",
@@ -236,6 +250,7 @@ const DICTIONARIES: Record<LanguageCode, Record<string, string>> = {
     "permits.back": "返回",
     "permits.disclaimer": "这是基于常见情况的估算。实际要求可能因具体房产、分区和项目细节而异。在开始项目前，请务必致电 {phone} 向 {town} 建筑部门确认。",
     "permits.page_disclaimer": "本工具仅提供一般性指导。请务必致电 {phone} 向 {town} 建筑部门确认要求。本工具不构成法律或专业建议。",
+    "source.verified": "已验证 {date}",
   },
 };
 

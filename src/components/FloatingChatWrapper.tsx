@@ -14,7 +14,7 @@ interface FloatingChatWrapperProps {
  * Wrapper component that mounts the FloatingChat and registers it with ChatContext.
  * Automatically hides on the /chat page to avoid conflicts with the old chat UI.
  */
-export function FloatingChatWrapper({ townId, assistantName }: FloatingChatWrapperProps) {
+export function FloatingChatWrapper({ townId, assistantName }: Readonly<FloatingChatWrapperProps>) {
   const pathname = usePathname();
   const { registerChatWidget } = useChatWidget();
   const chatRef = useRef<FloatingChatHandle>(null);

@@ -60,3 +60,9 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* Scroll fade affordance — signals more content off-screen */
+.scroll-fade-right {
+  mask-image: linear-gradient(to right, black calc(100% - 40px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black calc(100% - 40px), transparent 100%);
+}

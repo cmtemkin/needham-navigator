@@ -51,7 +51,7 @@ function getSourceColor(sourceId: string): string {
 // News Card Component
 // ---------------------------------------------------------------------------
 
-function NewsCard({ item, newsSources }: { item: ContentItem; newsSources?: Record<string, string> }) {
+function NewsCard({ item, newsSources }: Readonly<{ item: ContentItem; newsSources?: Record<string, string> }>) {
   const displayText = stripMarkdown(item.summary || item.content?.slice(0, 200) || "");
 
   return (

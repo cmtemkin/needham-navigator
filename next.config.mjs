@@ -4,7 +4,7 @@
 // content directly via rewrite. On unrecognized hosts the filesystem
 // page.tsx redirect to /{DEFAULT_TOWN_ID} kicks in as a fallback.
 const NEEDHAM_HOSTS =
-  "(?:needhamnavigator\\.com|www\\.needhamnavigator\\.com|localhost(?::\\d+)?|.*\\.vercel\\.app)";
+  "(?:needhamnavigator\\.com|www\\.needhamnavigator\\.com|staging\\.needhamnavigator\\.com|localhost(?::\\d+)?|.*\\.vercel\\.app)";
 
 const nextConfig = {
   turbopack: {

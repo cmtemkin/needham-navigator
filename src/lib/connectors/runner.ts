@@ -80,6 +80,76 @@ type LoadedConfig = ConnectorConfig & {
 // Upsert content items into Supabase
 // ---------------------------------------------------------------------------
 
+type SupabaseServiceClient = ReturnType<typeof getSupabaseServiceClient>;
+
+async function upsertSingleItem(
+  supabase: SupabaseServiceClient,
+  townId: string,
+  item: ContentItem,
+  shouldEmbed: boolean
+): Promise<{ upserted: boolean }> {
+  let embeddingValues: number[] | null = null;
+  if (shouldEmbed && item.content) {
+    const textToEmbed = `${item.title}\n\n${item.summary || item.content}`.slice(
+      0,
+      8000
+    );
+    try {
+      embeddingValues = await generateEmbedding(textToEmbed);
+    } catch (err) {
+      console.warn(
+        `[runner] Failed to embed item "${item.title}": ${err}`
+      );
+    }
+  }
+
+  const row = {
+    town_id: townId,
+    source_id: item.source_id,
+    category: item.category,
+    title: item.title,
+    content: item.content,
+    summary: item.summary ?? null,
+    published_at: item.published_at.toISOString(),
+    expires_at: item.expires_at?.toISOString() ?? null,
+    url: item.url ?? null,
+    image_url: item.image_url ?? null,
+    metadata: item.metadata,
+    content_hash: item.content_hash,
+    embedding: null, // Vectors stored in Pinecone, not Supabase
+    updated_at: new Date().toISOString(),
+  };
+
+  const { data: upsertedRow, error } = await supabase.from("content_items").upsert(row, {
+    onConflict: "town_id,source_id,content_hash",
+    ignoreDuplicates: false,
+  }).select("id").single();
+
+  if (error) {
+    if (error.code !== "23505") {
+      console.error(
+        `[runner] Upsert error for "${item.title}": ${error.message}`
+      );
+    }
+    return { upserted: false };
+  }
+
+  if (embeddingValues && upsertedRow?.id) {
+    try {
+      const tier = item.url ? classifyDocument(item.url, item.title) : "supplementary";
+      await upsertToPinecone(PINECONE_NS_CONTENT, [{
+        id: upsertedRow.id,
+        values: embeddingValues,
+        metadata: { town_id: townId, source_id: item.source_id, relevance_tier: tier },
+      }]);
+    } catch (pineconeErr) {
+      console.warn(`[runner] Pinecone upsert failed for "${item.title}": ${pineconeErr}`);
+    }
+  }
+
+  return { upserted: true };
+}
+
 async function upsertContentItems(
   townId: string,
   items: ContentItem[],
@@ -92,70 +162,11 @@ async function upsertContentItems(
   let skipped = 0;
 
   for (const item of items) {
-    // Generate embedding if configured (stored in Pinecone, not Supabase)
-    let embeddingValues: number[] | null = null;
-    if (shouldEmbed && item.content) {
-      const textToEmbed = `${item.title}\n\n${item.summary || item.content}`.slice(
-        0,
-        8000
-      );
-      try {
-        embeddingValues = await generateEmbedding(textToEmbed);
-      } catch (err) {
-        console.warn(
-          `[runner] Failed to embed item "${item.title}": ${err}`
-        );
-      }
-    }
-
-    const row = {
-      town_id: townId,
-      source_id: item.source_id,
-      category: item.category,
-      title: item.title,
-      content: item.content,
-      summary: item.summary ?? null,
-      published_at: item.published_at.toISOString(),
-      expires_at: item.expires_at?.toISOString() ?? null,
-      url: item.url ?? null,
-      image_url: item.image_url ?? null,
-      metadata: item.metadata,
-      content_hash: item.content_hash,
-      embedding: null, // Vectors stored in Pinecone, not Supabase
-      updated_at: new Date().toISOString(),
-    };
-
-    const { data: upsertedRow, error } = await supabase.from("content_items").upsert(row, {
-      onConflict: "town_id,source_id,content_hash",
-      ignoreDuplicates: false,
-    }).select("id").single();
-
-    if (error) {
-      // Duplicate = skip (content hasn't changed)
-      if (error.code === "23505") {
-        skipped++;
-      } else {
-        console.error(
-          `[runner] Upsert error for "${item.title}": ${error.message}`
-        );
-        skipped++;
-      }
-    } else {
+    const result = await upsertSingleItem(supabase, townId, item, shouldEmbed);
+    if (result.upserted) {
       upserted++;
-
-      // Upsert embedding to Pinecone if we generated one
-      if (embeddingValues && upsertedRow?.id) {
-        try {
-          const tier = item.url ? classifyDocument(item.url, item.title) : "supplementary";
-          await upsertToPinecone(PINECONE_NS_CONTENT, [{
-            id: upsertedRow.id,
-            values: embeddingValues,
-            metadata: { town_id: townId, source_id: item.source_id, relevance_tier: tier },
-          }]);
-        } catch (pineconeErr) {
-          console.warn(`[runner] Pinecone upsert failed for "${item.title}": ${pineconeErr}`);
-        }
-      }
+    } else {
+      skipped++;
     }
   }
 
@@ -214,6 +225,13 @@ export async function runConnectors(
   options: RunOptions = {}
 ): Promise<ConnectorResult[]> {
   const configs = await loadSourceConfigs(options.townId);
+
+  if (configs.length === 0) {
+    console.warn(
+      `[runner] No source_configs found for town=${options.townId ?? "all"}. Run seed-sources.ts to populate.`
+    );
+  }
+
   const results: ConnectorResult[] = [];
 
   for (const config of configs as LoadedConfig[]) {
@@ -275,6 +293,14 @@ export async function runConnectors(
         durationMs: Date.now() - startTime,
       });
     }
+  }
+
+  if (results.length > 0) {
+    const totalUpserted = results.reduce((s, r) => s + r.itemsUpserted, 0);
+    const totalErrors = results.reduce((s, r) => s + r.errors.length, 0);
+    console.log(
+      `[runner] Completed: ${results.length} connectors, ${totalUpserted} items upserted, ${totalErrors} errors`
+    );
   }
 
   return results;

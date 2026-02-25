@@ -13,7 +13,7 @@ const STORAGE_KEY = "nn-chat-history";
 const MAX_CONVERSATIONS = 20;
 
 export function getConversations(townId: string): SavedConversation[] {
-  if (typeof window === "undefined") return [];
+  if (globalThis.window === undefined) return [];
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     const all: SavedConversation[] = raw ? JSON.parse(raw) : [];
@@ -26,7 +26,7 @@ export function getConversations(townId: string): SavedConversation[] {
 }
 
 export function saveConversation(conversation: SavedConversation): void {
-  if (typeof window === "undefined") return;
+  if (globalThis.window === undefined) return;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     let all: SavedConversation[] = raw ? JSON.parse(raw) : [];
@@ -52,7 +52,7 @@ export function saveConversation(conversation: SavedConversation): void {
 }
 
 export function deleteConversation(id: string): void {
-  if (typeof window === "undefined") return;
+  if (globalThis.window === undefined) return;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     const all: SavedConversation[] = raw ? JSON.parse(raw) : [];
