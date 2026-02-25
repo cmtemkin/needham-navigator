@@ -17,6 +17,8 @@ export default [
       "*.config.mjs",
       "jest.config.ts",
       "tailwind.config.ts",
+      "scripts/pw/**",
+      "scripts/run_qa.js",
     ],
   },
   // JavaScript files

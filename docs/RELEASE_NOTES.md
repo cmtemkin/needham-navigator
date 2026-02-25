@@ -2,6 +2,30 @@
 
 ---
 
+## v0.18.0 — 2026-02-25
+
+**Events Calendar, Pipeline Health Dashboard, Mass.gov Search Expansion, Security Hardening**
+
+### New Features
+- **Events calendar** — Full month-view calendar UI at `/<town>/events` with colored event dots (purple = Town, blue = Library, green = Schools), day detail panel, source filters (All/Town/Library/Schools), Month/List view toggle, and month navigation (PR #141)
+- **Calendar subscribe** — "Subscribe to Calendar" button copies an iCal feed URL for Google Calendar, Apple Calendar, or Outlook. Per-event "Add to Calendar" dropdown with Google Calendar link and .ics download (PR #141)
+- **ICS feed endpoint** — `/api/events/ics?town=needham` returns a VCALENDAR feed with events for the past 7 days + next 90 days, 1-hour cache (PR #141)
+- **Pipeline Health dashboard** — New "Pipeline" tab in admin showing connector health (healthy/warning/error/disabled badges), last pipeline run, content freshness KPIs, and article generation stats (PR #140)
+- **Mass.gov query expansion** — 20+ new regex patterns in the query tier router so searches about building codes, septic, property assessment, conservation, firearms/liquor licenses, and special education now include relevant mass.gov results alongside local content (PR #137)
+
+### Bug Fixes
+- **Duplicate search bars** — Fixed homepage showing two search bars by adding case-insensitive regex and sticky positioning (PR #143)
+- **iCal injection** — Backslash escaping now runs before other iCal escape sequences to prevent content injection (PR #143)
+
+### Security
+- **12 CodeQL alerts resolved** — SSRF re-parse in test-url endpoint, log injection prevention in connector runner, exact domain matching in geo-filter (PR #143)
+- **~70 SonarCloud issues resolved** — `.replace(/g)` → `.replaceAll()`, `Readonly<>` props, nested ternary extraction, `globalThis` usage, negated condition flips across 28 files (PR #143)
+
+### Infrastructure
+- **Event source configs** — Seed script for 5 event sources: 3 town iCal feeds (enabled), library scraper + school calendar (disabled pending setup) (PR #141)
+
+---
+
 ## v0.17.0 — 2026-02-24
 
 **UX Polish, Search Quality, and Security Hardening**
