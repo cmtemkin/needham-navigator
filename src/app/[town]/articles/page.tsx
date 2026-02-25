@@ -470,7 +470,7 @@ export default function ArticlesPage() {
 
           {loading && (
             <div className="space-y-4">
-              {[...new Array(6)].map((_, i) => (
+              {Array.from({ length: 6 }, (_, i) => (
                 <ArticleSkeleton key={`skeleton-${i}`} variant="list" />
               ))}
             </div>

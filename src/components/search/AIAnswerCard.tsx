@@ -73,12 +73,12 @@ function AnswerBody({
   sources,
   onFollowUp,
   badge,
-}: {
+}: Readonly<{
   html: string;
   sources: { title: string; url: string; date?: string }[];
   onFollowUp: (question: string) => void;
   badge?: React.ReactNode;
-}) {
+}>) {
   return (
     <div className="bg-gradient-to-br from-[#EBF5FF] to-[#F0F9FF] border border-[#BAE6FF] rounded-xl p-5 mb-6">
       <div className="flex items-center gap-2 mb-4">

@@ -1,27 +1,27 @@
-/* global self, caches, fetch */
+/* global caches, fetch */
 const CACHE_NAME = 'nn-v1';
 const OFFLINE_URL = '/offline.html';
 
 // Install: cache the offline page
-self.addEventListener('install', (event) => {
+globalThis.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.add(OFFLINE_URL))
   );
-  self.skipWaiting();
+  globalThis.skipWaiting();
 });
 
 // Activate: clean old caches
-self.addEventListener('activate', (event) => {
+globalThis.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
     )
   );
-  self.clients.claim();
+  globalThis.clients.claim();
 });
 
 // Fetch: network-first for navigation, cache-first for static assets
-self.addEventListener('fetch', (event) => {
+globalThis.addEventListener('fetch', (event) => {
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request).catch(() => caches.match(OFFLINE_URL))

@@ -145,7 +145,7 @@ export function EventDetailPanel({
         <h3 className="text-sm font-semibold text-text-primary mb-3 flex items-center gap-2">
           <Calendar size={15} className="text-[var(--primary)]" />
           {date.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
-          <span className="text-text-muted font-normal">({events.length} event{events.length !== 1 ? "s" : ""})</span>
+          <span className="text-text-muted font-normal">({events.length} event{events.length === 1 ? "" : "s"})</span>
         </h3>
       )}
       <div className="space-y-3">

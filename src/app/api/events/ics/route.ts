@@ -30,16 +30,18 @@ interface EventRow {
 }
 
 function escapeICalText(text: string): string {
+  // Escape backslash first, then other special chars
+  // Use string literals (not regex) for CodeQL sanitization tracking
   return text
-    .replace(/\\/g, "\\\\")
-    .replace(/;/g, "\\;")
-    .replace(/,/g, "\\,")
-    .replace(/\n/g, "\\n");
+    .replaceAll("\\", "\\\\")
+    .replaceAll(";", "\\;")
+    .replaceAll(",", "\\,")
+    .replaceAll("\n", "\\n");
 }
 
 function toICalDate(dateStr: string): string {
   const d = new Date(dateStr);
-  return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  return d.toISOString().replaceAll(/[-:]/g, "").replace(/\.\d{3}/, "");
 }
 
 function generateVCalendar(events: EventRow[]): string {

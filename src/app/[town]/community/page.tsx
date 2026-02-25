@@ -225,7 +225,7 @@ export default function CommunityPage() {
                     </div>
                   </div>
                   <a
-                    href={`tel:${policeDept.phone.replace(/[^\d+]/g, "")}`}
+                    href={`tel:${policeDept.phone.replaceAll(/[^\d+]/g, "")}`}
                     className="inline-flex items-center gap-2 text-[15px] text-[var(--primary)] font-semibold hover:text-[var(--primary-dark)] transition-colors"
                   >
                     <Phone size={16} />
@@ -246,7 +246,7 @@ export default function CommunityPage() {
                     </div>
                   </div>
                   <a
-                    href={`tel:${fireDept.phone.replace(/[^\d+]/g, "")}`}
+                    href={`tel:${fireDept.phone.replaceAll(/[^\d+]/g, "")}`}
                     className="inline-flex items-center gap-2 text-[15px] text-[var(--primary)] font-semibold hover:text-[var(--primary-dark)] transition-colors"
                   >
                     <Phone size={16} />

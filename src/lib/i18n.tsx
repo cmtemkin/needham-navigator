@@ -268,7 +268,7 @@ function interpolate(
   template: string,
   replacements?: Record<string, string>
 ): string {
-  return template.replace(/\{(\w+)\}/g, (_match, token: string) => {
+  return template.replaceAll(/\{(\w+)\}/g, (_match, token: string) => {
     return replacements?.[token] ?? `{${token}}`;
   });
 }

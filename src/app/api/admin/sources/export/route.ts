@@ -31,8 +31,8 @@ export async function GET(request: Request): Promise<Response> {
       headers.join(","),
       ...sources.map((s) =>
         [
-          `"${(s.url ?? "").replace(/"/g, '""')}"`,
-          `"${(s.name ?? "").replace(/"/g, '""')}"`,
+          `"${(s.url ?? "").replaceAll('"', '""')}"`,
+          `"${(s.name ?? "").replaceAll('"', '""')}"`,
           s.category,
           s.priority,
           s.update_frequency,

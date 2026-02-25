@@ -302,7 +302,7 @@ export async function POST(request: Request): Promise<Response> {
 
         // Post-stream: parse USED_SOURCES metadata and update sources
         let filteredSources = sources;
-        const usedSourcesMatch = fullText.match(/USED_SOURCES:\s*(.+?)(?:\n|$)/i);
+        const usedSourcesMatch = /USED_SOURCES:\s*(.+?)(?:\n|$)/i.exec(fullText);
 
         if (usedSourcesMatch) {
           const usedSourcesStr = usedSourcesMatch[1].trim();

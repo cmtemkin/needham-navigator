@@ -143,7 +143,7 @@ function deduplicateByTitle(results: SearchResult[]): SearchResult[] {
 
   for (const result of results) {
     const normalized = stripTownSuffix(result.title.toLowerCase())
-      .replace(/\s+/g, ' ')
+      .replaceAll(/\s+/g, ' ')
       .trim();
 
     // Skip very short or generic titles to avoid false merges

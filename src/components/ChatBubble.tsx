@@ -22,7 +22,7 @@ interface ChatBubbleProps {
   isFirstAiMessage?: boolean;
 }
 
-export function ChatBubble({ message, onFollowupClick, sessionId, isFirstAiMessage }: ChatBubbleProps) {
+export function ChatBubble({ message, onFollowupClick, sessionId, isFirstAiMessage }: Readonly<ChatBubbleProps>) {
   if (message.role === "typing") {
     return (
       <div
@@ -132,12 +132,12 @@ function TypingDots() {
 function formatMarkdown(text: string): string {
   // Inline formatting first (before line-level processing)
   const processed = text
-    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-    .replace(
+    .replaceAll(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replaceAll(
       /\((\d{3})\)\s*(\d{3})-(\d{4})/g,
       '<a href="tel:+1$1$2$3">($1) $2-$3</a>'
     )
-    .replace(
+    .replaceAll(
       /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,
       '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
     );
@@ -188,10 +188,10 @@ function formatMarkdown(text: string): string {
 
   // Clean up artifacts
   html = html
-    .replace(/<br><\/p>/g, "</p>")
-    .replace(/<p><\/p>/g, "")
-    .replace(/<br>(<ul>|<ol[\s>])/g, "$1")
-    .replace(/(<\/ul>|<\/ol>)<br>/g, "$1");
+    .replaceAll(/<br><\/p>/g, "</p>")
+    .replaceAll(/<p><\/p>/g, "")
+    .replaceAll(/<br>(<ul>|<ol[\s>])/g, "$1")
+    .replaceAll(/(<\/ul>|<\/ol>)<br>/g, "$1");
 
   return html;
 }
