@@ -82,10 +82,10 @@ function extractICalDate(block: string, prop: string): string {
 
 function unfoldICalText(text: string): string {
   return text
-    .replace(/\\n/g, "\n")
-    .replace(/\\,/g, ",")
-    .replace(/\\;/g, ";")
-    .replace(/\\\\/g, "\\")
+    .replaceAll("\\n", "\n")
+    .replaceAll("\\,", ",")
+    .replaceAll("\\;", ";")
+    .replaceAll("\\\\", "\\")
     .trim();
 }
 

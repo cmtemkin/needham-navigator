@@ -6,7 +6,7 @@ import type { EventItem } from "./CalendarView";
 
 function formatGCalDate(dateStr: string): string {
   const d = new Date(dateStr);
-  return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  return d.toISOString().replaceAll(/[-:]/g, "").replace(/\.\d{3}/, "");
 }
 
 function generateGoogleCalendarUrl(event: EventItem): string {
@@ -26,16 +26,17 @@ function generateGoogleCalendarUrl(event: EventItem): string {
 
 function formatICalDate(dateStr: string): string {
   const d = new Date(dateStr);
-  return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  return d.toISOString().replaceAll(/[-:]/g, "").replace(/\.\d{3}/, "");
 }
 
 function generateIcsContent(event: EventItem): string {
   const start = event.metadata?.event_start || event.published_at;
   const end = event.metadata?.event_end || start;
   const description = (event.summary || event.content?.slice(0, 500) || "")
-    .replace(/\n/g, "\\n")
-    .replace(/,/g, "\\,")
-    .replace(/;/g, "\\;");
+    .replaceAll(/\\/g, "\\\\")
+    .replaceAll(/\n/g, "\\n")
+    .replaceAll(/,/g, "\\,")
+    .replaceAll(/;/g, "\\;");
 
   const lines = [
     "BEGIN:VCALENDAR",
@@ -45,8 +46,8 @@ function generateIcsContent(event: EventItem): string {
     "BEGIN:VEVENT",
     `DTSTART:${formatICalDate(start)}`,
     `DTEND:${formatICalDate(end)}`,
-    `SUMMARY:${event.title.replace(/,/g, "\\,").replace(/;/g, "\\;")}`,
-    `LOCATION:${(event.metadata?.event_location || "").replace(/,/g, "\\,").replace(/;/g, "\\;")}`,
+    `SUMMARY:${event.title.replaceAll(/\\/g, "\\\\").replaceAll(/,/g, "\\,").replaceAll(/;/g, "\\;")}`,
+    `LOCATION:${(event.metadata?.event_location || "").replaceAll(/\\/g, "\\\\").replaceAll(/,/g, "\\,").replaceAll(/;/g, "\\;")}`,
     `DESCRIPTION:${description}`,
   ];
 
@@ -69,10 +70,10 @@ function downloadIcs(event: EventItem) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `${event.title.replace(/[^a-zA-Z0-9]/g, "-").slice(0, 50)}.ics`;
+  a.download = `${event.title.replaceAll(/[^a-zA-Z0-9]/g, "-").slice(0, 50)}.ics`;
   document.body.appendChild(a);
   a.click();
-  document.body.removeChild(a);
+  a.remove();
   URL.revokeObjectURL(url);
 }
 

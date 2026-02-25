@@ -1432,7 +1432,7 @@ function SourcesTab({ password }: { password: string }) {
                 className="w-full px-3 py-2 rounded-lg border border-border-default text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
               >
                 {SOURCE_CATEGORIES.map((c) => (
-                  <option key={c} value={c}>{c.replace(/_/g, " ")}</option>
+                  <option key={c} value={c}>{c.replaceAll("_", " ")}</option>
                 ))}
               </select>
             </div>
@@ -1609,7 +1609,7 @@ function SourcesTab({ password }: { password: string }) {
         >
           <option value="">All Categories</option>
           {categories.map((c) => (
-            <option key={c} value={c}>{c.replace(/_/g, " ")}</option>
+            <option key={c} value={c}>{c.replaceAll("_", " ")}</option>
           ))}
         </select>
 
@@ -1656,8 +1656,8 @@ function SourcesTab({ password }: { password: string }) {
 
       {/* Source count */}
       <div className="text-sm text-text-muted mb-3">
-        {sources.length} source{sources.length !== 1 ? "s" : ""}
-        {categoryFilter ? ` in ${categoryFilter.replace(/_/g, " ")}` : ""}
+        {sources.length} source{sources.length === 1 ? "" : "s"}
+        {categoryFilter ? ` in ${categoryFilter.replaceAll("_", " ")}` : ""}
       </div>
 
       {/* Source table */}
@@ -1717,7 +1717,7 @@ function SourcesTab({ password }: { password: string }) {
                   </td>
                   <td className="px-3 py-3">
                     <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700">
-                      {source.category.replace(/_/g, " ")}
+                      {source.category.replaceAll("_", " ")}
                     </span>
                   </td>
                   <td className="px-3 py-3 text-center">

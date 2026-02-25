@@ -88,19 +88,19 @@ function extractAttr(xml: string, tag: string, attr: string): string {
 }
 
 function stripCdata(text: string): string {
-  return text.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1").trim();
+  return text.replaceAll(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1").trim();
 }
 
 function stripHtml(text: string): string {
   return text
     .replaceAll(/<[^>]+>/g, " ")
     // Decode named entities — &amp; must be last to prevent double-decoding
-    .replaceAll(/&lt;/g, "<")
-    .replaceAll(/&gt;/g, ">")
-    .replaceAll(/&quot;/g, '"')
-    .replaceAll(/&#39;/g, "'")
-    .replaceAll(/&nbsp;/g, " ")
-    .replaceAll(/&amp;/g, "&")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">")
+    .replaceAll("&quot;", '"')
+    .replaceAll("&#39;", "'")
+    .replaceAll("&nbsp;", " ")
+    .replaceAll("&amp;", "&")
     .replaceAll(/\s+/g, " ")
     .trim();
 }

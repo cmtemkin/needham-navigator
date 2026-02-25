@@ -142,7 +142,7 @@ function isGenericTitle(title: string): boolean {
 }
 
 function cleanLine(text: string, maxLength = 400): string {
-  const normalized = text.replace(/\s+/g, " ").trim();
+  const normalized = text.replaceAll(/\s+/g, " ").trim();
   if (normalized.length <= maxLength) {
     return normalized;
   }
@@ -990,7 +990,7 @@ export async function textSearchChunks(
 }
 
 export function buildHighlight(chunkText: string, query: string): string {
-  const normalized = chunkText.replace(/\s+/g, " ").trim();
+  const normalized = chunkText.replaceAll(/\s+/g, " ").trim();
   if (!normalized) {
     return "";
   }
@@ -998,7 +998,7 @@ export function buildHighlight(chunkText: string, query: string): string {
   const terms = query
     .toLowerCase()
     .split(/\s+/)
-    .map((term) => term.replace(/[^\w]/g, ""))
+    .map((term) => term.replaceAll(/[^\w]/g, ""))
     .filter((term) => term.length >= 3);
 
   const firstTerm = terms[0];

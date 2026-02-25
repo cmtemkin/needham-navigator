@@ -45,7 +45,8 @@ export async function POST(request: Request): Promise<Response> {
     const timeout = setTimeout(() => controller.abort(), 10000);
 
     try {
-      const res = await fetch(url, { // nosemgrep: js/request-forgery — URL is validated against allowlist above
+      const safeUrl = new URL(url);
+      const res = await fetch(safeUrl.href, { // nosemgrep: js/request-forgery — URL is validated against allowlist above
         method: "HEAD",
         signal: controller.signal,
         redirect: "follow",

@@ -11,10 +11,10 @@ export function cn(...inputs: ClassValue[]) {
  */
 export function stripMarkdown(text: string): string {
   return text
-    .replace(/#{1,6}\s*/g, '')        // headers
-    .replace(/\*\*(.*?)\*\*/g, '$1')  // bold
-    .replace(/\*(.*?)\*/g, '$1')      // italic
-    .replace(/`(.*?)`/g, '$1')        // inline code
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // links
+    .replaceAll(/#{1,6}\s*/g, '')        // headers
+    .replaceAll(/\*\*(.*?)\*\*/g, '$1')  // bold
+    .replaceAll(/\*(.*?)\*/g, '$1')      // italic
+    .replaceAll(/`(.*?)`/g, '$1')        // inline code
+    .replaceAll(/\[([^\]]+)\]\([^)]+\)/g, '$1') // links
     .trim();
 }

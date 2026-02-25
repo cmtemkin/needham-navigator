@@ -27,7 +27,7 @@ export function Header() {
   // Hide header search bar on the homepage (which has its own hero search bar)
   // and on the search results page (which has its own sticky search bar)
   const isOnSearchResults = pathname?.includes("/search");
-  const isOnHomepage = pathname ? /^\/[a-z][a-z0-9-]*\/?$/.test(pathname) : false;
+  const isOnHomepage = pathname ? /^\/[a-z][a-z0-9-]*\/?$/i.test(pathname) : false;
   const hideHeaderSearch = isOnSearchResults || isOnHomepage;
 
   useEffect(() => {

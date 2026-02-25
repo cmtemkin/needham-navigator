@@ -81,13 +81,13 @@ function parseEventDate(dateStr: string): Date | null {
 
   // Try native Date parsing first
   const parsed = new Date(cleaned);
-  if (!isNaN(parsed.getTime())) return parsed;
+  if (!Number.isNaN(parsed.getTime())) return parsed;
 
   // Try extracting date from combined date/time strings
   // Pattern: "Month DD, YYYY at HH:MM AM/PM"
   const withAt = cleaned.replace(/\s+at\s+/i, " ");
   const parsed2 = new Date(withAt);
-  if (!isNaN(parsed2.getTime())) return parsed2;
+  if (!Number.isNaN(parsed2.getTime())) return parsed2;
 
   return null;
 }

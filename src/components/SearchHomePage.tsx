@@ -462,10 +462,10 @@ export function SearchHomePage({ initialQuery = "" }: Readonly<SearchHomePagePro
   }, [openChat, town.town_id]);
 
   const handleFollowUp = useCallback((question: string) => {
-    const answerText = aiAnswer.type === "loaded" ? aiAnswer.html :
-                       aiAnswer.type === "cached" ? aiAnswer.answer.answer_html : "";
-    const sources = aiAnswer.type === "loaded" ? aiAnswer.sources :
-                    aiAnswer.type === "cached" ? aiAnswer.answer.sources : [];
+    const answerText = aiAnswer.type === "loaded" ? aiAnswer.html
+      : (aiAnswer.type === "cached" ? aiAnswer.answer.answer_html : "");
+    const sources = aiAnswer.type === "loaded" ? aiAnswer.sources
+      : (aiAnswer.type === "cached" ? aiAnswer.answer.sources : []);
     openChat({
       message: question,
       context: {
@@ -592,7 +592,7 @@ export function SearchHomePage({ initialQuery = "" }: Readonly<SearchHomePagePro
                       handleSearch(link.label);
                     }}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/10 backdrop-blur-sm text-white text-[13px] font-medium rounded-full hover:bg-white/20 transition-colors border border-white/20"
-                    data-pendo={`quick-link-${link.label.toLowerCase().replace(/\s+/g, '-')}`}
+                    data-pendo={`quick-link-${link.label.toLowerCase().replaceAll(/\s+/g, '-')}`}
                   >
                     <link.icon size={14} />
                     {link.label}
@@ -605,7 +605,7 @@ export function SearchHomePage({ initialQuery = "" }: Readonly<SearchHomePagePro
 
         {/* Sticky Search Bar - Only show when results exist */}
         {showResults && (
-          <div className="sticky top-0 z-40 bg-white border-b border-border-default h-[56px] px-4">
+          <div className="sticky top-[60px] z-40 bg-white border-b border-border-default h-[56px] px-4">
             <div className="max-w-content mx-auto h-full flex items-center gap-2">
               <Search size={18} className="text-text-muted" />
               <input
@@ -654,7 +654,7 @@ export function SearchHomePage({ initialQuery = "" }: Readonly<SearchHomePagePro
 
                     {articlesLoading ? (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {[...new Array(4)].map((_, i) => (
+                        {Array.from({ length: 4 }, (_, i) => (
                           <ArticleSkeleton key={`skeleton-${i}`} variant="grid" />
                         ))}
                       </div>
@@ -698,7 +698,7 @@ export function SearchHomePage({ initialQuery = "" }: Readonly<SearchHomePagePro
                             key={topic.title}
                             href={`/${town.town_id}${topic.townPath}`}
                             className={cardClass}
-                            data-pendo={`topic-${topic.title.toLowerCase().replace(/\s+/g, '-')}`}
+                            data-pendo={`topic-${topic.title.toLowerCase().replaceAll(/\s+/g, '-')}`}
                             onClick={() => trackEvent('topic_card_clicked', { topic: topic.title, town_id: town.town_id })}
                           >
                             {cardContent}
@@ -714,7 +714,7 @@ export function SearchHomePage({ initialQuery = "" }: Readonly<SearchHomePagePro
                             handleSearch(topic.title);
                           }}
                           className={cardClass}
-                          data-pendo={`topic-${topic.title.toLowerCase().replace(/\s+/g, '-')}`}
+                          data-pendo={`topic-${topic.title.toLowerCase().replaceAll(/\s+/g, '-')}`}
                         >
                           {cardContent}
                         </button>

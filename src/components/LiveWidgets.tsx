@@ -239,6 +239,9 @@ function TransitWidget() {
     ? new Date(data.nextDeparture).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
     : "No departures";
 
+  const stopSuffix = data.stopName ? ` · ${data.stopName}` : "";
+  const alertSuffix = data.alertCount === 1 ? "" : "s";
+
   return (
     <Link href={transitHref} className="group block bg-white border border-border-default rounded-xl p-5 hover:border-[var(--primary)] hover:shadow-md transition-all">
       <div className="flex items-center justify-between mb-3">
@@ -252,7 +255,7 @@ function TransitWidget() {
           {fetchedAt && <span className="text-[10px] text-text-muted">{relativeTime(fetchedAt)}</span>}
           {data.alertCount > 0 ? (
             <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-700 uppercase tracking-wider">
-              {data.alertCount} Alert{data.alertCount === 1 ? "" : "s"}
+              {data.alertCount} Alert{alertSuffix}
             </span>
           ) : (
             <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-green-50 text-green-700 uppercase tracking-wider">On Time</span>
@@ -264,7 +267,7 @@ function TransitWidget() {
       </div>
       <div className="text-sm text-text-secondary mb-1">
         {data.nextDeparture
-          ? `Next train${data.stopName ? ` · ${data.stopName}` : ""}`
+          ? `Next train${stopSuffix}`
           : "No upcoming departures today"}
       </div>
       {data.alertCount > 0 && data.alertHeader && (

@@ -42,9 +42,9 @@ function makeEmptyCategories(): Record<CategoryName, string[]> {
 
 function stripInlineMarkdown(text: string): string {
   return text
-    .replace(/\*\*(.+?)\*\*/g, "$1")
-    .replace(/`(.+?)`/g, "$1")
-    .replace(/\[(.+?)\]\((.+?)\)/g, "$1")
+    .replaceAll(/\*\*(.+?)\*\*/g, "$1")
+    .replaceAll(/`(.+?)`/g, "$1")
+    .replaceAll(/\[(.+?)\]\((.+?)\)/g, "$1")
     .trim();
 }
 
