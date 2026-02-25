@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Cloud, Train, Shield, ChevronRight, AlertTriangle } from "lucide-react";
 import { useTown, useTownHref } from "@/lib/town-context";
 import { filterActiveAlerts } from "@/lib/transit-utils";
+import { getEasternTimeHHMM, formatEasternTime } from "@/lib/timezone";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -162,12 +163,12 @@ function TransitWidget() {
     abortRef.current = controller;
 
     try {
-      const now = new Date().toISOString();
-      const minTime = now.split("T")[1]?.slice(0, 5) ?? "00:00";
+      const nowIso = new Date().toISOString();
+      const minTime = getEasternTimeHHMM();
 
       const [alertsRes, schedulesRes] = await Promise.all([
         fetch(
-          `https://api-v3.mbta.com/alerts?filter[route]=${routeId}&filter[datetime]=${now}&sort=-updated_at`,
+          `https://api-v3.mbta.com/alerts?filter[route]=${routeId}&filter[datetime]=${nowIso}&sort=-updated_at`,
           { signal: controller.signal }
         ),
         fetch(
@@ -184,11 +185,18 @@ function TransitWidget() {
       const schedules = schedulesData.data ?? [];
       const stops = schedulesData.included?.filter((i: { type: string }) => i.type === "stop") ?? [];
 
-      const firstSchedule = schedules[0];
-      const departureTime = firstSchedule?.attributes?.departure_time || firstSchedule?.attributes?.arrival_time || null;
-      const stopId = firstSchedule?.relationships?.stop?.data?.id;
+      // Use preferred stop if set, otherwise first departure from any stop
+      const preferredStopId = localStorage.getItem("nn_preferred_stop");
+      type ScheduleItem = { attributes: { departure_time: string | null; arrival_time: string | null; direction_id: number }; relationships?: { stop?: { data?: { id: string } } } };
+      const targetSchedule = preferredStopId
+        ? (schedules as ScheduleItem[]).find(
+            (s) => s.relationships?.stop?.data?.id === preferredStopId
+          ) || schedules[0]
+        : schedules[0];
+      const departureTime = targetSchedule?.attributes?.departure_time || targetSchedule?.attributes?.arrival_time || null;
+      const stopId = targetSchedule?.relationships?.stop?.data?.id;
       const stopName = stops.find((s: { id: string }) => s.id === stopId)?.attributes?.name ?? "";
-      const direction = firstSchedule?.attributes?.direction_id === 0 ? "Outbound" : "Inbound";
+      const direction = targetSchedule?.attributes?.direction_id === 0 ? "Outbound" : "Inbound";
 
       setData({
         nextDeparture: departureTime,
@@ -236,7 +244,7 @@ function TransitWidget() {
   }
 
   const formattedTime = data.nextDeparture
-    ? new Date(data.nextDeparture).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
+    ? formatEasternTime(data.nextDeparture)
     : "No departures";
 
   const stopSuffix = data.stopName ? ` · ${data.stopName}` : "";
@@ -267,7 +275,7 @@ function TransitWidget() {
       </div>
       <div className="text-sm text-text-secondary mb-1">
         {data.nextDeparture
-          ? `Next train${stopSuffix}`
+          ? `Next train${stopSuffix} · ${data.direction}`
           : "No upcoming departures today"}
       </div>
       {data.alertCount > 0 && data.alertHeader && (
