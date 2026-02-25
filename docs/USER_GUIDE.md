@@ -22,8 +22,9 @@ Needham Navigator supports two interface styles (configured via `uiMode` in town
 **Classic Mode (default)** — Chat-first interface with conversational AI as the primary feature. Great for exploratory questions and interactive conversations.
 
 **Search Mode** — Search-first interface optimized for quick lookup and document discovery:
-- Large search bar with instant results from town documents
-- AI-generated answers appear above search results (cached answers show instantly with a green "Instant" badge)
+- Large search bar with rotating example queries and instant results from town documents
+- **Search suggestions** — focusing the search bar shows a filtered suggestions dropdown populated from popular questions
+- AI-generated answers appear above search results with an AI disclaimer note (cached answers show instantly with a green "Instant" badge)
 - Floating chat button in bottom-right corner for follow-up questions
 - "Ask about this" buttons on search results open the chat with context
 - Browse by topic cards and popular questions for discovery
@@ -42,8 +43,9 @@ Navigate to **Ask a Question** from the header or visit `/<town>/chat`.
 - Type any question about town services, permits, zoning, schools, or departments
 - **Use everyday language** — say "the dump" instead of "Transfer Station", "who do I call about a rat" instead of "Board of Health contact" — the AI understands informal phrasing and expands your query automatically
 - The AI responds conversationally with sourced answers, confidence levels, and follow-up suggestions
-- **Clickable sources** — each response shows source pills linking directly to official town pages
+- **Clickable sources with dates** — each response shows source pills linking directly to official town pages, with document date labels (e.g. "Verified Jan 2026") so you know how fresh the data is
 - **Clickable phone numbers** — phone numbers in answers are tap-to-call on mobile
+- **AI disclaimer** — The first AI response in every conversation includes a notice that answers may not be current — always verify with official sources for important decisions
 - **Confidence levels** — "Verified from official sources" (green), "Based on town documents" (yellow), or "Limited information" (orange) helps you know when to verify
 - **Follow-up suggestion chips** — after each AI response, contextual follow-up questions appear (e.g., permit-related questions after a permit answer, school questions after a school answer)
 - **Conversation history** — click the History button to view, restore, or delete past conversations. Up to 20 conversations are saved per town in your browser's local storage.
@@ -101,6 +103,8 @@ A unified feed combining AI-generated articles and external local news in a sing
 **Features:**
 - **Source filter** — filter by All Sources, AI Articles, Patch, Observer, Needham Local, or Town of Needham
 - **Category filter** — filter by Town Government, Schools, Public Safety, Community, Permits & Development, Business, or News
+- **Keyword search** — type to filter articles by keyword
+- **Date range pills** — quickly filter to Today, This Week, This Month, or All Time
 - Unified feed shows both AI articles (click to read on-site) and external news (click to read at source)
 - Each AI article page shows: formatted content with headers and bullets, source type badge, clickable source links to official documents, AI disclaimer, thumbs up/down feedback, and an "Ask about this" button that opens chat pre-loaded with the article title
 - Articles are generated automatically each morning at 5 AM from newly ingested town documents
@@ -148,8 +152,9 @@ Emergency contacts and public safety resources:
 Navigate to **More → Transit** or visit `/<town>/transit`.
 
 Live MBTA schedules and alerts for the town's commuter rail line (configured via `transit_route` in town settings):
-- **Service alerts** with descriptions
+- **Service alerts** with descriptions (expired alerts are automatically filtered out)
 - **Upcoming departures** with stop names, direction, and times
+- **Auto-refresh** — data updates automatically while the page is open
 - Link to full schedule on MBTA.com
 
 ### Dining
