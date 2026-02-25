@@ -126,11 +126,20 @@ A daily AI-generated digest of the most important Needham news and updates, with
 - Collapsible accordion of up to 7 previous briefs
 - Brief is generated daily at 5 AM ET; "Check back after 5 AM" shown when not yet available
 
-### Events
+### Events Calendar
 
 Navigate to **More → Events** or visit `/<town>/events`.
 
-Community events, town meetings, and activities pulled from calendar feeds. Each event shows the date, time, location, and a link to details. When no events are available yet, you can ask Navigator about upcoming events.
+A full month-view calendar showing community events, town meetings, library programs, and school activities pulled from official calendar feeds.
+
+**Features:**
+- **Month grid** — 7-column calendar with colored event dots per day (purple = Town, blue = Library, green = Schools)
+- **Day detail panel** — click any day to see event cards with date, time, location, and source badge
+- **Source filters** — toggle All, Town, Library, or Schools to focus on specific event sources
+- **View toggle** — switch between Month (grid) and List (chronological) views
+- **Subscribe to Calendar** — click Subscribe to copy an iCal feed URL, then paste into Google Calendar, Apple Calendar, or Outlook to stay synced with Needham events automatically
+- **Add to Calendar** — each event has a dropdown to add it directly to Google Calendar or download a .ics file for Apple Calendar / Outlook
+- **Month navigation** — prev/next arrows to browse months, plus a "Today" button to jump back
 
 ### Weather
 
@@ -185,6 +194,7 @@ Visit `/admin` to access:
 - **Analytics** — feedback trends, query volume, response quality metrics
 - **Search Analytics** — total queries, average response time, zero-result rate, average confidence score, top 20 queries, zero-result queries (content gaps), and confidence distribution
 - **Content Quality** — total documents/chunks, stale document count, average chunks per document, documents by domain, stale document list, and document freshness distribution
+- **Pipeline Health** — connector status (healthy/warning/error/disabled), last pipeline run timestamp, content freshness KPIs (total items, last 24h, last 7d), article generation stats (today, this week, last daily brief)
 - **Costs** — OpenAI API spend monitoring: today/week/month totals, projected monthly cost, daily cost chart (last 30 days), cost-by-model breakdown, average cost per query
 - **System Logs** — ingestion status, error tracking, sync history
 - **Document Management** — view indexed content and sources
