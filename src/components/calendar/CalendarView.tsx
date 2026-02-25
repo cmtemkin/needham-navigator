@@ -152,8 +152,8 @@ export function CalendarView({ townId, townName }: Readonly<CalendarViewProps>) 
     setSelectedDate(now);
   };
 
-  const subscribeUrl = typeof window !== "undefined"
-    ? `${window.location.origin}/api/events/ics?town=${townId}`
+  const subscribeUrl = globalThis.window
+    ? `${globalThis.location.origin}/api/events/ics?town=${townId}`
     : `/api/events/ics?town=${townId}`;
 
   return (

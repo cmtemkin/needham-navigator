@@ -228,7 +228,7 @@ export async function runConnectors(
 
   if (configs.length === 0) {
     console.warn(
-      `[runner] No source_configs found for town=${options.townId ?? "all"}. Run seed-sources.ts to populate.`
+      `[runner] No source_configs found for town=${(options.townId ?? "all").replaceAll(/[\n\r]/g, "")}. Run seed-sources.ts to populate.`
     );
   }
 

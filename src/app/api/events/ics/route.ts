@@ -31,15 +31,15 @@ interface EventRow {
 
 function escapeICalText(text: string): string {
   return text
-    .replace(/\\/g, "\\\\")
-    .replace(/;/g, "\\;")
-    .replace(/,/g, "\\,")
-    .replace(/\n/g, "\\n");
+    .replaceAll(/\\/g, "\\\\")
+    .replaceAll(/;/g, "\\;")
+    .replaceAll(/,/g, "\\,")
+    .replaceAll(/\n/g, "\\n");
 }
 
 function toICalDate(dateStr: string): string {
   const d = new Date(dateStr);
-  return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  return d.toISOString().replaceAll(/[-:]/g, "").replace(/\.\d{3}/, "");
 }
 
 function generateVCalendar(events: EventRow[]): string {

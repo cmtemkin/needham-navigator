@@ -26,8 +26,8 @@ const STOPWORDS = new Set([
 export function normalizeQuery(query: string): string {
   return query
     .toLowerCase()
-    .replace(/[^\w\s]/g, '')
-    .replace(/\s+/g, ' ')
+    .replaceAll(/[^\w\s]/g, '')
+    .replaceAll(/\s+/g, ' ')
     .trim()
     .split(' ')
     .filter(w => !STOPWORDS.has(w))

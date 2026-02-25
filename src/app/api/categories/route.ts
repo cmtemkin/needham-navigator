@@ -19,7 +19,7 @@ const CATEGORY_NAMES: Record<string, string> = {
 
 function toTitleCase(value: string): string {
   return value
-    .replace(/[_-]+/g, " ")
+    .replaceAll(/[_-]+/g, " ")
     .split(" ")
     .filter(Boolean)
     .map((word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`)
