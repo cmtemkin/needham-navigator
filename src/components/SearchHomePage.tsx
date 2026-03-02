@@ -8,6 +8,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SearchResultCard } from "@/components/search/SearchResultCard";
 import { AIAnswerCard } from "@/components/search/AIAnswerCard";
+import { SearchLoadingState } from "@/components/search/SearchLoadingState";
 import { DailyBriefBanner } from "@/components/DailyBriefBanner";
 import { LiveWidgets } from "@/components/LiveWidgets";
 import { ArticleCard } from "@/components/ArticleCard";
@@ -794,6 +795,11 @@ export function SearchHomePage({ initialQuery = "" }: Readonly<SearchHomePagePro
               <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 mb-4 text-[14px] text-red-700">
                 Failed to generate AI answer. Try asking in chat instead.
               </div>
+            )}
+
+            {/* Loading state (shown while searching, before results arrive) */}
+            {isSearching && !searchResults && (
+              <SearchLoadingState townFacts={town.fun_facts} />
             )}
 
             {/* Result cards */}
