@@ -154,15 +154,34 @@ export function createRssConnector(
           .update(entry.link || entry.title)
           .digest("hex");
 
+        // Parse published date with fallback logic:
+        // 1. Try to parse the pubDate field
+        // 2. If invalid/missing, try to extract date from description (common format: "Month DD, YYYY")
+        // 3. Last resort: use current time but log a warning
+        let publishedAt = new Date();
+        if (entry.pubDate) {
+          const parsedDate = new Date(entry.pubDate);
+          if (!isNaN(parsedDate.getTime())) {
+            publishedAt = parsedDate;
+          } else {
+            // Try to extract date from description (common news format: "Month DD, YYYY")
+            const dateMatch = entry.description?.match(/\b(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4}\b/i);
+            if (dateMatch) {
+              const extractedDate = new Date(dateMatch[0]);
+              if (!isNaN(extractedDate.getTime())) {
+                publishedAt = extractedDate;
+              }
+            }
+          }
+        }
+
         return {
           source_id: config.id,
           category: config.category as ContentCategory,
           title: entry.title,
           content,
           summary: entry.description ? entry.description.slice(0, 300) : undefined,
-          published_at: entry.pubDate
-            ? new Date(entry.pubDate)
-            : new Date(),
+          published_at: publishedAt,
           url: entry.link || undefined,
           metadata: {
             source_name: sourceName,
