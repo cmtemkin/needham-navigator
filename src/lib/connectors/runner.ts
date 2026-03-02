@@ -116,6 +116,7 @@ async function upsertSingleItem(
     image_url: item.image_url ?? null,
     metadata: item.metadata,
     content_hash: item.content_hash,
+    embedding: null, // Vectors stored in Pinecone, not Supabase
     updated_at: new Date().toISOString(),
   };
 

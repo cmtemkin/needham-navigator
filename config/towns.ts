@@ -198,13 +198,13 @@ export const TOWNS: TownConfig[] = [
     },
     fun_facts: [
       "Needham was incorporated as a town in 1711, making it one of the oldest in Massachusetts.",
-      "The Charles River forms Needham's northern and western borders.",
-      "Needham is connected to downtown Boston via the MBTA Needham Line commuter rail — about 25 minutes to South Station.",
-      "The town covers approximately 12.8 square miles and is home to around 32,000 residents.",
+      "The Charles River forms Needham's southern and northeastern boundaries.",
+      "Needham is connected to downtown Boston via the MBTA Needham Line commuter rail.",
+      "The town covers approximately 12.3 square miles and is home to around 32,000 residents.",
       "Needham is named after Needham Market, a town in Suffolk, England.",
       "Memorial Park on Great Plain Avenue hosts free summer concerts every year.",
       "Needham's Transfer Station accepts electronics for recycling year-round — no fee for residents.",
-      "The Needham Public Library was founded in 1872 and is one of the oldest public libraries in Norfolk County.",
+      "The Needham Free Public Library was established in 1888 and moved to its current location on Highland Avenue in 1915.",
     ],
   },
   // Remove before production deployment — used for multi-tenant testing only
