@@ -31,7 +31,35 @@ jobs:
           SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
-      - name: 2. Ingest new documents
+      - name: 2. Ingest news from connectors (RSS feeds, etc.)
+        run: |-
+          cat > /tmp/run-connectors.ts << 'SCRIPT'
+          import { runConnectors } from "./src/lib/connectors/runner";
+          import "./src/lib/connectors/register-all";
+
+          (async () => {
+            try {
+              const results = await runConnectors({ townId: "needham", force: true });
+              console.log(`✓ Connectors completed: ${results.length} sources processed`);
+              const totalUpserted = results.reduce((s, r) => s + r.itemsUpserted, 0);
+              const totalErrors = results.reduce((s, r) => s + r.errors.length, 0);
+              console.log(`  Items upserted: ${totalUpserted}, Errors: ${totalErrors}`);
+              if (totalErrors > 0) process.exit(1);
+            } catch (err) {
+              console.error("✗ Connector run failed:", err);
+              process.exit(1);
+            }
+          })();
+          SCRIPT
+          npx tsx /tmp/run-connectors.ts
+        env:
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          UPSTASH_VECTOR_REST_URL: ${{ secrets.UPSTASH_VECTOR_REST_URL }}
+          UPSTASH_VECTOR_REST_TOKEN: ${{ secrets.UPSTASH_VECTOR_REST_TOKEN }}
+
+      - name: 2b. Ingest document pages from needhamma.gov
         run: npx tsx scripts/ingest.ts --limit=50
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
