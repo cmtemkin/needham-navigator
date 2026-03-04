@@ -90,9 +90,7 @@ async function upsertSingleItem(
 ): Promise<{ upserted: boolean }> {
   let embeddingValues: number[] | null = null;
   if (shouldEmbed && item.content) {
-    const textToEmbed = `${item.title}
-
-${item.summary || item.content}`.slice(
+    const textToEmbed = `${item.title}\n\n${item.summary || item.content}`.slice(
       0,
       8000
     );
@@ -229,8 +227,7 @@ export async function runConnectors(
 
   if (configs.length === 0) {
     // Strip newlines for log injection prevention (use string literals for CodeQL)
-    const safeTownId = (options.townId ?? "all").replaceAll("
-", "").replaceAll("", "");
+    const safeTownId = (options.townId ?? "all").replaceAll("\n", "").replaceAll("\r", "");
     console.warn(
       `[runner] No source_configs found for town=${safeTownId}. Run seed-sources.ts to populate.`
     );
