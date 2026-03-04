@@ -90,7 +90,9 @@ async function upsertSingleItem(
 ): Promise<{ upserted: boolean }> {
   let embeddingValues: number[] | null = null;
   if (shouldEmbed && item.content) {
-    const textToEmbed = `${item.title}\n\n${item.summary || item.content}`.slice(
+    const textToEmbed = `${item.title}
+
+${item.summary || item.content}`.slice(
       0,
       8000
     );
@@ -116,7 +118,6 @@ async function upsertSingleItem(
     image_url: item.image_url ?? null,
     metadata: item.metadata,
     content_hash: item.content_hash,
-    embedding: null, // Vectors stored in Pinecone, not Supabase
     updated_at: new Date().toISOString(),
   };
 
@@ -228,7 +229,8 @@ export async function runConnectors(
 
   if (configs.length === 0) {
     // Strip newlines for log injection prevention (use string literals for CodeQL)
-    const safeTownId = (options.townId ?? "all").replaceAll("\n", "").replaceAll("\r", "");
+    const safeTownId = (options.townId ?? "all").replaceAll("
+", "").replaceAll("", "");
     console.warn(
       `[runner] No source_configs found for town=${safeTownId}. Run seed-sources.ts to populate.`
     );
