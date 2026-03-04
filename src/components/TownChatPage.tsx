@@ -34,56 +34,170 @@ function generateConvoId(): string {
   return `convo-${crypto.randomUUID()}`;
 }
 
-/** Simple pattern matching to generate follow-up suggestion chips. */
-function getFollowUpSuggestions(lastAiText: string): string[] {
-  const lower = lastAiText.toLowerCase();
-  const suggestions: string[] = [];
-
-  if (lower.includes("permit") || lower.includes("building")) {
-    suggestions.push(
+/**
+ * Data-driven follow-up suggestion chips.
+ * Order matters — more specific categories come first so they match before
+ * broader ones (e.g. "transfer station" before generic "trash/DPW").
+ */
+const FOLLOW_UP_CATEGORIES: {
+  keywords: string[];
+  suggestions: string[];
+}[] = [
+  {
+    keywords: ["transfer station", "dump", "sticker", "hazardous"],
+    suggestions: [
+      "What are the Transfer Station hours?",
+      "How do I get a sticker?",
+      "Where do I drop off hazardous waste?",
+    ],
+  },
+  {
+    keywords: ["permit", "building"],
+    suggestions: [
       "What are the permit fees?",
       "How long does the permit process take?",
-      "What documents do I need to apply?"
-    );
-  } else if (lower.includes("school") || lower.includes("enrollment") || lower.includes("student")) {
-    suggestions.push(
+      "What documents do I need to apply?",
+    ],
+  },
+  {
+    keywords: ["school", "enrollment", "student"],
+    suggestions: [
       "How do I enroll my child?",
       "What are the school district boundaries?",
-      "When does the school year start?"
-    );
-  } else if (lower.includes("tax") || lower.includes("assessment") || lower.includes("property")) {
-    suggestions.push(
+      "When does the school year start?",
+    ],
+  },
+  {
+    keywords: ["tax", "assessment", "property tax"],
+    suggestions: [
       "When are property taxes due?",
       "How do I appeal my assessment?",
-      "What is the current tax rate?"
-    );
-  } else if (lower.includes("trash") || lower.includes("recycl") || lower.includes("waste") || lower.includes("dpw")) {
-    suggestions.push(
+      "What is the current tax rate?",
+    ],
+  },
+  {
+    keywords: ["trash", "recycl", "waste", "dpw"],
+    suggestions: [
       "What is the trash pickup schedule?",
       "What can I recycle?",
-      "How do I dispose of bulk items?"
-    );
-  } else if (lower.includes("recreation") || lower.includes("park") || lower.includes("program")) {
-    suggestions.push(
+      "How do I dispose of bulk items?",
+    ],
+  },
+  {
+    keywords: ["recreation", "park", "program"],
+    suggestions: [
       "What programs are available?",
       "How do I register for activities?",
-      "What are the park hours?"
-    );
-  } else if (lower.includes("zoning") || lower.includes("variance") || lower.includes("setback")) {
-    suggestions.push(
+      "What are the park hours?",
+    ],
+  },
+  {
+    keywords: ["zoning", "variance", "setback"],
+    suggestions: [
       "What is my zoning district?",
       "How do I apply for a variance?",
-      "What are the setback requirements?"
-    );
-  } else {
-    suggestions.push(
-      "Tell me about town services",
-      "What permits do I need for a renovation?",
-      "How do I contact town hall?"
-    );
+      "What are the setback requirements?",
+    ],
+  },
+  {
+    keywords: ["police", "safety", "emergency", "parking ban"],
+    suggestions: [
+      "What is the non-emergency police number?",
+      "How do I file a police report?",
+      "Are there any parking bans in effect?",
+    ],
+  },
+  {
+    keywords: ["fire", "ambulance", "smoke detector"],
+    suggestions: [
+      "How do I schedule a fire inspection?",
+      "Do I need a smoke detector certificate?",
+      "How do I get a burning permit?",
+    ],
+  },
+  {
+    keywords: ["election", "vote", "ballot", "town meeting"],
+    suggestions: [
+      "How do I register to vote?",
+      "When is the next Town Meeting?",
+      "Where is my polling place?",
+    ],
+  },
+  {
+    keywords: ["water", "sewer", "meter", "hydrant"],
+    suggestions: [
+      "How do I pay my water bill?",
+      "Are there water restrictions?",
+      "How do I report a water main break?",
+    ],
+  },
+  {
+    keywords: ["library", "book", "borrow"],
+    suggestions: [
+      "What are the library hours?",
+      "How do I get a library card?",
+      "What programs does the library offer?",
+    ],
+  },
+  {
+    keywords: ["snow", "plow", "winter", "storm"],
+    suggestions: [
+      "When does the parking ban start?",
+      "What is the snow plowing priority?",
+      "How do I report an unplowed street?",
+    ],
+  },
+  {
+    keywords: ["rat", "pest", "rodent", "dog license", "health department", "board of health"],
+    suggestions: [
+      "How do I report a pest problem?",
+      "How do I get a dog license?",
+      "What does the Board of Health handle?",
+    ],
+  },
+  {
+    keywords: ["clerk", "birth certificate", "marriage license", "vital record"],
+    suggestions: [
+      "How do I get a birth certificate?",
+      "How do I get a marriage license?",
+      "Where do I request vital records?",
+    ],
+  },
+  {
+    keywords: ["senior", "elder", "council on aging"],
+    suggestions: [
+      "What senior services are available?",
+      "How do I reach the Council on Aging?",
+      "Is there senior transportation?",
+    ],
+  },
+  {
+    keywords: ["tree", "sidewalk", "pothole", "streetlight"],
+    suggestions: [
+      "How do I report a pothole?",
+      "How do I request tree removal?",
+      "How do I report a broken streetlight?",
+    ],
+  },
+];
+
+const GENERIC_FOLLOW_UPS = [
+  "Tell me about town services",
+  "What permits do I need for a renovation?",
+  "How do I contact town hall?",
+];
+
+/** Pattern matching to generate follow-up suggestion chips. */
+function getFollowUpSuggestions(lastAiText: string): string[] {
+  const lower = lastAiText.toLowerCase();
+
+  for (const category of FOLLOW_UP_CATEGORIES) {
+    if (category.keywords.some((kw) => lower.includes(kw))) {
+      return category.suggestions.slice(0, 3);
+    }
   }
 
-  return suggestions.slice(0, 3);
+  return GENERIC_FOLLOW_UPS;
 }
 
 function ChatLoadingFallback() {

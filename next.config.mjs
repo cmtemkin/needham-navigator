@@ -10,6 +10,15 @@ const nextConfig = {
   turbopack: {
     root: ".",
   },
+  async redirects() {
+    return [
+      {
+        source: "/offline",
+        destination: "/offline.html",
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     return {
       beforeFiles: [

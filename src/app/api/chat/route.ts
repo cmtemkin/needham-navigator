@@ -13,7 +13,7 @@ import {
 } from "@/lib/rag";
 import { getSupabaseClient } from "@/lib/supabase";
 import { getTownById } from "@/lib/towns";
-import { getCachedAnswer, setCachedAnswer } from "@/lib/answer-cache";
+import { getCachedAnswer, setCachedAnswer, invalidateCachedAnswer } from "@/lib/answer-cache";
 
 const DEFAULT_CHAT_MODEL = "gpt-5-nano";
 const ALLOWED_MODELS = new Set([
@@ -158,20 +158,26 @@ export async function POST(request: Request): Promise<Response> {
           document_url: s.url,
         }));
 
-        return staticStreamResponse({
-          text: cached.answer_html,
-          confidence: {
-            level: "high" as const,
-            label: "Verified from official sources",
-            color: "green" as const,
-            averageSimilarity: 0.9,
-            topSimilarity: 0.95,
-            supportingChunks: cachedSources.length,
-            reason: "Served from answer cache",
-          },
-          sources: cachedSources,
-          responseId,
-        });
+        // Skip cache entries with no sources — likely stale from a pipeline bug.
+        // Invalidate the entry and fall through to the full RAG pipeline.
+        if (cachedSources.length === 0) {
+          invalidateCachedAnswer(latestUserMessage.content, townId).catch(() => {});
+        } else {
+          return staticStreamResponse({
+            text: cached.answer_html,
+            confidence: {
+              level: "high" as const,
+              label: "Verified from official sources",
+              color: "green" as const,
+              averageSimilarity: 0.9,
+              topSimilarity: 0.95,
+              supportingChunks: cachedSources.length,
+              reason: "Served from answer cache",
+            },
+            sources: cachedSources,
+            responseId,
+          });
+        }
       }
     } catch {
       // Cache lookup failure is non-fatal — proceed with full RAG pipeline
@@ -196,7 +202,7 @@ export async function POST(request: Request): Promise<Response> {
       console.error("[api/chat] Retrieval failed, returning fallback:", retrievalError);
     }
 
-    const confidence = scoreConfidenceFromChunks(chunks);
+    const confidence = scoreConfidenceFromChunks(chunks, latestUserMessage.content);
     const sources = dedupeSources(chunks).map((source) => ({
       source_id: source.sourceId,
       citation: source.citation,
@@ -341,13 +347,18 @@ export async function POST(request: Request): Promise<Response> {
           }).catch((err) => console.error("[api/chat] cost tracking error:", err));
         }).catch((err) => console.error("[api/chat] usage retrieval error:", err));
 
-        // Fire-and-forget: cache this answer for future requests
-        setCachedAnswer(
-          latestUserMessage.content,
-          townId,
-          cleanedText,
-          filteredSources.map(s => ({ title: s.document_title, url: s.document_url ?? '' }))
-        ).catch(() => {}); // silent fail
+        // Fire-and-forget: cache this answer for future requests.
+        // Prefer filtered sources; fall back to all sources if USED_SOURCES
+        // parsing yielded empty. Never cache with 0 sources when we had some.
+        const sourcesToCache = filteredSources.length > 0 ? filteredSources : sources;
+        if (sourcesToCache.length > 0) {
+          setCachedAnswer(
+            latestUserMessage.content,
+            townId,
+            cleanedText,
+            sourcesToCache.map(s => ({ title: s.document_title, url: s.document_url ?? '' }))
+          ).catch(() => {}); // silent fail
+        }
       },
       onError: () =>
         "Something went wrong while generating the answer. Please try again.",
