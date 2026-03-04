@@ -32,6 +32,14 @@ Needham Navigator supports two interface styles (configured via `uiMode` in town
 
 Both modes access the same underlying data and provide the same quality answers — choose based on your preferred interaction style.
 
+### Search Loading State with Fun Facts
+
+When searching in Search Mode, a beautiful animated loading screen appears while results are being retrieved:
+- **Rotating status messages** — encouraging messages like "Finding the perfect answer...", "Checking our sources...", and "Thinking..." keep you engaged
+- **Town fun facts** — interesting facts about Needham (historical events, notable landmarks, demographics) appear during the search, so you learn something while waiting
+- **Animated spinner** — a smooth loading animation indicates the search is in progress
+- This personalized touch makes the wait feel shorter and more delightful than a blank screen.
+
 ---
 
 ## Features
@@ -126,11 +134,16 @@ A daily AI-generated digest of the most important Needham news and updates, with
 - Collapsible accordion of up to 7 previous briefs
 - Brief is generated daily at 5 AM ET; "Check back after 5 AM" shown when not yet available
 
-### Events Calendar
+### Events Calendar & Library Events
 
 Navigate to **More → Events** or visit `/<town>/events`.
 
-A full month-view calendar showing community events, town meetings, library programs, and school activities pulled from official calendar feeds.
+A full month-view calendar showing community events, town meetings, library programs, and school activities pulled from official calendar feeds. Needham Public Library events are now fully searchable and integrated into the chat and search features.
+
+**Needham Public Library Events** — Library programming, workshops, and story times are automatically ingested from the Needham Public Library website and appear in:
+- The events calendar (filter by Library source)
+- Chat search results when asking about library programs
+- Regular search results alongside town documents
 
 **Features:**
 - **Month grid** — 7-column calendar with colored event dots per day (purple = Town, blue = Library, green = Schools)
@@ -163,7 +176,9 @@ Navigate to **More → Transit** or visit `/<town>/transit`.
 Live MBTA schedules and alerts for the town's commuter rail line (configured via `transit_route` in town settings):
 - **Service alerts** with descriptions (expired alerts are automatically filtered out)
 - **Upcoming departures** with stop names, direction, and times
+- **Preferred stop selector** — save your favorite station to quickly see departures for your commute. Your preference is saved locally and persists across visits
 - **Auto-refresh** — data updates automatically while the page is open
+- **Timezone handling** — times automatically display in your local timezone
 - Link to full schedule on MBTA.com
 
 ### Dining
