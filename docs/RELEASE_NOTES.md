@@ -928,3 +928,16 @@ Pinecone vector count (~244K vectors) exceeded the free tier limit. Rather than 
 - Data ingestion pipeline: crawl, extract, chunk, embed
 - Supabase schema and migrations
 - Next.js 14 project scaffold with Tailwind CSS
+
+## v0.6.0 (In Progress)
+
+### New Features
+- Fun search loader with rotating status messages and town facts during search
+- Library events connector for Needham Public Library (64+ events)
+- Upstash vector embeddings enabled for library events
+
+### Bug Fixes  
+- Fix header search bar visibility on homepage (prevent hydration flash)
+- Critical fix: connector embedding column bug that broke all ingestion (#152)
+- Transit: Eastern timezone fix + preferred stop selector (#148)
+- Content pipeline restored in GitHub Actions (connector ingest step restored) (#150, #149)

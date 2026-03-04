@@ -65,21 +65,20 @@ const EVENT_SOURCES = [
       daysAhead: 90,
     },
   },
-  // Library Events - Assabet Interactive (no iCal feed, needs scraper)
-  // Leaving disabled until a JSON-LD scraper connector is built
+  // Library Events - Assabet Interactive (JSON-LD scraper)
   {
     id: "needham:library-events",
     town_id: "needham",
     connector_type: "scrape",
     category: "events",
     schedule: "daily",
-    enabled: false,
-    should_embed: false,
+    enabled: true,
+    should_embed: true,
     config: {
+      subtype: "library-events",
       baseUrl: "https://needhamma.assabetinteractive.com/calendar/",
       sourceName: "Needham Public Library",
       daysAhead: 90,
-      note: "Needs custom JSON-LD scraper - structured data available in page <script type='application/ld+json'> tags",
     },
   },
   // School Calendar - SharpSchool (iCal URL needs manual discovery)

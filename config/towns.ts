@@ -77,6 +77,8 @@ export type TownConfig = {
   news_sources?: Record<string, string>;
   /** About page content — if omitted, about page shows generic content */
   about?: TownAboutContent;
+  /** Fun facts about the town — shown during search loading */
+  fun_facts?: string[];
 };
 
 export const TOWNS: TownConfig[] = [
@@ -194,6 +196,16 @@ export const TOWNS: TownConfig[] = [
       disclaimer: "AI can be wrong — always check official sources for critical decisions (permits, taxes, legal matters).",
       github_url: "https://github.com/cmtemkin/needham-navigator",
     },
+    fun_facts: [
+      "Needham was incorporated as a town in 1711, making it one of the oldest in Massachusetts.",
+      "The Charles River forms Needham's southern and northeastern boundaries.",
+      "Needham is connected to downtown Boston via the MBTA Needham Line commuter rail.",
+      "The town covers approximately 12.3 square miles and is home to around 32,000 residents.",
+      "Needham is named after Needham Market, a town in Suffolk, England.",
+      "Memorial Park on Great Plain Avenue hosts free summer concerts every year.",
+      "Needham's Transfer Station accepts electronics for recycling year-round — no fee for residents.",
+      "The Needham Free Public Library was established in 1888 and moved to its current location on Highland Avenue in 1915.",
+    ],
   },
   // Remove before production deployment — used for multi-tenant testing only
   {
