@@ -504,6 +504,7 @@ export function SearchHomePage({ initialQuery = "" }: Readonly<SearchHomePagePro
 
   return (
     <>
+      {/* Header without search bar - SearchHomePage has its own hero search */}
       <Header />
 
       <main>
