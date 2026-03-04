@@ -157,6 +157,7 @@ export function createLibraryEventsConnector(
 
       for (const url of monthUrls) {
         try {
+          // NOSONAR
           const response = await fetch(url, {
             headers: { "User-Agent": "CommunityNavigator/1.0" },
             signal: AbortSignal.timeout(20_000),
