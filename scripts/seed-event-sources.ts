@@ -73,7 +73,7 @@ const EVENT_SOURCES = [
     category: "events",
     schedule: "daily",
     enabled: true,
-    should_embed: false,
+    should_embed: true,
     config: {
       subtype: "library-events",
       baseUrl: "https://needhamma.assabetinteractive.com/calendar/",

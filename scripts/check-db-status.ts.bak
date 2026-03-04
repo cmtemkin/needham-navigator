@@ -1,0 +1,25 @@
+import { getSupabaseServiceClient } from './src/lib/supabase.js';
+
+async function main() {
+  const supabase = getSupabaseServiceClient();
+
+  const { count: docCount } = await supabase
+    .from('documents')
+    .select('*', { count: 'exact', head: true })
+    .eq('town_id', 'needham');
+
+  const { count: chunkCount } = await supabase
+    .from('document_chunks')
+    .select('*', { count: 'exact', head: true })
+    .eq('town_id', 'needham');
+
+  console.log(`Documents: ${docCount}`);
+  console.log(`Chunks: ${chunkCount}`);
+  console.log(`\nResume calculation:`);
+  console.log(`  Started with: 30,450 docs before crash`);
+  console.log(`  Current total: ${docCount}`);
+  console.log(`  Successfully added: ${docCount - 30450}`);
+  console.log(`  Remaining to ingest: ${50000 - docCount}`);
+}
+
+main().catch(console.error);

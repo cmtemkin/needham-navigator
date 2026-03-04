@@ -1,26 +1,26 @@
-# Merge, Integration Test & Local Server
+# Investigate Content Refresh and Generation Issues
 
-## Part 1 — Merge
-- [ ] Checkout main and pull latest
-- [ ] Merge `origin/feature/data-quality`
-- [ ] Merge `origin/feature/rag-excellence` (likely no-op, same commit as main)
-- [ ] Resolve any merge conflicts
-- [ ] Verify with `npx tsc --noEmit`
+- [x] Check `vercel.json` cron configuration and schedule.
+- [x] Inspect the `/api/cron/daily` endpoint to understand the daily generation and refresh logic.
+- [x] Identify if there are other cron endpoints or background jobs affecting content refresh.
+- [x] Determine why articles aren't refreshing and fix any bugs in the cron logic or refresh schedule.
+- [x] Update the cron schedule or add new crons to refresh content more frequently as expected by the user.
 
-## Part 2 — Install & Build
-- [ ] `npm install`
-- [ ] `npx tsc --noEmit` — fix any type errors
-- [ ] `npm run build` — fix any build errors
+## Proposed Fixes
+The `/api/cron/daily` endpoint on Vercel runs all three steps (monitor, ingest, generate) sequentially, but the `ingest` step often times out due to Vercel Hobby Plan function limits (10s to 60s max). If `ingest` times out, no new documents are added to the database.
 
-## Part 3 — Automated Tests
-- [ ] Run existing tests (`npm test`)
-- [ ] Create `__tests__/integration.test.ts` with 10 integration tests
-- [ ] Run all tests again
+Simultaneously, there is a GitHub Action (`generate-articles.yml`) set to run every day, but it ONLY generates articles assuming docs have already been ingested. Since no new docs are ingested successfully by Vercel, the generator skips creating the daily brief. 
 
-## Part 4 — Start Local Server
-- [ ] `npm run dev`
-- [ ] Report URL, landing page, and testing guidance
+To resolve this, we will move the entire pipeline to GitHub Actions, bypassing Vercel completely.
 
-## Part 5 — Commit & Push
-- [ ] `git add -A && git commit && git push`
-- [ ] Summary report to user
+1. **Delete** `.github/workflows/generate-articles.yml`
+2. **Create** a new `.github/workflows/content-pipeline.yml` that runs every 4 hours (`0 */4 * * *`) and executes:
+   - `npx tsx scripts/monitor.ts`
+   - `npx tsx scripts/ingest.ts --limit=50`
+   - `npx tsx scripts/generate-articles.ts`
+3. **Remove** the `crons` array from `vercel.json` as it's no longer needed and reliably fails.
+
+## Verification
+1. [x] Review the new `content-pipeline.yml` workflow.
+2. [x] Run locally to identify node/ts dependencies (failed with node permissions locally, but Action config is sound).
+3. [x] Commit changes so the user can trigger from GitHub Actions tab to ensure it runs without timeouts.
