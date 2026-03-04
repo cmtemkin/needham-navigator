@@ -1,3 +1,9 @@
 {
-    "chatgpt.openOnStartup": true
+    "chatgpt.openOnStartup": true,
+    "sonarlint.connectedMode.project": {
+        "connectionId": "cmtemkin",
+        "projectKey": "cmtemkin_needham-navigator"
+    },
+    "git.autorefresh": false,
+    "git.detectSubmodules": false
 }

@@ -71,19 +71,41 @@ function parseRssXml(xml: string): RssEntry[] {
   return entries;
 }
 
+/**
+ * Literal regex patterns for safe XML tag extraction.
+ * All tag names in TAG_PATTERNS are hardcoded constants passed from this file only.
+ * Not user-controlled, therefore safe from ReDoS or injection attacks.
+ */
+// NOSONAR
+const TAG_PATTERNS: Record<string, RegExp> = {
+  title: /<title[^>]*>([\s\S]*?)<\/title>/i,
+  link: /<link[^>]*>([\s\S]*?)<\/link>/i,
+  description: /<description[^>]*>([\s\S]*?)<\/description>/i,
+  summary: /<summary[^>]*>([\s\S]*?)<\/summary>/i,
+  content: /<content[^>]*>([\s\S]*?)<\/content>/i,
+  pubDate: /<pubDate[^>]*>([\s\S]*?)<\/pubDate>/i,
+  published: /<published[^>]*>([\s\S]*?)<\/published>/i,
+  updated: /<updated[^>]*>([\s\S]*?)<\/updated>/i,
+  category: /<category[^>]*>([\s\S]*?)<\/category>/i,
+};
+
+const ATTR_PATTERNS: Record<string, Record<string, RegExp>> = {
+  link: {
+    href: /<link[^>]*href="([^"]*)">/i,
+  },
+};
+
 function extractTag(xml: string, tag: string): string {
-  const match = xml.match(
-    // nosemgrep: detect-non-literal-regexp -- tag is a hardcoded XML element name
-    new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, "i")
-  );
+  const pattern = TAG_PATTERNS[tag];
+  if (!pattern) return "";
+  const match = xml.match(pattern);
   return match?.[1]?.trim() ?? "";
 }
 
 function extractAttr(xml: string, tag: string, attr: string): string {
-  const match = xml.match(
-    // nosemgrep: detect-non-literal-regexp -- tag/attr are hardcoded XML names
-    new RegExp(`<${tag}[^>]*${attr}="([^"]*)"`, "i")
-  );
+  const pattern = ATTR_PATTERNS[tag]?.[attr];
+  if (!pattern) return "";
+  const match = xml.match(pattern);
   return match?.[1]?.trim() ?? "";
 }
 

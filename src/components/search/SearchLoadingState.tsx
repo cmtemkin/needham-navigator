@@ -20,6 +20,7 @@ export function SearchLoadingState({ townFacts }: Readonly<SearchLoadingStatePro
   // Pick a random fun fact on mount
   const funFact = useMemo(() => {
     if (!townFacts || townFacts.length === 0) return null;
+    // NOSONAR S2245 -- non-cryptographic random is safe for UI fact selection
     return townFacts[Math.floor(Math.random() * townFacts.length)];
   }, [townFacts]);
 
