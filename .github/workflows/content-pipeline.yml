@@ -26,33 +26,16 @@ jobs:
 
       - name: 1. Monitor for changes
         run: npx tsx scripts/monitor.ts
+        continue-on-error: true
         env:
           SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
       - name: 2. Ingest news from connectors (RSS feeds, etc.)
-        run: |-
-          cat > /tmp/run-connectors.ts << 'SCRIPT'
-          import { runConnectors } from "./src/lib/connectors/runner";
-          import "./src/lib/connectors/register-all";
-
-          (async () => {
-            try {
-              const results = await runConnectors({ townId: "needham", force: true });
-              console.log(`✓ Connectors completed: ${results.length} sources processed`);
-              const totalUpserted = results.reduce((s, r) => s + r.itemsUpserted, 0);
-              const totalErrors = results.reduce((s, r) => s + r.errors.length, 0);
-              console.log(`  Items upserted: ${totalUpserted}, Errors: ${totalErrors}`);
-              if (totalErrors > 0) process.exit(1);
-            } catch (err) {
-              console.error("✗ Connector run failed:", err);
-              process.exit(1);
-            }
-          })();
-          SCRIPT
-          npx tsx /tmp/run-connectors.ts
+        run: npx tsx scripts/run-connectors.ts
         env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
