@@ -345,6 +345,7 @@ function ChatContent() {
 
         let confidence: "high" | "medium" | "low" | undefined;
         let sources: NonNullable<ChatMessage["sources"]> = [];
+        let followUps: string[] = [];
 
         await parseStreamResponse(response, {
           onText: () => {
@@ -357,9 +358,12 @@ function ChatContent() {
           onSources: (srcs) => {
             sources = srcs;
           },
+          onFollowUps: (fups) => {
+            followUps = fups;
+          },
           onDone: (cleanedText) => {
             completeResponse(
-              { id: `ai-${crypto.randomUUID().slice(0, 8)}`, role: "ai", text: cleanedText || "No response received.", sources, confidence, followups: [] },
+              { id: `ai-${crypto.randomUUID().slice(0, 8)}`, role: "ai", text: cleanedText || "No response received.", sources, confidence, followups: followUps },
               startTime
             );
           },
@@ -507,12 +511,13 @@ function ChatContent() {
 
   const showWelcome = messages.length === 0 && !isTyping;
 
-  // Compute follow-up suggestions from the last AI message
+  // Compute follow-up suggestions from the last AI message.
+  // Prefer LLM-generated follow-ups (rendered inside ChatBubble); fall back to keyword matching.
   const followUpSuggestions = useMemo(() => {
     if (isTyping || messages.length === 0) return [];
     const lastMsg = messages[messages.length - 1];
     if (lastMsg.role !== "ai") return [];
-    // If the message already has followups from the API/mock, use those
+    // If the message already has followups from the API/mock, ChatBubble renders them
     if (lastMsg.followups && lastMsg.followups.length > 0) return [];
     return getFollowUpSuggestions(lastMsg.text);
   }, [messages, isTyping]);

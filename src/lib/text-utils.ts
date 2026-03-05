@@ -6,7 +6,11 @@
  * Strip internal LLM metadata (e.g. USED_SOURCES lines) before displaying to users.
  */
 export function stripInternalMetadata(text: string): string {
-  return text.replaceAll(/\n?USED_SOURCES:\s*.+?(?:\n|$)/gi, "\n").replaceAll(/^\n+|\n+$/g, "").trim();
+  return text
+    .replaceAll(/\n?USED_SOURCES:\s*.+?(?:\n|$)/gi, "\n")
+    .replaceAll(/\n?FOLLOW_UPS:\s*.+?(?:\n|$)/gi, "\n")
+    .replaceAll(/^\n+|\n+$/g, "")
+    .trim();
 }
 
 /**

@@ -147,7 +147,7 @@ type AIAnswerState =
   | { type: "idle" }
   | { type: "loading" }
   | { type: "cached"; answer: CachedAnswer }
-  | { type: "loaded"; html: string; sources: { title: string; url: string; date?: string }[] }
+  | { type: "loaded"; html: string; sources: { title: string; url: string; date?: string }[]; followUps?: string[] }
   | { type: "error"; message: string };
 
 function normalizeQuery(value: string | null): string {
@@ -300,6 +300,7 @@ export function SearchHomePage({ initialQuery = "" }: Readonly<SearchHomePagePro
 
             let answerHtml = "";
             let sources: { title: string; url: string; date?: string }[] = [];
+            let followUps: string[] = [];
             const decoder = new TextDecoder();
 
             while (true) {
@@ -330,6 +331,11 @@ export function SearchHomePage({ initialQuery = "" }: Readonly<SearchHomePagePro
                       date: s.date,
                     }));
                   }
+
+                  // Handle follow-up questions
+                  if (parsed.type === "data-followups") {
+                    followUps = (parsed.data ?? []) as string[];
+                  }
                 } catch {
                   // Skip malformed JSON
                 }
@@ -338,7 +344,7 @@ export function SearchHomePage({ initialQuery = "" }: Readonly<SearchHomePagePro
 
             const cleanedHtml = stripInternalMetadata(answerHtml);
             if (cleanedHtml) {
-              setAiAnswer({ type: "loaded", html: cleanedHtml, sources });
+              setAiAnswer({ type: "loaded", html: cleanedHtml, sources, followUps });
             } else {
               setAiAnswer({ type: "error", message: "No answer generated" });
             }
@@ -789,6 +795,7 @@ export function SearchHomePage({ initialQuery = "" }: Readonly<SearchHomePagePro
                 state="loaded"
                 answerHtml={aiAnswer.html}
                 sources={aiAnswer.sources}
+                followUps={aiAnswer.followUps}
                 onFollowUp={handleFollowUp}
               />
             )}
