@@ -18,6 +18,7 @@ type AIAnswerCardProps =
       state: "loaded";
       answerHtml: string;
       sources: { title: string; url: string; date?: string }[];
+      followUps?: string[];
       onFollowUp: (question: string) => void;
     }
   | {
@@ -71,11 +72,13 @@ function FollowUpInput({ onSubmit }: Readonly<{ onSubmit: (question: string) => 
 function AnswerBody({
   html,
   sources,
+  followUps,
   onFollowUp,
   badge,
 }: Readonly<{
   html: string;
   sources: { title: string; url: string; date?: string }[];
+  followUps?: string[];
   onFollowUp: (question: string) => void;
   badge?: React.ReactNode;
 }>) {
@@ -103,6 +106,21 @@ function AnswerBody({
         <div className="flex flex-wrap gap-1.5 mb-3">
           {sources.map((source) => (
             <SourceChip key={source.url ?? source.title} source={source} />
+          ))}
+        </div>
+      )}
+
+      {/* LLM-generated follow-up suggestion chips */}
+      {followUps && followUps.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-3">
+          {followUps.map((question) => (
+            <button
+              key={question}
+              onClick={() => onFollowUp(question)}
+              className="px-3.5 py-[7px] bg-white border border-border-default rounded-[20px] text-[12.5px] text-text-secondary font-medium hover:border-primary hover:text-primary hover:bg-[#F5F8FC] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              {question}
+            </button>
           ))}
         </div>
       )}
@@ -180,6 +198,7 @@ export function AIAnswerCard(props: AIAnswerCardProps) {
     <AnswerBody
       html={props.answerHtml}
       sources={props.sources}
+      followUps={props.followUps}
       onFollowUp={props.onFollowUp}
     />
   );
