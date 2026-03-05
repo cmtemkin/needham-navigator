@@ -11,6 +11,8 @@ export interface StreamCallbacks {
   onSources?: (sources: MockSource[]) => void;
   /** Called when confidence data arrives */
   onConfidence?: (confidence: "high" | "medium" | "low") => void;
+  /** Called when follow-up questions arrive */
+  onFollowUps?: (followUps: string[]) => void;
   /** Called when the stream completes */
   onDone?: (fullText: string) => void;
   /** Called when an error occurs */
@@ -79,6 +81,9 @@ export async function parseStreamResponse(
                 })
               );
               callbacks.onSources?.(sources);
+            } else if (data.type === "data-followups") {
+              const followUps = (data.data ?? []) as string[];
+              callbacks.onFollowUps?.(followUps);
             }
           } catch (err) {
             // Skip invalid JSON chunks (common in SSE streams)

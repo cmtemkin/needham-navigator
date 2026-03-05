@@ -325,7 +325,27 @@ export async function POST(request: Request): Promise<Response> {
           });
         }
 
-        const cleanedText = fullText.replaceAll(/USED_SOURCES:\s*.+?(?:\n|$)/gi, "").trim();
+        // Parse FOLLOW_UPS metadata from LLM output
+        const followUpsMatch = /FOLLOW_UPS:\s*(.+?)(?:\n|$)/i.exec(fullText);
+        if (followUpsMatch) {
+          const followUps = followUpsMatch[1]
+            .split("|")
+            .map((q) => q.trim())
+            .filter((q) => q.length > 0)
+            .slice(0, 3);
+          if (followUps.length > 0) {
+            writer.write({
+              type: "data-followups",
+              data: followUps,
+              transient: true,
+            });
+          }
+        }
+
+        const cleanedText = fullText
+          .replaceAll(/USED_SOURCES:\s*.+?(?:\n|$)/gi, "")
+          .replaceAll(/FOLLOW_UPS:\s*.+?(?:\n|$)/gi, "")
+          .trim();
 
         // Fire-and-forget: log token usage and cost
         Promise.resolve(result.usage).then((usage) => {

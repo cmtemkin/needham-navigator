@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { ChevronLeft, ChevronRight, List, LayoutGrid, Rss } from "lucide-react";
 import { CalendarGrid } from "./CalendarGrid";
 import { EventDetailPanel } from "./EventDetailPanel";
+import { EventModal } from "./EventModal";
 
 // Re-export EventItem for other calendar components
 export interface EventItem {
@@ -146,10 +147,17 @@ export function CalendarView({ townId, townName }: Readonly<CalendarViewProps>) 
     setSelectedDate(null);
   };
 
+  // Only open modal when date has events
+  const handleSelectDate = useCallback((date: Date) => {
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    const dayEvents = eventsByDate.get(key) ?? [];
+    setSelectedDate(dayEvents.length > 0 ? date : null);
+  }, [eventsByDate]);
+
   const goToToday = () => {
     const now = new Date();
     setCurrentMonth(new Date(now.getFullYear(), now.getMonth(), 1));
-    setSelectedDate(now);
+    handleSelectDate(now);
   };
 
   const subscribeUrl = globalThis.window
@@ -302,14 +310,15 @@ export function CalendarView({ townId, townName }: Readonly<CalendarViewProps>) 
                 month={currentMonth}
                 eventsByDate={eventsByDate}
                 selectedDate={selectedDate}
-                onSelectDate={setSelectedDate}
+                onSelectDate={handleSelectDate}
                 getSourceColor={getSourceColor}
               />
-              {selectedDate && (
-                <EventDetailPanel
+              {selectedDate && selectedDateEvents.length > 0 && (
+                <EventModal
                   date={selectedDate}
                   events={selectedDateEvents}
                   getSourceColor={getSourceColor}
+                  onClose={() => setSelectedDate(null)}
                 />
               )}
             </>

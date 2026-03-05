@@ -1,12 +1,94 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ChevronDown, ChevronRight, Calendar } from "lucide-react";
 import { useTown } from "@/lib/town-context";
 import type { Article, ArticleListResponse } from "@/types/article";
 import ReactMarkdown from "react-markdown";
+import { transformBriefCitations } from "@/lib/brief-citations";
+import { BriefSourceFootnotes } from "@/components/BriefSourceFootnotes";
+
+/** Renders footnote-annotated [N] markers as styled superscripts in markdown text nodes. */
+const footnoteComponents = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  p: ({ children, ...props }: any) => (
+    <p {...props}>{styleFootnoteRefs(children)}</p>
+  ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  li: ({ children, ...props }: any) => (
+    <li {...props}>{styleFootnoteRefs(children)}</li>
+  ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  strong: ({ children, ...props }: any) => (
+    <strong {...props}>{styleFootnoteRefs(children)}</strong>
+  ),
+};
+
+function styleFootnoteRefs(children: React.ReactNode): React.ReactNode {
+  if (typeof children === "string") {
+    const parts = children.split(/(\[\d+\])/g);
+    if (parts.length === 1) return children;
+    return parts.map((part, i) => {
+      const match = /^\[(\d+)\]$/.exec(part);
+      if (match) {
+        return (
+          <sup key={i} className="text-[var(--primary)] font-bold text-[10px] ml-0.5">
+            [{match[1]}]
+          </sup>
+        );
+      }
+      return part;
+    });
+  }
+  if (Array.isArray(children)) {
+    return children.map((child, i) => <span key={i}>{styleFootnoteRefs(child)}</span>);
+  }
+  return children;
+}
+
+function BriefCard({ brief, label, dateLabel }: Readonly<{ brief: Article; label: string; dateLabel: string }>) {
+  const { body: transformedBody, footnotes } = useMemo(
+    () => transformBriefCitations(brief.body, brief.source_urls, brief.source_names),
+    [brief.body, brief.source_urls, brief.source_names],
+  );
+
+  return (
+    <div className="bg-white rounded-lg p-8 shadow-sm border border-border-default mb-8">
+      <div className="flex items-center gap-2 mb-6">
+        <span className="inline-flex items-center px-3 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800">
+          {label}
+        </span>
+        <span className="text-sm text-text-muted">{dateLabel}</span>
+      </div>
+
+      <h2 className="text-3xl font-bold text-text-primary mb-6">{brief.title}</h2>
+
+      <div className="prose prose-slate max-w-none">
+        <ReactMarkdown components={footnoteComponents}>{transformedBody}</ReactMarkdown>
+      </div>
+
+      <BriefSourceFootnotes footnotes={footnotes} briefDate={brief.published_at} />
+    </div>
+  );
+}
+
+function ExpandedBriefBody({ brief }: Readonly<{ brief: Article }>) {
+  const { body: transformedBody, footnotes } = useMemo(
+    () => transformBriefCitations(brief.body, brief.source_urls, brief.source_names),
+    [brief.body, brief.source_urls, brief.source_names],
+  );
+
+  return (
+    <div className="px-5 pb-5 border-t border-border-light pt-5">
+      <div className="prose prose-slate max-w-none">
+        <ReactMarkdown components={footnoteComponents}>{transformedBody}</ReactMarkdown>
+      </div>
+      <BriefSourceFootnotes footnotes={footnotes} briefDate={brief.published_at} />
+    </div>
+  );
+}
 
 export default function DailyBriefPage() {
   const town = useTown();
@@ -99,48 +181,7 @@ export default function DailyBriefPage() {
           ) : (
             <>
               {todayBrief ? (
-                <div className="bg-white rounded-lg p-8 shadow-sm border border-border-default mb-8">
-                  <div className="flex items-center gap-2 mb-6">
-                    <span className="inline-flex items-center px-3 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                      {"Today's Brief"}
-                    </span>
-                    <span className="text-sm text-text-muted">{today}</span>
-                  </div>
-
-                  <h2 className="text-3xl font-bold text-text-primary mb-6">{todayBrief.title}</h2>
-
-                  <div className="prose prose-slate max-w-none"><ReactMarkdown>{todayBrief.body}</ReactMarkdown></div>
-
-                  {todayBrief.source_urls && todayBrief.source_urls.length > 0 && (
-                    <div className="mt-8 pt-6 border-t border-border-light">
-                      <h3 className="text-sm font-semibold text-text-muted uppercase tracking-wide mb-3">
-                        Sources
-                      </h3>
-                      <ul className="space-y-1">
-                        {todayBrief.source_urls.map((url, i) => {
-                          let hostname: string;
-                          try {
-                            hostname = new URL(url).hostname.replace(/^www\./, "");
-                          } catch {
-                            hostname = url;
-                          }
-                          return (
-                            <li key={`source-${url}`}>
-                              <a
-                                href={url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-sm text-[var(--primary)] hover:underline"
-                              >
-                                {todayBrief.source_names?.[i] || hostname}
-                              </a>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </div>
-                  )}
-                </div>
+                <BriefCard brief={todayBrief} label="Today's Brief" dateLabel={today} />
               ) : (
                 <div className="bg-white rounded-lg p-12 shadow-sm border border-border-default mb-8 text-center">
                   <div className="text-6xl mb-4">📰</div>
@@ -190,9 +231,7 @@ export default function DailyBriefPage() {
                           </button>
 
                           {isExpanded && (
-                            <div className="px-5 pb-5 border-t border-border-light pt-5">
-                              <div className="prose prose-slate max-w-none"><ReactMarkdown>{brief.body}</ReactMarkdown></div>
-                            </div>
+                            <ExpandedBriefBody brief={brief} />
                           )}
                         </div>
                       );
