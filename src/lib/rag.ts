@@ -112,6 +112,43 @@ function readNumber(meta: ChunkMetadata, keys: string[]): number | undefined {
   return undefined;
 }
 
+// ---------------------------------------------------------------------------
+// Time-sensitivity detection & dynamic recency scoring
+// ---------------------------------------------------------------------------
+
+const TIME_SENSITIVE_PATTERNS = /\b(next|upcoming|when is|schedule|this year|deadline|current|latest|new|recent|tonight|tomorrow|this week|this month)\b/i;
+
+/** Returns true if the query implies the user cares about recency / timing. */
+function isTimeSensitiveQuery(query: string): boolean {
+  return TIME_SENSITIVE_PATTERNS.test(query);
+}
+
+/**
+ * Compute a 0-1 recency score based on how close a document year is to the
+ * current year.  Returns 0 when no parseable year is found.
+ *
+ * Scoring:
+ *   same year or future → 1.0
+ *   1 year old           → 0.7
+ *   2 years old          → 0.4
+ *   3 years old          → 0.2
+ *   4+ years old         → 0.0
+ */
+function computeRecencyFactor(meta: ChunkMetadata): number {
+  const docDate = readString(meta, ["document_date", "effective_date", "last_amended"]);
+  if (!docDate) return 0;
+  const yearMatch = docDate.match(/\d{4}/);
+  if (!yearMatch) return 0;
+  const docYear = parseInt(yearMatch[0], 10);
+  const currentYear = new Date().getFullYear();
+  const age = currentYear - docYear;
+  if (age <= 0) return 1.0;   // current or future year
+  if (age === 1) return 0.7;
+  if (age === 2) return 0.4;
+  if (age === 3) return 0.2;
+  return 0;                    // 4+ years old
+}
+
 /**
  * Strip CivicPlus CMS metadata from document titles.
  * "Frequently Asked Questions - CivicPlus.CMS.FAQ" → "Frequently Asked Questions"
@@ -457,15 +494,8 @@ function rerankChunks(
     const matchedTerms = queryTerms.filter(term => chunkLower.includes(term)).length;
     const keywordScore = (matchedTerms / Math.max(queryTerms.length, 1)) * 0.2;
 
-    // Document recency (configurable weight)
-    let recencyScore = 0;
-    const docDate = readString(metadata, ["document_date", "effective_date", "last_amended"]);
-    if (docDate) {
-      const year = parseInt(docDate.match(/\d{4}/)?.[0] ?? "0");
-      if (year >= 2024) recencyScore = recencyWeight;
-      else if (year >= 2020) recencyScore = recencyWeight * 0.7;
-      else if (year >= 2015) recencyScore = recencyWeight * 0.4;
-    }
+    // Document recency (configurable weight, dynamic year-relative scoring)
+    const recencyScore = computeRecencyFactor(metadata) * recencyWeight;
 
     // Document authority (configurable weight)
     let authorityScore = 0;
@@ -1114,8 +1144,19 @@ export async function hybridSearch(
   // Document-level dedup: keep only the best entry per source document URL.
   // Without this, semantic search returning chunk A from page X and text search
   // returning chunk B from the same page X both survive the chunk-id merge above.
-  const semanticWeight = 0.7;
-  const textWeight = 0.3;
+  //
+  // For time-sensitive queries ("next election", "upcoming meeting"), recency
+  // gets a heavier weight so current-year content surfaces above stale results.
+  const timeSensitive = isTimeSensitiveQuery(query);
+  const semanticWeight = timeSensitive ? 0.55 : 0.7;
+  const textWeight     = timeSensitive ? 0.25 : 0.3;
+  const recencyWeight  = timeSensitive ? 0.20 : 0.0;
+
+  /** Score a merged entry using the 3-factor formula. */
+  const scoreEntry = (value: { similarity: number; textRank: number; metadata: ChunkMetadata }) =>
+    value.similarity * semanticWeight +
+    value.textRank * textWeight +
+    computeRecencyFactor(value.metadata) * recencyWeight;
 
   const bestByDocUrl = new Map<string, [string, typeof merged extends Map<string, infer V> ? V : never]>();
   for (const [id, value] of merged.entries()) {
@@ -1125,9 +1166,7 @@ export async function hybridSearch(
     if (!existing) {
       bestByDocUrl.set(key, [id, value]);
     } else {
-      const existingScore = existing[1].similarity * semanticWeight + existing[1].textRank * textWeight;
-      const newScore = value.similarity * semanticWeight + value.textRank * textWeight;
-      if (newScore > existingScore) {
+      if (scoreEntry(value) > scoreEntry(existing[1])) {
         bestByDocUrl.set(key, [id, value]);
       }
     }
@@ -1140,7 +1179,7 @@ export async function hybridSearch(
   }
 
   const ranked = Array.from(bestByDocUrl.values()).map(([id, value]) => {
-    const score = value.similarity * semanticWeight + value.textRank * textWeight;
+    const score = scoreEntry(value);
     return {
       id,
       chunk_text: value.chunkText,
