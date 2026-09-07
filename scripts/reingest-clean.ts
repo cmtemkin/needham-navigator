@@ -10,6 +10,7 @@
  *   npx tsx scripts/reingest-clean.ts --input=scripts/scraped-data-remaining.json
  *   npx tsx scripts/reingest-clean.ts --hosts=needhamma.gov,needham.k12.ma.us
  *   npx tsx scripts/reingest-clean.ts --limit=5                # Smoke-test the pipeline
+ *   npx tsx scripts/reingest-clean.ts --match=CivicAlerts       # Re-ingest specific URLs
  *
  * --hosts restricts ingestion to documents whose source_url host ends with one
  * of the given suffixes. The 2026 Neon migration used it to drop mass.gov and
@@ -62,7 +63,7 @@ async function main() {
   // Knowing which file a re-ingest actually read is worth keeping in the log.
   console.log(`Loaded ${allDocuments.length} scraped documents from ${inputName}`);
 
-  const documents = hostSuffixes.length
+  let documents = hostSuffixes.length
     ? allDocuments.filter((d) => {
         const match = /^https?:\/\/([^/]+)/.exec(d.source_url ?? "");
         if (!match) return false;
@@ -75,6 +76,17 @@ async function main() {
     console.log(
       `Filtered to ${documents.length} documents matching hosts: ${hostSuffixes.join(", ")}`
     );
+  }
+
+  // --match re-ingests just the documents whose URL contains a substring. Used
+  // to pick up individual pages that failed a previous run without repeating the
+  // whole corpus; documents upsert on (town_id, url) so this is safe to re-run.
+  const matchArg = args.find((a) => a.startsWith("--match="));
+  if (matchArg) {
+    const needle = matchArg.slice("--match=".length);
+    const before = documents.length;
+    documents = documents.filter((d) => (d.source_url ?? "").includes(needle));
+    console.log(`Matched ${documents.length} of ${before} documents on URL substring`);
   }
 
   const limitArg = args.find((a) => a.startsWith("--limit="));
