@@ -84,6 +84,12 @@ async function main() {
   const matchArg = args.find((a) => a.startsWith("--match="));
   if (matchArg) {
     const needle = matchArg.slice("--match=".length);
+    // Restrict to characters that can legally appear in a URL. A substring with
+    // anything else would match nothing anyway, so failing loudly beats a run
+    // that silently ingests zero documents.
+    if (!/^[A-Za-z0-9._~:/?#[\]@!$&'()*+,;=%-]+$/.test(needle)) {
+      throw new Error("--match must contain only characters that are legal in a URL");
+    }
     const before = documents.length;
     documents = documents.filter((d) => (d.source_url ?? "").includes(needle));
     console.log(`Matched ${documents.length} of ${before} documents on URL substring`);
