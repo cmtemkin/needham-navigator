@@ -508,7 +508,6 @@ async function upsertEvents(
       image_url: null,
       metadata,
       content_hash: contentHash,
-      embedding: null,
       updated_at: new Date().toISOString(),
     };
 
