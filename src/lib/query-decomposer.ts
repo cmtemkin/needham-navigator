@@ -16,6 +16,7 @@
 
 import { openai } from "@ai-sdk/openai";
 import { generateText } from "ai";
+import { GENERATION_MODEL } from "@/lib/models";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -140,7 +141,7 @@ export async function decomposeQuery(query: string): Promise<QueryDecomposition>
   try {
     // Call GPT-5 Nano with 2-second timeout
     const { text } = await generateText({
-      model: openai("gpt-5-nano"),
+      model: openai(GENERATION_MODEL),
       system: DECOMPOSITION_SYSTEM_PROMPT,
       prompt: `Query: "${trimmed}"`,
       temperature: 0,

@@ -17,6 +17,7 @@
 
 import { openai } from "@ai-sdk/openai";
 import { generateText } from "ai";
+import { GENERATION_MODEL } from "@/lib/models";
 
 const REWRITE_SYSTEM_PROMPT = `You are a municipal search query optimizer. Your job is to rewrite a resident's question into an ideal search query that would match official government documents.
 
@@ -42,7 +43,7 @@ export async function rewriteQuery(
 ): Promise<string | null> {
   try {
     const { text } = await generateText({
-      model: openai("gpt-4.1-nano"),
+      model: openai(GENERATION_MODEL),
       system: REWRITE_SYSTEM_PROMPT,
       prompt: `Town: ${townName}\nResident's question: "${originalQuery}"`,
       temperature: 0,

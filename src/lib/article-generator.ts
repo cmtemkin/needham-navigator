@@ -10,8 +10,9 @@ import OpenAI from 'openai';
 import { getSupabaseServiceClient } from '@/lib/supabase';
 import { checkGeographicRelevance, isUrlGeographicallyRelevant } from '@/lib/geo-filter';
 import type { Article, CreateArticleInput, ArticleCategory, SourceType } from '@/types/article';
+import { GENERATION_MODEL } from "@/lib/models";
 
-const MODEL = 'gpt-4o-mini';
+const MODEL = GENERATION_MODEL;
 const TOWN_ID = 'needham';
 const TOWN_NAME = 'Needham, MA';
 const DEFAULT_DAYS_BACK = 30;

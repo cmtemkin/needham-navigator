@@ -15,6 +15,7 @@
 
 import { getSupabaseServiceClient } from "../src/lib/supabase";
 import OpenAI from "openai";
+import { GENERATION_MODEL } from "../src/lib/models";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -100,7 +101,7 @@ async function extractBusinessData(
 ): Promise<BusinessExtractionResult | null> {
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // Fast and cheap for extraction
+      model: GENERATION_MODEL,
       messages: [
         { role: "system", content: EXTRACTION_PROMPT },
         { role: "user", content: `Source URL: ${sourceUrl}\n\nText:\n${text.substring(0, 2000)}` },

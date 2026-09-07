@@ -1,19 +1,11 @@
 import { getSupabaseServiceClient } from "@/lib/supabase";
+import { MODEL_PRICING } from "@/lib/models";
 
 // ---------------------------------------------------------------------------
 // Model pricing (USD per 1M tokens) — update when prices change
 // ---------------------------------------------------------------------------
 
-export const MODEL_COSTS: Record<string, { input: number; output: number }> = {
-  // Chat models
-  "gpt-5-nano":                { input: 0.10, output: 0.40 },
-  "gpt-5-mini":                { input: 0.30, output: 1.20 },
-  "gpt-4o-mini":               { input: 0.15, output: 0.60 },
-  "gpt-4.1-mini":              { input: 0.40, output: 1.60 },
-  // Embedding models
-  "text-embedding-3-small":    { input: 0.02, output: 0 },
-  "text-embedding-3-large":    { input: 0.13, output: 0 },
-};
+export { MODEL_PRICING as MODEL_COSTS };
 
 // ---------------------------------------------------------------------------
 // Calculate cost from token counts
@@ -24,7 +16,7 @@ export function calculateCost(
   promptTokens: number,
   completionTokens: number,
 ): number {
-  const pricing = MODEL_COSTS[model];
+  const pricing = MODEL_PRICING[model];
   if (!pricing) return 0;
   return (promptTokens * pricing.input + completionTokens * pricing.output) / 1_000_000;
 }
