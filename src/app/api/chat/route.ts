@@ -14,11 +14,10 @@ import {
 import { getSupabaseClient } from "@/lib/supabase";
 import { getTownById } from "@/lib/towns";
 import { getCachedAnswer, setCachedAnswer, invalidateCachedAnswer } from "@/lib/answer-cache";
+import { GENERATION_MODEL, ALLOWED_CHAT_MODELS } from "@/lib/models";
 
-const DEFAULT_CHAT_MODEL = "gpt-5-nano";
-const ALLOWED_MODELS = new Set([
-  "gpt-5-nano", "gpt-5-mini", "gpt-4o-mini", "gpt-4.1-mini",
-]);
+const DEFAULT_CHAT_MODEL = GENERATION_MODEL;
+const ALLOWED_MODELS = new Set<string>(ALLOWED_CHAT_MODELS);
 
 type IncomingMessage = {
   role: "user" | "assistant" | "system";
