@@ -49,9 +49,60 @@ function migrationFiles(): string[] {
     .sort();
 }
 
+/**
+ * Apply one migration in a transaction, retrying once on a dropped connection.
+ * Neon suspends idle computes, so the first statement after a pause can fail
+ * with a terminated connection even though nothing is wrong with the SQL.
+ */
+async function applyMigration(
+  pool: Pool,
+  file: string,
+  sql: string,
+  attempt = 1
+): Promise<void> {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    await client.query(sql);
+    await client.query("INSERT INTO schema_migrations (name) VALUES ($1)", [file]);
+    await client.query("COMMIT");
+  } catch (error) {
+    try {
+      await client.query("ROLLBACK");
+    } catch {
+      // The connection is already gone; nothing to roll back.
+    }
+    const message = error instanceof Error ? error.message : String(error);
+    const droppedConnection =
+      /Connection terminated|socket hang up|ECONNRESET|server closed the connection/i.test(
+        message
+      );
+    if (droppedConnection && attempt === 1) {
+      console.warn(`[migrate] connection dropped on ${file}; retrying once`);
+      client.release();
+      return applyMigration(pool, file, sql, 2);
+    }
+    console.error(`✗ ${file}`);
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
 async function main(): Promise<void> {
   const statusOnly = process.argv.includes("--status");
-  const pool = new Pool({ connectionString: getDatabaseUrl() });
+  const pool = new Pool({
+    connectionString: getDatabaseUrl(),
+    // Neon requires TLS and will drop a connection whose compute suspends
+    // mid-run. Without a handler, that surfaces as an unhandled 'error' event
+    // that kills the process partway through the migration set.
+    ssl: { rejectUnauthorized: false },
+    connectionTimeoutMillis: 30_000,
+    idleTimeoutMillis: 0,
+  });
+  pool.on("error", (err) => {
+    console.warn(`[migrate] pool error (will retry): ${err.message}`);
+  });
 
   try {
     await pool.query(`
@@ -83,20 +134,8 @@ async function main(): Promise<void> {
 
     for (const file of pending) {
       const sql = readFileSync(resolve(MIGRATIONS_DIR, file), "utf8");
-      const client = await pool.connect();
-      try {
-        await client.query("BEGIN");
-        await client.query(sql);
-        await client.query("INSERT INTO schema_migrations (name) VALUES ($1)", [file]);
-        await client.query("COMMIT");
-        console.log(`✓ ${file}`);
-      } catch (error) {
-        await client.query("ROLLBACK");
-        console.error(`✗ ${file}`);
-        throw error;
-      } finally {
-        client.release();
-      }
+      await applyMigration(pool, file, sql);
+      console.log(`✓ ${file}`);
     }
 
     console.log(`\nApplied ${pending.length} migration(s).`);
