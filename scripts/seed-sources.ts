@@ -5,7 +5,7 @@
  * Run: npx tsx scripts/seed-sources.ts [--town needham] [--clear]
  */
 
-import { getSupabaseServiceClient, type DbClient } from "../src/lib/db";
+import { getSupabaseServiceClient } from "../src/lib/db";
 
 const DATABASE_URL = process.env.DATABASE_URL;
 

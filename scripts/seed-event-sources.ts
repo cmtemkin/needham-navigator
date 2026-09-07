@@ -9,7 +9,7 @@
  * Run: npx tsx scripts/seed-event-sources.ts
  */
 
-import { getSupabaseServiceClient, type DbClient } from "../src/lib/db";
+import { getSupabaseServiceClient } from "../src/lib/db";
 import dotenv from "dotenv";
 
 dotenv.config({ path: ".env.local" });

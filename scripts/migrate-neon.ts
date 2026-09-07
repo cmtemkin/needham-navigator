@@ -16,8 +16,8 @@
  * work against a plain Postgres (the container used by the migration tests).
  */
 
-import { readFileSync, readdirSync, existsSync } from "fs";
-import { resolve } from "path";
+import { readFileSync, readdirSync, existsSync } from "node:fs";
+import { resolve } from "node:path";
 import { Pool } from "pg";
 
 const MIGRATIONS_DIR = resolve(__dirname, "../db/migrations");

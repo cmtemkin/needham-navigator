@@ -24,8 +24,8 @@
  * The generated files are committed; this script is kept for auditability.
  */
 
-import { readFileSync, writeFileSync, mkdirSync, readdirSync } from "fs";
-import { resolve, basename } from "path";
+import { readFileSync, writeFileSync, mkdirSync, readdirSync } from "node:fs";
+import { resolve, basename } from "node:path";
 
 const SRC = resolve(__dirname, "../supabase/migrations");
 const OUT = resolve(__dirname, "../db/migrations");

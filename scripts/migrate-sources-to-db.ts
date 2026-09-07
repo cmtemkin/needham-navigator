@@ -7,7 +7,7 @@
  * Usage: npx ts-node scripts/migrate-sources-to-db.ts
  */
 
-import { getSupabaseServiceClient, type DbClient } from "../src/lib/db";
+import { getSupabaseServiceClient } from "../src/lib/db";
 import { CRAWL_SOURCES } from "../config/crawl-sources";
 
 const databaseUrl = process.env.DATABASE_URL;
