@@ -22,6 +22,11 @@
  *
  * Run once: npx tsx scripts/port-migrations-to-neon.ts
  * The generated files are committed; this script is kept for auditability.
+ *
+ * IMPORTANT: this only writes the files it generates — it never deletes. Do NOT
+ * `rm -rf db/migrations` before re-running, because hand-written migrations live
+ * in the same directory and are not regenerated (currently
+ * 20260907000000_fulltext_search_index.sql, which has no Supabase ancestor).
  */
 
 import { readFileSync, writeFileSync, mkdirSync, readdirSync } from "node:fs";
@@ -124,12 +129,14 @@ function port(): void {
 
     totalStripped += stripped;
 
+    const changeNote =
+      stripped > 0
+        ? `-- ${stripped} Supabase-only statement(s) removed (RLS / policies / grants).\n`
+        : "-- No changes required.\n";
     const header =
       `-- Ported from supabase/migrations/${name} for Neon.\n` +
-      (stripped > 0
-        ? `-- ${stripped} Supabase-only statement(s) removed (RLS / policies / grants).\n`
-        : `-- No changes required.\n`) +
-      `-- Regenerate with: npx tsx scripts/port-migrations-to-neon.ts\n\n`;
+      changeNote +
+      "-- Regenerate with: npx tsx scripts/port-migrations-to-neon.ts\n\n";
 
     const body = kept.join("").trim() + "\n";
     writeFileSync(resolve(OUT, name), header + body);
