@@ -91,15 +91,22 @@ async function applyMigration(
 
 async function main(): Promise<void> {
   const statusOnly = process.argv.includes("--status");
+  const connectionString = getDatabaseUrl();
+
+  // Enable TLS only when the connection string asks for it. Neon requires TLS;
+  // a local or CI Postgres container answers "the server does not support SSL
+  // connections" if it is forced on unconditionally.
+  const wantsSsl = /sslmode=(require|verify-ca|verify-full|prefer)/.test(connectionString);
+
   const pool = new Pool({
-    connectionString: getDatabaseUrl(),
-    // Neon requires TLS and will drop a connection whose compute suspends
-    // mid-run. Without a handler, that surfaces as an unhandled 'error' event
-    // that kills the process partway through the migration set.
-    ssl: { rejectUnauthorized: false },
+    connectionString,
+    ...(wantsSsl ? { ssl: { rejectUnauthorized: false } } : {}),
     connectionTimeoutMillis: 30_000,
     idleTimeoutMillis: 0,
   });
+  // Neon suspends idle computes and drops the connection. Without a handler
+  // that surfaces as an unhandled 'error' event which kills the process
+  // partway through the migration set.
   pool.on("error", (err) => {
     console.warn(`[migrate] pool error (will retry): ${err.message}`);
   });

@@ -7,6 +7,13 @@
  * Usage:
  *   npx tsx scripts/reingest-clean.ts
  *   npx tsx scripts/reingest-clean.ts --clear-first    # Delete all existing chunks first
+ *   npx tsx scripts/reingest-clean.ts --input=scripts/scraped-data-remaining.json
+ *   npx tsx scripts/reingest-clean.ts --hosts=needhamma.gov,needham.k12.ma.us
+ *
+ * --hosts restricts ingestion to documents whose source_url host ends with one
+ * of the given suffixes. The 2026 Neon migration used it to drop mass.gov and
+ * Wellesley, which were 84% of the corpus (15,070 of 19,550 pages) but are not
+ * Needham-specific.
  */
 
 import * as fs from "fs";
@@ -21,10 +28,33 @@ async function main() {
   const townId = "needham";
   const supabase = getSupabaseServiceClient();
 
+  const inputArg = args.find((a) => a.startsWith("--input="));
+  const inputPath = inputArg ? inputArg.slice("--input=".length) : "scripts/scraped-data.json";
+
+  const hostsArg = args.find((a) => a.startsWith("--hosts="));
+  const hostSuffixes = hostsArg
+    ? hostsArg.slice("--hosts=".length).split(",").map((h) => h.trim()).filter(Boolean)
+    : [];
+
   // Load scraped data
-  const rawData = fs.readFileSync("scripts/scraped-data.json", "utf-8");
-  const documents: ScrapedDocument[] = JSON.parse(rawData);
-  console.log(`Loaded ${documents.length} scraped documents`);
+  const rawData = fs.readFileSync(inputPath, "utf-8");
+  const allDocuments: ScrapedDocument[] = JSON.parse(rawData);
+  console.log(`Loaded ${allDocuments.length} scraped documents from ${inputPath}`);
+
+  const documents = hostSuffixes.length
+    ? allDocuments.filter((d) => {
+        const match = /^https?:\/\/([^/]+)/.exec(d.source_url ?? "");
+        if (!match) return false;
+        const host = match[1].toLowerCase();
+        return hostSuffixes.some((suffix) => host === suffix || host.endsWith(`.${suffix}`));
+      })
+    : allDocuments;
+
+  if (hostSuffixes.length) {
+    console.log(
+      `Filtered to ${documents.length} documents matching hosts: ${hostSuffixes.join(", ")}`
+    );
+  }
 
   if (clearFirst) {
     console.log("\n--- Clearing existing data ---");
