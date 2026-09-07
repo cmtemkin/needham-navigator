@@ -146,7 +146,7 @@ function toError(error: unknown, code = "DB_ERROR"): DbError {
 function ident(name: string): string {
   const parts = name.split(".");
   for (const part of parts) {
-    if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(part)) {
+    if (!/^[A-Za-z_]\w*$/.test(part)) {
       throw new Error(`Invalid SQL identifier: ${name}`);
     }
   }
@@ -180,8 +180,8 @@ function selectList(columns: string): string {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 class QueryBuilder<T = any[]> implements PromiseLike<DbResult<T>> {
-  private conditions: Condition[] = [];
-  private orderParts: Array<() => string> = [];
+  private readonly conditions: Condition[] = [];
+  private readonly orderParts: Array<() => string> = [];
   private limitValue: number | null = null;
   private offsetValue: number | null = null;
   private selectColumns = "*";
@@ -346,12 +346,10 @@ class QueryBuilder<T = any[]> implements PromiseLike<DbResult<T>> {
 
   order(column: string, options?: { ascending?: boolean; nullsFirst?: boolean }): this {
     const dir = options?.ascending === false ? "DESC" : "ASC";
-    const nulls =
-      options?.nullsFirst === undefined
-        ? ""
-        : options.nullsFirst
-          ? " NULLS FIRST"
-          : " NULLS LAST";
+    let nulls = "";
+    if (options?.nullsFirst !== undefined) {
+      nulls = options.nullsFirst ? " NULLS FIRST" : " NULLS LAST";
+    }
     this.orderParts.push(() => `${ident(column)} ${dir}${nulls}`);
     return this;
   }
@@ -413,64 +411,97 @@ class QueryBuilder<T = any[]> implements PromiseLike<DbResult<T>> {
       ? ` WHERE ${conditions.map((c) => c.sql()).join(" AND ")}`
       : "";
 
-    if (this.op === "select") {
-      if (this.headOnly) {
-        // { head: true } asks for the count only; PostgREST returns no rows.
-        const text = `SELECT COUNT(*)::int AS "__count" FROM ${table}${whereSql}`;
-        return this.materialize(text, whereValues);
-      }
-      const countCol = this.wantCount ? ', COUNT(*) OVER() AS "__count"' : "";
-      let text = `SELECT ${selectList(this.selectColumns)}${countCol} FROM ${table}${whereSql}`;
-      if (this.orderParts.length) text += ` ORDER BY ${this.orderParts.map((o) => o()).join(", ")}`;
-      if (this.limitValue !== null) text += ` LIMIT ${Number(this.limitValue)}`;
-      if (this.offsetValue !== null) text += ` OFFSET ${Number(this.offsetValue)}`;
-      return this.materialize(text, whereValues);
+    switch (this.op) {
+      case "select":
+        return this.buildSelect(table, whereSql, whereValues);
+      case "insert":
+      case "upsert":
+        return this.buildInsert(table);
+      case "update":
+        return this.buildUpdate(table, whereSql, whereValues);
+      default:
+        return this.buildDelete(table, whereSql, whereValues);
     }
+  }
 
-    if (this.op === "insert" || this.op === "upsert") {
-      if (this.payload.length === 0) throw new Error("insert() requires at least one row");
-      const columns = Array.from(new Set(this.payload.flatMap((r) => Object.keys(r))));
-      const params: unknown[] = [];
-      const tuples = this.payload.map((row) => {
-        const placeholders = columns.map((c) => {
-          params.push(row[c] ?? null);
-          return "?";
-        });
-        return `(${placeholders.join(", ")})`;
+  private buildSelect(
+    table: string,
+    whereSql: string,
+    whereValues: unknown[]
+  ): { text: string; params: unknown[] } {
+    if (this.headOnly) {
+      // { head: true } asks for the count only; PostgREST returns no rows.
+      return this.materialize(
+        `SELECT COUNT(*)::int AS "__count" FROM ${table}${whereSql}`,
+        whereValues
+      );
+    }
+    const countCol = this.wantCount ? ', COUNT(*) OVER() AS "__count"' : "";
+    let text = `SELECT ${selectList(this.selectColumns)}${countCol} FROM ${table}${whereSql}`;
+    if (this.orderParts.length) {
+      text += ` ORDER BY ${this.orderParts.map((o) => o()).join(", ")}`;
+    }
+    if (this.limitValue !== null) text += ` LIMIT ${Number(this.limitValue)}`;
+    if (this.offsetValue !== null) text += ` OFFSET ${Number(this.offsetValue)}`;
+    return this.materialize(text, whereValues);
+  }
+
+  /** ON CONFLICT clause for an upsert; empty string for a plain insert. */
+  private conflictClause(columns: string[]): string {
+    if (this.op !== "upsert") return "";
+    const target = this.conflictTarget
+      ? this.conflictTarget.split(",").map((c) => ident(c.trim())).join(", ")
+      : null;
+    if (!target) return " ON CONFLICT DO NOTHING";
+    if (this.ignoreDuplicates) return ` ON CONFLICT (${target}) DO NOTHING`;
+    const assignments = columns
+      .map((c) => `${ident(c)} = EXCLUDED.${ident(c)}`)
+      .join(", ");
+    return ` ON CONFLICT (${target}) DO UPDATE SET ${assignments}`;
+  }
+
+  private buildInsert(table: string): { text: string; params: unknown[] } {
+    if (this.payload.length === 0) throw new Error("insert() requires at least one row");
+    const columns = Array.from(new Set(this.payload.flatMap((r) => Object.keys(r))));
+    const params: unknown[] = [];
+    const tuples = this.payload.map((row) => {
+      const placeholders = columns.map((c) => {
+        params.push(row[c] ?? null);
+        return "?";
       });
-      let text =
-        `INSERT INTO ${table} (${columns.map(ident).join(", ")}) VALUES ${tuples.join(", ")}`;
-      if (this.op === "upsert") {
-        const target = this.conflictTarget
-          ? this.conflictTarget.split(",").map((c) => ident(c.trim())).join(", ")
-          : null;
-        if (!target || this.ignoreDuplicates) {
-          text += target ? ` ON CONFLICT (${target}) DO NOTHING` : " ON CONFLICT DO NOTHING";
-        } else {
-          text += ` ON CONFLICT (${target}) DO UPDATE SET ${columns
-            .map((c) => `${ident(c)} = EXCLUDED.${ident(c)}`)
-            .join(", ")}`;
-        }
-      }
-      if (this.returning) text += ` RETURNING ${selectList(this.selectColumns)}`;
-      return this.materialize(text, params);
-    }
+      return `(${placeholders.join(", ")})`;
+    });
 
-    if (this.op === "update") {
-      const row = this.payload[0] ?? {};
-      const params: unknown[] = [];
-      const assignments = Object.entries(row).map(([column, value]) => {
-        params.push(value);
-        return `${ident(column)} = ?`;
-      });
-      if (!assignments.length) throw new Error("update() requires at least one column");
-      let text = `UPDATE ${table} SET ${assignments.join(", ")}${whereSql}`;
-      params.push(...whereValues);
-      if (this.returning) text += ` RETURNING ${selectList(this.selectColumns)}`;
-      return this.materialize(text, params);
-    }
+    let text = `INSERT INTO ${table} (${columns.map(ident).join(", ")}) VALUES ${tuples.join(", ")}`;
+    text += this.conflictClause(columns);
+    if (this.returning) text += ` RETURNING ${selectList(this.selectColumns)}`;
+    return this.materialize(text, params);
+  }
 
-    // delete
+  private buildUpdate(
+    table: string,
+    whereSql: string,
+    whereValues: unknown[]
+  ): { text: string; params: unknown[] } {
+    const row = this.payload[0] ?? {};
+    const params: unknown[] = [];
+    const assignments = Object.entries(row).map(([column, value]) => {
+      params.push(value);
+      return `${ident(column)} = ?`;
+    });
+    if (!assignments.length) throw new Error("update() requires at least one column");
+
+    let text = `UPDATE ${table} SET ${assignments.join(", ")}${whereSql}`;
+    params.push(...whereValues);
+    if (this.returning) text += ` RETURNING ${selectList(this.selectColumns)}`;
+    return this.materialize(text, params);
+  }
+
+  private buildDelete(
+    table: string,
+    whereSql: string,
+    whereValues: unknown[]
+  ): { text: string; params: unknown[] } {
     let text = `DELETE FROM ${table}${whereSql}`;
     if (this.returning) text += ` RETURNING ${selectList(this.selectColumns)}`;
     return this.materialize(text, whereValues);
@@ -550,6 +581,12 @@ class QueryBuilder<T = any[]> implements PromiseLike<DbResult<T>> {
     return { data: rows as unknown as T, error: null, count };
   }
 
+  /**
+   * Makes the builder awaitable. Implementing PromiseLike is the whole reason
+   * `await db.from(...).select(...)` works without a terminal call, matching
+   * supabase-js. Sonar flags `then` on a class by default; here it is the point.
+   */
+  // NOSONAR — intentional thenable; see comment above.
   then<TResult1 = DbResult<T>, TResult2 = never>(
     onfulfilled?: ((value: DbResult<T>) => TResult1 | PromiseLike<TResult1>) | null,
     onrejected?: ((reason: unknown) => TResult2 | PromiseLike<TResult2>) | null
@@ -608,6 +645,6 @@ let serviceClient: DbClient | null = null;
 
 /** Unscoped client for ingestion scripts and admin operations. */
 export function getSupabaseServiceClient(): DbClient {
-  if (!serviceClient) serviceClient = new DbClient(null);
+  serviceClient ??= new DbClient(null);
   return serviceClient;
 }
