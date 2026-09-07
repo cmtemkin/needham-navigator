@@ -1,5 +1,5 @@
 import { generateEmbedding } from "@/lib/embeddings";
-import { getSupabaseClient } from "@/lib/supabase";
+import { getSupabaseClient } from "@/lib/db";
 import { queryPinecone, PINECONE_NS_CHUNKS, PINECONE_NS_CONTENT } from "@/lib/upstash-vector";
 import { DEFAULT_TOWN_ID as DEFAULT_TOWN_ID_FROM_CONFIG } from "@/lib/towns";
 import { expandQuery } from "@/lib/synonyms";

@@ -7,7 +7,7 @@
  */
 
 import OpenAI from 'openai';
-import { getSupabaseServiceClient } from '@/lib/supabase';
+import { getSupabaseServiceClient } from '@/lib/db';
 import { checkGeographicRelevance, isUrlGeographicallyRelevant } from '@/lib/geo-filter';
 import type { Article, CreateArticleInput, ArticleCategory, SourceType } from '@/types/article';
 import { GENERATION_MODEL } from "@/lib/models";

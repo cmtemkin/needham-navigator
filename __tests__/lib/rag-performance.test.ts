@@ -26,7 +26,7 @@ jest.mock("@/lib/upstash-vector", () => ({
 const mockSelect = jest.fn();
 const mockIn = jest.fn();
 const mockFrom = jest.fn();
-jest.mock("@/lib/supabase", () => ({
+jest.mock("@/lib/db", () => ({
   getSupabaseClient: () => ({
     from: (...args: unknown[]) => mockFrom(...args),
   }),

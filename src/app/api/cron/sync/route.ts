@@ -8,7 +8,7 @@
  * Protected by CRON_SECRET or ADMIN_PASSWORD.
  */
 
-import { getSupabaseServiceClient } from "@/lib/supabase";
+import { getSupabaseServiceClient } from "@/lib/db";
 
 const DEFAULT_TOWN_ID = "needham";
 

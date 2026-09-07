@@ -11,7 +11,7 @@
  * Run after ingestion to verify data quality.
  */
 
-import { getSupabaseServiceClient } from "../src/lib/supabase";
+import { getSupabaseServiceClient } from "../src/lib/db";
 import { createHash } from "crypto";
 
 // ---------------------------------------------------------------------------

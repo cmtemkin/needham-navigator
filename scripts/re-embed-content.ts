@@ -8,7 +8,7 @@
  * in the "content" namespace.
  */
 
-import { getSupabaseServiceClient } from "../src/lib/supabase";
+import { getSupabaseServiceClient } from "../src/lib/db";
 import { generateEmbeddings } from "../src/lib/embeddings";
 import { upsertToPinecone, PINECONE_NS_CONTENT } from "../src/lib/upstash-vector";
 import type { PineconeVector } from "../src/lib/upstash-vector";

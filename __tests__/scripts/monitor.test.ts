@@ -8,7 +8,7 @@ const mockUpdateCall = jest.fn();
 const mockInsert = jest.fn().mockResolvedValue({ error: null });
 const mockLt = jest.fn().mockResolvedValue({ error: null });
 
-jest.mock("@/lib/supabase", () => ({
+jest.mock("@/lib/db", () => ({
   getSupabaseServiceClient: () => ({
     from: jest.fn().mockImplementation((table: string) => {
       if (table === "documents") {

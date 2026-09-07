@@ -1,4 +1,4 @@
-import { getSupabaseServiceClient } from './supabase';
+import { getSupabaseServiceClient } from './db';
 
 export interface CachedAnswer {
   answer_html: string;

@@ -2,7 +2,7 @@
  * Quick script to check enrichment results in the database
  */
 
-import { getSupabaseServiceClient } from "../src/lib/supabase";
+import { getSupabaseServiceClient } from "../src/lib/db";
 
 async function checkEnrichment() {
   const supabase = getSupabaseServiceClient();

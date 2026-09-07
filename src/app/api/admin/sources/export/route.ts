@@ -1,5 +1,5 @@
 import { isAdminAuthorized, unauthorizedAdminResponse } from "@/lib/admin-auth";
-import { getSupabaseServiceClient } from "@/lib/supabase";
+import { getSupabaseServiceClient } from "@/lib/db";
 import { DEFAULT_TOWN_ID } from "@/../config/towns";
 
 export async function GET(request: Request): Promise<Response> {

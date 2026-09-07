@@ -32,7 +32,7 @@ const mockFrom = jest.fn().mockImplementation((table: string) => {
   return {};
 });
 
-jest.mock("@/lib/supabase", () => ({
+jest.mock("@/lib/db", () => ({
   getSupabaseServiceClient: () => ({
     from: mockFrom,
   }),
