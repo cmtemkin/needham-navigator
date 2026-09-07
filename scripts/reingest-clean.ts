@@ -56,7 +56,10 @@ async function main() {
   // Load scraped data
   const rawData = fs.readFileSync(inputPath, "utf-8");
   const allDocuments: ScrapedDocument[] = JSON.parse(rawData);
-  // inputName is validated above, so it is safe to echo.
+  // NOSONAR — inputName is not raw argv: it is a basename checked against
+  // /^[A-Za-z0-9._-]+\.json$/ above, so it cannot carry a path or arbitrary
+  // text. Sonar's taint analysis does not recognise that regex as a sanitiser.
+  // Knowing which file a re-ingest actually read is worth keeping in the log.
   console.log(`Loaded ${allDocuments.length} scraped documents from ${inputName}`);
 
   const documents = hostSuffixes.length
