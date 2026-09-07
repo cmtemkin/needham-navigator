@@ -149,13 +149,14 @@ export async function embedAndStoreChunks(
 
       const embeddings = await generateEmbeddings(textsForEmbedding);
 
-      // Prepare Supabase rows (no embedding — vectors go to Pinecone)
+      // Chunk text + metadata only. The embedding column was dropped by
+      // 20260221000002_drop_embeddings.sql when vectors moved to Upstash;
+      // writing it fails against a correctly-migrated schema.
       const rows = batch.map((chunk, idx) => ({
         document_id: documentId,
         town_id: townId,
         chunk_index: i + idx,
         chunk_text: chunk.text,
-        embedding: null,
         metadata: chunk.metadata,
       }));
 

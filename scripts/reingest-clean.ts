@@ -9,6 +9,7 @@
  *   npx tsx scripts/reingest-clean.ts --clear-first    # Delete all existing chunks first
  *   npx tsx scripts/reingest-clean.ts --input=scripts/scraped-data-remaining.json
  *   npx tsx scripts/reingest-clean.ts --hosts=needhamma.gov,needham.k12.ma.us
+ *   npx tsx scripts/reingest-clean.ts --limit=5                # Smoke-test the pipeline
  *
  * --hosts restricts ingestion to documents whose source_url host ends with one
  * of the given suffixes. The 2026 Neon migration used it to drop mass.gov and
@@ -16,7 +17,8 @@
  * Needham-specific.
  */
 
-import * as fs from "fs";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import { getSupabaseServiceClient } from "../src/lib/db";
 import { chunkDocument } from "./chunk";
 import { embedAndStoreChunks } from "./embed";
@@ -32,14 +34,23 @@ async function main() {
   const inputPath = inputArg ? inputArg.slice("--input=".length) : "scripts/scraped-data.json";
 
   const hostsArg = args.find((a) => a.startsWith("--hosts="));
+  // Validate host suffixes rather than trusting the raw flag: they are used in
+  // matching and echoed to logs, and a hostname has a narrow legal shape.
   const hostSuffixes = hostsArg
-    ? hostsArg.slice("--hosts=".length).split(",").map((h) => h.trim()).filter(Boolean)
+    ? hostsArg
+        .slice("--hosts=".length)
+        .split(",")
+        .map((h) => h.trim().toLowerCase())
+        .filter((h) => /^[a-z0-9.-]+$/.test(h))
     : [];
 
   // Load scraped data
   const rawData = fs.readFileSync(inputPath, "utf-8");
   const allDocuments: ScrapedDocument[] = JSON.parse(rawData);
-  console.log(`Loaded ${allDocuments.length} scraped documents from ${inputPath}`);
+  // Log the basename only — the full path can carry local directory names.
+  console.log(
+    `Loaded ${allDocuments.length} scraped documents from ${path.basename(inputPath)}`
+  );
 
   const documents = hostSuffixes.length
     ? allDocuments.filter((d) => {
@@ -54,6 +65,13 @@ async function main() {
     console.log(
       `Filtered to ${documents.length} documents matching hosts: ${hostSuffixes.join(", ")}`
     );
+  }
+
+  const limitArg = args.find((a) => a.startsWith("--limit="));
+  const limit = limitArg ? Number.parseInt(limitArg.slice("--limit=".length), 10) : 0;
+  if (limit > 0) {
+    documents.length = Math.min(documents.length, limit);
+    console.log(`Limited to ${documents.length} documents`);
   }
 
   if (clearFirst) {

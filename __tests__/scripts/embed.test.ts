@@ -131,7 +131,11 @@ describe("embed", () => {
     );
   });
 
-  it("stores null embedding in Supabase", async () => {
+  it("does not write an embedding column — vectors live in Upstash", async () => {
+    // 20260221000002_drop_embeddings.sql removed document_chunks.embedding when
+    // vectors moved to the vector store. This test previously asserted
+    // `embedding: null` was written, which locked in a bug: against a correctly
+    // migrated schema every insert failed with "column embedding does not exist".
     const chunks = createTestChunks(1);
     mockGenerateEmbeddings.mockResolvedValueOnce([new Array(1536).fill(0.1)]);
     mockInsertSelect.mockResolvedValueOnce({
@@ -141,11 +145,14 @@ describe("embed", () => {
 
     await embedAndStoreChunks(chunks, "test-doc-id");
 
-    expect(mockInsert).toHaveBeenCalledWith(
-      expect.arrayContaining([
-        expect.objectContaining({ embedding: null }),
-      ])
-    );
+    const insertedRows = mockInsert.mock.calls[0][0] as Array<Record<string, unknown>>;
+    expect(insertedRows).toHaveLength(1);
+    expect(insertedRows[0]).not.toHaveProperty("embedding");
+    expect(insertedRows[0]).toMatchObject({
+      document_id: "test-doc-id",
+      chunk_index: 0,
+      chunk_text: "Chunk 0 text content",
+    });
   });
 
   it("deletes existing chunks before inserting", async () => {
