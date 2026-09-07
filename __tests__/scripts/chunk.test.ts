@@ -219,4 +219,54 @@ describe("chunk", () => {
       expect(chunks[0].metadata.effective_date).toBe("2024-01-01");
     });
   });
+  describe("oversized documents", () => {
+    // Regression: splitOversizedChunk recursed without guaranteeing progress.
+    // Each pass carried overlap tokens into the next segment, so the replacement
+    // text could come out no shorter than the text it replaced. A 48 KB
+    // needhamma.gov election-results page blew the stack at ~193 frames and was
+    // silently dropped from ingestion — three documents were lost before it was
+    // caught during the 2026 Neon re-ingest.
+    //
+    // The shape matters, not just the size: a markdown table has very few blank
+    // lines, so the first delimiter (/\n\n+/) yields a handful of huge parts
+    // rather than many small ones, and few sentence stops for the last delimiter
+    // to use. A document of the same size with regular paragraphs splits fine.
+    // Verified that 200 rows reproduces the overflow against the pre-fix code.
+    function electionResultsTable(rows: number): string {
+      const header = "# Official Annual Town Election Results\n\nPrecinct totals follow.";
+      const body = Array.from(
+        { length: rows },
+        (_, i) => `| Candidate Name ${i} | 115 | 178 | 159 | 212 | 230 | 183 | 255 | 136 | 228 | 183 | 1879 |`
+      ).join("\n");
+      return `${header}\n\n${body}\n\n| TOTAL | 177 | 298 | 229 | 330 | 360 | 295 | 2878 |`;
+    }
+
+    it("chunks a large table-shaped document without overflowing the stack", () => {
+      const text = electionResultsTable(200);
+      expect(text.length).toBeGreaterThan(15_000);
+
+      const chunks = chunkDocument(text, {
+        documentId: "big-doc",
+        documentUrl: "https://needhamma.gov/CivicAlerts.asp?AID=1432",
+        documentTitle: "Official 2022 Annual Town Election Results",
+      });
+
+      expect(chunks.length).toBeGreaterThan(1);
+      expect(chunks.every((c) => c.text.trim().length > 0)).toBe(true);
+      // Nothing may be silently dropped; overlap means the total can exceed the source.
+      const combined = chunks.reduce((n, c) => n + c.text.length, 0);
+      expect(combined).toBeGreaterThanOrEqual(text.length * 0.9);
+    });
+
+    it("terminates on text with no usable delimiters at all", () => {
+      // One unbroken run: every delimiter fails, so only the hard token split
+      // can finish the job.
+      const chunks = chunkDocument("x".repeat(1_500), {
+        documentId: "no-delims",
+        documentUrl: "https://example.com/blob",
+        documentTitle: "Blob",
+      });
+      expect(chunks.length).toBeGreaterThan(0);
+    });
+  });
 });
