@@ -31,7 +31,16 @@ async function main() {
   const supabase = getSupabaseServiceClient();
 
   const inputArg = args.find((a) => a.startsWith("--input="));
-  const inputPath = inputArg ? inputArg.slice("--input=".length) : "scripts/scraped-data.json";
+  const requestedInput = inputArg ? inputArg.slice("--input=".length) : "scripts/scraped-data.json";
+
+  // Validate rather than trust argv: the value is read from disk and echoed to
+  // logs. Restricting it to a plain .json filename under the repo also stops a
+  // stray flag from pointing the ingest at an unrelated file.
+  const inputName = path.basename(requestedInput);
+  if (!/^[A-Za-z0-9._-]+\.json$/.test(inputName)) {
+    throw new Error(`--input must be a .json file name, got: ${inputName}`);
+  }
+  const inputPath = path.join(path.dirname(requestedInput), inputName);
 
   const hostsArg = args.find((a) => a.startsWith("--hosts="));
   // Validate host suffixes rather than trusting the raw flag: they are used in
@@ -47,10 +56,8 @@ async function main() {
   // Load scraped data
   const rawData = fs.readFileSync(inputPath, "utf-8");
   const allDocuments: ScrapedDocument[] = JSON.parse(rawData);
-  // Log the basename only — the full path can carry local directory names.
-  console.log(
-    `Loaded ${allDocuments.length} scraped documents from ${path.basename(inputPath)}`
-  );
+  // inputName is validated above, so it is safe to echo.
+  console.log(`Loaded ${allDocuments.length} scraped documents from ${inputName}`);
 
   const documents = hostSuffixes.length
     ? allDocuments.filter((d) => {
