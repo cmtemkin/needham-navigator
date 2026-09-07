@@ -1,6 +1,6 @@
 import { createHash } from "crypto";
 import { DEFAULT_TOWN_ID } from "@/lib/rag";
-import { getSupabaseClient } from "@/lib/supabase";
+import { getSupabaseClient } from "@/lib/db";
 
 type FeedbackRequestBody = {
   response_id?: unknown;

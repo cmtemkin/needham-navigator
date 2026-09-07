@@ -8,7 +8,7 @@
  */
 
 import { NextRequest } from "next/server";
-import { getSupabaseClient } from "@/lib/supabase";
+import { getSupabaseClient } from "@/lib/db";
 import { DEFAULT_TOWN_ID } from "@/lib/towns";
 import { checkGeographicRelevance } from "@/lib/geo-filter";
 
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest): Promise<Response> {
     }
 
     // Exclude expired items
-    query = query.or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`);
+    query = query.where("(expires_at IS NULL OR expires_at > ?)", [new Date().toISOString()]);
 
     const { data, error, count } = await query;
 

@@ -8,7 +8,7 @@
  */
 
 import { createHash } from "crypto";
-import { getSupabaseServiceClient } from "@/lib/supabase";
+import { getSupabaseServiceClient } from "@/lib/db";
 import { generateEmbedding } from "@/lib/embeddings";
 import { upsertToPinecone, PINECONE_NS_CONTENT } from "@/lib/upstash-vector";
 import { classifyDocument } from "@/lib/relevance-classifier";

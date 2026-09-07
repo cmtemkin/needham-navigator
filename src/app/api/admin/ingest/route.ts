@@ -1,6 +1,6 @@
 import { isAdminAuthorized, unauthorizedAdminResponse } from "@/lib/admin-auth";
 import { DEFAULT_TOWN_ID } from "@/lib/rag";
-import { getSupabaseServiceClient } from "@/lib/supabase";
+import { getSupabaseServiceClient } from "@/lib/db";
 
 type IngestRequestBody = {
   source_url?: unknown;

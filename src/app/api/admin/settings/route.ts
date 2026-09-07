@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { isAdminAuthorized, unauthorizedAdminResponse } from "@/lib/admin-auth";
-import { getSupabaseServiceClient } from "@/lib/supabase";
+import { getSupabaseServiceClient } from "@/lib/db";
 import { DEFAULT_TOWN_ID } from "@/lib/towns";
 import { ALLOWED_CHAT_MODELS, GENERATION_MODEL, MODEL_LABELS, MODEL_PRICING } from "@/lib/models";
 

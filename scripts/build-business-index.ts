@@ -13,7 +13,7 @@
  *   npx tsx scripts/build-business-index.ts --limit=50          # Process only 50 chunks
  */
 
-import { getSupabaseServiceClient } from "../src/lib/supabase";
+import { getSupabaseServiceClient } from "../src/lib/db";
 import OpenAI from "openai";
 import { GENERATION_MODEL } from "../src/lib/models";
 
@@ -234,8 +234,13 @@ async function buildBusinessIndex(options: {
   let query = supabase
     .from("document_chunks")
     .select("chunk_id, text, metadata, document_id")
-    .or(
-      "metadata->>content_type.eq.local_business,metadata->>document_url.ilike.%yelp%,metadata->>document_url.ilike.%angi%,metadata->>document_url.ilike.%bbb%,metadata->>document_url.ilike.%needhamba%"
+    .where(
+      `(metadata->>'content_type' = ?
+        OR metadata->>'document_url' ILIKE ?
+        OR metadata->>'document_url' ILIKE ?
+        OR metadata->>'document_url' ILIKE ?
+        OR metadata->>'document_url' ILIKE ?)`,
+      ["local_business", "%yelp%", "%angi%", "%bbb%", "%needhamba%"]
     );
 
   if (limit) {

@@ -10,9 +10,28 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    services:
+      postgres:
+        # Real Postgres for the data-layer integration tests. pgvector is required
+        # because the migration history creates vector columns before
+        # 20260221000002_drop_embeddings.sql removes them.
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: nntest
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
     env:
       # Dummy values so the build doesn't fail on missing env vars
       OPENAI_API_KEY: sk-test-dummy-key-for-ci-build
+      TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/nntest
+      HAS_API_SECRETS: ${{ secrets.OPENAI_API_KEY != '' && secrets.UPSTASH_VECTOR_REST_URL != '' }}
       SUPABASE_URL: https://test.supabase.co
       SUPABASE_ANON_KEY: eyJ-test-dummy-anon-key
       SUPABASE_SERVICE_KEY: eyJ-test-dummy-service-key
@@ -40,8 +59,52 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Apply migrations to the test database
+        # Proves the ported db/migrations/*.sql still apply cleanly to real
+        # Postgres, and gives the integration tests a schema to run against.
+        run: npx tsx scripts/migrate-neon.ts
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/nntest
+
+      - name: Verify migrations are idempotent
+        run: |
+          OUTPUT=$(npx tsx scripts/migrate-neon.ts)
+          echo "$OUTPUT"
+          echo "$OUTPUT" | grep -q "No pending migrations" || {
+            echo "::error::Re-running migrations was not a no-op"; exit 1; }
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/nntest
+
       - name: Run tests
         run: npm test
+
+      - name: Live API tests against the built server
+        # Decision 10A: these three suites used to be skipped in CI and only ran
+        # locally, where they failed against whatever held port 3000 — so they
+        # protected nothing. They now run against the real built server backed by
+        # the Postgres service, which is what actually exercises src/lib/db.ts
+        # end to end. Skipped when the API secrets are unavailable (e.g. forks).
+        if: ${{ env.HAS_API_SECRETS == 'true' }}
+        run: |
+          npx tsx scripts/migrate-neon.ts
+          npm run start &
+          SERVER_PID=$!
+          for i in $(seq 1 45); do
+            curl -sf http://localhost:3000/api/health >/dev/null 2>&1 && break
+            sleep 2
+          done
+          set +e
+          RUN_API_TESTS=1 npx jest __tests__/api/feedback.test.ts __tests__/api/search.test.ts __tests__/api/chat.test.ts
+          STATUS=$?
+          kill $SERVER_PID 2>/dev/null || true
+          exit $STATUS
+        env:
+          HAS_API_SECRETS: ${{ secrets.OPENAI_API_KEY != '' && secrets.UPSTASH_VECTOR_REST_URL != '' }}
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/nntest
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          UPSTASH_VECTOR_REST_URL: ${{ secrets.UPSTASH_VECTOR_REST_URL }}
+          UPSTASH_VECTOR_REST_TOKEN: ${{ secrets.UPSTASH_VECTOR_REST_TOKEN }}
+          ADMIN_PASSWORD: ci-test-password
 
       - name: Security audit (critical)
         run: npm audit --production --audit-level=critical

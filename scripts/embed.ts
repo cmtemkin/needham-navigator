@@ -8,7 +8,7 @@
  * 4. Updates the parent document record with chunk count and timestamps
  */
 
-import { getSupabaseServiceClient } from "../src/lib/supabase";
+import { getSupabaseServiceClient } from "../src/lib/db";
 import { generateEmbeddings } from "../src/lib/embeddings";
 import { upsertToPinecone, deleteFromPinecone, PINECONE_NS_CHUNKS } from "../src/lib/upstash-vector";
 import type { PineconeVector } from "../src/lib/upstash-vector";

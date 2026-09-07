@@ -1,4 +1,4 @@
-import { getSupabaseServiceClient } from "@/lib/supabase";
+import { getSupabaseServiceClient } from "@/lib/db";
 import { MODEL_PRICING } from "@/lib/models";
 
 // ---------------------------------------------------------------------------

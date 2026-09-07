@@ -10,7 +10,7 @@
  */
 
 import { createHash } from "crypto";
-import { getSupabaseServiceClient } from "@/lib/supabase";
+import { getSupabaseServiceClient } from "@/lib/db";
 import { cleanupExpiredCache } from "@/lib/answer-cache";
 
 // ---------------------------------------------------------------------------
