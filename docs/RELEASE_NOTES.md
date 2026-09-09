@@ -2,6 +2,73 @@
 
 ---
 
+## v0.19.0 — 2026-09-08
+
+**Database Migration to Neon, GPT-5.6 Upgrade, Pipeline Restoration, Security Fix**
+
+### Site Restored
+- **The site had been serving a dead backend since 2026-06-17.** Every page returned 200 while
+  every API call failed. Search, chat, articles and the daily brief were all non-functional.
+  Two independent causes, plus a monitoring gap that hid both:
+  - GitHub auto-disabled all six scheduled workflows after 60 days without repository
+    activity, so the content pipeline stopped on 2026-06-03.
+  - The Supabase project auto-paused for inactivity and could not be restored: the free plan
+    allows two active projects and both slots were in use elsewhere.
+  - The nightly health check only alerted when a check was fully "down". `/api/chat` returns a
+    canned fallback when retrieval fails, so it reported "up" against a dead database for
+    three months.
+
+### Breaking Changes
+- **Database moved from Supabase to Neon Postgres** (PR #176). Neon auto-suspends when idle but
+  resumes transparently, so an idle period can no longer take the site offline. `DATABASE_URL`
+  replaces all `SUPABASE_*` environment variables.
+- **Search corpus is now Needham-only.** mass.gov and Wellesley pages were dropped — 15,070 of
+  the 19,550 scraped pages, 84% of storage, and not Needham-specific. Answers to Needham
+  questions are unaffected; general Massachusetts state-law queries will return less.
+
+### New Features
+- **Backend health monitoring** (PR #174) — the nightly check now verifies `/api/health`, the
+  only endpoint that proves the database connection works, and alerts when it degrades.
+
+### Improvements
+- **All AI generation upgraded to GPT-5.6 Luna** (PR #174) — replaces GPT-5 Nano, GPT-4o Mini
+  and GPT-4.1 Nano. On a representative permit question it answered in 3.8s using 264 tokens,
+  where GPT-5 Nano took 9.4s and 1,934 tokens. Faster, cheaper and stronger. Model ids were
+  duplicated across eight files and now live in a single registry (`src/lib/models.ts`).
+- **Full-text search is now indexed** (PR #176) — searches previously scanned every chunk and
+  computed the text vector on the fly. A GIN expression index replaces the sequential scan.
+
+### Bug Fixes
+- **Ingestion wrote a column that no longer exists** (PR #181) — `embed.ts` still set
+  `embedding: null` after vectors moved to Upstash. Every chunk insert failed against a
+  correctly migrated schema. Latent for months because the old database still had the column.
+- **Large pages were silently dropped** (PR #185) — the chunker recursed without guaranteeing
+  progress and overflowed the stack on documents whose shape defeated every split delimiter
+  (markdown tables). Five town pages were affected and have been recovered.
+- **Migration runner survived Neon's dropped connections** (PR #179).
+
+### Security
+- **A Supabase account-level access token was committed to this public repository** (PR #175)
+  in `scripts/cleanup-url-duplicates 2.ts`, present in four commits since PR #153. The file has
+  been removed, but **the token must be revoked** — deleting it from HEAD does not remove it
+  from public git history.
+- **Filter injection in the admin sources endpoint** (PR #176) — user input was interpolated
+  directly into a PostgREST filter string. Now parameterized.
+- **13 dependency vulnerabilities resolved** (PR #174), including one critical. One low remains.
+
+### Infrastructure
+- Data layer rewritten as a PostgREST-compatible client (`src/lib/db.ts`), so roughly 495 call
+  sites across 60 files were unchanged. Covered by 35 contract tests and 13 integration tests
+  against a real Postgres.
+- CI now runs a Postgres service, applies the migrations and asserts they are idempotent.
+- Three API test suites were gated on `process.env.CI`, so they were skipped in CI and only ran
+  locally against whatever held port 3000 — they protected nothing. Now gated on
+  `RUN_API_TESTS` and wired to run against a real server.
+- Corpus rebuilt: **4,480 documents, 20,252 chunks**, with the Upstash vector index matching
+  exactly.
+
+---
+
 ## v0.18.0 — 2026-02-25
 
 **Events Calendar, Pipeline Health Dashboard, Mass.gov Search Expansion, Security Hardening**
