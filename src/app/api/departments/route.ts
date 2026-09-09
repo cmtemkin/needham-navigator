@@ -1,5 +1,5 @@
 import { DEFAULT_TOWN_ID } from "@/lib/rag";
-import { getSupabaseClient } from "@/lib/supabase";
+import { getSupabaseClient } from "@/lib/db";
 
 export async function GET(request: Request): Promise<Response> {
   const { searchParams } = new URL(request.url);

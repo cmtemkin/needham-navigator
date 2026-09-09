@@ -9,7 +9,7 @@
  */
 
 import { NextRequest } from "next/server";
-import { getSupabaseClient } from "@/lib/supabase";
+import { getSupabaseClient } from "@/lib/db";
 import { DEFAULT_TOWN_ID } from "@/lib/towns";
 
 export const dynamic = "force-dynamic";

@@ -103,8 +103,28 @@ jobs:
             echo "permits_code=$PERMITS_CODE" >> $GITHUB_OUTPUT
           fi
 
+          # --- CHECK 4: Backend health (database reachability) ---
+          # /api/chat serves a canned fallback when retrieval fails, so it reports
+          # "up" even with a dead database. /api/health is the only check that
+          # actually proves the Supabase connection works — a paused or deleted
+          # project shows up here as "degraded" while every page still returns 200.
+          HEALTH_RAW=$(curl -sL -w "\nHTTP_CODE:%{http_code}" --max-time 30 "https://www.needhamnavigator.com/api/health" 2>/dev/null || echo "HTTP_CODE:000")
+          HEALTH_HTTP=$(echo "$HEALTH_RAW" | grep -o 'HTTP_CODE:[0-9]*' | tail -1 | cut -d: -f2)
+          HEALTH_BODY=$(echo "$HEALTH_RAW" | sed '/HTTP_CODE:[0-9]*/d')
+          HEALTH_HTTP=${HEALTH_HTTP:-000}
+          echo "Backend health HTTP code: $HEALTH_HTTP"
+          echo "Backend health body: ${HEALTH_BODY:0:300}"
+
+          if echo "$HEALTH_BODY" | grep -q '"status":"ok"'; then
+            echo "backend_status=up" >> $GITHUB_OUTPUT
+          else
+            echo "backend_status=down" >> $GITHUB_OUTPUT
+          fi
+          echo "backend_code=$HEALTH_HTTP" >> $GITHUB_OUTPUT
+          echo "backend_detail=HTTP $HEALTH_HTTP — ${HEALTH_BODY:0:200}" >> $GITHUB_OUTPUT
+
       - name: Create issue if site is down
-        if: steps.health.outputs.homepage_status == 'down' || steps.health.outputs.api_status == 'down' || steps.health.outputs.permits_status == 'down'
+        if: steps.health.outputs.homepage_status == 'down' || steps.health.outputs.api_status == 'down' || steps.health.outputs.permits_status == 'down' || steps.health.outputs.backend_status == 'down'
         uses: actions/github-script@v7
         with:
           script: |
@@ -115,6 +135,9 @@ jobs:
             const apiDetail = '${{ steps.health.outputs.api_detail }}';
             const permitsStatus = '${{ steps.health.outputs.permits_status }}';
             const permitsCode = '${{ steps.health.outputs.permits_code }}';
+            const backendStatus = '${{ steps.health.outputs.backend_status }}';
+            const backendCode = '${{ steps.health.outputs.backend_code }}';
+            const backendDetail = '${{ steps.health.outputs.backend_detail }}';
             const today = new Date().toISOString().split('T')[0];
 
             const statusIcon = (s) => s === 'up' ? '✅ Up' : s === 'degraded' ? '🟡 Degraded' : '❌ Down';
@@ -123,13 +146,15 @@ jobs:
             body += `| Endpoint | Status | HTTP Code | Detail |\n|---|---|---|---|\n`;
             body += `| Homepage | ${statusIcon(homepageStatus)} | ${homepageCode} | — |\n`;
             body += `| Chat API | ${statusIcon(apiStatus)} | ${apiCode} | ${apiDetail} |\n`;
-            body += `| Permits | ${statusIcon(permitsStatus)} | ${permitsCode} | — |\n\n`;
+            body += `| Permits | ${statusIcon(permitsStatus)} | ${permitsCode} | — |\n`;
+            body += `| Backend (DB) | ${statusIcon(backendStatus)} | ${backendCode} | ${backendDetail} |\n\n`;
             body += `**What to do:**\n`;
             body += `1. Check Vercel deployment logs: https://vercel.com/charlie-temkins-projects/needham-navigator\n`;
             body += `2. Open a Claude Code session and run the agent preflight checklist\n`;
             body += `3. If the last deploy broke things, use Vercel's "Instant Rollback" button\n`;
             body += `4. The chat API test sends a real question ("What are the hours for Needham Town Hall?") — if it fails, the AI pipeline is broken, not just the server\n`;
             body += `5. Chat API retried 3 times with 60s delays before marking as down — this is not a transient blip\n`;
+            body += `6. If **Backend (DB)** is down but every page is 200, the Supabase project is unreachable — most often it was auto-paused for inactivity (free tier pauses after ~7 days idle and is deleted after ~90 days). Restore it from the Supabase dashboard.\n`;
 
             // Check if there's already an open health-check issue to avoid duplicates
             const existingIssues = await github.rest.issues.listForRepo({

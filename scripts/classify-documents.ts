@@ -12,7 +12,7 @@
  * Note: To update vector metadata in Upstash after classifying, re-run re-embed.ts.
  */
 
-import { getSupabaseServiceClient } from "../src/lib/supabase";
+import { getSupabaseServiceClient } from "../src/lib/db";
 import { classifyDocument } from "../src/lib/relevance-classifier";
 import type { RelevanceTier } from "../src/lib/relevance-classifier";
 

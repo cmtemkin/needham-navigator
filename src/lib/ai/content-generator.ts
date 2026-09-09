@@ -6,6 +6,7 @@
  */
 
 import OpenAI from "openai";
+import { GENERATION_MODEL } from "@/lib/models";
 
 let openaiClient: OpenAI | null = null;
 
@@ -20,7 +21,7 @@ function getOpenAI(): OpenAI {
   return openaiClient;
 }
 
-const MODEL = "gpt-4o-mini";
+const MODEL = GENERATION_MODEL;
 
 /**
  * Generate a 2-sentence summary of an article.

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseClient, getSupabaseServiceClient } from '@/lib/supabase';
+import { getSupabaseClient, getSupabaseServiceClient } from '@/lib/db';
 import { checkGeographicRelevance } from '@/lib/geo-filter';
 import type { Article, ArticleListResponse, CreateArticleInput } from '@/types/article';
 

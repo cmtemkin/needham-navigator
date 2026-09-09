@@ -5,17 +5,16 @@
  * Run: npx tsx scripts/seed-sources.ts [--town needham] [--clear]
  */
 
-import { createClient } from "@supabase/supabase-js";
+import { getSupabaseServiceClient } from "../src/lib/db";
 
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
+const DATABASE_URL = process.env.DATABASE_URL;
 
-if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
-  console.error("Missing SUPABASE_URL or SUPABASE_SERVICE_KEY env vars");
+if (!DATABASE_URL) {
+  console.error("Missing DATABASE_URL env var");
   process.exit(1);
 }
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+const supabase = getSupabaseServiceClient();
 
 // ---------------------------------------------------------------------------
 // Source configurations by town
