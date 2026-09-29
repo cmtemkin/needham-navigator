@@ -180,8 +180,64 @@ jobs:
               core.info(`✅ No new CodeQL alerts introduced by this PR (${branchAlerts.data.length} existing alerts on branch, ${mainAlertNumbers.size} on main).`);
             }
 
+  secret-scan:
+    # This repository is public: a committed credential is exposed the moment it
+    # is pushed, and deleting it later does not remove it from history. A
+    # Supabase account token sat in scripts/ from 2026-02 to 2026-09 (#113, #153,
+    # #175) because nothing here looked for it. Rules live in .gitleaks.toml.
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      GITLEAKS_VERSION: 8.30.1
+      # From gitleaks_8.30.1_checksums.txt on the release page.
+      GITLEAKS_TARBALL_SHA256: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Full history, so the PR's base..head range resolves.
+          fetch-depth: 0
+
+      - name: Install gitleaks (pinned, checksum-verified)
+        run: |
+          curl -sSfL -o "$RUNNER_TEMP/gitleaks.tar.gz" \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          echo "${GITLEAKS_TARBALL_SHA256}  $RUNNER_TEMP/gitleaks.tar.gz" | sha256sum --check --strict
+          tar -xzf "$RUNNER_TEMP/gitleaks.tar.gz" -C "$RUNNER_TEMP" gitleaks
+          sudo install -m 0755 "$RUNNER_TEMP/gitleaks" /usr/local/bin/gitleaks
+          gitleaks version
+
+      - name: Self-test the custom rules
+        # gitleaks' defaults have no Supabase or Postgres-URI rule, so the ones
+        # that matter here are custom. A rule that silently stopped matching looks
+        # exactly like a clean scan, so prove they fire on every run. Fixtures are
+        # generated at runtime so no token-shaped literal is ever committed.
+        run: |
+          fixtures="$RUNNER_TEMP/gitleaks-fixtures"
+          report="$RUNNER_TEMP/gitleaks-self-test.json"
+          mkdir -p "$fixtures"
+          printf 'const token = "sbp_%s";\n' "$(openssl rand -hex 20)" > "$fixtures/pat.ts"
+          printf 'DATABASE_URL=postgres://neondb_owner:npg_%s@ep-fixture-123456.us-east-2.aws.neon.tech/neondb\n' "$(openssl rand -hex 8)" > "$fixtures/neon.env"
+          printf 'DATABASE_URL: postgres://postgres:postgres@localhost:5432/nntest\n' > "$fixtures/ci-placeholder.yml"
+          printf 'DATABASE_URL=postgres://user:password@ep-xxxx.us-east-2.aws.neon.tech/neondb\n' > "$fixtures/env-example"
+          gitleaks dir "$fixtures" --config .gitleaks.toml --no-banner --redact --exit-code 0 \
+            --report-format json --report-path "$report"
+          for rule in supabase-personal-access-token postgres-uri-with-password; do
+            jq -e --arg rule "$rule" 'any(.[]; .RuleID == $rule)' "$report" >/dev/null \
+              || { echo "::error::gitleaks rule '$rule' did not fire on its fixture"; exit 1; }
+          done
+          jq -e 'all(.[]; (.File | test("ci-placeholder|env-example")) | not)' "$report" >/dev/null \
+            || { echo "::error::a placeholder DATABASE_URL was flagged — the allowlist regressed"; exit 1; }
+
+      - name: Scan the commits in this PR
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: gitleaks git . --config .gitleaks.toml --no-banner --redact --verbose --log-opts="$BASE_SHA..$HEAD_SHA"
+
   auto-merge:
-    needs: [build-and-test, codeql]
+    needs: [build-and-test, codeql, secret-scan]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -255,7 +311,7 @@ jobs:
             }
 
   production-gate:
-    needs: [build-and-test, codeql]
+    needs: [build-and-test, codeql, secret-scan]
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -275,7 +331,7 @@ jobs:
             });
 
   on-failure:
-    needs: [build-and-test, codeql]
+    needs: [build-and-test, codeql, secret-scan]
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write

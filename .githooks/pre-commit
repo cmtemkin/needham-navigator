@@ -1,0 +1,20 @@
+#!/bin/sh
+# Pre-commit hook: blocks commits that stage a secret.
+# This repository is public, so a committed credential is exposed as soon as it
+# is pushed and stays in history after deletion. Rules live in .gitleaks.toml;
+# the secret-scan job in CI enforces the same check on every PR.
+# Bypass with: git commit --no-verify  (don't — rotate the secret instead)
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "pre-commit: gitleaks is not installed, so staged changes were NOT scanned for secrets."
+  echo "            Install it with: brew install gitleaks  (CI still scans every PR)"
+  exit 0
+fi
+
+gitleaks git --pre-commit --staged --redact --no-banner --config .gitleaks.toml
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "pre-commit: gitleaks found a secret in the staged changes. Remove it before committing."
+  echo "            If it was ever pushed anywhere, treat it as leaked and revoke it."
+  exit 1
+fi
