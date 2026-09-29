@@ -10,7 +10,7 @@
  */
 
 import * as fs from "fs";
-import { getSupabaseServiceClient } from "../src/lib/supabase";
+import { getSupabaseServiceClient } from "../src/lib/db";
 import { chunkDocument } from "./chunk";
 import { embedAndStoreChunks } from "./embed";
 import type { ScrapedDocument } from "./scraper";

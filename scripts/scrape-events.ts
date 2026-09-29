@@ -12,7 +12,7 @@
 
 import { createHash } from "crypto";
 import * as cheerio from "cheerio";
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { getSupabaseServiceClient, type DbClient } from "../src/lib/db";
 
 // ---------------------------------------------------------------------------
 // Configuration
@@ -446,7 +446,7 @@ function parseAlertsPage(
 // Supabase upsert
 // ---------------------------------------------------------------------------
 
-function getSupabase(): SupabaseClient {
+function getSupabase(): DbClient {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_KEY;
 
@@ -457,11 +457,11 @@ function getSupabase(): SupabaseClient {
     process.exit(1);
   }
 
-  return createClient(url, key);
+  return getSupabaseServiceClient();
 }
 
 async function upsertEvents(
-  supabase: SupabaseClient,
+  supabase: DbClient,
   events: ScrapedEvent[],
   townId: string
 ): Promise<{ upserted: number; skipped: number }> {
@@ -508,7 +508,6 @@ async function upsertEvents(
       image_url: null,
       metadata,
       content_hash: contentHash,
-      embedding: null,
       updated_at: new Date().toISOString(),
     };
 

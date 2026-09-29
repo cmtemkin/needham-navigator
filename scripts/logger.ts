@@ -7,7 +7,7 @@
  * 3. Tracks success/failure counts per pipeline stage
  */
 
-import { getSupabaseServiceClient } from "../src/lib/supabase";
+import { getSupabaseServiceClient } from "../src/lib/db";
 
 // ---------------------------------------------------------------------------
 // Types

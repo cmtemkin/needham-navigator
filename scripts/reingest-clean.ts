@@ -7,10 +7,20 @@
  * Usage:
  *   npx tsx scripts/reingest-clean.ts
  *   npx tsx scripts/reingest-clean.ts --clear-first    # Delete all existing chunks first
+ *   npx tsx scripts/reingest-clean.ts --input=scripts/scraped-data-remaining.json
+ *   npx tsx scripts/reingest-clean.ts --hosts=needhamma.gov,needham.k12.ma.us
+ *   npx tsx scripts/reingest-clean.ts --limit=5                # Smoke-test the pipeline
+ *   npx tsx scripts/reingest-clean.ts --match=CivicAlerts       # Re-ingest specific URLs
+ *
+ * --hosts restricts ingestion to documents whose source_url host ends with one
+ * of the given suffixes. The 2026 Neon migration used it to drop mass.gov and
+ * Wellesley, which were 84% of the corpus (15,070 of 19,550 pages) but are not
+ * Needham-specific.
  */
 
-import * as fs from "fs";
-import { getSupabaseServiceClient } from "../src/lib/supabase";
+import * as fs from "node:fs";
+import * as path from "node:path";
+import { getSupabaseServiceClient } from "../src/lib/db";
 import { chunkDocument } from "./chunk";
 import { embedAndStoreChunks } from "./embed";
 import type { ScrapedDocument } from "./scraper";
@@ -21,10 +31,76 @@ async function main() {
   const townId = "needham";
   const supabase = getSupabaseServiceClient();
 
+  const inputArg = args.find((a) => a.startsWith("--input="));
+  const requestedInput = inputArg ? inputArg.slice("--input=".length) : "scripts/scraped-data.json";
+
+  // Validate rather than trust argv: the value is read from disk and echoed to
+  // logs. Restricting it to a plain .json filename under the repo also stops a
+  // stray flag from pointing the ingest at an unrelated file.
+  const inputName = path.basename(requestedInput);
+  if (!/^[A-Za-z0-9._-]+\.json$/.test(inputName)) {
+    throw new Error(`--input must be a .json file name, got: ${inputName}`);
+  }
+  const inputPath = path.join(path.dirname(requestedInput), inputName);
+
+  const hostsArg = args.find((a) => a.startsWith("--hosts="));
+  // Validate host suffixes rather than trusting the raw flag: they are used in
+  // matching and echoed to logs, and a hostname has a narrow legal shape.
+  const hostSuffixes = hostsArg
+    ? hostsArg
+        .slice("--hosts=".length)
+        .split(",")
+        .map((h) => h.trim().toLowerCase())
+        .filter((h) => /^[a-z0-9.-]+$/.test(h))
+    : [];
+
   // Load scraped data
-  const rawData = fs.readFileSync("scripts/scraped-data.json", "utf-8");
-  const documents: ScrapedDocument[] = JSON.parse(rawData);
-  console.log(`Loaded ${documents.length} scraped documents`);
+  const rawData = fs.readFileSync(inputPath, "utf-8");
+  const allDocuments: ScrapedDocument[] = JSON.parse(rawData);
+  // NOSONAR — inputName is not raw argv: it is a basename checked against
+  // /^[A-Za-z0-9._-]+\.json$/ above, so it cannot carry a path or arbitrary
+  // text. Sonar's taint analysis does not recognise that regex as a sanitiser.
+  // Knowing which file a re-ingest actually read is worth keeping in the log.
+  console.log(`Loaded ${allDocuments.length} scraped documents from ${inputName}`);
+
+  let documents = hostSuffixes.length
+    ? allDocuments.filter((d) => {
+        const match = /^https?:\/\/([^/]+)/.exec(d.source_url ?? "");
+        if (!match) return false;
+        const host = match[1].toLowerCase();
+        return hostSuffixes.some((suffix) => host === suffix || host.endsWith(`.${suffix}`));
+      })
+    : allDocuments;
+
+  if (hostSuffixes.length) {
+    console.log(
+      `Filtered to ${documents.length} documents matching hosts: ${hostSuffixes.join(", ")}`
+    );
+  }
+
+  // --match re-ingests just the documents whose URL contains a substring. Used
+  // to pick up individual pages that failed a previous run without repeating the
+  // whole corpus; documents upsert on (town_id, url) so this is safe to re-run.
+  const matchArg = args.find((a) => a.startsWith("--match="));
+  if (matchArg) {
+    const needle = matchArg.slice("--match=".length);
+    // Restrict to characters that can legally appear in a URL. A substring with
+    // anything else would match nothing anyway, so failing loudly beats a run
+    // that silently ingests zero documents.
+    if (!/^[A-Za-z0-9._~:/?#[\]@!$&'()*+,;=%-]+$/.test(needle)) {
+      throw new Error("--match must contain only characters that are legal in a URL");
+    }
+    const before = documents.length;
+    documents = documents.filter((d) => (d.source_url ?? "").includes(needle));
+    console.log(`Matched ${documents.length} of ${before} documents on URL substring`);
+  }
+
+  const limitArg = args.find((a) => a.startsWith("--limit="));
+  const limit = limitArg ? Number.parseInt(limitArg.slice("--limit=".length), 10) : 0;
+  if (limit > 0) {
+    documents.length = Math.min(documents.length, limit);
+    console.log(`Limited to ${documents.length} documents`);
+  }
 
   if (clearFirst) {
     console.log("\n--- Clearing existing data ---");

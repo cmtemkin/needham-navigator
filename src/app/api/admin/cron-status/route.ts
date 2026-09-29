@@ -9,7 +9,7 @@
  */
 
 import { NextResponse } from "next/server";
-import { getSupabaseClient } from "@/lib/supabase";
+import { getSupabaseClient } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 

@@ -1,5 +1,5 @@
 import { isAdminAuthorized, unauthorizedAdminResponse } from "@/lib/admin-auth";
-import { getSupabaseServiceClient } from "@/lib/supabase";
+import { getSupabaseServiceClient } from "@/lib/db";
 import { CRAWL_SOURCES } from "@/../config/crawl-sources";
 import { DEFAULT_TOWN_ID } from "@/../config/towns";
 

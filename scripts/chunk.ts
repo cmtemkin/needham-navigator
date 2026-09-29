@@ -552,19 +552,55 @@ export interface ChunkDocumentOptions {
  *   3. Split on sentence boundaries (. ! ?)
  *   4. Hard split by encoded tokens (last resort)
  */
+/**
+ * Guard against runaway recursion.
+ *
+ * Each delimiter pass carries `overlapTokens` from the previous segment into the
+ * next, so `overlapText + separator + part` can come out no shorter than the text
+ * it replaced. When that happens the recursion never makes progress: a 48 KB
+ * town-election results page blew the stack at ~193 frames and was silently
+ * dropped from ingestion. Two guards below: recurse only on text that is
+ * strictly shorter, and stop descending past MAX_SPLIT_DEPTH. Both fall through
+ * to the hard token split, which always terminates.
+ */
+const MAX_SPLIT_DEPTH = 20;
+
 function splitOversizedChunk(
   chunk: Chunk,
   limit: number,
   overlapTokens: number,
   out: Chunk[],
+  depth = 0,
 ): void {
   if (estimateTokens(chunk.text) <= limit) {
     out.push(chunk);
     return;
   }
 
+  /** Recurse only when it shrinks the text; otherwise hard-split. */
+  const recurse = (text: string): void => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    if (trimmed.length < chunk.text.length && depth < MAX_SPLIT_DEPTH) {
+      splitOversizedChunk(
+        { text: trimmed, metadata: { ...chunk.metadata } },
+        limit,
+        overlapTokens,
+        out,
+        depth + 1,
+      );
+    } else {
+      hardSplit({ text: trimmed, metadata: { ...chunk.metadata } }, limit, overlapTokens, out);
+    }
+  };
+
   // Try progressively finer split delimiters
   const delimiters = [/\n\n+/, /\n/, /(?<=\.)\s+/];
+
+  if (depth >= MAX_SPLIT_DEPTH) {
+    hardSplit(chunk, limit, overlapTokens, out);
+    return;
+  }
 
   for (const delim of delimiters) {
     const parts = chunk.text.split(delim);
@@ -579,12 +615,7 @@ function splitOversizedChunk(
 
       if (estimateTokens(testText) > limit && currentText) {
         // Recurse in case currentText is still oversized
-        splitOversizedChunk(
-          { text: currentText.trim(), metadata: { ...chunk.metadata } },
-          limit,
-          overlapTokens,
-          out,
-        );
+        recurse(currentText);
         const overlapText = getLastNTokens(currentText, overlapTokens);
         currentText = overlapText + separator + part;
         didSplit = true;
@@ -594,20 +625,25 @@ function splitOversizedChunk(
     }
 
     if (currentText.trim()) {
-      splitOversizedChunk(
-        { text: currentText.trim(), metadata: { ...chunk.metadata } },
-        limit,
-        overlapTokens,
-        out,
-      );
+      recurse(currentText);
     }
 
     if (didSplit) return;
   }
 
-  // Last resort: hard-split by tokens
+  hardSplit(chunk, limit, overlapTokens, out);
+}
+
+/** Split strictly by token count. Always terminates — the recursion's floor. */
+function hardSplit(
+  chunk: Chunk,
+  limit: number,
+  overlapTokens: number,
+  out: Chunk[],
+): void {
   const tokens = encoder.encode(chunk.text);
-  for (let start = 0; start < tokens.length; start += limit - overlapTokens) {
+  const stride = Math.max(1, limit - overlapTokens);
+  for (let start = 0; start < tokens.length; start += stride) {
     const slice = tokens.slice(start, start + limit);
     const text = encoder.decode(slice).trim();
     if (text) {

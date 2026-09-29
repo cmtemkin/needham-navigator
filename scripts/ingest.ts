@@ -17,7 +17,7 @@
  */
 
 import { createHash } from "crypto";
-import { getSupabaseServiceClient } from "../src/lib/supabase";
+import { getSupabaseServiceClient } from "../src/lib/db";
 import { scrape, toCrawlResults, CrawlResult } from "./scraper";
 import { extractPdfs, PdfExtractionResult } from "./extract-pdf";
 import { chunkDocument, Chunk, detectDocumentType } from "./chunk";

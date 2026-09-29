@@ -47,7 +47,7 @@ jest.mock("@/lib/prompts", () => ({
   buildChatSystemPrompt: jest.fn(() => "You are a helpful municipal assistant."),
 }));
 
-jest.mock("@/lib/supabase", () => ({
+jest.mock("@/lib/db", () => ({
   getSupabaseClient: () => ({
     from: () => ({
       select: () => ({

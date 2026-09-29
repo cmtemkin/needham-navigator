@@ -4,7 +4,7 @@
  * Tests similarity scores, answer quality, and checks for boilerplate contamination.
  */
 
-import { getSupabaseServiceClient } from "../src/lib/supabase";
+import { getSupabaseServiceClient } from "../src/lib/db";
 import { generateEmbeddings } from "../src/lib/embeddings";
 import { queryPinecone, PINECONE_NS_CHUNKS } from "../src/lib/upstash-vector";
 

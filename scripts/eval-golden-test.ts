@@ -12,6 +12,7 @@
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { resolve } from "path";
 import OpenAI from "openai";
+import { GENERATION_MODEL } from "../src/lib/models";
 
 // Load .env.local (Next.js doesn't do this for standalone scripts)
 const envPath = resolve(__dirname, "../.env.local");
@@ -85,7 +86,7 @@ const TOWN_ID = "needham";
 const DELAY_MS = 3000;
 const MAX_RETRIES = 3;
 const RETRY_BASE_MS = 5000;
-const JUDGE_MODEL = "gpt-4.1-nano";
+const JUDGE_MODEL = GENERATION_MODEL;
 
 // ---------------------------------------------------------------------------
 // OpenAI client for LLM-as-judge
@@ -382,7 +383,7 @@ async function main() {
   console.log(`\n=== Summary ===`);
   console.log(`Overall Score: ${Math.round(overallScore * 100)}%`);
   console.log(`Pass (>=50%): ${passCount}/${results.length}`);
-  console.log(`Query rewriting: enabled (gpt-4.1-nano)`);
+  console.log(`Query rewriting: enabled (${GENERATION_MODEL})`);
 
   const dateStr = new Date().toISOString().split("T")[0];
   const outputPath = resolve(__dirname, `../docs/eval-results-${dateStr}.json`);

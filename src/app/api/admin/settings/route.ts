@@ -1,17 +1,18 @@
 import { NextRequest } from "next/server";
 import { isAdminAuthorized, unauthorizedAdminResponse } from "@/lib/admin-auth";
-import { getSupabaseServiceClient } from "@/lib/supabase";
+import { getSupabaseServiceClient } from "@/lib/db";
 import { DEFAULT_TOWN_ID } from "@/lib/towns";
+import { ALLOWED_CHAT_MODELS, GENERATION_MODEL, MODEL_LABELS, MODEL_PRICING } from "@/lib/models";
 
-const AVAILABLE_MODELS = [
-  { id: "gpt-5-nano", label: "GPT-5 Nano", inputPrice: 0.05, outputPrice: 0.40 },
-  { id: "gpt-5-mini", label: "GPT-5 Mini", inputPrice: 0.25, outputPrice: 2.00 },
-  { id: "gpt-4o-mini", label: "GPT-4o Mini", inputPrice: 0.15, outputPrice: 0.60 },
-  { id: "gpt-4.1-mini", label: "GPT-4.1 Mini", inputPrice: 0.40, outputPrice: 1.60 },
-];
+const AVAILABLE_MODELS = ALLOWED_CHAT_MODELS.map((id) => ({
+  id,
+  label: MODEL_LABELS[id] ?? id,
+  inputPrice: MODEL_PRICING[id]?.input ?? 0,
+  outputPrice: MODEL_PRICING[id]?.output ?? 0,
+}));
 
-const VALID_MODEL_IDS = new Set(AVAILABLE_MODELS.map((m) => m.id));
-const DEFAULT_MODEL = "gpt-5-nano";
+const VALID_MODEL_IDS = new Set<string>(ALLOWED_CHAT_MODELS);
+const DEFAULT_MODEL = GENERATION_MODEL;
 
 export async function GET(request: NextRequest): Promise<Response> {
   if (!isAdminAuthorized(request)) {

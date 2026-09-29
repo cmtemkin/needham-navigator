@@ -11,7 +11,7 @@
  * Designed to be run via Replit Scheduled Deployments.
  */
 
-import { getSupabaseServiceClient } from "../src/lib/supabase";
+import { getSupabaseServiceClient } from "../src/lib/db";
 import { IngestionLogger } from "./logger";
 
 // ---------------------------------------------------------------------------

@@ -13,7 +13,7 @@
  * 5. Deletes the loser document rows
  */
 
-import { getSupabaseServiceClient } from "../src/lib/supabase";
+import { getSupabaseServiceClient } from "../src/lib/db";
 import { canonicalizeUrl } from "../src/lib/url-canonicalize";
 import { deleteFromPinecone, PINECONE_NS_CHUNKS } from "../src/lib/upstash-vector";
 

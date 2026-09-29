@@ -97,6 +97,7 @@ Every time code is merged to `main`, complete these steps before pushing:
 9. **Before starting any new work**, check for open issues labeled `ci-failure` or `prod-down`:
    `gh issue list --label ci-failure --label prod-down --state open`
    If any exist, **fix those first** before starting new features
+10. **NEVER commit a credential — this repository is public** - `.githooks/pre-commit` and the `secret-scan` CI job run gitleaks (rules in `.gitleaks.toml`; install locally with `brew install gitleaks`). If either flags something, remove it; if it was ever pushed, it must be revoked, because deleting it does not remove it from history. Never bypass with `--no-verify`
 
 ## Production Promotion Checklist
 

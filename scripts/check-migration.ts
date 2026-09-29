@@ -1,4 +1,4 @@
-import { getSupabaseServiceClient } from '../src/lib/supabase';
+import { getSupabaseServiceClient } from '../src/lib/db';
 
 async function main() {
   const supabase = getSupabaseServiceClient();

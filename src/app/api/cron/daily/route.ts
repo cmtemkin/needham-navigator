@@ -24,7 +24,7 @@ import {
   summarizeExternalArticle,
   generateDailyBrief,
 } from "@/lib/article-generator";
-import { getSupabaseClient } from "@/lib/supabase";
+import { getSupabaseClient } from "@/lib/db";
 
 // Register all connector factories so the runner can instantiate them
 import "@/lib/connectors/register-all";

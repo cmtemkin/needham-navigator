@@ -125,14 +125,16 @@ export function Header() {
             {t("header.ask_question")}
           </button>
 
-          {/* Mobile Ask button (icon only) */}
-          <button
-            onClick={() => openChat()}
-            aria-label={t("header.ask_question")}
-            className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary text-white transition-all hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:hidden"
-          >
-            <MessageSquare size={16} />
-          </button>
+          {/* Mobile Ask button (icon only) — hidden on homepage where hero search is prominent */}
+          {!isOnHomepage && (
+            <button
+              onClick={() => openChat()}
+              aria-label={t("header.ask_question")}
+              className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary text-white transition-all hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:hidden"
+            >
+              <MessageSquare size={16} />
+            </button>
+          )}
         </div>
       </div>
 

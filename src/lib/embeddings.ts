@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { EMBEDDING_MODEL, EMBEDDING_DIMENSIONS } from "@/lib/models";
 
 let openaiClient: OpenAI | null = null;
 
@@ -13,8 +14,6 @@ function getOpenAI(): OpenAI {
   return openaiClient;
 }
 
-const EMBEDDING_MODEL = "text-embedding-3-large";
-const EMBEDDING_DIMENSIONS = 1536;
 const MAX_BATCH_SIZE = 100; // OpenAI allows up to 2048, but 100 is safer for rate limits
 
 // ---------------------------------------------------------------------------

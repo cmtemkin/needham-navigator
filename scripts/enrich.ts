@@ -11,14 +11,14 @@
  */
 
 import OpenAI from "openai";
+import { GENERATION_MODEL } from "../src/lib/models";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Use the cheapest/fastest model available for bulk processing
-// GPT-5 Nano is the ideal choice, fallback to gpt-4o-mini if not available
-const ENRICHMENT_MODEL = "gpt-5-nano";
+// Shared generation model (see src/lib/models.ts)
+const ENRICHMENT_MODEL = GENERATION_MODEL;
 
 export interface EnrichmentResult {
   ai_summary: string;      // 2-3 sentence plain-text summary
@@ -43,7 +43,7 @@ export async function enrichDocument(
   try {
     const response = await openai.chat.completions.create({
       model: ENRICHMENT_MODEL,
-      // Note: gpt-5-nano does not support custom temperature - uses default (1.0)
+      // Note: reasoning models do not support custom temperature - uses default (1.0)
       response_format: { type: "json_object" },
       messages: [
         {

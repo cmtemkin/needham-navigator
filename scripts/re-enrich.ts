@@ -10,7 +10,7 @@
  *   npx tsx scripts/re-enrich.ts --limit=50   # Enrich up to 50 documents
  */
 
-import { getSupabaseServiceClient } from "../src/lib/supabase";
+import { getSupabaseServiceClient } from "../src/lib/db";
 import { enrichDocument, EnrichmentResult } from "./enrich";
 
 interface ReEnrichOptions {

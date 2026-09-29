@@ -40,7 +40,7 @@ const mockSupabaseClient = {
     rpc: mockRpc,
 };
 
-jest.mock("@/lib/supabase", () => ({
+jest.mock("@/lib/db", () => ({
     getSupabaseClient: jest.fn(() => mockSupabaseClient),
     getSupabaseServiceClient: jest.fn(() => mockSupabaseClient),
 }));

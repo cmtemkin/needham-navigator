@@ -1,0 +1,47 @@
+# gitleaks configuration — used by .githooks/pre-commit and the secret-scan job
+# in .github/workflows/ci.yml.
+#
+# This repository is public. A committed credential is exposed the moment it is
+# pushed, and deleting the file later does not remove it from history. A
+# Supabase account token sat in scripts/ from 2026-02 to 2026-09 (#113, #153,
+# #175) because nothing here looked for it.
+#
+# gitleaks' built-in rules (kept via useDefault) cover OpenAI, GitHub, AWS, JWTs
+# and more, but have no Supabase rule and nothing for Postgres connection URIs —
+# the two credential types this project has actually used. Those are added below.
+# The CI job self-tests them on every run.
+
+title = "needham-navigator"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "supabase-personal-access-token"
+description = "Supabase personal access token — account-scoped, controls every project the owner can reach"
+regex = '''\bsbp_(?:v0_)?[a-f0-9]{40}\b'''
+keywords = ["sbp_"]
+
+[[rules]]
+id = "supabase-secret-key"
+description = "Supabase secret API key — server-side, bypasses row-level security"
+regex = '''\bsb_secret_[A-Za-z0-9_-]{20,}'''
+keywords = ["sb_secret_"]
+
+[[rules]]
+id = "postgres-uri-with-password"
+description = "Postgres connection URI with an embedded password (e.g. the Neon DATABASE_URL)"
+regex = '''postgres(?:ql)?://[^:@/\s]+:([^@/\s'"`]{8,})@([A-Za-z0-9.-]+)'''
+secretGroup = 1
+keywords = ["postgres"]
+
+  # Local and CI databases, e.g. the service container in ci.yml.
+  [[rules.allowlists]]
+  regexTarget = "match"
+  regexes = ['''@(?:localhost|127\.0\.0\.1|postgres)$''']
+
+  # Placeholders and interpolation rather than literal passwords, e.g.
+  # .env.example's postgres://user:password@ep-xxxx...
+  [[rules.allowlists]]
+  regexes = ['''^(?:\$\{|\$[A-Z_]|\{\{|<|%s)''']
+  stopwords = ["password", "changeme", "example", "placeholder"]

@@ -3,7 +3,19 @@
  * These tests require a running server and are skipped in CI
  */
 
-(process.env.CI ? describe.skip : describe)('POST /api/feedback', () => {
+/**
+ * Live HTTP tests against a running server.
+ *
+ * Previously gated on `process.env.CI`, which meant they were skipped in CI and
+ * only ever ran locally — where they failed against whatever happened to be on
+ * port 3000. They therefore protected nothing.
+ *
+ * Now they run only when RUN_API_TESTS=1, which CI sets after starting the built
+ * server against a real database. Locally they skip cleanly unless you opt in.
+ */
+const runApiTests = process.env.RUN_API_TESTS === '1';
+
+(runApiTests ? describe : describe.skip)('POST /api/feedback', () => {
   const API_URL = process.env.API_BASE_URL || 'http://localhost:3000';
 
   it('should accept valid feedback', async () => {
@@ -94,3 +106,5 @@
     expect(response.status).toBe(400);
   });
 });
+
+export {};

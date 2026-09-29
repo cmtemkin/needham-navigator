@@ -7,18 +7,17 @@
  * Usage: npx ts-node scripts/migrate-sources-to-db.ts
  */
 
-import { createClient } from "@supabase/supabase-js";
+import { getSupabaseServiceClient } from "../src/lib/db";
 import { CRAWL_SOURCES } from "../config/crawl-sources";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const databaseUrl = process.env.DATABASE_URL;
 
-if (!supabaseUrl || !supabaseServiceKey) {
-  console.error("Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
+if (!databaseUrl) {
+  console.error("Missing DATABASE_URL");
   process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+const supabase = getSupabaseServiceClient();
 
 async function migrate() {
   console.log(`Migrating ${CRAWL_SOURCES.length} sources to database...`);

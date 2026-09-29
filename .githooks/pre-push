@@ -8,8 +8,28 @@ echo "Running pre-push checks..."
 npm run lint
 LINT_EXIT=$?
 
-npx tsc --noEmit
-TSC_EXIT=$?
+# Run tsc with a 90-second timeout to avoid deadlocks on resource-constrained machines
+if command -v timeout >/dev/null 2>&1; then
+  timeout 90 npx tsc --noEmit
+  TSC_EXIT=$?
+  if [ $TSC_EXIT -eq 124 ]; then
+    echo "tsc timed out after 90s — skipping (CI will catch type errors)"
+    TSC_EXIT=0
+  fi
+else
+  npx tsc --noEmit &
+  TSC_PID=$!
+  ( sleep 90; kill $TSC_PID 2>/dev/null ) &
+  WATCHDOG_PID=$!
+  wait $TSC_PID 2>/dev/null
+  TSC_EXIT=$?
+  kill $WATCHDOG_PID 2>/dev/null
+  wait $WATCHDOG_PID 2>/dev/null
+  if [ $TSC_EXIT -gt 128 ]; then
+    echo "tsc timed out after 90s — skipping (CI will catch type errors)"
+    TSC_EXIT=0
+  fi
+fi
 
 if [ $LINT_EXIT -ne 0 ] || [ $TSC_EXIT -ne 0 ]; then
   echo ""

@@ -1,6 +1,6 @@
 import { isAdminAuthorized, unauthorizedAdminResponse } from "@/lib/admin-auth";
 import { DEFAULT_TOWN_ID } from "@/lib/rag";
-import { getSupabaseServiceClient } from "@/lib/supabase";
+import { getSupabaseServiceClient } from "@/lib/db";
 
 export async function GET(request: Request): Promise<Response> {
   if (!isAdminAuthorized(request)) return unauthorizedAdminResponse();

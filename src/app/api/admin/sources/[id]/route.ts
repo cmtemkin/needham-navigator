@@ -1,5 +1,5 @@
 import { isAdminAuthorized, unauthorizedAdminResponse } from "@/lib/admin-auth";
-import { getSupabaseServiceClient } from "@/lib/supabase";
+import { getSupabaseServiceClient } from "@/lib/db";
 
 export async function PUT(
   request: Request,

@@ -5,7 +5,7 @@
  * RAG pipeline performance, query patterns, and retrieval quality.
  */
 
-import { getSupabaseServiceClient } from "@/lib/supabase";
+import { getSupabaseServiceClient } from "@/lib/db";
 
 export interface SearchTelemetry {
   query: string;

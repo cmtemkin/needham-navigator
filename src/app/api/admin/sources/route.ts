@@ -1,5 +1,5 @@
 import { isAdminAuthorized, unauthorizedAdminResponse } from "@/lib/admin-auth";
-import { getSupabaseServiceClient } from "@/lib/supabase";
+import { getSupabaseServiceClient } from "@/lib/db";
 import { DEFAULT_TOWN_ID } from "@/../config/towns";
 
 export async function GET(request: Request): Promise<Response> {
@@ -23,7 +23,9 @@ export async function GET(request: Request): Promise<Response> {
       .order("name", { ascending: true });
 
     if (search) {
-      query = query.or(`name.ilike.%${search}%,url.ilike.%${search}%`);
+      // Parameterized — `search` was previously interpolated straight into a
+      // PostgREST filter string, where a `,` or `.` could alter the predicate.
+      query = query.where("(name ILIKE ? OR url ILIKE ?)", [`%${search}%`, `%${search}%`]);
     }
 
     if (category) {

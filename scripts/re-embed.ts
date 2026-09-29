@@ -12,7 +12,7 @@
  * The chunk_text column is NOT modified — only the embedding changes.
  */
 
-import { getSupabaseServiceClient } from "../src/lib/supabase";
+import { getSupabaseServiceClient } from "../src/lib/db";
 import { generateEmbeddings } from "../src/lib/embeddings";
 import { upsertToPinecone, PINECONE_NS_CHUNKS } from "../src/lib/upstash-vector";
 import type { PineconeVector } from "../src/lib/upstash-vector";

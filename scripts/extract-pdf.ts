@@ -12,7 +12,7 @@
 
 import { createHash } from "crypto";
 import { PDFParse } from "pdf-parse";
-import { getSupabaseServiceClient } from "../src/lib/supabase";
+import { getSupabaseServiceClient } from "../src/lib/db";
 
 // ---------------------------------------------------------------------------
 // Types
